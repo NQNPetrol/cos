@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('contratos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('cliente_id');
+            $table->string('nombre_proyecto');
+            $table->string('localidad');
+            $table->string('provincia');
+            $table->text('observaciones')->nullable();
+
+
+            $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
             $table->timestamps();
         });
     }
