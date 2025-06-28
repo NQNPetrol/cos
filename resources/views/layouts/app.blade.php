@@ -317,7 +317,7 @@
                 <!-- Submenú -->
                 <div id="submenuClientes" class="pl-6 space-y-1 hidden">
                     <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Clientes</a>
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Cliente</a>
+                    <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Cliente</a>
                 </div>
 
                 <!-- Botón para desplegar -->
@@ -346,13 +346,39 @@
                     <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Ver Patrullas</a>
                     <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
                 </div>
+
+                <button id="toggleConfiguracion" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-gear-fill text-xl"></i>Configuración
+                    <svg class="w-4 h-4 transition-transform" id="iconConfiguracion" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                <div id="submenuConfiguracion" class="pl-6 space-y-1 hidden">
+                    <a href="{{ route('sistema.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Permisos</a>
+                    <a href="{{ route('asignar.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Asignacion de Permisos</a>
+                </div>
+                {{-- USUARIOS --}}
+                <button id="toggleUsuarios" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-person-fill text-xl"></i>Usuarios
+                    <svg class="w-4 h-4 transition-transform" id="iconUsuarios" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                <div id="submenuUsuarios" class="pl-6 space-y-1 hidden">
+                    <a href="{{ route('usuarios.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Usuarios</a>
+                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
+                </div>
                 
             </nav>
         </aside>
 
         <!-- Contenido -->
-        <main class="flex-1 p-6 ml-0 md:ml-64">
-            @yield('content')
+        <main class="flex-1 p-6 ml-0 md:ml-8">
+            {{ $slot }}
         </main>
     </div>
 
@@ -393,6 +419,24 @@
         togglePatrullas.addEventListener('click', () => {
             submenuPatrullas.classList.toggle('hidden');
             iconPatrullas.classList.toggle('rotate-180');
+        });
+
+        const toggleConfiguracion = document.getElementById('toggleConfiguracion');
+        const submenuConfiguracion = document.getElementById('submenuConfiguracion');
+        const iconConfiguracion = document.getElementById('iconConfiguracion');
+
+        toggleConfiguracion.addEventListener('click', () => {
+            submenuConfiguracion.classList.toggle('hidden');
+            iconConfiguracion.classList.toggle('rotate-180');
+        });
+
+        const toggleUsuarios = document.getElementById('toggleUsuarios');
+        const submenuUsuarios = document.getElementById('submenuUsuarios');
+        const iconUsuarios = document.getElementById('iconUsuarios');
+
+        toggleUsuarios.addEventListener('click', () => {
+            submenuUsuarios.classList.toggle('hidden');
+            iconUsuarios.classList.toggle('rotate-180');
         });
     </script>
 
