@@ -49,6 +49,37 @@ Route::middleware([
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->name('usuarios.roles');
 
+    //CONTRATOS
+    // INDEX
+    Route::get('/contratos', [App\Http\Controllers\ContratoController::class, 'index'])
+        ->middleware('can:ver.contratos')
+        ->name('contratos.index');
+
+    // CREATE
+    Route::get('/contratos/create', [App\Http\Controllers\ContratoController::class, 'create'])
+        ->middleware('can:crear.contratos')
+        ->name('contratos.create');
+
+    // STORE
+    Route::post('/contratos', [App\Http\Controllers\ContratoController::class, 'store'])
+        ->middleware('can:crear.contratos')
+        ->name('contratos.store');
+
+    // EDIT
+    Route::get('/contratos/{contrato}/edit', [App\Http\Controllers\ContratoController::class, 'edit'])
+        ->middleware('can:editar.contratos')
+        ->name('contratos.edit');
+
+    // UPDATE
+    Route::put('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'update'])
+        ->middleware('can:editar.contratos')
+        ->name('contratos.update');
+
+    // DELETE
+    Route::delete('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'destroy'])
+        ->middleware('can:borrar.contratos')
+        ->name('contratos.destroy');
+
 });
 
 

@@ -263,38 +263,7 @@
                         </x-responsive-nav-link>
                     </form>
 
-                    <!-- Team Management -->
-                    @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                        <div class="border-t border-gray-200"></div>
 
-                        <div class="block px-4 py-2 text-xs text-gray-400">
-                            {{ __('Manage Team') }}
-                        </div>
-
-                        <!-- Team Settings -->
-                        {{-- <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
-                            {{ __('Team Settings') }}
-                        </x-responsive-nav-link> --}}
-
-                        @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                            <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
-                                {{ __('Create New Team') }}
-                            </x-responsive-nav-link>
-                        @endcan
-
-                        <!-- Team Switcher -->
-                        @if (Auth::user()->allTeams()->count() > 1)
-                            <div class="border-t border-gray-200"></div>
-
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Switch Teams') }}
-                            </div>
-
-                            @foreach (Auth::user()->allTeams() as $team)
-                                <x-switchable-team :team="$team" component="responsive-nav-link" />
-                            @endforeach
-                        @endif
-                    @endif
                 </div>
             </div>
         </div>
@@ -304,7 +273,7 @@
     <div class="flex pt-10 h-screen mt-6">
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="bg-white w-64 h-full shadow-lg fixed md:static hidden md:block z-10">
+        <aside id="sidebar" class="bg-white w-64 h-full shadow-lg fixed hidden md:block z-10">
             <nav class="p-8 space-y-2">
                 <!-- Enlace directo -->
                 <button id="toggleClientes" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
@@ -316,8 +285,10 @@
 
                 <!-- Submenú -->
                 <div id="submenuClientes" class="pl-6 space-y-1 hidden">
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Clientes</a>
+                    
                     <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Cliente</a>
+                    
+                    <a href="{{ route('contratos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2"><i class="bi bi-file-earmark-medical mr-2"></i>Contratos</a>
                 </div>
 
                 <!-- Botón para desplegar -->
@@ -377,7 +348,7 @@
         </aside>
 
         <!-- Contenido -->
-        <main class="flex-1 p-6 ml-0 md:ml-8">
+        <main class="flex-1 p-6 ml-0 md:ml-64">
             {{ $slot }}
         </main>
     </div>

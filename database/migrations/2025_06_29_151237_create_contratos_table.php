@@ -12,17 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('contratos', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
             $table->unsignedBigInteger('cliente_id');
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin');
             $table->string('nombre_proyecto');
             $table->string('localidad');
             $table->string('provincia');
-            $table->text('observaciones')->nullable();
-
-
-            $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
+            $table->string('detalles');
+            $table->string('observaciones');
             $table->timestamps();
-        });
+
+            // Foreign key a clientes
+            $table->foreign('cliente_id')
+                ->references('id')
+                ->on('clientes')
+                ->onDelete('cascade');
+            });
     }
 
     /**
