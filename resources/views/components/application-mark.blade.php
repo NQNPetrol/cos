@@ -1,4 +1,8 @@
-<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
-  <path d="M11.395 44.428C4.557 40.198 0 32.632 0 24 0 10.745 10.745 0 24 0a23.891 23.891 0 0113.997 4.502c-.2 17.907-11.097 33.245-26.602 39.926z" fill="#6875F5"/>
-  <path d="M14.134 45.885A23.914 23.914 0 0024 48c13.255 0 24-10.745 24-24 0-3.516-.756-6.856-2.115-9.866-4.659 15.143-16.608 27.092-31.75 31.751z" fill="#6875F5"/>
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
+  <rect width="64" height="64" rx="12" fill="#1e293b"/>
+  <path d="M32 8 L12 20 V36 C12 46 32 56 32 56 C32 56 52 46 52 36 V20 L32 8 Z" 
+        fill="#1f2937" stroke="#bfa25a" stroke-width="2" />
+  <circle cx="32" cy="32" r="8" fill="#0a0f1c" stroke="#bfa25a" stroke-width="2"/>
+  <circle cx="32" cy="32" r="3" fill="#bfa25a" />
+  <path d="M20 24 L44 40 M44 24 L20 40" stroke="#bfa25a" stroke-width="1.5" opacity="0.6"/>
 </svg>

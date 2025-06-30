@@ -73,14 +73,14 @@
                     </div>
                     <!-- Logo -->
                     <div class="shrink-0 flex">
-                        <a href="#">
+                        <a href="/dashboard">
                             <x-application-mark class="h-14 w-auto" />
                         </a>
                     </div>
 
                     <!-- Navigation Links -->
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex  lg:px-36">
-                        <x-nav-link class="text-white active:bg-slate-100" href="#" :active="request()->routeIs('dashboard')">
+                        <x-nav-link class="text-white active:bg-slate-100" href="/dashboard" :active="request()->routeIs('dashboard')">
                             Inicio
                         </x-nav-link>
                         <x-nav-link class="text-white" href="#" :active="request()->routeIs('dashboard')">
@@ -286,9 +286,15 @@
                 <!-- Submenú -->
                 <div id="submenuClientes" class="pl-6 space-y-1 hidden">
                     
-                    <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Cliente</a>
+                    <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-person-plus mr-2"></i>
+                        Nuevo Cliente
+                    </a>
                     
-                    <a href="{{ route('contratos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2"><i class="bi bi-file-earmark-medical mr-2"></i>Contratos</a>
+                    <a href="{{ route('contratos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-file-earmark-medical mr-2"></i>
+                        Contratos
+                    </a>
                 </div>
 
                 <!-- Botón para desplegar -->
