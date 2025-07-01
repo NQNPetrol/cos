@@ -17,10 +17,8 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
-            {{ $slot }}
-        </div>
+    <body class="font-sans antialiased bg-gray-900 text-gray-100">
+        {{ $slot }}
 
         @livewireScripts
     </body>
