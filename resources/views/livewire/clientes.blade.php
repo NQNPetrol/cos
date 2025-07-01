@@ -17,12 +17,12 @@
                 @error('nombre') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
-                <label class="block text-sm mb-1">CUIT *</label>
+                <label class="block text-sm mb-1">CUIT</label>
                 <input type="text" wire:model.defer="cuit" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                 @error('cuit') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
-                <label class="block text-sm mb-1">Domicilio *</label>
+                <label class="block text-sm mb-1">Domicilio</label>
                 <input type="text" wire:model.defer="domicilio" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                 @error('domicilio') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>

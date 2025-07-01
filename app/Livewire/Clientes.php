@@ -22,8 +22,8 @@ class Clientes extends Component
 
     protected $rules = [
         'nombre'    => 'required|min:3',
-        'cuit'      => 'required',
-        'domicilio' => 'required',
+        'cuit'      => 'nullable',
+        'domicilio' => 'nullable',
         'ciudad'    => 'nullable',
         'provincia' => 'nullable',
         'categoria' => 'nullable',
