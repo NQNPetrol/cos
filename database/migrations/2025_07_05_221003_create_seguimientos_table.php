@@ -15,15 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('titulo');
             $table->text('descripcion');
-            $table->dateTime('fecha');
+            $table->date('fecha');
             $table->foreignId('user_id')->constrained();
-            $table->string('estado')->default('ABIERTO');
-            $table->foreignId('evento_id')
-              ->nullable()
-              ->constrained('eventos')
-              ->onDelete('cascade');
-                
-            $table->text('detalles');
             $table->timestamps();
         });
     }
