@@ -57,10 +57,10 @@ class NuevoSeguimiento extends Component
         }
 
         Seguimiento::create([
-            'id_evento' => $this->id_evento,
+            'evento_id' => $this->id_evento,
             'estado' => $this->estado,
             'detalles' => $this->detalles,
-            'registra' => Auth::id(),
+            'user_id' => Auth::id(),
             'fecha_registro' => now()
         ]);
 
