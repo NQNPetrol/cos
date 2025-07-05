@@ -90,6 +90,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/permisos', [App\Http\Controllers\SistemaController::class, 'asignar_permisos'])
     ->middleware('role:admin')
     ->name('asignar.permisos');
+    Route::get('/seguimientos', \App\Livewire\Seguimientos\VerSeguimientos::class)->name('seguimientos.index');
+    Route::get('/seguimientos/nuevo', \App\Livewire\Seguimientos\NuevoSeguimiento::class)->name('seguimientos.create');
 });
 
 
