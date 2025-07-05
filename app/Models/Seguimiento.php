@@ -11,11 +11,9 @@ class Seguimiento extends Model
     use HasFactory;
 
     protected $fillable = [
-       'id_evento',
         'estado',
         'detalles',
         'registra',
-        'fecha_registro' 
     ];
 
     public function evento(): BelongsTo

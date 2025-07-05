@@ -11,13 +11,19 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $searchCliente = '';
+    public $searchCliente = null;
     public $searchNombre = '';
     public $sortField = 'nombre_proyecto';
     public $sortDirection = 'asc';
 
-    public function updatingSearchCliente()
+    public $casts = [
+        'searchCliente' => 'integer',
+    ];
+
+    public function filtrarCliente($value)
     {
+        $this->searchCliente = $value === '' ? null : (int) $value;
+
         $this->resetPage();
     }
 
@@ -42,7 +48,7 @@ class Index extends Component
 
         $contratos = Contrato::with('cliente')
             ->when($this->searchCliente, fn($q) =>
-                $q->where('id_cliente', $this->searchCliente)
+                $q->where('cliente_id', $this->searchCliente)
             )
             ->when($this->searchNombre, fn($q) =>
                 $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
