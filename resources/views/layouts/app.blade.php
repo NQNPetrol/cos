@@ -333,6 +333,28 @@
                     </a>
                 </div>
 
+                <!-- OBJETIVOS -->
+                <button id="toggleObjetivos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-bullseye text-xl"></i>Objetivos
+                    <svg class="w-4 h-4 transition-transform" id="iconObjetivos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                <div id="submenuObjetivos" class="pl-6 space-y-1 hidden">
+                    
+                    <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-plus-circle mr-2"></i>
+                        Nuevo Objetivo
+                    </a>
+                    
+                    <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-list-task mr-2"></i>
+                        Objetivos
+                    </a>
+                </div>
+
                 <button id="togglePatrullas" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
                     <i class="bi bi-taxi-front-fill text-xl"></i>Patrullas
                     <svg class="w-4 h-4 transition-transform" id="iconPatrullas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
