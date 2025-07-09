@@ -25,12 +25,10 @@ class ContratoController extends Controller
         $validated = $request->validate([
             'cliente_id'      => 'required|exists:clientes,id',
             'nombre_proyecto' => 'required|string|max:255',
-            'localidad'       => 'required|string|max:255',
-            'provincia'       => 'required|string|max:255',
-            'detalles'        => 'required|string',
-            'observaciones'   => 'required|string',
+            'localidad'       => 'string|max:255',
+            'provincia'       => 'string|max:255',
+            'observaciones'   => 'string',
             'fecha_inicio'    => 'required|date',
-            'fecha_fin'       => 'required|date|after_or_equal:fecha_inicio',
         ]);
 
         Contrato::create($validated);
