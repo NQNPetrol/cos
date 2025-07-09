@@ -47,16 +47,7 @@
                             @endif
                         @endif
                     </th>
-                    <th class="px-4 py-2 cursor-pointer" wire:click="sortBy('fecha_fin')">
-                        Fecha Fin
-                        @if ($sortField == 'fecha_fin')
-                            @if ($sortDirection == 'asc')
-                                ▲
-                            @else
-                                ▼
-                            @endif
-                        @endif
-                    </th>
+                    
                     <th class="px-4 py-2">Acciones</th>
                 </tr>
             </thead>
@@ -66,23 +57,7 @@
                         <td class="px-4 py-2 text-center">{{ $contrato->nombre_proyecto }}</td>
                         <td class="px-4 py-2 text-center">{{ $contrato->cliente?->nombre ?? '-' }}</td>
                         <td class="px-4 py-2 text-center">{{ $contrato->fecha_inicio }}</td>
-                        @php
-                            $fechaFin = \Carbon\Carbon::parse($contrato->fecha_fin);
-                            $hoy = now();
-                            $en30 = $hoy->copy()->addDays(30);
-
-                            $clase = '';
-
-                            if ($fechaFin->lt($hoy)) {
-                                $clase = 'bg-red-700 text-white';
-                            } elseif ($fechaFin->between($hoy, $en30)) {
-                                $clase = 'bg-yellow-600 text-black';
-                            }
-                        @endphp
-
-                        <td class="px-4 py-2 text-center {{ $clase }}">
-                            {{ $contrato->fecha_fin }}
-                        </td>
+                        
                         <td class="px-4 py-2 text-center">
                             <a href="{{ route('contratos.edit', $contrato->id) }}" class="text-blue-400 hover:underline">
                                 Editar

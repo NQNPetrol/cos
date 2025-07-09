@@ -39,43 +39,32 @@
             <!-- Localidad y Provincia -->
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block mb-1">Localidad *</label>
-                    <input type="text" name="localidad" value="{{ old('localidad') }}" required
+                    <label class="block mb-1">Localidad</label>
+                    <input type="text" name="localidad" value="{{ old('localidad') }}" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
                 <div>
-                    <label class="block mb-1">Provincia *</label>
-                    <input type="text" name="provincia" value="{{ old('provincia') }}" required
+                    <label class="block mb-1">Provincia</label>
+                    <input type="text" name="provincia" value="{{ old('provincia') }}" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
-            </div>
-
-            <!-- Detalles -->
-            <div>
-                <label class="block mb-1">Detalles *</label>
-                <textarea name="detalles" required rows="3"
-                          class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">{{ old('detalles') }}</textarea>
             </div>
 
             <!-- Observaciones -->
             <div>
-                <label class="block mb-1">Observaciones *</label>
-                <textarea name="observaciones" required rows="3"
+                <label class="block mb-1">Observaciones</label>
+                <textarea name="observaciones" rows="3"
                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">{{ old('observaciones') }}</textarea>
             </div>
 
             <!-- Fechas -->
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block mb-1">Fecha Inicio *</label>
-                    <input type="date" name="fecha_inicio" value="{{ old('fecha_inicio') }}" required
+                    <label class="block mb-1">Fecha Inicio</label>
+                    <input type="date" name="fecha_inicio" value="{{ old('fecha_inicio') }}" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
-                <div>
-                    <label class="block mb-1">Fecha Fin *</label>
-                    <input type="date" name="fecha_fin" value="{{ old('fecha_fin') }}" required
-                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
-                </div>
+
             </div>
 
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
