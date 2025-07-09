@@ -80,6 +80,12 @@ Route::middleware([
         ->middleware('can:borrar.contratos')
         ->name('contratos.destroy');
 
+    //OBJETIVOS    
+    Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])
+        ->middleware('can:ver.objetivos')
+        ->name('objetivos.index');
+
+
 });
 
 
