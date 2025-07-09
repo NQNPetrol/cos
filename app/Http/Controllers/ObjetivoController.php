@@ -32,8 +32,8 @@ class ObjetivoController extends Controller
             'nombre' => 'required|string|max:255',
             'contrato_id' => 'required|exists:contratos,id',
             'cliente_id' => 'required|exists:clientes,id',
-            'latitud' => 'required|string|max:255',
-            'longitud' => 'required|string|max:255',
+            'latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
+            'longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
             'localidad' => 'required|string|max:255',
         ]);
 

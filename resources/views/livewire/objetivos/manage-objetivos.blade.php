@@ -79,6 +79,7 @@
                 <thead class="bg-gray-700 text-gray-300">
                     <tr>
                         <th class="px-4 py-2 text-left">Nombre</th>
+                        <th class="px-4 py-2 text-left">Ubicación</th>
                         <th class="px-4 py-2 text-left">Cliente</th>
                         <th class="px-4 py-2 text-left">Contrato</th>
                         <th class="px-4 py-2 text-left">Localidad</th>
@@ -88,7 +89,18 @@
                 <tbody>
                     @forelse ($objetivos as $obj)
                         <tr class="border-b border-gray-700">
-                            <td class="px-4 py-2">{{ $obj->nombre }}</td>
+                            <td class="px-4 py-2"> {{ $obj->nombre }}</td>
+                            <td class="pl-8 py-2 text-center gap-2">
+                                <a href="https://www.google.com/maps?q={{ $obj->latitud }},{{ $obj->longitud }}"
+                                target="_blank"
+                                class="text-green-400 hover:text-green-300"
+                                title="Ver en Google Maps">
+                                    <!-- Ícono de ubicación / mapa -->
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 20l-4.95-6.05a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </td>
                             <td class="px-4 py-2">{{ $obj->cliente->nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $obj->contrato->nombre_proyecto ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $obj->localidad }}</td>
