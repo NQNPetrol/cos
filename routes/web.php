@@ -3,6 +3,7 @@
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -85,10 +86,12 @@ Route::middleware([
         ->middleware('can:ver.objetivos')
         ->name('objetivos.index');
     
-    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientosController::class,'index'])
+    //SEGUIMIENTOS
+    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'index'])
         ->name('seguimientos.index');
-    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'nuevo'])
+    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'create'])
         ->name('seguimientos.create');
+    Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->name('seguimientos.store');
 });
 
 

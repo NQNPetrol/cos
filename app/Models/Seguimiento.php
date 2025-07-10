@@ -2,29 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Seguimiento extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-       'id_evento',
-        'estado',
-        'detalles',
-        'registra',
-        'fecha_registro' 
-    ];
 
     public function evento(): BelongsTo
     {
-       return $this->belongsTo(Evento::class, 'id_evento'); 
+       return $this->belongsTo(Evento::class); 
     }
 
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'registra');
+        return $this->belongsTo(User::class);
     }
 }
