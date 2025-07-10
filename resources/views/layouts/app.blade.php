@@ -271,10 +271,30 @@
 
     <!-- Contenedor -->
     <div class="flex pt-10 h-screen mt-6">
-
+        
         <!-- Sidebar -->
         <aside id="sidebar" class="bg-white w-64 h-full shadow-lg fixed hidden md:block z-10">
             <nav class="p-8 space-y-2">
+                <button id="toggleClientes" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-person-arms-up text-xl"></i>Clientes
+                    <svg class="w-4 h-4 transition-transform" id="iconClientes" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                <div id="submenuClientes" class="pl-6 space-y-1 hidden">
+                    
+                    <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-person-plus mr-2"></i>
+                        Nuevo Cliente
+                    </a>
+                    
+                    <a href="{{ route('contratos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-file-earmark-medical mr-2"></i>
+                        Contratos
+                    </a>
+                </div>
                 <!-- Botón para desplegar -->
                 <button id="toggleEventos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
                     <i class="bi bi-bell-fill text-xl"></i>Seguimiento Eventos
@@ -371,6 +391,16 @@
         // toggleBtn.addEventListener('click', () => {
         //     sidebar.classList.toggle('hidden');
         // });
+
+        // Menú desplegable Clientes
+        const toggleClientes = document.getElementById('toggleClientes');
+        const submenuClientes = document.getElementById('submenuClientes');
+        const iconClientes = document.getElementById('iconClientes');
+
+        toggleClientes.addEventListener('click', () => {
+            submenuClientes.classList.toggle('hidden');
+            iconClientes.classList.toggle('rotate-180');
+        });
 
         // Menú desplegable Eventos
         const toggleEventos = document.getElementById('toggleEventos');

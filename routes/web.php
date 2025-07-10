@@ -84,8 +84,11 @@ Route::middleware([
     Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])
         ->middleware('can:ver.objetivos')
         ->name('objetivos.index');
-
-
+    
+    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientosController::class,'index'])
+        ->name('seguimientos.index');
+    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'nuevo'])
+        ->name('seguimientos.create');
 });
 
 
@@ -96,8 +99,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/permisos', [App\Http\Controllers\SistemaController::class, 'asignar_permisos'])
     ->middleware('role:admin')
     ->name('asignar.permisos');
-    Route::get('/seguimientos', \App\Livewire\Seguimientos\VerSeguimientos::class)->name('seguimientos.index');
-    Route::get('/seguimientos/nuevo', \App\Livewire\Seguimientos\NuevoSeguimiento::class)->name('seguimientos.create');
+    
 });
 
 
