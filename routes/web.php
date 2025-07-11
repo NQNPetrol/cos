@@ -98,6 +98,11 @@ Route::middleware([
     Route::get('/relevos', [\App\Http\Controllers\RelevoController::class,'index'])
         ->name('relevos.index');
     Route::post('/relevos', [\App\Http\Controllers\RelevoController::class, 'store'])->name('relevos.store');
+
+    //EVENTOS
+    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
+    Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
+    Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
 });
 
 

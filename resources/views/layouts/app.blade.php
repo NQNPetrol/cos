@@ -305,8 +305,8 @@
 
                 <!-- Submenú -->
                 <div id="submenuEventos" class="pl-6 space-y-1 hidden">
-                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Eventos</a>
-                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Registrar Evento</a>
+                    <a href="{{ route('eventos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Eventos</a>
+                    <a href="{{ route('eventos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
                     <a href="{{ route('seguimientos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Seguimientos</a>
                     <a href="{{ route('seguimientos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Seguimiento</a>
                 </div>
