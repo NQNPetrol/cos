@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Evento;
+use App\Models\Cliente;
 
 class EventoController extends Controller
 {
@@ -27,7 +28,11 @@ class EventoController extends Controller
 
     public function create()
     {
-        return view('eventos.nuevo');
+        $clientes = \App\Models\Cliente::all();
+        $supervisores = \App\Models\User::whereHas('roles', function($query) {
+        $query->where('name', 'supervisor');
+    })->get();
+        return view('eventos.nuevo', compact('clientes', 'supervisores'));
     }
 
     public function store(Request $request)
