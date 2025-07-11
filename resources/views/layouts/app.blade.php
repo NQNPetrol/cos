@@ -297,7 +297,7 @@
                 </div>
                 <!-- Botón para desplegar -->
                 <button id="toggleEventos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
-                    <i class="bi bi-bell-fill text-xl"></i>Seguimiento Eventos
+                    <i class="bi bi-bell-fill text-xl"></i>Eventos
                     <svg class="w-4 h-4 transition-transform" id="iconEventos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
@@ -305,6 +305,8 @@
 
                 <!-- Submenú -->
                 <div id="submenuEventos" class="pl-6 space-y-1 hidden">
+                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Eventos</a>
+                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Registrar Evento</a>
                     <a href="{{ route('seguimientos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Seguimientos</a>
                     <a href="{{ route('seguimientos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Seguimiento</a>
                 </div>
@@ -467,58 +469,18 @@
             submenuUsuarios.classList.toggle('hidden');
             iconUsuarios.classList.toggle('rotate-180');
         });
+
+        const toggleRelevos = document.getElementById('toggleRelevos');
+        const submenuRelevos = document.getElementById('submenuRelevos');
+        const iconRelevos = document.getElementById('iconRelevos');
+
+        toggleRelevos.addEventListener('click', () => {
+            submenuRelevos.classList.toggle('hidden');
+            iconRelevos.classList.toggle('rotate-180');
+        });
+
     </script>
 
 </body>
 </html>
 
-
-
-
-
-
-{{-- <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-        <!-- Styles -->
-        @livewireStyles
-    </head>
-    <body class="font-sans antialiased">
-        <x-banner />
-
-        <div class="min-h-screen bg-gray-100">
-            @livewire('navigation-menu')
-
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-
-        @stack('modals')
-
-        @livewireScripts
-    </body>
-</html> --}}
