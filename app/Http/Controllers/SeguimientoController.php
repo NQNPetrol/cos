@@ -49,4 +49,17 @@ class SeguimientoController extends Controller
             'filtros' => $request->only(['estado', 'evento_id', 'busqueda'])
         ]);
     }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'fecha' => 'required|date',
+            'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
+            'evento_id' => 'required|exists:eventos,id'
+        ]);
+
+
+        return redirect()->route('seguimientos.index');
+    }
 }
