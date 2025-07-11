@@ -92,6 +92,12 @@ Route::middleware([
     Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'create'])
         ->name('seguimientos.create');
     Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->name('seguimientos.store');
+
+    //RELEVOS
+    Route::get('/relevos/nuevo', [\App\Http\Controllers\RelevoController::class, 'create'])->name('relevos.create');
+    Route::get('/relevos', [\App\Http\Controllers\RelevoController::class,'index'])
+        ->name('relevos.index');
+    Route::post('/relevos', [\App\Http\Controllers\RelevoController::class, 'store'])->name('relevos.store');
 });
 
 
