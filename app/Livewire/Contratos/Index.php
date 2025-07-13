@@ -27,6 +27,18 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function loadContratos($cliente)
+    {
+        $cliente = Cliente::find($this->cliente_id);
+        
+        // Asegúrate de que $client no sea nulo antes de intentar acceder a wells
+        if ($cliente) {
+            $this->contratos = $cliente->contratos;
+        } else {
+            $this->contratos = collect(); // Si no hay cliente seleccionado, retorna una colección vacía
+        }
+    }
+
     public function updatingSearchNombre()
     {
         $this->resetPage();
@@ -45,6 +57,7 @@ class Index extends Component
     public function render()
     {
         $clientes = Cliente::all();
+        $query = Contrato::with('cliente');
 
         $contratos = Contrato::with('cliente')
             ->when($this->searchCliente, fn($q) =>
@@ -58,7 +71,7 @@ class Index extends Component
 
         return view('livewire.contratos.index', [
             'contratos' => $contratos,
-            'clientes' => $clientes
+            'clientes' => $clientes,
         ]);
     }
 }

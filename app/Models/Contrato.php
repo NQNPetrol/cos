@@ -11,10 +11,8 @@ class Contrato extends Model
         'nombre_proyecto',
         'localidad',
         'provincia',
-        'detalles',
         'observaciones',
         'fecha_inicio',
-        'fecha_fin',
     ];
 
     public function cliente()
