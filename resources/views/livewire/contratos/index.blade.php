@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto"> 
         <table class="min-w-full text-sm">
             <thead class="bg-gray-800 text-gray-300">
                 <tr>

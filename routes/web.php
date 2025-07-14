@@ -103,6 +103,15 @@ Route::middleware([
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
+
+    //PERSONAL
+    Route::get('/personal', [\App\Http\Controllers\PersonalController::class, 'index'])
+        ->name('personal.index');
+    Route::get('/personal/create', [\App\Http\Controllers\PersonalController::class, 'create'])
+        ->name('personal.create');
+    Route::post('/personal/store/', [\App\Http\Controllers\PersonalController::class, 'store'])
+        ->name('personal.store');
+
 });
 
 
