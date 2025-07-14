@@ -522,6 +522,15 @@
         toggleRelevos.addEventListener('click', () => {
             submenuRelevos.classList.toggle('hidden');
             iconRelevos.classList.toggle('rotate-180');
+
+        const toggleTurnos = document.getElementById('toggleTurnos');
+        const submenuTurnos = document.getElementById('submenuTurnos');
+        const iconTurnos = document.getElementById('iconTurnos');
+        });
+
+        toggleTurnos.addEventListener('click', () => {
+            submenuTurnos.classList.toggle('hidden');
+            iconTurnos.classList.toggle('rotate-180');
         });
         //turnos
         const toggleTurnos = document.getElementById('toggleTurnos');
