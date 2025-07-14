@@ -109,6 +109,14 @@ Route::middleware([
     Route::get('/turnos/edit', [\App\Http\Controllers\TurnoController::class, 'edit'])->name('turnos.edit');
     Route::get('/turnos', [\App\Http\Controllers\TurnoController::class, 'index'])->name('turnos.index');
     Route::post('/turnos', [\App\Http\Controllers\TurnoController::class, 'store'])->name('turnos.store');
+    //PERSONAL
+    Route::get('/personal', [\App\Http\Controllers\PersonalController::class, 'index'])
+        ->name('personal.index');
+    Route::get('/personal/create', [\App\Http\Controllers\PersonalController::class, 'create'])
+        ->name('personal.create');
+    Route::post('/personal/store/', [\App\Http\Controllers\PersonalController::class, 'store'])
+        ->name('personal.store');
+
 });
 
 

@@ -376,7 +376,7 @@
 
                 <!-- Relevos -->
                 <button id="toggleRelevos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
-                    <i class="bi bi-people-fill text-xl"></i>Relevos
+                    <i class="bi bi-people-fill text-xl"></i>Personal
                     <svg class="w-4 h-4 transition-transform" id="iconRelevos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
@@ -384,6 +384,10 @@
 
                 <!-- Submenú -->
                  <div id="submenuRelevos" class="pl-6 space-y-1 hidden">
+                    <a href="{{ route('personal.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-person-fill-add mr-2"></i>
+                        Nuevo Personal
+                    </a>
                     <a href="{{ route('relevos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
                         Ver Relevos
