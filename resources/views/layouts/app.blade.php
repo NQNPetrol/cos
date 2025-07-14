@@ -386,11 +386,31 @@
                  <div id="submenuRelevos" class="pl-6 space-y-1 hidden">
                     <a href="{{ route('relevos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
-                        Nuevo Relevo
+                        Ver Relevos
                     </a>
                     <a href="{{ route('relevos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-list-task mr-2"></i>
-                        Ver Relevos
+                        Ver Reporte
+                    </a>
+                </div>
+
+                <!-- Turnos -->
+                <button id="toggleTurnos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-people-fill text-xl"></i>Turnos/Rondas
+                    <svg class="w-4 h-4 transition-transform" id="iconTurnos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                 <div id="submenuTurnos" class="pl-6 space-y-1 hidden">
+                    <a href="{{ route('turnos.edit') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-plus-circle mr-2"></i>
+                        Comenzar Turno
+                    </a>
+                    <a href="{{ route('turnos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-list-task mr-2"></i>
+                        Turnos Activos
                     </a>
                 </div>
             
@@ -477,6 +497,15 @@
         toggleRelevos.addEventListener('click', () => {
             submenuRelevos.classList.toggle('hidden');
             iconRelevos.classList.toggle('rotate-180');
+
+        const toggleTurnos = document.getElementById('toggleTurnos');
+        const submenuTurnos = document.getElementById('submenuTurnos');
+        const iconTurnos = document.getElementById('iconTurnos');
+        });
+
+        toggleTurnos.addEventListener('click', () => {
+            submenuTurnos.classList.toggle('hidden');
+            iconTurnos.classList.toggle('rotate-180');
         });
 
     </script>

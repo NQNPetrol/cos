@@ -103,6 +103,12 @@ Route::middleware([
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
+
+    //TURNOS O RONDAS
+    //EVENTOS
+    Route::get('/turnos/edit', [\App\Http\Controllers\TurnoController::class, 'edit'])->name('turnos.edit');
+    Route::get('/turnos', [\App\Http\Controllers\TurnoController::class, 'index'])->name('turnos.index');
+    Route::post('/turnos', [\App\Http\Controllers\TurnoController::class, 'store'])->name('turnos.store');
 });
 
 
