@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Seguimiento extends Model
 {
-    use HasFactory;
 
     protected $fillable = [
+        'titulo',
+        'descripcion',
         'estado',
-        'detalles',
-        'registra',
+        'fecha',
+        'user_id',
+        'evento_id',
     ];
 
     public function evento(): BelongsTo

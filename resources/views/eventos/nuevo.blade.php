@@ -13,24 +13,18 @@
                     <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6">
                         @csrf
 
-                        <!-- Sección 1: Categoría del Evento -->
                         <div class="bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">1. ¿A qué categoría pertenece el evento?</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                @foreach([
-                                    'Seguridad física',
-                                    'Incidentes con el personal',
-                                    'Seguridad vial y patrullaje',
-                                    'Tecnológicos/comunicación',
-                                    'Entorno y contexto',
-                                    'Administrativos/reportables al cliente'
-                                ] as $categoria)
+                                @foreach($categorias as $categoria)
                                 <div class="flex items-center">
-                                    <input id="categoria-{{ Str::slug($categoria) }}" name="categoria" type="radio" value="{{ $categoria }}" 
+                                    <input id="categoria-{{ Str::slug($categoria->nombre) }}" name="categoria_id" type="radio"
+                                        data-nombre="{{ $categoria->nombre }}"
+                                        value="{{ $categoria->id }}" 
                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600" required
-                                           @if(old('categoria') === $categoria) checked @endif>
+                                           @if(old('categoria') === $categoria->nombre) checked @endif>
                                     <label for="categoria-{{ Str::slug($categoria) }}" class="ml-3 block text-sm font-medium text-gray-300">
-                                        {{ $categoria }}
+                                        {{ $categoria->nombre }}
                                     </label>
                                 </div>
                                 @endforeach
@@ -112,7 +106,7 @@
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
                                     <option value="{{ $supervisor->id }}" @if(old('supervisor_id') == $supervisor->id) selected @endif>
-                                        {{ $supervisor->name }}
+                                        {{ $supervisor->nombre }}
                                     </option>
                                 @endforeach
                             </select>
@@ -229,15 +223,16 @@
     }
 
     // Escuchar cambios en la selección de categoría
-    document.querySelectorAll('input[name="categoria"]').forEach(radio => {
+    document.querySelectorAll('input[name="categoria_id"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            cargarTipos(this.value);
+            const nombreCategoria = this.dataset.nombre;
+            cargarTipos(nombreCategoria);
         });
     });
 
     // Inicializar el formulario si hay valores antiguos
     document.addEventListener('DOMContentLoaded', function() {
-        const categoriaSeleccionada = document.querySelector('input[name="categoria"]:checked');
+        const categoriaSeleccionada = document.querySelector('input[name="categoria_id"]:checked');
         const tipoSeleccionado = "{{ old('tipo') }}";
         
         if (categoriaSeleccionada) {
