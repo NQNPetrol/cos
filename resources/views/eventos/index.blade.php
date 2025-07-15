@@ -1,8 +1,8 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-100 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Listado de Eventos</h2>
                         <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
@@ -49,8 +49,8 @@
                     
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="min-w-full dark:divide-gray-700">
+                            <thead class="bg-gray-800 text-gray-300 dark:bg-gray-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
@@ -61,24 +61,30 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody class="dark:bg-gray-800 ">
                                 @forelse($eventos as $evento)
-                                <tr class="hover:bg-gray-700 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ $evento->id }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
-                                        <a href="#" class="text-blue-400 hover:text-blue-300">{{ $evento->nombre }}</a>
+                                <tr class="hover:bg-gray-600 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">{{ str_pad($evento->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 dark:text-gray-300">
+                                        <a href="#" class="text-blue-400 hover:text-blue-300">{{ $evento->categoria?->nombre ?? 'Sin categoría' }}</a>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $evento->cliente ?? 'N/A' }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
+                                        {{ $evento->cliente->nombre ?? 'N/A' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $evento->ubicacion }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
+                                        @if ($evento->ubicacion)
+                                            <a href="{{ $evento->ubicacion }}" target="_blank" class="text-blue-400 hover:underline">
+                                                Ver ubicación
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400">Sin ubicación</span>
+                                        @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
                                         {{ \Carbon\Carbon::parse($evento->fecha)->format('d/m/Y H:i') }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $evento->usuario->name ?? 'N/A' }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
+                                        {{ $evento->creador->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">

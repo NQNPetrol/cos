@@ -7,9 +7,50 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Evento extends Model
 {
-    protected $fillable = ['fecha_hora', 'id_cliente', 'id_supervisor', 'longitud', 'latitud', 'observaciones', 'url_reporte', 'user_id'];
-    public function seguimientos(): HasMany
+        protected $fillable = [
+        'fecha_hora',
+        'cliente_id',
+        'supervisor_id',
+        'longitud',
+        'latitud',
+        'observaciones',
+        'url_reporte',
+        'user_id',
+        'categoria_id',
+        'tipo',
+    ];
+
+    public function seguimientos()
     {
         return $this->hasMany(Seguimiento::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, 'cliente_id');
+    }
+
+    public function supervisor()
+    {
+        return $this->belongsTo(User::class, 'id_supervisor');
+    }
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUbicacionAttribute()
+    {
+        if ($this->latitud && $this->longitud) {
+            return "https://www.google.com/maps/search/?api=1&query={$this->latitud},{$this->longitud}";
+        }
+
+        return null;
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 }
