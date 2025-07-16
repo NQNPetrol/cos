@@ -386,9 +386,9 @@
                  <div id="submenuRelevos" class="pl-6 space-y-1 hidden">
                     <a href="{{ route('personal.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-person-fill-add mr-2"></i>
-                        Nuevo Personal
+                        Ver Personal
                     </a>
-                    <a href="{{ route('relevos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                    <a href="{{ route('personal.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
                         Ver Relevos
                     </a>
