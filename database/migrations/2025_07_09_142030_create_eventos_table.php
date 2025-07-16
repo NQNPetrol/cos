@@ -15,9 +15,21 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
-            $table->dateTime('fecha_inicio');
-            $table->dateTime('fecha_fin')->nullable();
-            $table->boolean('activo')->default(true);
+            $table->string('tipo');
+            $table->dateTime('fecha_hora');
+
+            //geo tables
+            $table->decimal('latitud', 10, 7);
+            $table->decimal('longitud', 10, 7);
+
+            //relaciones
+            $table->foreignId('supervisor_id')->constrained('personal')->onDelete('set null');
+            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('set null');
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('set null');
+
+            $table->text('observaciones')->nullable();
+            $table->string('url_reporte')->nullable();
+
             $table->timestamps();
         });
     }
