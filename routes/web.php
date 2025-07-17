@@ -111,6 +111,14 @@ Route::middleware([
         ->name('personal.create');
     Route::post('/personal/store/', [\App\Http\Controllers\PersonalController::class, 'store'])
         ->name('personal.store');
+    Route::get('/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])
+        //->middleware('can:editar.personal')
+        ->name('personal.edit');
+    Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
+        //->middleware('can:editar.contratos')
+        ->name('personal.update');
+    Route::resource('personal', PersonalController::class)->except(['create', 'store']);
+
 
 });
 

@@ -39,4 +39,8 @@ class Listado extends Component
             'personal' => $personal,
         ]);
     }
+    public function edit($id)
+    {
+        return redirect()->route('personal.edit', $id);
+    }
 }

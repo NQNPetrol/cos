@@ -28,8 +28,7 @@ class PersonalController extends Controller
             'documento' => 'nullable|string|max:255|unique:personal,documento',
             'fecha_inicio' => 'nullable|date',
             'puesto' => 'nullable|string|max:255',
-            'categoria_id' => 'nullable|exists:categorias,id',
-            'estado' => 'required|string|max:255',
+            'cargo' => 'required|string'
         ]);
 
         Personal::create($validated);
@@ -48,7 +47,8 @@ class PersonalController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $personal = Personal::findOrFail($id);
+        return view('personal.edit', compact('personal'));
     }
 
     /**
@@ -56,7 +56,19 @@ class PersonalController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $personal = Personal::findOrFail($id);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'documento' => 'nullable|string|max:255|unique:personal,documento',
+            'fecha_inicio' => 'nullable|date',
+            'puesto' => 'nullable|string|max:255',
+            'cargo' => 'required|string'
+        ]);
+        $personal->update($validated);
+
+        return redirect()->route('personal.index')
+        ->with('success', 'Personal actualizado correctamente');
     }
 
     /**
