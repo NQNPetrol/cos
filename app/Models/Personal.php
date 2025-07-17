@@ -15,9 +15,9 @@ class Personal extends Model
         'nombre',
         'apellido',
         'documento',
+        'cargo',
         'puesto',
-        'categoria_id',
-        'estado',
+        'convenio',
         'fecha_inicio',
     ];
 

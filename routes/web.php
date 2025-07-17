@@ -109,6 +109,7 @@ Route::middleware([
     Route::get('/turnos/edit', [\App\Http\Controllers\TurnoController::class, 'edit'])->name('turnos.edit');
     Route::get('/turnos', [\App\Http\Controllers\TurnoController::class, 'index'])->name('turnos.index');
     Route::post('/turnos', [\App\Http\Controllers\TurnoController::class, 'store'])->name('turnos.store');
+    
     //PERSONAL
     Route::get('/personal', [\App\Http\Controllers\PersonalController::class, 'index'])
         ->name('personal.index');
@@ -116,6 +117,14 @@ Route::middleware([
         ->name('personal.create');
     Route::post('/personal/store/', [\App\Http\Controllers\PersonalController::class, 'store'])
         ->name('personal.store');
+    Route::get('/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])
+        //->middleware('can:editar.personal')
+        ->name('personal.edit');
+    Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
+        //->middleware('can:editar.contratos')
+        ->name('personal.update');
+    Route::resource('personal', PersonalController::class)->except(['create', 'store']);
+
 
 });
 

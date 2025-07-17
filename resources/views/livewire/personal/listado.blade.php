@@ -17,9 +17,11 @@
                     <th class="px-4 py-2">Nombre</th>
                     <th class="px-4 py-2">Apellido</th>
                     <th class="px-4 py-2">Documento</th>
+                    <th class="px-4 py-2">Cargo</th>
                     <th class="px-4 py-2">Puesto</th>
-                    <th class="px-4 py-2">Estado</th>
+                    <th class="px-4 py-2">Convenio</th>
                     <th class="px-4 py-2">Fecha Inicio</th>
+                    <th class="px-4 py-2">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,9 +30,19 @@
                         <td class="px-4 py-2 text-center">{{ $p->nombre }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->apellido }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->documento }}</td>
+                        <td class="px-4 py-2 text-center">{{ $p->cargo }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->puesto }}</td>
-                        <td class="px-4 py-2 text-center">{{ ucfirst($p->estado) }}</td>
+                        <td class="px-4 py-2 text-center">{{ $p->convenio }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->fecha_inicio }}</td>
+                        <td class="px-4 py-2 text-center">
+                            <button wire:click="edit({{ $p->id }})" 
+                                    class="text-blue-400 hover:text-blue-300"
+                                    title="Editar">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </td>
                     </tr>
                 @empty
                     <tr>
