@@ -360,6 +360,7 @@
                     <a href="{{ route('sistema.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Permisos</a>
                     <a href="{{ route('asignar.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Asignacion de Permisos</a>
                 </div>
+                <!-- Usuarios -->
                 {{-- USUARIOS --}}
                 <button id="toggleUsuarios" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
                     <i class="bi bi-person-fill text-xl"></i>Usuarios
@@ -374,6 +375,23 @@
                     <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
                 </div>
 
+                <!-- Personal -->
+                <button id="togglePersonal" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
+                    <i class="bi bi-people-fill text-xl"></i>Personal
+                    <svg class="w-4 h-4 transition-transform" id="iconPersonal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <!-- Submenú -->
+                 <div id="submenuPersonal" class="pl-6 space-y-1 hidden">
+                    
+                    <a href="{{ route('personal.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-plus-circle mr-2"></i>
+                        Nuevo Personal
+                    </a>
+                </div>
+
                 <!-- Relevos -->
                 <button id="toggleRelevos" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
                     <i class="bi bi-people-fill text-xl"></i>Relevos
@@ -385,7 +403,7 @@
                 <!-- Submenú -->
                  <div id="submenuRelevos" class="pl-6 space-y-1 hidden">
                     
-                    <a href="{{ route('personal.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                    <a href="{{ route('relevos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
                         Ver Relevos
                     </a>
@@ -454,7 +472,7 @@
             submenuEventos.classList.toggle('hidden');
             iconEventos.classList.toggle('rotate-180');
         });
-
+        //objetivos
         const toggleObjetivos = document.getElementById('toggleObjetivos');
         const submenuObjetivos = document.getElementById('submenuObjetivos');
         const iconObjetivos = document.getElementById('iconObjetivos');
@@ -463,7 +481,7 @@
             submenuObjetivos.classList.toggle('hidden');
             iconObjetivos.classList.toggle('rotate-180');
         });
-
+        //patrullas
         const togglePatrullas = document.getElementById('togglePatrullas');
         const submenuPatrullas = document.getElementById('submenuPatrullas');
         const iconPatrullas = document.getElementById('iconPatrullas');
@@ -472,7 +490,7 @@
             submenuPatrullas.classList.toggle('hidden');
             iconPatrullas.classList.toggle('rotate-180');
         });
-
+        //config
         const toggleConfiguracion = document.getElementById('toggleConfiguracion');
         const submenuConfiguracion = document.getElementById('submenuConfiguracion');
         const iconConfiguracion = document.getElementById('iconConfiguracion');
@@ -481,7 +499,7 @@
             submenuConfiguracion.classList.toggle('hidden');
             iconConfiguracion.classList.toggle('rotate-180');
         });
-
+        //usuarios
         const toggleUsuarios = document.getElementById('toggleUsuarios');
         const submenuUsuarios = document.getElementById('submenuUsuarios');
         const iconUsuarios = document.getElementById('iconUsuarios');
@@ -490,7 +508,7 @@
             submenuUsuarios.classList.toggle('hidden');
             iconUsuarios.classList.toggle('rotate-180');
         });
-
+        //relevos
         const toggleRelevos = document.getElementById('toggleRelevos');
         const submenuRelevos = document.getElementById('submenuRelevos');
         const iconRelevos = document.getElementById('iconRelevos');
@@ -498,15 +516,24 @@
         toggleRelevos.addEventListener('click', () => {
             submenuRelevos.classList.toggle('hidden');
             iconRelevos.classList.toggle('rotate-180');
-
+        });
+        //turnos
         const toggleTurnos = document.getElementById('toggleTurnos');
         const submenuTurnos = document.getElementById('submenuTurnos');
         const iconTurnos = document.getElementById('iconTurnos');
-        });
 
         toggleTurnos.addEventListener('click', () => {
             submenuTurnos.classList.toggle('hidden');
             iconTurnos.classList.toggle('rotate-180');
+        });
+        //personal
+        const togglePersonal = document.getElementById('togglePersonal');
+        const submenuPersonal = document.getElementById('submenuPersonal');
+        const iconPersonal = document.getElementById('iconPersonal');
+
+        togglePersonal.addEventListener('click', () => {
+            submenuPersonal.classList.toggle('hidden');
+            iconPersonal.classList.toggle('rotate-180');
         });
 
     </script>
