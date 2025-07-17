@@ -391,7 +391,7 @@
                     </a>
                     <a href="{{ route('relevos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-list-task mr-2"></i>
-                        Ver Reporte
+                        Ver Reportes
                     </a>
                 </div>
 
