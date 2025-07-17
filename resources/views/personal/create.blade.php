@@ -48,6 +48,12 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm mb-1">Cargo</label>
+                    <input type="text" name="puesto" value="{{ old('puesto') }}"
+                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
+                </div>
+
+                <div>
                     <label class="block text-sm mb-1">Categoría</label>
                     <select name="categoria_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
                         <option value="">Sin categoría</option>
