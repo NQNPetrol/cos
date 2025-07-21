@@ -23,9 +23,9 @@ return new class extends Migration
             $table->decimal('longitud', 10, 7);
 
             //relaciones
-            $table->foreignId('supervisor_id')->constrained('personal')->onDelete('set null');
-            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('set null');
-            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('set null');
+            $table->foreignId('supervisor_id')->constrained('personal')->onDelete('cascade');
+            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
 
             $table->text('observaciones')->nullable();
             $table->string('url_reporte')->nullable();

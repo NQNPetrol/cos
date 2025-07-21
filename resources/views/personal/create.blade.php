@@ -45,11 +45,11 @@
                     <label class="block text-sm mb-1">Cargo<span class="text-red-500">*</span></label>
                     <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'Personal de seguridad')" 
                             class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
-                        <option value="Gerente" {{ old('cargo') == 'Gerente' ? 'selected' : '' }}>Gerente</option>
-                        <option value="Coordinador" {{ old('cargo') == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>
-                        <option value="Supervisor" {{ old('cargo') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="Operador" {{ old('cargo') == 'Operador' ? 'selected' : '' }}>Operador</option>
-                        <option value="Personal de seguridad" {{ old('cargo') == 'Personal de seguridad' ? 'selected' : '' }}>Personal de seguridad</option>
+                        <option value="gerente" {{ old('cargo') == 'Gerente' ? 'selected' : '' }}>Gerente</option>
+                        <option value="coordinador" {{ old('cargo') == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>
+                        <option value="supervisor" {{ old('cargo') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
+                        <option value="operador" {{ old('cargo') == 'Operador' ? 'selected' : '' }}>Operador</option>
+                        <option value="personal-seguridad" {{ old('cargo') == 'Personal de seguridad' ? 'selected' : '' }}>Personal de seguridad</option>
                     </select>
                 </div>
 

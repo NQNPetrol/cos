@@ -123,7 +123,7 @@ Route::middleware([
     Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
         //->middleware('can:editar.contratos')
         ->name('personal.update');
-    Route::resource('personal', PersonalController::class)->except(['create', 'store']);
+    //Route::resource('personal', PersonalController::class)->except(['create', 'store']);
 
 
 });

@@ -31,19 +31,20 @@ class EventoController extends Controller
     public function create()
     {
         $clientes = \App\Models\Cliente::all();
-        $supervisores = Personal::all();
+        $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
         return view('eventos.nuevo', compact('clientes', 'supervisores','categorias'));
     }
 
     public function store(Request $request)
     {
+        
         $validated = $request->validate([
             'fecha_hora'    => 'required|date',
-            'id_cliente'    => 'nullable|exists:clientes,id',
-            'id_supervisor' => 'nullable|exists:users,id',
-            'categoria_id'  => 'nullable|exists:categorias,id',
-            'tipo'          => 'nullable|string|max:255',
+            'cliente_id'    => 'required|exists:clientes,id',
+            'supervisor_id' => 'required|exists:personal,id',
+            'categoria_id'  => 'required|exists:categorias,id',
+            'tipo'          => 'required|string|max:255',
             'coordenadas'   => [
                 'required',
                 'regex:/^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/'
@@ -55,10 +56,10 @@ class EventoController extends Controller
         
          Evento::create([
             'fecha_hora'    => $validated['fecha_hora'],
-            'id_cliente'    => $validated['id_cliente'] ?? null,
-            'id_supervisor' => $validated['id_supervisor'] ?? null,
+            'cliente_id'    => $validated['cliente_id'] ?? null,
+            'supervisor_id' => $validated['supervisor_id'] ?? null,
             'categoria_id'  => $validated['categoria_id'] ?? null,
-            'tipo'          => $validated['tipo'] ?? null,
+            'tipo'          => $validated['tipo'],
             'longitud'      => $lng,
             'latitud'       => $lat,
             'observaciones' => $validated['observaciones'] ?? null,
