@@ -7,16 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Seguimiento extends Model
 {
-
-    protected $fillable = [
-        'titulo',
-        'descripcion',
-        'estado',
-        'fecha',
-        'user_id',
-        'evento_id',
-    ];
-
+    protected $fillable = ['titulo', 'descripcion', 'fecha', 'estado', 'evento_id', 'user_id'];
+    
     public function evento(): BelongsTo
     {
        return $this->belongsTo(Evento::class); 
