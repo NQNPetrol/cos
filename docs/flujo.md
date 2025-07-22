@@ -65,3 +65,21 @@ git push origin --delete feature/nueva-tarea
 - `develop` es el entorno de staging probado
 - Cada colaborador trabaja en una rama `feature/*`
 - Todo merge a `main` debe venir desde `develop` y estar aprobado
+
+```
+    pull origin develop --ff-only: asegura que tenés la última versión sin mezclar commits.
+    checkout -b: crea y cambia a una nueva rama.
+    fetch origin: trae la última versión del repositorio remoto.
+    rebase origin/develop: coloca tus commits encima de los más recientes de develop.
+    git push origin feature/agregar-formulario
+
+    git checkout develop
+    git pull origin develop --ff-only
+    git merge feature/agregar-formulario --no-ff: crea un commit de merge visible (útil en equipo).
+    git push origin develop
+
+    git checkout main
+    git pull origin main --ff-only
+    git merge develop --no-ff
+    git push origin main
+```
