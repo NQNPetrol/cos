@@ -13,7 +13,7 @@
             </div>
         @endif
 
-        <form x-data="{mostrarPuesto: {{ $personal->cargo == 'Personal de seguridad' ? 'true' : 'false' }}}"  
+        <form x-data="{mostrarPuesto: {{ $personal->cargo == 'personal-seguridad' ? 'true' : 'false' }}}"  
               action="{{ route('personal.update', $personal->id) }}" method="POST" 
               class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
             @csrf
@@ -45,14 +45,26 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm mb-1">Cliente <span class="text-red-500">*</span></label>
+                    <select name="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                        <option value="">Seleccione un cliente</option>
+                        @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id }}" {{ old('cliente_id', $personal->cliente_id) == $cliente->id ? 'selected' : '' }}>
+                                {{ $cliente->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-sm mb-1">Cargo<span class="text-red-500">*</span></label>
-                    <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'Personal de seguridad')" 
+                    <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'personal-seguridad')" 
                             class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
-                        <option value="Gerente" {{ old('cargo', $personal->cargo) == 'Gerente' ? 'selected' : '' }}>Gerente</option>
-                        <option value="Coordinador" {{ old('cargo', $personal->cargo) == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>
-                        <option value="Supervisor" {{ old('cargo', $personal->cargo) == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="Operador" {{ old('cargo', $personal->cargo) == 'Operador' ? 'selected' : '' }}>Operador</option>
-                        <option value="Personal de seguridad" {{ old('cargo', $personal->cargo) == 'Personal de seguridad' ? 'selected' : '' }}>Personal de seguridad</option>
+                        <option value="gerente" {{ old('cargo', $personal->cargo) == 'Gerente' ? 'selected' : '' }}>Gerente</option>
+                        <option value="coordinador" {{ old('cargo', $personal->cargo) == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>
+                        <option value="supervisor" {{ old('cargo', $personal->cargo) == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
+                        <option value="operador" {{ old('cargo', $personal->cargo) == 'Operador' ? 'selected' : '' }}>Operador</option>
+                        <option value="personal-seguridad" {{ old('cargo', $personal->cargo) == 'Personal de seguridad' ? 'selected' : '' }}>Personal de seguridad</option>
                     </select>
                 </div>
 

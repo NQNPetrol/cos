@@ -93,22 +93,11 @@ Route::middleware([
         ->name('seguimientos.create');
     Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->name('seguimientos.store');
 
-    //RELEVOS
-    Route::get('/relevos/nuevo', [\App\Http\Controllers\RelevoController::class, 'create'])->name('relevos.create');
-    Route::get('/relevos', [\App\Http\Controllers\RelevoController::class,'index'])
-        ->name('relevos.index');
-    Route::post('/relevos', [\App\Http\Controllers\RelevoController::class, 'store'])->name('relevos.store');
-
     //EVENTOS
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
 
-    //TURNOS O RONDAS
-    //EVENTOS
-    Route::get('/turnos/edit', [\App\Http\Controllers\TurnoController::class, 'edit'])->name('turnos.edit');
-    Route::get('/turnos', [\App\Http\Controllers\TurnoController::class, 'index'])->name('turnos.index');
-    Route::post('/turnos', [\App\Http\Controllers\TurnoController::class, 'store'])->name('turnos.store');
     
     //PERSONAL
     Route::get('/personal', [\App\Http\Controllers\PersonalController::class, 'index'])
@@ -123,7 +112,6 @@ Route::middleware([
     Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
         //->middleware('can:editar.contratos')
         ->name('personal.update');
-    //Route::resource('personal', PersonalController::class)->except(['create', 'store']);
 
 
 });
