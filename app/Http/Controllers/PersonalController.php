@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Personal;
 use App\Models\Categoria;
+use App\Models\Cliente;
 
 class PersonalController extends Controller
 {
@@ -17,7 +18,8 @@ class PersonalController extends Controller
     public function create()
     {
         $categorias = Categoria::orderBy('nombre')->get();
-        return view('personal.create', compact('categorias'));
+        $clientes = Cliente::orderBy('nombre')->get();
+        return view('personal.create', compact('clientes', 'categorias'));
     }
 
     public function store(Request $request)
@@ -27,6 +29,7 @@ class PersonalController extends Controller
             'apellido' => 'required|string|max:255',
             'documento' => 'nullable|string|max:255|unique:personal,documento',
             'fecha_inicio' => 'nullable|date',
+            'cliente_id' => 'required|exists:clientes,id',
             'puesto' => 'nullable|string|max:255',
             'cargo' => 'required|string'
         ]);
@@ -48,7 +51,10 @@ class PersonalController extends Controller
     public function edit(string $id)
     {
         $personal = Personal::findOrFail($id);
-        return view('personal.edit', compact('personal'));
+
+        $clientes = Cliente::orderBy('nombre')->get();
+        
+        return view('personal.edit', compact('personal', 'clientes'));
     }
 
     /**
@@ -62,6 +68,7 @@ class PersonalController extends Controller
             'apellido' => 'required|string|max:255',
             'documento' => 'nullable|string|max:255|unique:personal,documento',
             'fecha_inicio' => 'nullable|date',
+            'cliente_id' => 'required|exists:clientes,id',
             'puesto' => 'nullable|string|max:255',
             'cargo' => 'required|string'
         ]);
@@ -69,6 +76,7 @@ class PersonalController extends Controller
 
         return redirect()->route('personal.index')
         ->with('success', 'Personal actualizado correctamente');
+
     }
 
     /**

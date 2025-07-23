@@ -15,4 +15,10 @@ class Cliente extends Model
         'categoria',
         'convenio',
     ];
+
+    public function personal()
+    {
+        return $this->hasMany(Personal::class);
     }
+
+}
