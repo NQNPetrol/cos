@@ -13,7 +13,7 @@
             </div>
         @endif
 
-        <form x-data="{mostrarPuesto: {{ old('cargo') == 'Personal de seguridad' ? 'true' : 'false' }}}"  action="{{ route('personal.store') }}" method="POST" class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+        <form x-data="{mostrarPuesto: {{ old('cargo') == 'personal-seguridad' ? 'true' : 'false' }}}"  action="{{ route('personal.store') }}" method="POST" class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -42,8 +42,20 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm mb-1">Cliente <span class="text-red-500">*</span></label>
+                    <select name="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                        <option value="">Seleccione un cliente</option>
+                        @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : ''}}>
+                                {{ $cliente->nombre}}
+                            </option>
+                        @endforeach
+                    </select>                    
+                </div>
+
+                <div>
                     <label class="block text-sm mb-1">Cargo<span class="text-red-500">*</span></label>
-                    <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'Personal de seguridad')" 
+                    <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'personal-seguridad')" 
                             class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
                         <option value="gerente" {{ old('cargo') == 'Gerente' ? 'selected' : '' }}>Gerente</option>
                         <option value="coordinador" {{ old('cargo') == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>

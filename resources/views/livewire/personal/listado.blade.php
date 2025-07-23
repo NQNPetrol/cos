@@ -17,6 +17,7 @@
                     <th class="px-4 py-2">Nombre</th>
                     <th class="px-4 py-2">Apellido</th>
                     <th class="px-4 py-2">Documento</th>
+                    <th class="px-4 py-2">Cliente</th>
                     <th class="px-4 py-2">Cargo</th>
                     <th class="px-4 py-2">Puesto</th>
                     <th class="px-4 py-2">Convenio</th>
@@ -30,6 +31,9 @@
                         <td class="px-4 py-2 text-center">{{ $p->nombre }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->apellido }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->documento }}</td>
+                        <td class="px-4 py-2 text-center">
+                            {{ $p->cliente->nombre ?? 'Sin cliente' }}
+                        </td>
                         <td class="px-4 py-2 text-center">{{ $p->cargo }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->puesto }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->convenio }}</td>

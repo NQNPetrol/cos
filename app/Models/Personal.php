@@ -15,6 +15,7 @@ class Personal extends Model
         'nombre',
         'apellido',
         'documento',
+        'cliente_id',
         'cargo',
         'puesto',
         'convenio',
@@ -24,5 +25,10 @@ class Personal extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 }
