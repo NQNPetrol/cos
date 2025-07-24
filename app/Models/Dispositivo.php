@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Dispositivo extends Model
 {
@@ -36,6 +37,13 @@ class Dispositivo extends Model
         'fecha_instalacion' => 'date',
         'ultimo_mantenimiento' => 'date',
         'proximo_mantenimiento' => 'date',
+    ];
+
+    protected $attributes = [
+        'estado_hikconnect' => 'Conectado',
+        'estado_inventario' => 'En stock',
+        'necesita_mantenimiento' => false,
+        'necesita_actualizacion' => false,
     ];
 
     // Relaciones

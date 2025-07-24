@@ -15,14 +15,14 @@
         <div>
             <label class="block text-sm mb-1">Buscar</label>
             <input type="text"
-                   wire:model.debounce.500ms="search"
+                   wire:model.live="search"
                    placeholder="Tipo, Serial, IP, Ubicación, Cliente..."
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
-
+        <!-- Filtro cliente -->
         <div>
             <label class="block text-sm mb-1">Cliente</label>
-            <select wire:model="clienteFilter" 
+            <select wire:model.live="clienteFilter" 
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos los clientes</option>
                 @foreach($clientes as $cliente)
@@ -30,10 +30,10 @@
                 @endforeach
             </select>
         </div>
-
+        <!-- Filtro inventario -->
         <div>
             <label class="block text-sm mb-1">Estado Inventario</label>
-            <select wire:model="estadoInventarioFilter" 
+            <select wire:model.live="estadoInventarioFilter" 
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="En stock">En stock</option>
@@ -46,14 +46,14 @@
         <div>
             <label class="block text-sm mb-1">Tipo de Dispositivo</label>
             <input type="text"
-                   wire:model.debounce.500ms="deviceTypeFilter"
+                   wire:model.live="deviceTypeFilter"
                    placeholder="cámara_ip,nvr_dvr,control_acceso,intercomunicador,switch_poe,sensor_alarma,dispositivo_reconocimiento,gps,otros"
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
 
         <div>
             <label class="block text-sm mb-1">Necesita Mantenimiento</label>
-            <select wire:model="mantenimientoFilter" 
+            <select wire:model.live="mantenimientoFilter" 
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="si">Sí</option>
@@ -63,7 +63,7 @@
 
         <div>
             <label class="block text-sm mb-1">Necesita Actualización</label>
-            <select wire:model="actualizacionFilter" 
+            <select wire:model.live="actualizacionFilter" 
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="si">Sí</option>

@@ -104,6 +104,7 @@ class ManageDispositivos extends Component
     {
         $this->showModal = false;
         $this->resetForm();
+        $this->editingId = null;
     }
 
     public function save()
@@ -130,12 +131,15 @@ class ManageDispositivos extends Component
         if ($this->editingId) {
             Dispositivo::findOrFail($this->editingId)->update($data);
             session()->flash('success', 'Dispositivo actualizado correctamente.');
+            $message = 'Dispositivo actualizado correctamente.';
         } else {
             Dispositivo::create($data);
             session()->flash('success', 'Dispositivo creado correctamente.');
+            $message = 'Dispositivo creado correctamente.';
         }
 
         $this->closeModal();
+        session()->flash('success', $message);
     }
 
     public function edit($id)
@@ -168,35 +172,27 @@ class ManageDispositivos extends Component
 
     public function resetForm()
     {
-        $this->editingId = null;
-        $this->tipo = '';
-        $this->direccion_ip = '';
-        $this->puerto = '8000';
-        $this->version_software = '';
-        $this->estado_hikconnect = 'OFF';
-        $this->cliente_id = '';
-        $this->ubicacion = '';
-        $this->observaciones = '';
-        $this->necesita_mantenimiento = false;
-        $this->necesita_actualizacion = false;
-        $this->fecha_instalacion = '';
-        $this->ultimo_mantenimiento = '';
-        $this->proximo_mantenimiento = '';
-        $this->estado_inventario = 'En stock';
+        $this->reset([
+            'tipo', 'cliente_id', 'ubicacion', 'fecha_instalacion', 
+            'observaciones', 'direccion_ip', 'puerto', 'version_software',
+            'estado_hikconnect', 'necesita_actualizacion', 'necesita_mantenimiento',
+            'ultimo_mantenimiento', 'proximo_mantenimiento', 'estado_inventario'
+        ]);
     }
 
     public function render()
     {
-        $query = Dispositivo::with('cliente');
+        $query = Dispositivo::query()->with('cliente');
 
         // Aplicar filtros
         if ($this->search) {
             $query->where(function($q) {
                 $q->where('tipo', 'like', '%' . $this->search . '%')
-                  ->orWhere('direccion_ip', 'like', '%' . $this->search . '%')
+                  ->orWhere('tipo', 'like', '%' . $this->search . '%')
                   ->orWhere('ubicacion', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('cliente', function($subQuery) {
-                      $subQuery->where('nombre', 'like', '%' . $this->search . '%');
+                   ->orWhere('modelo', 'like', '%' . $this->search . '%')
+                   ->orWhereHas('cliente', function($subQuery) {
+                        $subQuery->where('nombre', 'like', '%' . $this->search . '%');
                   });
             });
         }
@@ -228,6 +224,9 @@ class ManageDispositivos extends Component
 
         $dispositivos = $query->orderBy('id', 'desc')->paginate(15);
 
-        return view('livewire.inventario.manage-dispositivos', compact('dispositivos'));
+        return view('livewire.inventario.manage-dispositivos', [
+            'dispositivos' => $dispositivos,
+            'clientes' => Cliente::all()
+        ]);
     }
 }
