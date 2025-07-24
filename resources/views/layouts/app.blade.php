@@ -414,11 +414,6 @@
                         <i class="bi bi-plus-circle mr-2"></i>
                         Ver Inventario
                     </a>
-                 
-                    <a href="{{ route('inventario.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-plus-circle mr-2"></i>
-                        Registrar Inventario
-                    </a>
             
                 </div>
             </nav>

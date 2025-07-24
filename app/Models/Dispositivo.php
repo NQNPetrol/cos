@@ -83,7 +83,7 @@ class Dispositivo extends Model
 
     public function scopeConectadosHik($query)
     {
-        return $query->where('estado_hikconnect', 'conectado');
+        return $query->where('estado_hikconnect', 'Conectado');
     }
 
     // Accessors

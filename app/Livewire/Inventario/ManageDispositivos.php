@@ -13,6 +13,7 @@ class ManageDispositivos extends Component
 
     //propiedades para el modal
     public $showModal = false;
+    public $editingId = null;
 
     // Propiedades para filtros
     public $search = '';
@@ -30,7 +31,7 @@ class ManageDispositivos extends Component
     public $version_software = '';
     public $direccion_ip = '';
     public $fecha_instalacion = '';
-    public $estado_hikconnect = '';
+    public $estado_hikconnect = 'Conectado';
     public $cliente_id = '';
     public $ubicacion = '';
     public $observaciones = '';
@@ -52,7 +53,8 @@ class ManageDispositivos extends Component
         'fecha_instalacion' => 'nullable|date',
         'ultimo_mantenimiento' => 'nullable|date',
         'proximo_mantenimiento' => 'nullable|date|after_or_equal:today',
-        'estado_inventario' => 'required|in:En stock,Instalado,En mantenimiento,Dado de baja',
+        'estado_hikconnect' => 'nullable|in:Conectado, Por Conectar',
+        'estado_inventario' => 'required|in:En stock,Instalado,En mantenimiento,Dado de baja'
     ];
 
     public function mount()
@@ -168,8 +170,8 @@ class ManageDispositivos extends Component
     {
         $this->editingId = null;
         $this->tipo = '';
-        $this->ipv4_address = '';
-        $this->port = '8000';
+        $this->direccion_ip = '';
+        $this->puerto = '8000';
         $this->version_software = '';
         $this->estado_hikconnect = 'OFF';
         $this->cliente_id = '';

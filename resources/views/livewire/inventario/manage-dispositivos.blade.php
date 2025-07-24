@@ -1,6 +1,6 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Inventario de Dispositivos</h2>
+        <h2 class="text-2xl font-bold">Inventario</h2>
         <button wire:click="openModal" 
                 class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium">
             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,18 +18,6 @@
                    wire:model.debounce.500ms="search"
                    placeholder="Tipo, Serial, IP, Ubicación, Cliente..."
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-        </div>
-
-        <div>
-            <label class="block text-sm mb-1">Estado</label>
-            <select wire:model="statusFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                <option value="">Todos los estados</option>
-                <option value="Active">Activo</option>
-                <option value="Inactive">Inactivo</option>
-                <option value="Maintenance">Mantenimiento</option>
-                <option value="Pending">Pendiente</option>
-            </select>
         </div>
 
         <div>
@@ -59,7 +47,7 @@
             <label class="block text-sm mb-1">Tipo de Dispositivo</label>
             <input type="text"
                    wire:model.debounce.500ms="deviceTypeFilter"
-                   placeholder="DS-3E1105P-EI, DS-KD9403-E6..."
+                   placeholder="cámara_ip,nvr_dvr,control_acceso,intercomunicador,switch_poe,sensor_alarma,dispositivo_reconocimiento,gps,otros"
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
 
@@ -97,13 +85,11 @@
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Tipo</th>
-                    <th class="px-4 py-2 text-left">Serial</th>
                     <th class="px-4 py-2 text-left">IP</th>
                     <th class="px-4 py-2 text-left">Cliente</th>
                     <th class="px-4 py-2 text-left">Ubicación</th>
                     <th class="px-4 py-2 text-left">Estado</th>
-                    <th class="px-4 py-2 text-left">Inventario</th>
-                    <th class="px-4 py-2 text-left">Versión SW</th>
+                    <th class="px-4 py-2 text-left">Version SW</th>
                     <th class="px-4 py-2 text-left">Mantenimiento</th>
                     <th class="px-4 py-2 text-left">Actualización</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
@@ -113,15 +99,12 @@
                 @forelse ($dispositivos as $dispositivo)
                     <tr class="border-b border-gray-700 hover:bg-gray-800">
                         <td class="px-4 py-2">
-                            <div class="font-medium">{{ $dispositivo->device_type }}</div>
+                            <div class="font-medium">{{ $dispositivo->tipo }}</div>
                         </td>
                         <td class="px-4 py-2">
-                            <div class="text-sm">{{ $dispositivo->device_serial_number ?: 'N/A' }}</div>
-                        </td>
-                        <td class="px-4 py-2">
-                            <div class="text-sm">{{ $dispositivo->ipv4_address ?: 'N/A' }}</div>
-                            @if($dispositivo->port && $dispositivo->port != '8000')
-                                <div class="text-xs text-gray-400">:{{ $dispositivo->port }}</div>
+                            <div class="text-sm">{{ $dispositivo->direccion_ip ?: 'N/A' }}</div>
+                            @if($dispositivo->puerto && $dispositivo->puerto != '8000')
+                                <div class="text-xs text-gray-400">:{{ $dispositivo->puerto }}</div>
                             @endif
                         </td>
                         <td class="px-4 py-2">
@@ -131,17 +114,12 @@
                             <div class="text-sm">{{ $dispositivo->ubicacion ?: 'N/A' }}</div>
                         </td>
                         <td class="px-4 py-2">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $dispositivo->status_badge }}">
-                                {{ $dispositivo->status }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-2">
                             <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $dispositivo->estado_inventario_badge }}">
                                 {{ $dispositivo->estado_inventario }}
                             </span>
                         </td>
                         <td class="px-4 py-2">
-                            <div class="text-sm">{{ $dispositivo->software_version ?: 'N/A' }}</div>
+                            <div class="text-sm">{{ $dispositivo->version_software ?: 'N/A' }}</div>
                         </td>
                         <td class="px-4 py-2">
                             @if($dispositivo->necesita_mantenimiento)
@@ -214,8 +192,8 @@
 
     <!-- Modal -->
     @if($showModal)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+        <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto" @click.stop>
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-100">
                         {{ $editingId ? 'Editar Dispositivo' : 'Nuevo Dispositivo' }}
@@ -239,116 +217,26 @@
 
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Tipo de Dispositivo <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="device_type"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="DS-3E1105P-EI">
-                            @error('device_type') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Estado <span class="text-red-500">*</span></label>
-                            <select wire:model="status" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                <option value="Active">Activo</option>
-                                <option value="Inactive">Inactivo</option>
-                                <option value="Maintenance">Mantenimiento</option>
-                                <option value="Pending">Pendiente</option>
+                            <select wire:model="tipo" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <option value="">Seleccionar...</option>
+                                <option value="cámara_ip">Cámara IP</option>
+                                <option value="nvr_dvr">NVR/DVR</option>
+                                <option value="control_acceso">Control de Acceso</option>
+                                <option value="intercomunicador">Intercomunicador</option>
+                                <option value="switch_poe">Switch PoE</option>
+                                <option value="sensor_alarma">Sensor de Alarma</option>
+                                <option value="dispositivo_reconocimiento">Reconocimiento Facial</option>
+                                <option value="gps">GPS</option>
+                                <option value="otros">Otros</option>
                             </select>
-                            @error('status') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            @error('tipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-sm mb-1 text-gray-300">Número de Serie</label>
-                            <input type="text" wire:model="device_serial_number"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="DS-3E1105P-EI20240314FB5267942">
-                            @error('device_serial_number') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Configuración de Red -->
-                        <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
-                                Configuración de Red
-                            </h4>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Dirección IPv4</label>
-                            <input type="text" wire:model="ipv4_address"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="192.168.0.61">
-                            @error('ipv4_address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Puerto</label>
-                            <input type="text" wire:model="port"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="8000">
-                            @error('port') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Gateway IPv4</label>
-                            <input type="text" wire:model="ipv4_gateway"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="192.168.0.1">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Máscara de Subred</label>
-                            <input type="text" wire:model="subnet_mask"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="255.255.255.0">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Dirección MAC</label>
-                            <input type="text" wire:model="mac_address"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="80-be-af-09-49-b1">
-                            @error('mac_address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Puerto HTTP</label>
-                            <input type="text" wire:model="http_port"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="80">
-                        </div>
-
-                        <!-- Configuración Adicional -->
-                        <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
-                                Configuración de Software
-                            </h4>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Versión de Software</label>
-                            <input type="text" wire:model="software_version"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="V1.2.0build 210616">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Versión DSP</label>
-                            <input type="text" wire:model="dsp_version"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="V4.0, build 000000">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Canales de Codificación</label>
-                            <input type="text" wire:model="encoding_channels"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="0">
-                        </div>
-
-                        <!-- Información de Inventario -->
-                        <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
-                                Información de Inventario
-                            </h4>
+                            <label class="block text-sm mb-1 text-gray-300">Fecha de Instalación</label>
+                            <input type="date" wire:model="fecha_instalacion"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            @error('fecha_instalacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -363,6 +251,96 @@
                         </div>
 
                         <div>
+                            <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
+                            <input type="text" wire:model="ubicacion"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   placeholder="Oficina Principal - Recepción">
+                            @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="col-span-full">
+                            <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
+                            <textarea wire:model="observaciones" rows="3"
+                                      class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                      placeholder="Notas adicionales sobre el dispositivo..."></textarea>
+                        </div>
+
+
+                        <!-- Configuración de Red -->
+                        <div class="col-span-full">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                                Configuración de Red
+                            </h4>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Dirección IPv4</label>
+                            <input type="text" wire:model="direccion_ip"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   placeholder="192.168.0.61">
+                            @error('direccion_ip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Puerto</label>
+                            <input type="text" wire:model="puerto"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   placeholder="8000">
+                            @error('puerto') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+
+                        <!-- Configuración Adicional -->
+                        <div class="col-span-full">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                                Estado y Mantenimiento
+                            </h4>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Versión de Software</label>
+                            <input type="text" wire:model="version_software"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   placeholder="V1.2.0build 210616">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Estado Hik-Connect</label>
+                            <select wire:model="estado_hikconnect" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <option value="Conectado">Conectado</option>
+                                <option value="Por Conectar">Por Conectar</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" wire:model="necesita_actualizacion" id="necesita_actualizacion"
+                                   class="bg-gray-800 border-gray-700 rounded">
+                            <label for="necesita_actualizacion" class="text-sm text-gray-300">Necesita Actualización</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" wire:model="necesita_mantenimiento" id="necesita_mantenimiento"
+                                   class="bg-gray-800 border-gray-700 rounded">
+                            <label for="necesita_mantenimiento" class="text-sm text-gray-300">Necesita Mantenimiento</label>
+                        </div>
+                         <div>
+                            <label class="block text-sm mb-1 text-gray-300">Último Mantenimiento</label>
+                            <input type="date" wire:model="ultimo_mantenimiento"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            @error('ultimo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Próximo Mantenimiento</label>
+                            <input type="date" wire:model="proximo_mantenimiento"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            @error('proximo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Información de Inventario -->
+                        <div class="col-span-full">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                                Información de Inventario
+                            </h4>
+                        </div>
+
+                        <div>
                             <label class="block text-sm mb-1 text-gray-300">Estado de Inventario <span class="text-red-500">*</span></label>
                             <select wire:model="estado_inventario" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                                 <option value="En stock">En stock</option>
@@ -373,80 +351,8 @@
                             @error('estado_inventario') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
-                            <input type="text" wire:model="ubicacion"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="Oficina Principal - Recepción">
-                            @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Fechas -->
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Fecha de Instalación</label>
-                            <input type="date" wire:model="fecha_instalacion"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                            @error('fecha_instalacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Último Mantenimiento</label>
-                            <input type="date" wire:model="ultimo_mantenimiento"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                            @error('ultimo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Próximo Mantenimiento</label>
-                            <input type="date" wire:model="proximo_mantenimiento"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                            @error('proximo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Checkboxes -->
-                        <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
-                                Estado y Configuración
-                            </h4>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="necesita_mantenimiento" id="necesita_mantenimiento"
-                                   class="bg-gray-800 border-gray-700 rounded">
-                            <label for="necesita_mantenimiento" class="text-sm text-gray-300">Necesita Mantenimiento</label>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="necesita_actualizacion" id="necesita_actualizacion"
-                                   class="bg-gray-800 border-gray-700 rounded">
-                            <label for="necesita_actualizacion" class="text-sm text-gray-300">Necesita Actualización</label>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="support_ipv6" id="support_ipv6"
-                                   class="bg-gray-800 border-gray-700 rounded">
-                            <label for="support_ipv6" class="text-sm text-gray-300">Soporte IPv6</label>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="support_dhcp" id="support_dhcp"
-                                   class="bg-gray-800 border-gray-700 rounded">
-                            <label for="support_dhcp" class="text-sm text-gray-300">Soporte DHCP</label>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="support_hik_connect" id="support_hik_connect"
-                                   class="bg-gray-800 border-gray-700 rounded">
-                            <label for="support_hik_connect" class="text-sm text-gray-300">Soporte Hik-Connect</label>
-                        </div>
-
-                        <!-- Observaciones -->
-                        <div class="col-span-full">
-                            <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
-                            <textarea wire:model="observaciones" rows="3"
-                                      class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                      placeholder="Notas adicionales sobre el dispositivo..."></textarea>
-                        </div>
+                    
+                        
                     </div>
 
                     <!-- Botones -->
