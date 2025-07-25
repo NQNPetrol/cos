@@ -110,8 +110,22 @@ Route::middleware([
         //->middleware('can:editar.personal')
         ->name('personal.edit');
     Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
-        //->middleware('can:editar.contratos')
+        //->middleware('can:editar.personal')
         ->name('personal.update');
+
+    //INVENTARIO
+    Route::get('/inventario', [\App\Http\Controllers\InventarioController::class, 'index'])
+        ->name('inventario.index');
+    Route::get('/inventario/create', [\App\Http\Controllers\InventarioController::class, 'create'])
+        ->name('inventario.create');
+    Route::post('/inventario/store/', [\App\Http\Controllers\InventarioController::class, 'store'])
+        ->name('inventario.store');
+    Route::get('/inventario/{id}/edit', [App\Http\Controllers\InventarioController::class, 'edit'])
+        //->middleware('can:editar.inventario')
+        ->name('inventario.edit');
+    Route::put('/inventario/{id}', [App\Http\Controllers\InventarioController::class, 'update'])
+        //->middleware('can:editar.inventario')
+        ->name('inventario.update');
 
 
 });
