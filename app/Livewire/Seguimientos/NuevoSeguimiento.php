@@ -11,33 +11,27 @@ class NuevoSeguimiento extends Component
 {
     public $id_evento = '';
     public $estado = 'ABIERTO';
-    public $detalles = '';
+    public $observaciones = '';
 
     protected $rules = [
         'id_evento' => 'required|exists:eventos,id',
         'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
-        'detalles' => 'required|string|min:10|max:2000',
+        'observaciones' => 'nullable|string|min:5|max:2000',
     ];
 
-    public function layout()
-    {
-        return 'layouts.app';
-    }
+    protected $messages = [
+        'id_evento.required' => 'Debe seleccionar un evento',
+    ];
+
 
     public function render()
     {
-        // Obtener eventos disponibles con manejo de errores
-        try {
-            $eventos = Evento::whereDoesntHave('seguimientos', function($query) {
-                $query->where('estado', 'CERRADO');
-            })->get();
-        } catch (\Exception $e) {
-            $eventos = collect(); // Retorna colección vacía si hay error
-        }
+        $eventos = Evento::whereDoesntHave('seguimientos', function($query) {
+            $query->where('estado', 'CERRADO');
+        })->get();
 
         return view('livewire.seguimientos.nuevo-seguimiento', [
             'eventos' => $eventos,
-            'title' => 'Nuevo Seguimiento',
             'header' => 'Nuevo Seguimiento de Evento'
         ]);
     }
@@ -45,26 +39,20 @@ class NuevoSeguimiento extends Component
     public function save()
     {
         $this->validate();
-
-        // Verificar que el evento o se encuentre cerrado
-        $eventoDisponible = Evento::whereDoesntHave('seguimientos', function($query) {
-            $query->where('estado', 'CERRADO');
-        })->where('id', $this->id_evento)->exists();
-
-        if (!$eventoDisponible) {
-            $this->addError('id_evento', 'El evento seleccionado ya no está disponible');
-            return;
-        }
-
-        Seguimiento::create([
+        try{
+            Seguimiento::create([
             'evento_id' => $this->id_evento,
             'estado' => $this->estado,
-            'detalles' => $this->detalles,
+            'observaciones' => $this->observaciones,
             'user_id' => Auth::id(),
-            'fecha_registro' => now()
+            'fecha' => now(),
+            'titulo' => 'Seguimiento para Evento #'.$this->id_evento
         ]);
 
-        session()->flash('message', 'Seguimiento creado exitosamente!');
-        return redirect()->to('/seguimientos');
+            session()->flash('sucess', 'Seguimiento creado exitosamente!');
+            return redirect()->route('seguimientos.index');
+        } catch (\Exception $e) {
+            $this->addError('save_error', 'Error al guardar el seguimiento:'.$e->getMessage());
+        }
     }
 }
