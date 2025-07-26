@@ -9,8 +9,9 @@ class Seguimiento extends Model
 {
     protected $fillable = [
         'titulo',
-        'detalles',
-        'fecha', 'estado',
+        'observaciones',
+        'fecha',
+        'estado',
         'evento_id',
         'user_id'];
 

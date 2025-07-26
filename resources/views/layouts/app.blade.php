@@ -305,10 +305,10 @@
 
                 <!-- Submenú -->
                 <div id="submenuEventos" class="pl-6 space-y-1 hidden">
-                    <a href="{{ route('eventos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Eventos</a>
-                    <a href="{{ route('eventos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
-                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver Seguimientos</a>
-                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Seguimiento</a>
+                    <a href="{{ route('eventos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Eventos</a>
+                    <a href="{{ route('eventos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-plus mr-2"></i>Nuevo Evento</a>
+                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Seguimientos</a>
+                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-node-plus mr-2"></i>Nuevo Seguimiento</a>
                 </div>
 
                 <!-- OBJETIVOS -->
@@ -401,7 +401,7 @@
 
                 <!-- Inventario -->
                 <button id="toggleInventario" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
-                    <i class="bi bi-camera-video-fill text-xl"></i>Inventario
+                    <i class="bi bi-box-seam mr-2"></i>Inventario
                     <svg class="w-4 h-4 transition-transform" id="iconInventario" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
@@ -411,7 +411,7 @@
                  <div id="submenuInventario" class="pl-6 space-y-1 hidden">
                     
                     <a href="{{ route('inventario.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-camera-video-fill text-xl"></i>
+                        <i class="bi bi-search mr-2"></i>
                         Ver Inventario
                     </a>
             

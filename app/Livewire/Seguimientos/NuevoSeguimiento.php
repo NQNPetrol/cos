@@ -11,17 +11,16 @@ class NuevoSeguimiento extends Component
 {
     public $id_evento = '';
     public $estado = 'ABIERTO';
-    public $detalles = '';
+    public $observaciones = '';
 
     protected $rules = [
         'id_evento' => 'required|exists:eventos,id',
         'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
-        'detalles' => 'required|string|min:5|max:2000',
+        'observaciones' => 'nullable|string|min:5|max:2000',
     ];
 
     protected $messages = [
         'id_evento.required' => 'Debe seleccionar un evento',
-        'detalles.required' => 'Campo obligatorio',
     ];
 
 
@@ -44,7 +43,7 @@ class NuevoSeguimiento extends Component
             Seguimiento::create([
             'evento_id' => $this->id_evento,
             'estado' => $this->estado,
-            'detalles' => $this->detalles,
+            'observaciones' => $this->observaciones,
             'user_id' => Auth::id(),
             'fecha' => now(),
             'titulo' => 'Seguimiento para Evento #'.$this->id_evento

@@ -69,16 +69,16 @@
                         </div>
                     </div>
 
-                    <!-- Campo Detalles -->
+                    <!-- Campo observaciones -->
                     <div class="mb-6">
-                        <label for="detalles" class="block text-sm font-medium text-gray-300 mb-2">
-                            Detalles <span class="text-red-500">*</span>
+                        <label for="observaciones" class="block text-sm font-medium text-gray-300 mb-2">
+                            Observaciones <span class="text-red-500">*</span>
                         </label>
-                        <textarea wire:model="detalles" id="detalles" rows="5"
+                        <textarea wire:model="observaciones" id="observaciones" rows="5"
                                 class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
                                         focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white"
                                 placeholder="Describa los detalles del seguimiento..."></textarea>
-                        @error('detalles') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                        @error('observaciones') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                         @error('save_error') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                     </div>
 

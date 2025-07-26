@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('eventos', function (Blueprint $table) {
-            // $table->dropColumn('nombre');
+        Schema::table('seguimientos', function (Blueprint $table) {
+            $table->string('observaciones')->nullable()->after('fecha');
         });
     }
 
@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('eventos', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

@@ -51,7 +51,7 @@
                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
-                                    Nuevo Seguimiento
+                                    Nuevo
                                 </a>
                             </div>
                         </div>
@@ -62,6 +62,16 @@
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="g-gray-800 text-gray-300 dark:bg-gray-700">
                                 <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('fecha')">
+                                        Fecha
+                                        @if($sortField === 'fecha_registro')
+                                            @if($sortDirection === 'asc')
+                                                ↑
+                                            @else
+                                                ↓
+                                            @endif
+                                        @endif
+                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('id')">
                                         Evento
                                         @if($sortField === 'id')
@@ -94,16 +104,8 @@
                                             @endif
                                         @endif
                                     </th>
-
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('fecha')">
-                                        Fecha
-                                        @if($sortField === 'fecha_registro')
-                                            @if($sortDirection === 'asc')
-                                                ↑
-                                            @else
-                                                ↓
-                                            @endif
-                                        @endif
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('tipo')">
+                                        Observaciones
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                                 </tr>
@@ -111,6 +113,9 @@
                             <tbody class="dark:bg-gray-800">
                                 @forelse ($seguimientos as $seguimiento)
                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
+                                        {{ $seguimiento->fecha->format('d/m/Y') }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
                                         Evento #{{ $seguimiento->evento->id ?? 'N/A' }}
                                         @if($seguimiento->evento)
@@ -128,7 +133,7 @@
                                         {{ $seguimiento->evento->tipo ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
-                                        {{ $seguimiento->fecha->format('d/m/Y H:i') }}
+                                        {{ $seguimiento->observaciones ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
