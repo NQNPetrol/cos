@@ -345,8 +345,7 @@
 
                 <!-- Submenú -->
                 <div id="submenuPatrullas" class="pl-6 space-y-1 hidden">
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Ver Patrullas</a>
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
+                    <a href="{{ route('patrullas.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Administrar Patrullas</a>
                 </div>
 
                 <button id="toggleConfiguracion" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">

@@ -30,7 +30,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
-
+    //CLIENTES
     Route::get('/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])
         // ->middleware('can:crear.cliente')
         ->name('crear.cliente');
@@ -42,7 +42,7 @@ Route::middleware([
 
     Route::get('/configuracion/permisos', [App\Http\Controllers\SistemaController::class, 'crear_permiso'])
         ->name('crear.permiso');
-
+    //USUARIOS
     Route::get('/usuarios', [App\Http\Controllers\UserController::class, 'index'])
         // ->middleware('can:administrar.usuarios')
         ->name('usuarios.index');
@@ -126,6 +126,10 @@ Route::middleware([
     Route::put('/inventario/{id}', [App\Http\Controllers\InventarioController::class, 'update'])
         //->middleware('can:editar.inventario')
         ->name('inventario.update');
+
+    //PATRULLAS
+    Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'index'])
+        ->name('patrullas.index');
 
 
 });
