@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('dispositivo_id')->constrained('dispositivos')->onDelete('cascade');
             $table->date('fecha_asignacion');
             $table->timestamps();
+
+            $table->unique(['patrulla_id', 'dispositivo_id']);
         });
     }
 

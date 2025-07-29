@@ -10,7 +10,8 @@ class Patrulla extends Model
     
     public function dispositivos()
     {
-        return $this->belongsToMany(Dispositivo::class, 'dispositivo_patrulla')
+        return $this->belongsToMany(Dispositivo::class)
+                    ->using(DispositivoPatrulla::class)
                     ->withPivot('fecha_asignacion')
                     ->withTimestamps();
     }

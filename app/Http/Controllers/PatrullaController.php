@@ -10,4 +10,9 @@ class PatrullaController extends Controller
     {
         return view('patrullas.index');
     }
+
+    public function create()
+    {
+        return view('patrullas.create');
+    }
 }

@@ -5,6 +5,9 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
+use App\Http\Controllers\DispositivoPatrullaController;
+use App\Models\Patrulla;
 
 Route::get('/', function () {
     return view('welcome');
@@ -130,7 +133,12 @@ Route::middleware([
     //PATRULLAS
     Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'index'])
         ->name('patrullas.index');
+    Route::get('/livewire/patrullas', [\App\Http\Controllers\PatrullaController::class, 'create'])
+        ->name('patrullas.create');
 
+    //DISPOSiTIVO-PATRULLA
+    Route::get('/patrullas/{patrulla}/dispositivos', [DispositivoPatrullaController::class, 'index'])
+    ->name('patrullas.dispositivos');
 
 });
 
