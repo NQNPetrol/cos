@@ -42,10 +42,16 @@ class AsignarDispositivos extends Component
             $query->where('patrulla_id', $this->patrulla->id);
         })
         ->when($this->search, function($query) {
-            $query->where('tipo', 'like', '%'.$this->search.'%')
-                  ->orWhere('modelo', 'like', '%'.$this->search.'%');
+            $query->where(function($q) {
+                $q->where('id', 'like', '%'.$this->search.'%')
+                  ->orWhere('tipo', 'like', '%'.$this->search.'%')
+                  ->orWhereHas('cliente', function($q) {
+                      $q->where('nombre', 'like', '%'.$this->search.'%');
+                  });
+            });
         })
         ->where('estado_inventario', '!=', 'Dado de Baja')
+        ->with('cliente')
         ->get();
         return view('livewire.patrullas.asignar-dispositivos', [
             'asignaciones' => $asignaciones,
