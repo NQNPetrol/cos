@@ -18,6 +18,7 @@ class Listado extends Component
 
     //formulario
     public $patente;
+    public $marca;
     public $modelo;
     public $color;
     public $estado = 'operativa';
@@ -32,7 +33,7 @@ class Listado extends Component
             'max:10',
             Rule::unique('patrullas', 'patente')->ignore($this->editingId)
         ],
-        // ... otras reglas
+        
     ];
     }
 
@@ -41,6 +42,7 @@ class Listado extends Component
         $patrullas = Patrulla::query()
             ->when($this->search, function($query){
                 $query->where('patente', 'like', '%'.$this->search.'%')
+                      ->orwhere('marca', 'like', '%'.$this->search.'%')
                       ->orwhere('modelo', 'like', '%'.$this->search.'%');
             })
             ->when($this->estadoFilter, function($query){
@@ -69,6 +71,7 @@ class Listado extends Component
     public function resetForm()
     {
         $this->editingId = null;
+        $this->marca = '';
         $this->patente = '';
         $this->modelo = '';
         $this->color = '';
@@ -85,6 +88,7 @@ class Listado extends Component
             $patrulla = Patrulla::find($this->editingId);
             $patrulla->update([
                 'patente' => $this->patente,
+                'marca' => $this->marca,
                 'modelo' => $this->modelo,
                 'color' => $this->color,
                 'estado' => $this->estado,
@@ -95,6 +99,7 @@ class Listado extends Component
         } else {
             Patrulla::create([
                 'patente' => $this->patente,
+                'marca' => $this->marca,
                 'modelo' => $this->modelo,
                 'color' => $this->color,
                 'estado' => $this->estado,
@@ -112,6 +117,7 @@ class Listado extends Component
         
         $this->editingId = $id;
         $this->patente = $patrulla->patente;
+        $this->marca = $patrulla->marca;
         $this->modelo = $patrulla->modelo;
         $this->color = $patrulla->color;
         $this->estado = $patrulla->estado;

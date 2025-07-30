@@ -15,7 +15,7 @@
         <div>
             <label class="block text-sm mb-1">Buscar</label>
             <input type="text" wire:model.live="search"
-                   placeholder="Patente, modelo..."
+                   placeholder="Patente, marca, modelo..."
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
         
@@ -37,6 +37,7 @@
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Patente</th>
+                    <th class="px-4 py-2 text-left">Marca</th>
                     <th class="px-4 py-2 text-left">Modelo</th>
                     <th class="px-4 py-2 text-left">Color</th>
                     <th class="px-4 py-2 text-left">Estado</th>
@@ -48,6 +49,7 @@
                 @forelse ($patrullas as $patrulla)
                     <tr class="border-b border-gray-700 hover:bg-gray-800">
                         <td class="px-4 py-2 font-medium">{{ $patrulla->patente }}</td>
+                        <td class="px-4 py-2">{{ $patrulla->marca }}</td>
                         <td class="px-4 py-2">{{ $patrulla->modelo }}</td>
                         <td class="px-4 py-2">{{ $patrulla->color }}</td>
                         <td class="px-4 py-2">
@@ -131,16 +133,23 @@
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                             @error('patente') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Marca</label>
+                            <input type="text" wire:model="marca" 
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            @error('marca') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
                         
                         <div>
-                            <label class="block text-sm mb-1 text-gray-300">Modelo <span class="text-red-500">*</span></label>
+                            <label class="block text-sm mb-1 text-gray-300">Modelo</label>
                             <input type="text" wire:model="modelo" 
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                             @error('modelo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
-                            <label class="block text-sm mb-1 text-gray-300">Color <span class="text-red-500">*</span></label>
+                            <label class="block text-sm mb-1 text-gray-300">Color</label>
                             <input type="text" wire:model="color" 
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                             @error('color') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -149,7 +158,7 @@
     
                         
                         <div>
-                            <label class="block text-sm mb-1 text-gray-300">Estado <span class="text-red-500">*</span></label>
+                            <label class="block text-sm mb-1 text-gray-300">Estado</label>
                             <select wire:model="estado" 
                                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                                 <option value="operativa">Operativa</option>

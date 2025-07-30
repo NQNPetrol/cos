@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patrulla extends Model
 {
-    protected $fillable = ['patente', 'modelo', 'color', 'estado', 'observaciones'];
+    protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones'];
     
     public function dispositivos()
     {
