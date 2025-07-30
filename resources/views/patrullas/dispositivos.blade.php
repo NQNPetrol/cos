@@ -8,7 +8,7 @@
                 </svg>
                 Volver a Patrullas
             </a>
-            <h1 class="text-2xl font-bold text-gray-100">Patrulla: {{ $patrulla->patente }}</h1>
+            <h1 class="text-2xl font-bold text-gray-100">Patrulla {{ $patrulla->patente }}</h1>
         </div>
         
         @livewire('dispositivo-patrulla.asignar-dispositivos', ['patrulla' => $patrulla])

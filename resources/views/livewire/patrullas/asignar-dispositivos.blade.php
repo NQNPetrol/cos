@@ -15,9 +15,8 @@
         <table class="min-w-full text-sm">
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
-                    <th class="px-4 py-2 text-left">Dispositivo</th>
+                    <th class="px-4 py-2 text-left">Id</th>
                     <th class="px-4 py-2 text-left">Tipo</th>
-                    <th class="px-4 py-2 text-left">Modelo</th>
                     <th class="px-4 py-2 text-left">Fecha Asignación</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
@@ -26,13 +25,9 @@
                 @forelse ($asignaciones as $asignacion)
                     <tr class="border-b border-gray-700 hover:bg-gray-800">
                         <td class="px-4 py-2">
-                            {{ $asignacion->dispositivo->nombre }}
-                            <div class="text-xs text-gray-400">
-                                {{ $asignacion->dispositivo->direccion_ip }}
-                            </div>
+                            {{ $asignacion->dispositivo->id }}
                         </td>
                         <td class="px-4 py-2">{{ $asignacion->dispositivo->tipo }}</td>
-                        <td class="px-4 py-2">{{ $asignacion->dispositivo->modelo }}</td>
                         <td class="px-4 py-2">{{ $asignacion->fecha_asignacion->format('d/m/Y') }}</td>
                         <td class="px-4 py-2">
                             <button wire:click="eliminarAsignacion({{ $asignacion->dispositivo_id }})"
@@ -145,11 +140,6 @@
                             <input type="date" wire:model="fechaAsignacion"
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                         </div>
-                        <div>
-                            <label class="block text-sm mb-1">Observaciones</label>
-                            <input type="text" wire:model="observaciones"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                        </div>
                     </div>
 
                     <!-- Botones -->
@@ -159,9 +149,15 @@
                             Cancelar
                         </button>
                         <button type="submit"
-                                class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded text-white font-medium"
-                                @if(count($selectedDispositivos) === 0) disabled @endif>
-                            Asignar Dispositivos
+                                wire:loading.attr="disabled"
+                                class="px-6 py-2 rounded font-medium min-w-32 transition-all">
+                            <span wire:loading.remove wire:target="asignarDispositivos">Asignar</span>
+                            <span wire:loading wire:target="asignarDispositivos">
+                                <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
                         </button>
                     </div>
                 </form>

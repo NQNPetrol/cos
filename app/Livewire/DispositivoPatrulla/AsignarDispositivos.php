@@ -87,7 +87,7 @@ class AsignarDispositivos extends Component
         $this->patrulla->dispositivos()->syncWithoutDetaching($syncData);
 
         $this->showModal = false;
-        $this->dispatchBrowserEvent('notify', [
+        $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Dispositivos asignados correctamente'
         ]);
@@ -97,7 +97,7 @@ class AsignarDispositivos extends Component
     {
         $this->patrulla->dispositivos()->detach($dispositivoId);
         
-        $this->dispatchBrowserEvent('notify', [
+        $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Dispositivo desvinculado correctamente'
         ]);
