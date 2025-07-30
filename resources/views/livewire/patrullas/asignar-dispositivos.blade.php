@@ -17,6 +17,7 @@
                 <tr>
                     <th class="px-4 py-2 text-left">Id</th>
                     <th class="px-4 py-2 text-left">Tipo</th>
+                    <th class="px-4 py-2 text-left">Descripción</th>
                     <th class="px-4 py-2 text-left">Fecha Asignación</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
@@ -28,6 +29,7 @@
                             {{ $asignacion->dispositivo->id }}
                         </td>
                         <td class="px-4 py-2">{{ $asignacion->dispositivo->tipo }}</td>
+                        <td class="px-4 py-2">{{ $asignacion->dispositivo->observaciones ?: 'N/A' }}</td>
                         <td class="px-4 py-2">{{ $asignacion->fecha_asignacion->format('d/m/Y') }}</td>
                         <td class="px-4 py-2">
                             <button wire:click="eliminarAsignacion({{ $asignacion->dispositivo_id }})"
