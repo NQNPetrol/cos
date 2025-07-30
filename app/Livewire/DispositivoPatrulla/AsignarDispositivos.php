@@ -38,24 +38,23 @@ class AsignarDispositivos extends Component
             ->where('patrulla_id', $this->patrulla->id)
             ->paginate(10);
 
-        $dispositivosDisponibles = Dispositivo::whereDoesntHave('patrullas', function ($query) {
-            $query->where('patrulla_id', $this->patrulla->id);
-        })
-        ->when($this->search, function($query) {
-            $query->where(function($q) {
-                $q->where('id', 'like', '%'.$this->search.'%')
-                  ->orWhere('tipo', 'like', '%'.$this->search.'%')
-                  ->orWhereHas('cliente', function($q) {
-                      $q->where('nombre', 'like', '%'.$this->search.'%');
-                  });
-            });
-        })
-        ->where('estado_inventario', '!=', 'Dado de Baja')
-        ->with('cliente')
-        ->get();
-        return view('livewire.patrullas.asignar-dispositivos', [
-            'asignaciones' => $asignaciones,
-            'dispositivosDisponibles' => $dispositivosDisponibles
+        $dispositivosDisponibles = Dispositivo::whereDoesntHave('patrullas')
+            ->when($this->search, function($query) {
+                $query->where(function($q) {
+                    $q->where('id', 'like', '%'.$this->search.'%')
+                      ->orWhere('tipo', 'like', '%'.$this->search.'%')
+                      ->orWhereHas('cliente', function($q) {
+                        $q->where('nombre', 'like', '%'.$this->search.'%');
+                    });
+                });
+            })
+            ->where('estado_inventario', '!=', 'Dado de Baja')
+            ->with('cliente')
+            ->get();
+            
+            return view('livewire.patrullas.asignar-dispositivos', [
+                'asignaciones' => $asignaciones,
+                'dispositivosDisponibles' => $dispositivosDisponibles
         ]);
     }
 
@@ -76,6 +75,19 @@ class AsignarDispositivos extends Component
     public function asignarDispositivos()
     {
         $this->validate();
+
+        // Verificar que los dispositivos no estén asignados a otras patrullas
+        $yaAsignados = DispositivoPatrulla::whereIn('dispositivo_id', $this->selectedDispositivos)
+            ->where('patrulla_id', '!=', $this->patrulla->id)
+            ->exists();
+
+        if ($yaAsignados) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Uno o más dispositivos ya están asignados a otra patrulla'
+            ]);
+            return;
+        }
 
         $syncData = [];
         foreach ($this->selectedDispositivos as $dispositivoId) {
