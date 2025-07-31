@@ -52,6 +52,14 @@ class Dispositivo extends Model
         return $this->belongsTo(Cliente::class);
     }
 
+    public function patrullas()
+    {
+        return $this->belongsToMany(Patrulla::class)
+                    ->using(DispositivoPatrulla::class)
+                    ->withPivot('fecha_asignacion')
+                    ->withTimestamps();
+    }
+
     // Scopes
     
     public function scopeInstalados($query)
