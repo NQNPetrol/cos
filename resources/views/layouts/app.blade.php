@@ -324,7 +324,7 @@
                     
                     <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
-                        Nuevo Objetivo
+                        Administrar Objetivos
                     </a>
                     
                 </div>
