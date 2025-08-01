@@ -327,10 +327,6 @@
                         Nuevo Objetivo
                     </a>
                     
-                    <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-list-task mr-2"></i>
-                        Objetivos
-                    </a>
                 </div>
 
 
