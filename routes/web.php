@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
 use App\Models\Patrulla;
+use App\Http\Controllers\EventoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -100,6 +101,13 @@ Route::middleware([
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoController::class, 'edit'])->name('eventos.edit');
+    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])->name('eventos.update');
+    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
+    
+    //MEDIA
+    Route::delete('/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
+    ->name('media.destroy');
 
     
     //PERSONAL
