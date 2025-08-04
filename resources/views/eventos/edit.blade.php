@@ -168,12 +168,12 @@
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
-                                        <div class="flex text-sm text-gray-400">
+                                        <div class="text-sm text-gray-400 text-center">
                                             <label for="media" class="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
                                                 <span>Subir archivos</span>
                                                 <input id="media" name="media[]" type="file" class="sr-only" multiple accept="image/jpeg,image/png">
                                             </label>
-                                            <p class="pl-1">o arrastrar y soltar</p>
+                                            <p class="text-xs"> mantené Ctrl + click izquierdo para seleccionar multiples</p>
                                         </div>
                                         <p class="text-xs text-gray-400">PNG, JPG hasta 2MB</p>
                                     </div>
@@ -189,13 +189,6 @@
                                     <div class="relative group">
                                         <img src="{{ Storage::url($media->file_path) }}" alt="Imagen del evento {{ $media->file_name }}" class="w-full h-32 object-cover rounded-md">
                                         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <!-- <form class="delete-media-form" action="{{ route('media.eventos.destroy', [$evento, $media]) }}" method="POST" enctype="multipart/form-data" onsubmit="return confirmDelete(event)">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="delete-media-btn text-red-500 hover:text-red-400">
-                                                    <i class="bi bi-trash text-xl"></i>
-                                                </button>
-                                            </form> -->
                                             <a href="{{ route('media.eventos.destroy', $media) }}" onclick="return confirm('¿Estás seguro de eliminar la imagen?')"
                                                class="delete-media-btn text-red-500 hover:text-red-400">
                                                 <i class="bi bi-trash text-xl"></i>
@@ -346,7 +339,7 @@
                 
                 Array.from(this.files)
                     .filter(file => file.type.match('image.*'))
-                    .forEach(file => {
+                    .forEach((file, index) => {
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const div = document.createElement('div');
@@ -369,6 +362,12 @@
                         
                             div.appendChild(img);
                             div.appendChild(removeBtn);
+
+                            const fileNumber = document.createElement('div');
+                            fileNumber.className = 'absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded';
+                            fileNumber.textContent = `${index + 1}`;
+                            div.appendChild(fileNumber);
+
                             previewContainer.appendChild(div);
                         };
                         reader.readAsDataURL(file);
@@ -380,39 +379,6 @@
             onsole.log('Formulario enviado');
         });
 
-        // Manejo del envio del formulario y eliminar imagenes
-    //     document.addEventListener('DOMContentLoaded', function() {
-    //         document.querySelectorAll('.delete-media-btn').forEach(btn => {
-    //             btn.addEventListener('click', function() {
-    //                 if (!confirm('¿Eliminar esta imagen definitivamente?')) return;
-
-    //                 const form = this.closest('form');
-    //                 const formData = new FormData(form);
-
-    //                 fetch(form.action, {
-    //                     method: 'POST',
-    //                     headers: {
-    //                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
-    //                         'Accept': 'application/json'
-    //                     },
-    //                     body: formData
-    //                 })
-    //                 .then(response => {
-    //                 if (response.ok) {
-    //                     // Eliminar la imagen del DOM
-    //                     form.closest('.relative.group').remove();
-    //                     console.log('Imagen eliminada correctamente');
-    //                 } else {
-    //                     alert('Error al eliminar la imagen');
-    //                 }
-    //             })
-    //             .catch(error => {
-    //                 console.error('Error:', error);
-    //                 alert('Error al eliminar la imagen');
-    //             });
-    //         });
-    //     });
-    // });
     </script>
     @endpush
 </x-app-layout>
