@@ -88,15 +88,21 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="#" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
+                                            <a href="{{ route('eventos.edit', $evento) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
+                                                title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <a href="#" class="text-red-600 hover:text-red-900 dark:text-red-400">
+                                            <form action="{{ route('eventos.destroy', $evento) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                    onclick="return confirm('¿Estás seguro de eliminar este evento?')"
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400"
+                                                    title="Eliminar">
                                                 <i class="bi bi-trash"></i>
-                                            </a>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

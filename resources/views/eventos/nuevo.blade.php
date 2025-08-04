@@ -10,11 +10,11 @@
                         </a>
                     </div>
 
-                    <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6">
+                    <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
-
+                        <!-- 1. Categoria -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">1. ¿A qué categoría pertenece el evento?</h3>
+                            <h3 class="text-lg font-medium text-white mb-4"> 1. ¿A qué categoría pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($categorias as $categoria)
                                 <div class="flex items-center">
@@ -23,7 +23,7 @@
                                         value="{{ $categoria->id }}" 
                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600" required
                                            @if(old('categoria') === $categoria->nombre) checked @endif>
-                                    <label for="categoria-{{ Str::slug($categoria) }}" class="ml-3 block text-sm font-medium text-gray-300">
+                                    <label for="categoria-{{ Str::slug($categoria->nombre) }}" class="ml-3 block text-sm font-medium text-gray-300">
                                         {{ $categoria->nombre }}
                                     </label>
                                 </div>
@@ -36,7 +36,7 @@
 
                         <!-- Sección 2: Tipo de Evento (dinámico) -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">2. ¿A qué tipo pertenece el evento?</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">2. ¿A qué tipo pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div id="tipos-container">
                                 <!-- Opciones se cargarán dinámicamente con JavaScript -->
                                 <p class="text-gray-400 italic">Seleccione primero una categoría</p>
@@ -48,7 +48,7 @@
 
                         <!-- Sección 3: Fecha y Hora -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">3. Fecha y hora del incidente</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">3. Fecha y hora del incidente <span class="text-red-500">*</span></h3>
                             <input type="datetime-local" name="fecha_hora" id="fecha_hora"
                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('fecha_hora') }}" required>
@@ -59,7 +59,7 @@
 
                         <!-- Sección 4: Coordenadas -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">4. Ubicación (coordenadas)</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">4. Ubicación <span class="text-red-500">*</span></h3>
                             <div class="mb-4 bg-gray-800 p-3 rounded-md">
                                 <p class="text-sm text-gray-300 mb-2">Cómo obtener las coordenadas:</p>
                                 <ol class="list-decimal list-inside text-sm text-gray-400 space-y-1">
@@ -83,7 +83,7 @@
 
                         <!-- Sección 5: Cliente -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5. Cliente</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">5. Cliente <span class="text-red-500">*</span></h3>
                             <select name="cliente_id" id="cliente_id" required
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
@@ -100,7 +100,7 @@
 
                         <!-- Sección 6: Supervisor -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">6. Supervisor</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">6. Supervisor <span class="text-red-500">*</span></h3>
                             <select name="supervisor_id" id="supervisor_id" required
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un supervisor</option>
@@ -117,17 +117,43 @@
 
                         <!-- Sección 7: Observaciones -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">7. Observaciones (opcional)</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">7. Observaciones</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
                                       class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">8. Link del reporte (opcional)</h3>
-                            <input type="url" name="reporte_url" id="reporte_url" placeholder="https://drive.google.com/..."
+                            <h3 class="text-lg font-medium text-white mb-4">8. Link del reporte</h3>
+                            <input type="url" name="reporte_url" id="url_reporte" placeholder="https://drive.google.com/..."
                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('reporte_url') }}">
+                        </div>
+
+                        <!-- Sección 9: Multimedia -->
+                         <div class="bg-gray-700 p-4 rounded-lg">
+                             <h3 class="text-lg font-medium text-white mb-4">9. Multimedia</h3>
+                             <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Imágenes (JPG, PNG - Máx. 2MB c/u)</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <div class="flex text-sm text-gray-400">
+                                            <label for="media" class="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
+                                                <span>Subir archivos</span>
+                                                <input id="media" name="media[]" type="file" class="sr-only" multiple accept="image/jpeg,image/png">
+                                            </label>
+                                            <p class="pl-1">o arrastrar y soltar</p>
+                                        </div>
+                                        <p class="text-xs text-gray-400">PNG, JPG hasta 2MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Vista previa de imágenes-->
+                            <div id="preview-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 hidden">
+                            </div>
                         </div>
 
                         <!-- Botones de acción -->
@@ -247,6 +273,47 @@
                     }
                 }
             }, 100);
+        }
+    });
+
+    //vista previa imagenes
+    document.getElementById('media').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+        previewContainer.classList.add('hidden');
+        
+        if (this.files.length > 0) {
+            previewContainer.classList.remove('hidden');
+            
+            Array.from(this.files)
+                .filter(file => file.type.match('image.*'))
+                .forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative group';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'h-32 w-full object-cover rounded-md';
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center';
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.onclick = function() {
+                            div.remove();
+                            if (previewContainer.children.length === 0) {
+                                previewContainer.classList.add('hidden');
+                            }
+                        };
+                    
+                        div.appendChild(img);
+                        div.appendChild(removeBtn);
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
         }
     });
 </script>
