@@ -53,35 +53,24 @@ class EventoController extends Controller
             ],
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
-            'media.*'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048' //2MB max
+            'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048' //2MB max
         ]);
 
         [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
+        $validated['latitud'] = $lat;
+        $validated['longitud'] = $lng;
+
+        $validated['user_id'] = auth()->id();
         
-        $evento = Evento::create([
-            'fecha_hora'    => $validated['fecha_hora'],
-            'cliente_id'    => $validated['cliente_id'] ?? null,
-            'supervisor_id' => $validated['supervisor_id'] ?? null,
-            'categoria_id'  => $validated['categoria_id'] ?? null,
-            'tipo'          => $validated['tipo'],
-            'longitud'      => $lng,
-            'latitud'       => $lat,
-            'observaciones' => $validated['observaciones'] ?? null,
-            'url_reporte'   => $validated['url_reporte'] ?? null,
-            'user_id'       => auth()->id(),
-        ]);
+        $evento = Evento::create($validated);
 
-        if ($request->hasFile('media')){
-
-            //crear si no existe
-            Storage::makeDirectory('public/eventos/media');
-
+        if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
-                $path = $file->store('public/eventos/media');
+                $path = $file->store('media/eventos', 'public');
 
                 Media::create([
                     'file_name' => $file->getClientOriginalName(),
-                    'file_path' => Storage::url($path),
+                    'file_path' => $path,
                     'file_type' => $file->getClientMimeType(),
                     'file_size' => $file->getSize(),
                     'model_id' => $evento->id,
@@ -122,38 +111,30 @@ class EventoController extends Controller
         ],
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
-        'media.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        'media.*' => 'nullable|image|mimes:jpeg,png|max:2048'
     ]);
 
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
+    $validated['latitud'] = $lat;
+    $validated['longitud'] = $lng;
 
-    $evento->update([
-        'fecha_hora' => $validated['fecha_hora'],
-        'cliente_id' => $validated['cliente_id'],
-        'supervisor_id' => $validated['supervisor_id'],
-        'categoria_id' => $validated['categoria_id'],
-        'tipo' => $validated['tipo'],
-        'longitud' => $lng,
-        'latitud' => $lat,
-        'observaciones' => $validated['observaciones'],
-        'url_reporte' => $validated['url_reporte']
-    ]);
+    $validated['user_id'] = auth()->id();
+
+    $evento->update($validated);
 
     // Manejo de archivos
     if ($request->hasFile('media')) {
-        Storage::makeDirectory('public/eventos/media');
-        
         foreach ($request->file('media') as $file) {
-            $path = $file->store('public/eventos/media');
+                $path = $file->store('media/eventos', 'public');
 
-            Media::create([
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => Storage::url($path),
-                'file_type' => $file->getClientMimeType(),
-                'file_size' => $file->getSize() ?? 0,
-                'model_id' => $evento->id,
-                'model_type' => Evento::class,
-            ]);
+                Media::create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                    'model_id' => $evento->id,
+                    'model_type' => Evento::class,
+                ]);
         }
     }
 
@@ -165,14 +146,20 @@ class EventoController extends Controller
     public function destroy(Evento $evento)
     {
         foreach($evento->media as $media) {
-            $filePath = str_replace('/storage', 'public', $media->file_path);
-            Storage::delete($filePath);
-
+            Storage::disk('public')->delete($media->file_path);
             $media->delete();
         }
 
         $evento->delete();
 
         return redirect()->route('eventos.index')->with('success', 'Evento eliminado correctamente');
+    }
+
+    public function destroyMedia(Media $media)
+    {
+        Storage::disk('public')->delete($media->file_path);
+        $media->delete();
+
+        return back()->with('success', 'Imagen eliminada correctamente');
     }
 }

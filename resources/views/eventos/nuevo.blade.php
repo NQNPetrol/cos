@@ -151,8 +151,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="preview-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 hidden">
-                                <!-- Vista previa de imágenes-->
+                            <!-- Vista previa de imágenes-->
+                            <div id="preview-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 hidden">
                             </div>
                         </div>
 
@@ -291,7 +291,7 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const div = document.createElement('div');
-                        div.className = 'relative';
+                        div.className = 'relative group';
                         
                         const img = document.createElement('img');
                         img.src = e.target.result;

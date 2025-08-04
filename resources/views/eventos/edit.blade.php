@@ -10,9 +10,22 @@
                         </a>
                     </div>
 
-                    <form action="{{ route('eventos.update', $evento) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                    <div id="debug-output" class="mb-4 p-3 bg-gray-800 text-sm text-gray-300 rounded-md"></div>
+
+                    <form id="evento-edit-form" action="{{ route('eventos.update', $evento) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
+                        @if ($errors->any())
+                            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                                <p class="font-bold">Error</p>
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         
                         <!-- 1. Categoria -->
                         <div class="bg-gray-700 p-4 rounded-lg">
@@ -174,17 +187,20 @@
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     @foreach($evento->media as $media)
                                     <div class="relative group">
-                                        <img src="{{ asset($media->file_path) }}" alt="Imagen del evento" class="w-full h-32 object-cover rounded-md">
+                                        <img src="{{ Storage::url($media->file_path) }}" alt="Imagen del evento {{ $media->file_name }}" class="w-full h-32 object-cover rounded-md">
                                         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <form action="{{ route('media.destroy', $media) }}" method="POST" class="incline">
+                                            <!-- <form class="delete-media-form" action="{{ route('media.eventos.destroy', [$evento, $media]) }}" method="POST" enctype="multipart/form-data" onsubmit="return confirmDelete(event)">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" 
-                                                        onclick="return confirm('¿Eliminar esta imagen definitivamente?')"
-                                                        class="text-red-500 hover:text-red-400">
+                                                <button type="button" class="delete-media-btn text-red-500 hover:text-red-400">
                                                     <i class="bi bi-trash text-xl"></i>
                                                 </button>
-                                            </form>
+                                            </form> -->
+                                            <a href="{{ route('media.eventos.destroy', $media) }}" onclick="return confirm('¿Estás seguro de eliminar la imagen?')"
+                                               class="delete-media-btn text-red-500 hover:text-red-400">
+                                                <i class="bi bi-trash text-xl"></i>
+                
+                                            </a>
                                         </div>
                                     </div>
                                     @endforeach
@@ -193,8 +209,7 @@
                             @endif
                             
                             <!-- Vista previa de nuevas imágenes -->
-                            <div id="preview-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 hidden">
-                                <!-- Vista previa de imágenes nuevas -->
+                            <div id="preview-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 hidden">
                             </div>
                         </div>
 
@@ -206,8 +221,10 @@
                                Cancelar
                             </a>
 
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                <i class="bi bi-save mr-2"></i> Actualizar Evento
+                            <button type="submit" 
+                                    id="actualizar-evento-btn"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <span id="btn-text"><i class="bi bi-save mr-2"></i> Actualizar Evento</span>
                             </button>
                         </div>
                     </form>
@@ -333,7 +350,7 @@
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const div = document.createElement('div');
-                            div.className = 'relative';
+                            div.className = 'relative group';
                             
                             const img = document.createElement('img');
                             img.src = e.target.result;
@@ -358,6 +375,44 @@
                     });
             }
         });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            onsole.log('Formulario enviado');
+        });
+
+        // Manejo del envio del formulario y eliminar imagenes
+    //     document.addEventListener('DOMContentLoaded', function() {
+    //         document.querySelectorAll('.delete-media-btn').forEach(btn => {
+    //             btn.addEventListener('click', function() {
+    //                 if (!confirm('¿Eliminar esta imagen definitivamente?')) return;
+
+    //                 const form = this.closest('form');
+    //                 const formData = new FormData(form);
+
+    //                 fetch(form.action, {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
+    //                         'Accept': 'application/json'
+    //                     },
+    //                     body: formData
+    //                 })
+    //                 .then(response => {
+    //                 if (response.ok) {
+    //                     // Eliminar la imagen del DOM
+    //                     form.closest('.relative.group').remove();
+    //                     console.log('Imagen eliminada correctamente');
+    //                 } else {
+    //                     alert('Error al eliminar la imagen');
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error:', error);
+    //                 alert('Error al eliminar la imagen');
+    //             });
+    //         });
+    //     });
+    // });
     </script>
     @endpush
 </x-app-layout>

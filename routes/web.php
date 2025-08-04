@@ -106,8 +106,8 @@ Route::middleware([
     Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
     
     //MEDIA
-    Route::delete('/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
-    ->name('media.destroy');
+    Route::get('/eventos/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
+        ->name('media.eventos.destroy');
 
     
     //PERSONAL
