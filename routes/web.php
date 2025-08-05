@@ -85,6 +85,16 @@ Route::middleware([
         ->middleware('can:borrar.contratos')
         ->name('contratos.destroy');
 
+    //EMPRESAS ASOCIADAS A CLIENTES
+    Route::get('/empresas-asociadas', function() {
+        $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
+        return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
+    })->name('empresas-asociadas.index');
+
+    Route::get('/clientes/{cliente}/empresas-asociadas', function($cliente) {
+        return view('clientes.nueva-empresa-asociada', ['cliente' => \App\Models\Cliente::findOrFail($cliente)]);
+    })->name('clientes.empresas-asociadas');
+
     //OBJETIVOS    
     Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])
         ->middleware('can:ver.objetivos')

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\EmpresaAsociada;
 
 class Cliente extends Model
 {
@@ -19,6 +20,11 @@ class Cliente extends Model
     public function personal()
     {
         return $this->hasMany(Personal::class);
+    }
+
+    public function empresasAsociadas()
+    {
+        return $this->hasMany(EmpresaAsociada::class);
     }
 
 }

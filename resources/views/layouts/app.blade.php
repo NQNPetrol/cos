@@ -289,6 +289,11 @@
                         <i class="bi bi-person-plus mr-2"></i>
                         Nuevo Cliente
                     </a>
+
+                    <a href="{{ route('empresas-asociadas.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-person-plus mr-2"></i>
+                        Empresas Asociadas
+                    </a>
                     
                     <a href="{{ route('contratos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-file-earmark-medical mr-2"></i>
