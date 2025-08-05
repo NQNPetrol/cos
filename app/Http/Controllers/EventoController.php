@@ -14,20 +14,23 @@ class EventoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Evento::with('usuario')->latest();
+        $query = Evento::with(['creador', 'cliente', 'categoria'])->latest('fecha_hora');
 
-        if ($request->has('cliente')){
-            $query->where('cliente', 'like', '%'.$request->cliente.'%');
+        if ($request->filled('cliente_id')){
+            $query->where('cliente_id', $request->cliente_id);
         }
-        if ($request->has('fecha_desde')){
-            $query->where('fecha', '>=', $request->fecha_desde);
+        if ($request->filled('fecha_desde')){
+            $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
         }
-        if ($request->has('fecha_hasta')){
-            $query->where('fecha', '<=', $request->fecha_hasta);
+        if ($request->filled('fecha_hasta')){
+            $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
         }
         
-        $eventos = Evento::with('creador','cliente')->latest()->paginate(10);
-        return view('eventos.index', compact('eventos'));
+        $eventos = $query->paginate(10)->appends($request->query());
+
+        $clientes = Cliente::orderBy('nombre')->get();
+
+        return view('eventos.index', compact('eventos', 'clientes'));
     }
 
     public function create()
