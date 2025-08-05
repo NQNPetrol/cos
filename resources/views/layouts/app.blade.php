@@ -305,10 +305,9 @@
 
                 <!-- Submenú -->
                 <div id="submenuEventos" class="pl-6 space-y-1 hidden">
-                    <a href="{{ route('eventos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Eventos</a>
-                    <a href="{{ route('eventos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-plus mr-2"></i>Nuevo Evento</a>
-                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Seguimientos</a>
-                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-node-plus mr-2"></i>Nuevo Seguimiento</a>
+                    <a href="{{ route('eventos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Listado</a>
+                    <a href="{{ route('eventos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-plus mr-2"></i>Nuevo</a>
+                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Administrar Seguimientos</a>
                 </div>
 
                 <!-- OBJETIVOS -->

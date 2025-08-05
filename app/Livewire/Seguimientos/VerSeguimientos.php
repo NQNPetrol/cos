@@ -17,6 +17,7 @@ class VerSeguimientos extends Component
     public $estadoFilter = '';
     public $eventoFilter = '';
     public $tipoFilter = '';
+    public $eventosDisponibles = [];
     
     // Propiedades para ordenar
     public $sortField = 'fecha';
@@ -41,12 +42,46 @@ class VerSeguimientos extends Component
 
     public function mount()
     {
-        $this->eventos = Evento::all();
+        $this->eventosDisponibles = Evento::whereDoesntHave('seguimientos', function($query) {
+            $query->where('estado', 'CERRADO');
+        })->with(['cliente', 'categoria'])->get();
+    }
+
+    public function saveNew()
+    {
+        $this->validate([
+            'evento_id' => 'required|exists:eventos,id',
+            'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
+            'observaciones' => 'nullable|string|max:1000' // Corregido "nulalble" a "nullable"
+            ]);
+
+        try {
+            $seguimiento = Seguimiento::create([
+                'evento_id' => $this->evento_id,
+                'estado' => $this->estado,
+                'observaciones' => $this->observaciones,
+                'user_id' => auth()->id(),
+                'fecha' => now(), // Usar now() en lugar de $this->fecha que no está definido
+                'titulo' => 'Seguimiento para Evento #'.$this->evento_id
+            ]);
+
+        $this->reset(['evento_id', 'observaciones', 'estado']);
+        $this->estado = 'ABIERTO';
+        
+        $this->showModal = false;
+        session()->flash('success', 'Seguimiento creado exitosamente!');
+        $this->resetPage();
+        
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al crear el seguimiento: '.$e->getMessage());
+            \Log::error('Error al crear seguimiento: '.$e->getMessage());
+        }
     }
 
     public function openModal()
     {
         $this->resetForm();
+        $this->mount();
         $this->showModal = true;
     }
 
