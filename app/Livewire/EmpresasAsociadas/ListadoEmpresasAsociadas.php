@@ -20,15 +20,26 @@ class ListadoEmpresasAsociadas extends Component
     public $nombre = '';
     public $cliente_id = '';
     public $clientesDisponibles = [];
+    public $clienteEspecifico = null;
 
-    public function mount()
+    public function mount($clienteId = null)
     {
         $this->clientesDisponibles = Cliente::all();
+
+        if ($clienteId) {
+            $this->clienteEspecifico = Cliente::find($clienteId);
+            $this->clienteFilter = $clienteId;
+        }
     }
+    
 
     public function render()
     {
         $query = EmpresaAsociada::query()->with('cliente');
+
+        if ($this->clienteFilter) {
+            $query->where('cliente_id', $this->clienteFilter);
+        }
 
         if ($this->search) {
             $query->where(function($q) {
@@ -38,15 +49,13 @@ class ListadoEmpresasAsociadas extends Component
                   });
             });
         }
-        if ($this->clienteFilter) {
-            $query->where('cliente_id', $this->clienteFilter);
-        }
         
         $empresas = $query->orderBy('nombre')->paginate(10);
 
         return view('livewire.clientes.listado-empresas-asociadas', [
             'empresas' => $empresas,
-            'clientes' => Cliente::all()
+            'clientes' => $this->clientesDisponibles,
+            'clienteEspecifico' => $this->clienteEspecifico
         ]);
     }
 

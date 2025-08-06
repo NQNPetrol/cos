@@ -1,7 +1,15 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">
-            Empresas Asociadas
+            @if($clienteEspecifico)
+                Empresas Asociadas a {{ $clienteEspecifico->nombre }}
+                <a href="{{ route('crear.cliente') }}" 
+                   class="text-blue-400 text-sm ml-2 hover:underline">
+                   Volver al listado
+                </a>
+            @else
+                Empresas Asociadas
+            @endif
         </h2>
         <button wire:click="openModal"
                 class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium">

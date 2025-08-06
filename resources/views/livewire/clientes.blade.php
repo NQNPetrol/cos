@@ -12,7 +12,7 @@
 
         <div class="grid md:grid-cols-2 gap-4 mb-4">
             <div>
-                <label class="block text-sm mb-1">Nombre *</label>
+                <label class="block text-sm mb-1">Nombre</label>
                 <input type="text" wire:model.defer="nombre" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                 @error('nombre') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
@@ -69,9 +69,28 @@
                             <td class="px-4 py-2">{{ $cliente->cuit }}</td>
                             <td class="px-4 py-2">{{ $cliente->domicilio }}</td>
                             <td class="px-4 py-2">
-                                <a href="{{ route('clientes.edit', $cliente->id) }}" class="text-blue-400 hover:underline">
-                                    Editar
-                                </a>
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('clientes.edit', $cliente->id) }}" class="text-blue-400 hover:underline">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    </a>
+                                    <button wire:click="delete({{ $cliente->id }})"
+                                            onclick="return confirm('¿Está seguro de que desea eliminar esta empresa?')"
+                                            class="text-red-400 hover:text-red-300"
+                                            title="Eliminar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                    <a href="{{ route('clientes.empresas-asociadas', $cliente->id) }}"
+                                            class="text-green-600 hover:text-green-300"
+                                            title="Empresas Asociadas">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                            </svg>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
