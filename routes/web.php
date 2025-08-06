@@ -86,10 +86,17 @@ Route::middleware([
         ->name('contratos.destroy');
 
     //EMPRESAS ASOCIADAS A CLIENTES
+
     Route::get('/empresas-asociadas', function() {
         $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
         return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
     })->name('empresas-asociadas.index');
+
+    //especifica por cliente
+    // Route::get('/empresas-asociadas', function() {
+    //     $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
+    //     return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
+    // })->name('empresas-asociadas.index');
 
     Route::get('/clientes/{cliente}/empresas-asociadas', function($cliente) {
         return view('clientes.nueva-empresa-asociada', ['cliente' => \App\Models\Cliente::findOrFail($cliente)]);
