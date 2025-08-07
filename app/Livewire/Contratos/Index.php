@@ -27,6 +27,13 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function clearFilters()
+    {
+        $this->searchNombre = '';
+        $this->searchCliente = '';
+        $this->resetPage();
+    }
+
     public function loadContratos($cliente)
     {
         $cliente = Cliente::find($this->cliente_id);
@@ -57,21 +64,31 @@ class Index extends Component
     public function render()
     {
         $clientes = Cliente::all();
-        $query = Contrato::with('cliente');
+        $query = Contrato::with(['cliente', 'empresaAsociada']);
 
-        $contratos = Contrato::with('cliente')
+        $contratos = $query
             ->when($this->searchCliente, fn($q) =>
                 $q->where('cliente_id', $this->searchCliente)
             )
             ->when($this->searchNombre, fn($q) =>
                 $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
-            )
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+                  ->orWhereHas('empresaAsociada', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
+                        }))
+                        ->orderBy($this->sortField, $this->sortDirection)
+                        ->paginate(10);
 
         return view('livewire.contratos.index', [
             'contratos' => $contratos,
             'clientes' => $clientes,
         ]);
     }
+
+    public function delete($id)
+    {
+        Contrato::find($id)->delete();
+        session()->flash('message', 'Contrato eliminado correctamente');
+    }
+    
 }
+

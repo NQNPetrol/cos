@@ -123,7 +123,7 @@
                 </div>
 
                 <form wire:submit.prevent="save">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Nombre <span class="text-red-500">*</span></label>
                             <input type="text" wire:model="nombre" 

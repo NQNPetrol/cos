@@ -287,11 +287,11 @@
                     
                     <a href="{{ route('crear.cliente') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-person-plus mr-2"></i>
-                        Nuevo Cliente
+                        Administrar Clientes
                     </a>
 
                     <a href="{{ route('empresas-asociadas.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-person-plus mr-2"></i>
+                        <i class="bi bi-people mr-2"></i>
                         Empresas Asociadas
                     </a>
                     
@@ -371,8 +371,10 @@
 
                 <!-- Submenú -->
                 <div id="submenuUsuarios" class="pl-6 space-y-1 hidden">
-                    <a href="{{ route('usuarios.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Usuarios</a>
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
+                    <a href="{{ route('usuarios.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-people mr-2"></i>
+                        Administrar Usuarios
+                    </a>
                 </div>
 
                 <!-- Personal -->
@@ -387,13 +389,13 @@
                  <div id="submenuPersonal" class="pl-6 space-y-1 hidden">
                     
                     <a href="{{ route('personal.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-plus-circle mr-2"></i>
-                        Ver Personal
+                        <i class="bi bi-search mr-2"></i>
+                        Listado
                     </a>
                  
                     <a href="{{ route('personal.create') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
-                        Nuevo Personal
+                        Nuevo
                     </a>
             
                 </div>

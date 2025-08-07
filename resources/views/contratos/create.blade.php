@@ -18,7 +18,7 @@
 
             <!-- Cliente -->
             <div>
-                <label class="block mb-1">Cliente *</label>
+                <label class="block mb-1">Cliente <span class="text-red-500">*</span></label>
                 <select name="cliente_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                     <option value="">Seleccione un cliente</option>
                     @foreach ($clientes as $cliente)
@@ -29,9 +29,21 @@
                 </select>
             </div>
 
+            <div>
+                <label class="block mb-1">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
+                <select name="empresa_asociada_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                    <option value="">Seleccione una empresa asociada</option>
+                    @foreach ($empresas_asociadas as $empresa)
+                        <option value="{{ $empresa->id }}" {{ old('empresa_asociada_id') == $empresa->id ? 'selected' : '' }}>
+                            {{ $empresa->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- Nombre Proyecto -->
             <div>
-                <label class="block mb-1">Nombre del Proyecto *</label>
+                <label class="block mb-1">Nombre del Proyecto <span class="text-red-500">*</span></label>
                 <input type="text" name="nombre_proyecto" value="{{ old('nombre_proyecto') }}" required
                        class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
             </div>
@@ -70,6 +82,10 @@
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
                 Guardar Contrato
             </button>
+            <a href="{{ route('contratos.index') }}" 
+                class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2 text-sm ml-4 hover:underline">
+                Cancelar
+            </a>
         </form>
     </div>
 </x-app-layout>
