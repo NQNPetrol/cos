@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if(!Schema::hasColumn('contratos', 'empresa_asociada_id')){
             Schema::table('contratos', function (Blueprint $table) {
-                $table->foreignId('empresa_asociada_id')->constrained()->after('cliente_id');
+                $table->foreignId('empresa_asociada_id')->constrained('empresas_asociadas')->after('cliente_id');
             });
         }
     }
