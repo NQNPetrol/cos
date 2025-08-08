@@ -4,6 +4,7 @@ namespace App\Livewire\Contratos;
 
 use App\Models\Contrato;
 use App\Models\Cliente;
+use App\Models\EmpresaAsociada;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,9 +17,27 @@ class Index extends Component
     public $sortField = 'nombre_proyecto';
     public $sortDirection = 'asc';
 
+    // Nuevas propiedades para el formulario
+    public $cliente_id;
+    public $empresa_asociada_id;
+    public $empresasFiltradas = [];
+
     public $casts = [
         'searchCliente' => 'integer',
     ];
+
+    public function cargarEmpresas()
+    {
+        $this->empresasFiltradas = EmpresaAsociada::where('cliente_id', $cliente_id)->get();
+        $this->empresa_asociada_id = null;
+    }
+
+    public function mount()
+    {
+        if ($this->cliente_id) {
+            $this->cargarEmpresas($this->cliente_id);
+        }
+    }
 
     public function filtrarCliente($value)
     {
@@ -64,15 +83,14 @@ class Index extends Component
     public function render()
     {
         $clientes = Cliente::all();
-        $query = Contrato::with(['cliente', 'empresaAsociada']);
 
-        $contratos = $query
+        $contratos = Contrato::with(['cliente', 'empresasFiltradas'])
             ->when($this->searchCliente, fn($q) =>
                 $q->where('cliente_id', $this->searchCliente)
             )
             ->when($this->searchNombre, fn($q) =>
                 $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
-                  ->orWhereHas('empresaAsociada', function($q) {
+                  ->orWhereHas('empresasFiltradas', function($q) {
                           $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
                         }))
                         ->orderBy($this->sortField, $this->sortDirection)

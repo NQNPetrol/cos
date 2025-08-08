@@ -19,7 +19,7 @@
             <!-- Cliente -->
             <div>
                 <label class="block mb-1">Cliente <span class="text-red-500">*</span></label>
-                <select name="cliente_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <select name="cliente_id" id="cliente_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                     <option value="">Seleccione un cliente</option>
                     @foreach ($clientes as $cliente)
                         <option value="{{ $cliente->id }}" {{ old('id_cliente') == $cliente->id ? 'selected' : '' }}>
@@ -31,9 +31,9 @@
 
             <div>
                 <label class="block mb-1">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
-                <select name="empresa_asociada_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <select name="empresa_asociada_id" id="empresa_asociada_id" required class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                     <option value="">Seleccione una empresa asociada</option>
-                    @foreach ($empresas_asociadas as $empresa)
+                    @foreach ($empresasFiltradas as $empresa)
                         <option value="{{ $empresa->id }}" {{ old('empresa_asociada_id') == $empresa->id ? 'selected' : '' }}>
                             {{ $empresa->nombre }}
                         </option>

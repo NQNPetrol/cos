@@ -17,7 +17,7 @@ class ContratoController extends Controller
     public function create()
     {
         $clientes = Cliente::all();
-        $empresas_asociadas = EmpresaAsociada::all();
+        $empresas_asociadas = collect();
         return view('contratos.create', compact(['clientes', 'empresas_asociadas']));
     }
 
@@ -42,8 +42,8 @@ class ContratoController extends Controller
     public function edit(Contrato $contrato)
     {
         $clientes = Cliente::all();
-        $empresa_asociada = EmpresaAsociada::all();
-        return view('contratos.edit', compact(['contrato', 'clientes', 'empresa_asociada']));
+        $empresa_asociada = $contrato->cliente->empresasAsociadas ?? collect();
+        return view('contratos.edit', compact(['contrato', 'clientes', 'empresa_asociada', 'cliente_id']));
     }
 
     public function update(Request $request, Contrato $contrato)
