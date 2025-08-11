@@ -12,7 +12,9 @@ class ClienteEmpresasAsociadasController extends Controller
     public function index($clienteId)
     {
         // Verificar que el cliente existe
-        $cliente = Cliente::with('empresasAsociadas')->findOrFail($clienteId);
+        $cliente = Cliente::with(['empresasAsociadas' => function($query) {
+            $query->withTimestamps();
+        }])->findOrFail($clienteId);
 
         $empresasNoAsociadas = EmpresaAsociada::whereDoesntHave('cliente', function($query) use ($clienteId) {
             $query->where('cliente_id', $clienteId);
@@ -33,8 +35,13 @@ class ClienteEmpresasAsociadasController extends Controller
         ]);
 
         $cliente = Cliente::findOrFail($clienteId);
-        
-        $cliente->empresasAsociadas()->syncWithoutDetaching($request->empresas);
+        $now = now()->format('Y-m-d H:i:s');
+        $attachData = [];
+        foreach ($request->empresas as $empresaId) {
+            $attachData[$empresaId] = ['created_at' => $now, 'updated_at' => $now];
+        }
+
+        $cliente->empresasAsociadas()->syncWithoutDetaching($attachData);
 
         return redirect()
             ->route('clientes.empresas-asociadas', $clienteId)

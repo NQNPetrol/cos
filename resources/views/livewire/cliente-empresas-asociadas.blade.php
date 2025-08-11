@@ -108,7 +108,7 @@
         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-gray-900 rounded-lg p-6 w-full max-w-md" @click.stop>
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold text-gray-100">Asociar Empresa</h3>
+                    <h3 class="text-xl font-bold text-gray-100">Asociar Empresas</h3>
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -117,14 +117,17 @@
                 </div>
 
                 <form wire:submit.prevent="asociarEmpresa">
-                    <div class="mb-4">
-                        <label class="block text-sm mb-1 text-gray-300">Seleccionar Empresa <span class="text-red-500">*</span></label>
-                        <select wire:model="empresaSeleccionada" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                            <option value="">Selecciona una empresa...</option>
-                            @foreach($empresasDisponibles as $empresa)
-                                <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
-                            @endforeach
-                        </select>
+                    <div class="mb-4 max-h-96 overflow-y-auto">
+                        <label class="block text-sm mb-1 text-gray-300">Seleccionar Empresas <span class="text-red-500">*</span></label>
+                        @foreach($empresasDisponibles as $empresa)
+                        <label class="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded">
+                            <input type="checkbox" 
+                                   wire:model="empresasSeleccionadas"
+                                   value="{{ $empresa->id }}"
+                                   class="rounded border-gray-600 text-green-500 focus:ring-green-500">
+                            <span>{{ $empresa->nombre }}</span>
+                        </label>
+                        @endforeach
                         @error('empresaSeleccionada') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror
@@ -136,17 +139,21 @@
                         </div>
                     @endif
 
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" wire:click="closeModal"
-                                class="px-4 py-2 text-gray-300 hover:text-gray-100">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                                @if($empresasDisponibles->isEmpty()) disabled @endif
-                                class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-6 py-2 rounded text-white font-medium">
-                            Asociar
-                        </button>
-                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-400">
+                            Seleccionadas: {{ count($empresasSeleccionadas) }}
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" wire:click="closeModal"
+                                    class="px-4 py-2 text-gray-300 hover:text-gray-100">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    @if($empresasDisponibles->isEmpty()) disabled @endif
+                                    class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-6 py-2 rounded text-white font-medium">
+                                Asociar
+                            </button>
+                        </div>
                 </form>
             </div>
         </div>

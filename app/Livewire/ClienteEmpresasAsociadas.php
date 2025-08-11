@@ -18,6 +18,7 @@ class ClienteEmpresasAsociadas extends Component
     public $search = '';
     public $showModal = false;
     public $empresaSeleccionada = '';
+    public $empresasSeleccionadas = [];
 
     public function mount($clienteId)
     {
@@ -28,6 +29,7 @@ class ClienteEmpresasAsociadas extends Component
     public function render()
     {
         $empresasAsociadas = $this->cliente->empresasAsociadas()
+            ->withPivot(['created_at', 'updated_at']) 
             ->when($this->search, function($query) {
                 $query->where('nombre', 'like', '%'.$this->search.'%');
             })
@@ -54,22 +56,29 @@ class ClienteEmpresasAsociadas extends Component
     {
         $this->showModal = false;
         $this->empresaSeleccionada = '';
+        $this->reset('empresasSeleccionadas');
     }
 
     public function asociarEmpresa()
     {
         $this->validate([
-            'empresaSeleccionada' => 'required|exists:empresas_asociadas,id'
+        'empresasSeleccionadas' => 'required|array',
+        'empresasSeleccionadas.*' => 'exists:empresas_asociadas,id'
         ]);
 
-        // Verificar que la empresa no esté ya asociada
-        if (!$this->cliente->empresasAsociadas()->where('empresa_asociada_id', $this->empresaSeleccionada)->exists()) {
-            $this->cliente->empresasAsociadas()->attach($this->empresaSeleccionada);
-            session()->flash('message', 'Empresa asociada correctamente');
-        } else {
-            session()->flash('error', 'La empresa ya está asociada a este cliente');
+        $now = now()->format('Y-m-d H:i:s');
+        $attachData = [];
+    
+        foreach ($this->empresasSeleccionadas as $empresaId) {
+            $attachData[$empresaId] = [
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
         }
 
+        $this->cliente->empresasAsociadas()->syncWithoutDetaching($attachData);
+    
+        session()->flash('message', 'Empresas asociadas correctamente');
         $this->closeModal();
         $this->resetPage();
     }

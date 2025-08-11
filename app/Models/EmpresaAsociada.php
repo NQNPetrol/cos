@@ -18,6 +18,7 @@ class EmpresaAsociada extends Model
     public function cliente()
     {
         return $this->belongsToMany(Cliente::class, 'cliente_empresa_asociada')
+                    ->withPivot(['created_at', 'updated_at'])
                     ->using(ClienteEmpresaAsociada::class);
     }
 }
