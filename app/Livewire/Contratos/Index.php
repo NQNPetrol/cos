@@ -20,31 +20,10 @@ class Index extends Component
     // Nuevas propiedades para el formulario
     public $cliente_id;
     public $empresa_asociada_id;
-    public $empresasFiltradas = [];
 
     public $casts = [
         'searchCliente' => 'integer',
     ];
-
-    public function cargarEmpresas()
-    {
-        $this->empresasFiltradas = EmpresaAsociada::where('cliente_id', $cliente_id)->get();
-        $this->empresa_asociada_id = null;
-    }
-
-    public function mount()
-    {
-        if ($this->cliente_id) {
-            $this->cargarEmpresas($this->cliente_id);
-        }
-    }
-
-    public function filtrarCliente($value)
-    {
-        $this->searchCliente = $value === '' ? null : (int) $value;
-
-        $this->resetPage();
-    }
 
     public function clearFilters()
     {
@@ -53,17 +32,6 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function loadContratos($cliente)
-    {
-        $cliente = Cliente::find($this->cliente_id);
-        
-        // Asegúrate de que $client no sea nulo antes de intentar acceder a wells
-        if ($cliente) {
-            $this->contratos = $cliente->contratos;
-        } else {
-            $this->contratos = collect(); // Si no hay cliente seleccionado, retorna una colección vacía
-        }
-    }
 
     public function updatingSearchNombre()
     {
@@ -84,13 +52,13 @@ class Index extends Component
     {
         $clientes = Cliente::all();
 
-        $contratos = Contrato::with(['cliente', 'empresasFiltradas'])
+        $contratos = Contrato::with(['cliente', 'empresaAsociada'])
             ->when($this->searchCliente, fn($q) =>
                 $q->where('cliente_id', $this->searchCliente)
             )
             ->when($this->searchNombre, fn($q) =>
                 $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
-                  ->orWhereHas('empresasFiltradas', function($q) {
+                  ->orWhereHas('empresaAsociada', function($q) {
                           $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
                         }))
                         ->orderBy($this->sortField, $this->sortDirection)

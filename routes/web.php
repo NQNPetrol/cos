@@ -93,18 +93,17 @@ Route::middleware([
     })->name('empresas-asociadas.index');
 
     // Ruta para ver empresas asociadas de un cliente específico
-    Route::get('/clientes/{cliente}/empresas-asociadas', function($cliente) {
-        $cliente = \App\Models\Cliente::findOrFail($cliente);
-        return view('clientes.nueva-empresa-asociada', [
-            'cliente' => $cliente,
-            'empresas' => $cliente->empresasAsociadas()->paginate(10)
-        ]);
-    })->name('clientes.empresas-asociadas');
+    // Route::get('/clientes/{cliente}/empresas-asociadas', function($cliente) {
+    //     $cliente = \App\Models\Cliente::findOrFail($cliente);
+    //     return view('clientes.nueva-empresa-asociada', [
+    //         'cliente' => $cliente,
+    //         'empresas' => $cliente->empresasAsociadas()->paginate(10)
+    //     ]);
+    // })->name('clientes.empresas-asociadas');
 
-    Route::get('/empresas-asociadas', function() {
-        $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
-        return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
-    })->name('empresas-asociadas.index');
+    
+    
+    Route::get('/clienteEmpresaAsociada/index', [App\Livewire\ClienteEmpresasAsociadas::class, 'index'])->name('cliente-empresas-asociadas.index');
 
     //OBJETIVOS    
     Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])

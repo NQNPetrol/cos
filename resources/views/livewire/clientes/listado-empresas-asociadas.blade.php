@@ -30,16 +30,17 @@
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
         <!-- Filtro cliente -->
+        @if(!$clienteEspecifico)
         <div>
-            <label class="block text-sm mb-1">Cliente</label>
-            <select wire:model.live="clienteFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+            <label class="block text-sm mb-1">Filtrar por Cliente</label>
+            <select wire:model.live="clienteFilter" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos los clientes</option>
                 @foreach($clientesDisponibles as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
                 @endforeach
             </select>
         </div>
+        @endif
 
         <div class="flex items-end">
             <button wire:click="clearFilters" 
@@ -48,6 +49,7 @@
             </button>
         </div>
     </div>
+   
 
     <!-- Tabla contenido -->
     <div class="overflow-x-auto">
@@ -66,9 +68,26 @@
                             <div class="text-sm">{{ $empresa->nombre ?? 'N/A' }}</div>
                         </td>
                         <td class="px-4 py-2">
-                            <div class="text-sm">{{ $empresa->cliente->nombre ?? 'N/A' }}</div>
+                            @if($empresa->clientes->count() > 0)
+                                @foreach($empresa->clientes as $cliente)
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-sm bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                            {{ $cliente->nombre }}
+                                        </span>
+                                        <button wire:click="desasociarDeCliente({{ $empresa->id }}, {{ $cliente->id }})"
+                                                onclick="return confirm('¿Está seguro de que desea desasociar esta empresa del cliente {{ $cliente->nombre }}?')"
+                                                class="text-red-400 hover:text-red-300 ml-2"
+                                                title="Desasociar de cliente">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <span class="text-gray-400 text-sm">Sin asociar</span>
+                            @endif
                         </td>
-                
                         <td class="px-4 py-2">
                             <div class="flex space-x-2">
                                 <button wire:click="editarEmpresa({{ $empresa->id }} )"
@@ -130,17 +149,6 @@
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                             @error('nombre') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
-
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Cliente<span class="text-red-500">*</span></label>
-                            <select wire:model="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                <option value="">Todos los clientes</option>
-                                @foreach($clientesDisponibles as $cliente)
-                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
                     <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
                         <button type="button" wire:click="closeModal"
                                 class="px-4 py-2 text-gray-300 hover:text-gray-100">

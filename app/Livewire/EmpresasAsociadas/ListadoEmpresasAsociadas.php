@@ -35,10 +35,12 @@ class ListadoEmpresasAsociadas extends Component
 
     public function render()
     {
-        $query = EmpresaAsociada::query()->with('cliente');
+        $query = EmpresaAsociada::query();
 
         if ($this->clienteFilter) {
-            $query->where('cliente_id', $this->clienteFilter);
+            $query->whereHas('clientes', function($q){
+                $q->where('clientes.id', $this->clienteFilter);
+            });
         }
 
         if ($this->search) {
@@ -50,7 +52,7 @@ class ListadoEmpresasAsociadas extends Component
             });
         }
         
-        $empresas = $query->orderBy('nombre')->paginate(10);
+        $empresas = $query->with('clientes')->orderBy('nombre')->paginate(10);
 
         return view('livewire.clientes.listado-empresas-asociadas', [
             'empresas' => $empresas,
@@ -66,9 +68,14 @@ class ListadoEmpresasAsociadas extends Component
         $this->resetPage();
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function openModal()
     {
-        $this->reset(['nombre', 'cliente_id', 'editingId']);
+        $this->reset(['nombre', 'editingId']);
         $this->showModal = true;
     }
 
@@ -84,41 +91,56 @@ class ListadoEmpresasAsociadas extends Component
         $empresa = EmpresaAsociada::findOrFail($id);
         $this->editingId = $id;
         $this->nombre = $empresa->nombre;
-        $this->cliente_id = $empresa->cliente_id;
         $this->showModal = true;
     }
 
     public function save()
     {
         $this->validate([
-            'nombre' => 'required|string|max:255',
-            'cliente_id' => 'required|exists:clientes,id'
+            'nombre' => 'required|string|max:255'
         ]);
 
         if ($this->editingId) {
             $empresa = EmpresaAsociada::find($this->editingId);
             $empresa->update([
-                'nombre' => $this->nombre,
-                'cliente_id' => $this->cliente_id
+                'nombre' => $this->nombre
             ]);
             $message = 'Empresa actualizada correctamente';
         } else {
             EmpresaAsociada::create([
-                'nombre' => $this->nombre,
-                'cliente_id' => $this->cliente_id
+                'nombre' => $this->nombre
             ]);
             $message = 'Empresa creada correctamente';
         }
 
         $this->closeModal();
         session()->flash('message', $message);
+        $this->resetPage();
 
     }
 
     public function eliminarEmpresa($id)
     {
-        EmpresaAsociada::find($id)->delete();
+        $empresa = EmpresaAsociada::findOrFail($id);
+
+        if ($empresa->clientes()->count() > 0) {
+            session()->flash('error', 'No se puede eliminar');
+            return;
+        }
+        $empresa->delete();
         session()->flash('message', 'Empresa asociada eliminada correctamente');
+        $this->resetPage();
+    }
+
+    public function desasociarDeCliente($empresaId, $clienteId)
+    {
+        $empresa = EmpresaAsociada::findOrFail($empresaId);
+        $cliente = Cliente::findOrFail($clienteId);
+        
+        $empresa->clientes()->detach($clienteId);
+        
+        session()->flash('message', "Empresa '{$empresa->nombre}' desasociada del cliente '{$cliente->nombre}' correctamente");
+        $this->resetPage();
     }
     
 }
