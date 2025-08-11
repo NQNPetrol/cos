@@ -52,7 +52,7 @@
                     <!-- Campo Registra (automático) -->
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-300 mb-2">
-                            Registrado por
+                            Registra
                         </label>
                         <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
                             {{ auth()->user()->name }}
@@ -65,14 +65,14 @@
                             Fecha de Registro
                         </label>
                         <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
-                            {{ now()->format('d/m/Y H:i') }}
+                            {{ now()->format('d/m/Y') }}
                         </div>
                     </div>
 
                     <!-- Campo observaciones -->
                     <div class="mb-6">
                         <label for="observaciones" class="block text-sm font-medium text-gray-300 mb-2">
-                            Observaciones <span class="text-red-500">*</span>
+                            Detalles y observaciones <span class="text-red-500">*</span>
                         </label>
                         <textarea wire:model="observaciones" id="observaciones" rows="5"
                                 class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 

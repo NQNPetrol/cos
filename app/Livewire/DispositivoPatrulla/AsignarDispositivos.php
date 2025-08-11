@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Livewire\DispositivoPatrulla;
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\Patrulla;
+use App\Models\Dispositivo;
+use App\Models\DispositivoPatrulla;
+
+class AsignarDispositivos extends Component
+{
+
+    use WithPagination;
+
+    public $patrulla;
+    public $showModal = false;
+    public $selectedDispositivos = [];
+    public $search = '';
+    public $fechaAsignacion;
+
+    protected $rules = [
+        'selectedDispositivos' => 'required|array|min:1',
+        'selectedDispositivos.*' => 'exists:dispositivos,id',
+        'fechaAsignacion' => 'required|date'
+    ];
+
+    public function mount(Patrulla $patrulla)
+    {
+        $this->patrulla = $patrulla;
+        $this->fechaAsignacion = now()->format('Y-m-d');
+    }
+
+    public function render()
+    {
+
+        $asignaciones = DispositivoPatrulla::with(['dispositivo.cliente'])
+            ->where('patrulla_id', $this->patrulla->id)
+            ->paginate(10);
+
+        $dispositivosDisponibles = Dispositivo::whereDoesntHave('patrullas')
+            ->when($this->search, function($query) {
+                $query->where(function($q) {
+                    $q->where('id', 'like', '%'.$this->search.'%')
+                      ->orWhere('tipo', 'like', '%'.$this->search.'%')
+                      ->orWhereHas('cliente', function($q) {
+                        $q->where('nombre', 'like', '%'.$this->search.'%');
+                    });
+                });
+            })
+            ->where('estado_inventario', '!=', 'Dado de Baja')
+            ->with('cliente')
+            ->get();
+            
+            return view('livewire.patrullas.asignar-dispositivos', [
+                'asignaciones' => $asignaciones,
+                'dispositivosDisponibles' => $dispositivosDisponibles
+        ]);
+    }
+
+    public function openModal()
+    {
+        $this->reset(['selectedDispositivos', 'search']);
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->reset(['selectedDispositivos', 'search']);
+        $this->showModal = false;
+        $this->resetErrorBag();
+        $this->dispatch('close-modal');
+    }
+
+    public function asignarDispositivos()
+    {
+        $this->validate();
+
+        // Verificar que los dispositivos no estén asignados a otras patrullas
+        $yaAsignados = DispositivoPatrulla::whereIn('dispositivo_id', $this->selectedDispositivos)
+            ->where('patrulla_id', '!=', $this->patrulla->id)
+            ->exists();
+
+        if ($yaAsignados) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Uno o más dispositivos ya están asignados a otra patrulla'
+            ]);
+            return;
+        }
+
+        $syncData = [];
+        foreach ($this->selectedDispositivos as $dispositivoId) {
+            $syncData[$dispositivoId] = [
+                'fecha_asignacion' => $this->fechaAsignacion
+            ];
+        }
+
+        $this->patrulla->dispositivos()->syncWithoutDetaching($syncData);
+
+        $this->showModal = false;
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Dispositivos asignados correctamente'
+        ]);
+    }
+
+    public function eliminarAsignacion($dispositivoId)
+    {
+        $this->patrulla->dispositivos()->detach($dispositivoId);
+        
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Dispositivo desvinculado correctamente'
+        ]);
+    }
+}

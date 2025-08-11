@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Evento extends Model
 {
@@ -38,6 +39,11 @@ class Evento extends Model
     public function creador()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function media()
+    {
+        return $this->morphMany(Media::class, 'model');
     }
 
     public function getUbicacionAttribute()

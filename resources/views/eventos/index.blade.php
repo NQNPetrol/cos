@@ -12,40 +12,69 @@
 
                     <!-- Filtros -->
                     <form method="GET" action="{{ route('eventos.index') }}" class="mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex flex-wrap items-end gap-4">
                             <!-- Filtro por cliente -->
-                            <div>
+                            <div class="flex-1 min-w-[300px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Cliente</label>
-                                <input type="text" name="cliente" value="{{ request('cliente') }}" 
-                                       placeholder="Buscar por cliente..."
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                <select name="cliente_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                    <option value="">Todos los clientes</option>
+                                     @foreach($clientes as $cliente)
+                                        <option value="{{ $cliente->id }}" 
+                                                {{ request('cliente_id') == $cliente->id ? 'selected' : '' }}>
+                                            {{ $cliente->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             
                             <!-- Filtro por fecha desde -->
-                            <div>
+                            <div class="flex-1 min-w-[220px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Desde</label>
                                 <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
                             </div>
                             
                             <!-- Filtro por fecha hasta -->
-                            <div>
+                            <div class="flex-1 min-w-[220px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Hasta</label>
                                 <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
                             </div>
                             
-                            <!-- Botones -->
-                            <div class="flex items-end space-x-2 md:col-span-3">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <!-- Boton Filtrar -->
+                            <div class="flex-1 min-w-[50px]">
+                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                     <i class="bi bi-funnel mr-2"></i>Filtrar
                                 </button>
-                                <a href="{{ route('eventos.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-                                    <i class="bi bi-arrow-counterclockwise mr-2"></i>Limpiar
-                                </a>
                             </div>
                         </div>
                     </form>
+
+                    <!-- Mostrar filtros activos -->
+                    @if(request()->hasAny(['cliente_id', 'fecha_desde', 'fecha_hasta']))
+                        <div class="mb-4 p-3 bg-blue-900 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-blue-100">
+                                    <span class="font-medium">Filtros activos:</span>
+                                    @if(request('cliente_id'))
+                                        @php
+                                            $clienteFiltro = $clientes->firstWhere('id', request('cliente_id'));
+                                        @endphp
+                                        <span class="ml-2 px-2 py-1 bg-blue-800 rounded">Cliente: {{ $clienteFiltro->nombre ?? 'ID'.request('cliente_id') }}</span>
+                                    @endif
+                                    @if(request('fecha_desde'))
+                                        <span class="ml-2 px-2 py-1 bg-blue-800 rounded">Desde: {{ request('fecha_desde') }}</span>
+                                    @endif
+                                    @if(request('fecha_hasta'))
+                                        <span class="ml-2 px-2 py-1 bg-blue-800 rounded">Hasta: {{ request('fecha_hasta') }}</span>
+                                    @endif
+                                </div>
+                                <a href="{{ route('eventos.index') }}" class="text-blue-300 hover:text-blue-100 text-sm">
+                                    <i class="bi bi-x-circle mr-1"></i>Limpiar filtros
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                     
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
@@ -88,15 +117,21 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="#" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
+                                            <a href="{{ route('eventos.edit', $evento) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
+                                                title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <a href="#" class="text-red-600 hover:text-red-900 dark:text-red-400">
+                                            <form action="{{ route('eventos.destroy', $evento) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                    onclick="return confirm('¿Estás seguro de eliminar este evento?')"
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400"
+                                                    title="Eliminar">
                                                 <i class="bi bi-trash"></i>
-                                            </a>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -111,10 +146,18 @@
                         </table>
                     </div>
                     
-                    <!-- Paginación -->
-                    <div class="mt-4">
-                        {{ $eventos->links() }}
-                    </div>
+                    <!-- Información de resultados y paginación -->
+                    @if($eventos->count() > 0)
+                        <div class="mt-4 flex items-center justify-between">
+                            <div class="text-sm text-gray-400">
+                                Mostrando {{ $eventos->firstItem() }} a {{ $eventos->lastItem() }} 
+                                de {{ $eventos->total() }} resultados
+                            </div>
+                            <div>
+                                {{ $eventos->links() }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

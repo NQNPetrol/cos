@@ -305,10 +305,9 @@
 
                 <!-- Submenú -->
                 <div id="submenuEventos" class="pl-6 space-y-1 hidden">
-                    <a href="{{ route('eventos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Eventos</a>
-                    <a href="{{ route('eventos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-plus mr-2"></i>Nuevo Evento</a>
-                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Ver Seguimientos</a>
-                    <a href="{{ route('seguimientos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-node-plus mr-2"></i>Nuevo Seguimiento</a>
+                    <a href="{{ route('eventos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Listado</a>
+                    <a href="{{ route('eventos.create') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-plus mr-2"></i>Nuevo</a>
+                    <a href="{{ route('seguimientos.index') }}" class="block text-gray-700 hover:text-gray-900 p-2"><i class="bi bi-search mr-2"></i>Administrar Seguimientos</a>
                 </div>
 
                 <!-- OBJETIVOS -->
@@ -324,13 +323,9 @@
                     
                     <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-plus-circle mr-2"></i>
-                        Nuevo Objetivo
+                        Administrar Objetivos
                     </a>
                     
-                    <a href="{{ route('objetivos.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-list-task mr-2"></i>
-                        Objetivos
-                    </a>
                 </div>
 
 
@@ -345,8 +340,7 @@
 
                 <!-- Submenú -->
                 <div id="submenuPatrullas" class="pl-6 space-y-1 hidden">
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Ver Patrullas</a>
-                    <a href="#" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Evento</a>
+                    <a href="{{ route('patrullas.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Administrar Patrullas</a>
                 </div>
 
                 <button id="toggleConfiguracion" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">

@@ -19,7 +19,9 @@ class ManageObjetivos extends Component
     public $latitud = '';
     public $longitud = '';
     public $localidad = '';
+    public $localidades = [];
 
+    public $showModal = false;
     public $editingId = null;
     public $clientes;
     public $allContratos;
@@ -33,11 +35,44 @@ class ManageObjetivos extends Component
         'longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
     ];
 
+    protected $queryString = [
+        'search' => ['except' => '', 'as' => 'q'],
+        'cliente_id' => ['except' => ''],
+        'contrato_id' => ['except' => ''],
+        'localidad' => ['except' => '']
+    ];
+
+    public function openModal()
+    {
+        $this->resetForm();
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->resetForm();
+        $this->showModal = false;
+    }
+
+
     public function mount()
     {
         $this->clientes = Cliente::all();
         $this->allContratos = Contrato::all();
-        $this->contratos = collect();
+        $this->contratos = $this->allContratos; // Mostrar todos los contratos inicialmente
+        $this->localidades = Objetivo::select('localidad')
+            ->distinct()
+            ->whereNotNull('localidad')
+            ->orderBy('localidad')
+            ->pluck('localidad')
+            ->toArray();
+    }
+
+    public function resetFilters()
+    {
+        $this->reset(['search', 'cliente_id', 'contrato_id', 'localidad']);
+        $this->contratos = $this->allContratos;
+        $this->resetPage();
     }
 
     public function selectClient($value)
@@ -60,6 +95,7 @@ class ManageObjetivos extends Component
         ]);
 
         $this->resetForm();
+        $this->closeModal();
 
         session()->flash('success', 'Objetivo creado correctamente.');
     }
@@ -74,6 +110,7 @@ class ManageObjetivos extends Component
         $this->latitud = $objetivo->latitud;
         $this->longitud = $objetivo->longitud;
         $this->localidad = $objetivo->localidad;
+        $this->showModal = true;
     }
 
     public function update()
@@ -92,6 +129,7 @@ class ManageObjetivos extends Component
         ]);
 
         $this->resetForm();
+        $this->closeModal();
 
         session()->flash('success', 'Objetivo actualizado correctamente.');
     }
@@ -111,12 +149,40 @@ class ManageObjetivos extends Component
         $this->latitud = '';
         $this->longitud = '';
         $this->localidad = '';
+        $this->resetErrorbag();
+    }
+
+    public function updated($property)
+    {
+        if (in_array($property, ['search', 'cliente_id', 'contrato_id', 'localidad'])){
+            $this->resetPage();
+        }
+
+        if ($property === 'cliente_id'){
+            $this->contratos = $this->allContratos->where('cliente_id', $this->cliente_id)->values();
+            $this->contrato_id = '';
+        }
     }
 
     public function render()
     {
         $objetivos = Objetivo::with('cliente', 'contrato')
-            ->where('nombre', 'like', '%'.$this->search.'%')
+            ->when($this->search, function($query) {
+                $query->where(function($q){
+                    $q->where('nombre', 'like', '%'.$this->search.'%')
+                       ->orWhere('localidad', 'like', '%'.$this->search.'%')
+                       ->orWhere('cliente_id', 'like', '%'.$this->search.'%');
+                    });
+            })
+            ->when($this->cliente_id, function($query) {
+                $query->where('cliente_id', $this->cliente_id);
+            })
+            ->when($this->contrato_id, function($query) {
+                $query->where('contrato_id', $this->contrato_id);
+            })
+            ->when($this->localidad, function($query) {
+                $query->where('localidad', $this->localidad);
+            })
             ->orderBy('id', 'desc')
             ->paginate(10);
 

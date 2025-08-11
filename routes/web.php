@@ -5,6 +5,10 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
+use App\Http\Controllers\DispositivoPatrullaController;
+use App\Models\Patrulla;
+use App\Http\Controllers\EventoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,7 +34,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
-
+    //CLIENTES
     Route::get('/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])
         // ->middleware('can:crear.cliente')
         ->name('crear.cliente');
@@ -42,7 +46,7 @@ Route::middleware([
 
     Route::get('/configuracion/permisos', [App\Http\Controllers\SistemaController::class, 'crear_permiso'])
         ->name('crear.permiso');
-
+    //USUARIOS
     Route::get('/usuarios', [App\Http\Controllers\UserController::class, 'index'])
         // ->middleware('can:administrar.usuarios')
         ->name('usuarios.index');
@@ -97,6 +101,13 @@ Route::middleware([
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
     Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
     Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoController::class, 'edit'])->name('eventos.edit');
+    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])->name('eventos.update');
+    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
+    
+    //MEDIA
+    Route::get('/eventos/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
+        ->name('media.eventos.destroy');
 
     
     //PERSONAL
@@ -127,6 +138,15 @@ Route::middleware([
         //->middleware('can:editar.inventario')
         ->name('inventario.update');
 
+    //PATRULLAS
+    Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'index'])
+        ->name('patrullas.index');
+    Route::get('/livewire/patrullas', [\App\Http\Controllers\PatrullaController::class, 'create'])
+        ->name('patrullas.create');
+
+    //DISPOSiTIVO-PATRULLA
+    Route::get('/patrullas/{patrulla}/dispositivos', [DispositivoPatrullaController::class, 'index'])
+    ->name('patrullas.dispositivos');
 
 });
 

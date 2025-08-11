@@ -17,10 +17,131 @@ class VerSeguimientos extends Component
     public $estadoFilter = '';
     public $eventoFilter = '';
     public $tipoFilter = '';
+    public $eventosDisponibles = [];
     
     // Propiedades para ordenar
     public $sortField = 'fecha';
     public $sortDirection = 'desc';
+
+    // Propiedades para el modal
+    public $showModal = false;
+    public $editingId = null;
+    
+    // Propiedades del formulario
+    public $evento_id;
+    public $fecha;
+    public $estado = 'ABIERTO';
+    public $observaciones;
+
+    protected $rules = [
+        'evento_id' => 'required|exists:eventos,id',
+        'fecha' => 'required|date',
+        'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
+        'observaciones' => 'nullable|string|max:1000',
+    ];
+
+    public function mount()
+    {
+        $this->eventosDisponibles = Evento::whereDoesntHave('seguimientos', function($query) {
+            $query->where('estado', 'CERRADO');
+        })->with(['cliente', 'categoria'])->get();
+    }
+
+    public function saveNew()
+    {
+        $this->validate([
+            'evento_id' => 'required|exists:eventos,id',
+            'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
+            'observaciones' => 'nullable|string|max:1000' // Corregido "nulalble" a "nullable"
+            ]);
+
+        try {
+            $seguimiento = Seguimiento::create([
+                'evento_id' => $this->evento_id,
+                'estado' => $this->estado,
+                'observaciones' => $this->observaciones,
+                'user_id' => auth()->id(),
+                'fecha' => now(), // Usar now() en lugar de $this->fecha que no está definido
+                'titulo' => 'Seguimiento para Evento #'.$this->evento_id
+            ]);
+
+        $this->reset(['evento_id', 'observaciones', 'estado']);
+        $this->estado = 'ABIERTO';
+        
+        $this->showModal = false;
+        session()->flash('success', 'Seguimiento creado exitosamente!');
+        $this->resetPage();
+        
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al crear el seguimiento: '.$e->getMessage());
+            \Log::error('Error al crear seguimiento: '.$e->getMessage());
+        }
+    }
+
+    public function openModal()
+    {
+        $this->resetForm();
+        $this->mount();
+        $this->showModal = true;
+    }
+
+    public function edit($id)
+    {
+        $seguimiento = Seguimiento::findOrFail($id);
+        $this->editingId = $id;
+        $this->evento_id = $seguimiento->evento_id;
+        $this->fecha  = $seguimiento->fecha->format('Y-m-d');
+        $this->estado  = $seguimiento->estado;
+        $this->observaciones = $seguimiento->observaciones;
+        $this->showModal = true;
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        $data = [
+            'evento_id' => $this->evento_id,
+            'fecha' => $this->fecha,
+            'estado' => $this->estado,
+            'observaciones' => $this->observaciones,
+            'user_id' => auth()->id(),
+        ];
+
+        if ($this->editingId) {
+            Seguimiento::find($this->editingId)->update($data);
+            $message = 'Seguimiento actualizado correctamente';
+        } else {
+            Seguimiento::create($data);
+            $message = 'Seguimiento creado correctamente';
+        }
+
+        $this->closeModal();
+        session()->flash('success', $message);
+    }
+
+
+    public function delete($id)
+    {
+        Seguimiento::find($id)->delete();
+        session()->flash('success', 'Seguimiento eliminado correctamente');
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->resetForm();
+    }
+
+    private function resetForm()
+    {
+        $this->editingId = null;
+        $this->evento_id = '';
+        $this->fecha = '';
+        $this->estado = 'ABIERTO';
+        $this->observaciones = '';
+    }
+
 
     public function updatingSearch()
     {
@@ -36,6 +157,16 @@ class VerSeguimientos extends Component
         }
         
         $this->sortField = $field;
+    }
+
+    public function updatingTipoFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingEstadoFilter()
+    {
+        $this->resetPage();
     }
 
     public function clearFilters()
@@ -55,7 +186,7 @@ class VerSeguimientos extends Component
                         });
                     }
                     // Buscar en detalles o tipo
-                    $q->orWhere('detalles', 'like', '%'.$this->search.'%')
+                    $q->orWhere('observaciones', 'like', '%'.$this->search.'%')
                       ->orWhere('estado', 'like', '%'.$this->search.'%')
                       ->orWhere('id', 'like', '%'.$this->search.'%')
                       ->orWhereHas('evento', function($subQuery) {
@@ -78,4 +209,5 @@ class VerSeguimientos extends Component
             'header' => 'Listado de Seguimientos'
         ]);
     }
+
 }
