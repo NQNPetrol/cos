@@ -1,7 +1,7 @@
 
-import EventBarChart from './Components/EventBarChart.vue';
+import EventosBarras from './Components/EventosBarras.vue';
 
 
 const app = createApp({});
-app.component('event-bar-chart', EventBarChart);
+app.component('eventos-barras', EventosBarras);
 app.mount('#app');
