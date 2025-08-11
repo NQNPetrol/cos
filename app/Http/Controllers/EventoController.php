@@ -9,6 +9,8 @@ use App\Models\Personal;
 use App\Models\Categoria;
 use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EventoController extends Controller
 {
@@ -165,4 +167,31 @@ class EventoController extends Controller
 
         return back()->with('success', 'Imagen eliminada correctamente');
     }
+
+    public function eventosBarras(Request $request)
+    {
+
+         $query = Evento::query();
+
+        // Filtrar por fecha, ?start_date=2025-08-01&end_date=2025-08-05
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('fecha_hora', [
+                $request->input('start_date') . ' 00:00:00',
+                $request->input('end_date')   . ' 23:59:59',
+            ]);
+        }
+
+        $data = $query
+            ->select(
+                DB::raw("DATE(`fecha_hora`) as date"),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return response()->json($data);
+
+    }
+    
 }
