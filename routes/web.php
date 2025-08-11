@@ -74,6 +74,8 @@ Route::middleware([
     Route::get('/contratos/{contrato}/edit', [App\Http\Controllers\ContratoController::class, 'edit'])
         ->middleware('can:editar.contratos')
         ->name('contratos.edit');
+    Route::get('/contratos/{contrato}/edit-livewire', \App\Livewire\Contratos\Edit::class)
+        ->name('contratos.edit-livewire');
 
     // UPDATE
     Route::put('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'update'])

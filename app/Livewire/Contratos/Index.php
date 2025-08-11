@@ -16,13 +16,14 @@ class Index extends Component
     public $searchNombre = '';
     public $sortField = 'nombre_proyecto';
     public $sortDirection = 'asc';
+    public $empresa_asociada_id = null;
 
-    // Nuevas propiedades para el formulario
-    public $cliente_id;
-    public $empresa_asociada_id;
-
-    public $casts = [
-        'searchCliente' => 'integer',
+    protected $queryString = [
+        'searchNombre' => ['except' => ''],
+        'searchCliente' => ['except' => null],
+        'empresa_asociada_id' => ['except' => null],
+        'sortField' => ['except' => 'nombre_proyecto'],
+        'sortDirection' => ['except' => 'asc'],
     ];
 
     public function clearFilters()
@@ -48,33 +49,42 @@ class Index extends Component
         }
     }
 
-    public function render()
-    {
-        $clientes = Cliente::all();
-
-        $contratos = Contrato::with(['cliente', 'empresaAsociada'])
-            ->when($this->searchCliente, fn($q) =>
-                $q->where('cliente_id', $this->searchCliente)
-            )
-            ->when($this->searchNombre, fn($q) =>
-                $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
-                  ->orWhereHas('empresaAsociada', function($q) {
-                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
-                        }))
-                        ->orderBy($this->sortField, $this->sortDirection)
-                        ->paginate(10);
-
-        return view('livewire.contratos.index', [
-            'contratos' => $contratos,
-            'clientes' => $clientes,
-        ]);
-    }
-
     public function delete($id)
     {
         Contrato::find($id)->delete();
         session()->flash('message', 'Contrato eliminado correctamente');
     }
     
+
+    public function render()
+    {
+        $clientes = Cliente::orderBy('nombre')->get();
+
+        $contratos = Contrato::with(['cliente', 'empresaAsociada'])
+            ->when($this->searchCliente, function($query) {
+                $query->where('cliente_id', $this->searchCliente);
+            })
+            ->when($this->empresa_asociada_id, function ($query) {
+                $query->where('empresa_asociada_id', $this->empresa_asociada_id);
+            })
+            ->when($this->searchNombre, function($query) {
+                $query->where(function($q) {
+                    $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
+                      ->orWhereHas('empresaAsociada', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
+                    })
+                    ->orWhereHas('cliente', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
+                    });
+                });
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
+
+        return view('livewire.contratos.index', [
+            'contratos' => $contratos,
+            'clientes' => $clientes,
+        ]);
+    }
 }
 

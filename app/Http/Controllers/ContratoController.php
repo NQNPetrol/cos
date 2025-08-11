@@ -41,9 +41,7 @@ class ContratoController extends Controller
 
     public function edit(Contrato $contrato)
     {
-        $clientes = Cliente::all();
-        $empresa_asociada = $contrato->cliente->empresasAsociadas ?? collect();
-        return view('contratos.edit', compact(['contrato', 'clientes', 'empresa_asociada', 'cliente_id']));
+        return redirect()->route('contratos.edit-livewire', $contrato);
     }
 
     public function update(Request $request, Contrato $contrato)

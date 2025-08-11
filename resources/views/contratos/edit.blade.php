@@ -12,5 +12,6 @@
                 </ul>
             </div>
         @endif
+        <livewire:livewire.contratos.edit :contrato="$contrato"/>
     </div>
 </x-app-layout>

@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-6">
         <div class="flex-1">
             <label class="block text-sm mb-1">Filtrar por Cliente</label>
-            <select wire:change="filtrarCliente($event.target.value)"
+            <select wire:model.live="searchCliente"
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 @foreach ($clientes as $cliente)

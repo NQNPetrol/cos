@@ -13,7 +13,9 @@
 
             <div class="mb-4">
                 <label class="block mb-1">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
-                <select wire:model="empresa_asociada_id" class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <select wire:model="empresa_asociada_id"
+                        class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2"
+                        @if(!$cliente_id) disabled @endif>
                     <option value="">Seleccione una empresa asociada</option>
                     @foreach ($empresasFiltradas as $empresa)
                         <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
@@ -33,12 +35,12 @@
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-1">Localidad</label>
-                    <input type="text" name="localidad" value="{{ old('localidad') }}" 
+                    <input type="text" wire:model="localidad" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
                 <div>
                     <label class="block mb-1">Provincia</label>
-                    <input type="text" name="provincia" value="{{ old('provincia') }}" 
+                    <input type="text" wire:model="provincia" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
             </div>
@@ -46,7 +48,7 @@
             <!-- Observaciones -->
             <div class="mb-4">
                 <label class="block mb-1">Observaciones</label>
-                <textarea name="observaciones" rows="3"
+                <textarea wire:model="observaciones"
                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">{{ old('observaciones') }}</textarea>
             </div>
 
@@ -54,7 +56,7 @@
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-1">Fecha Inicio</label>
-                    <input type="date" name="fecha_inicio" value="{{ old('fecha_inicio') }}" 
+                    <input type="date" wire:model="fecha_inicio" 
                            class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
 
