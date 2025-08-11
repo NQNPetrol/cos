@@ -15,7 +15,7 @@ class EmpresaAsociada extends Model
         'nombre'
     ];
     
-    public function clientes()
+    public function cliente()
     {
         return $this->belongsToMany(Cliente::class, 'cliente_empresa_asociada')
                     ->using(ClienteEmpresaAsociada::class);

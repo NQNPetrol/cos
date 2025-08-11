@@ -14,12 +14,14 @@ class ClienteEmpresasAsociadas extends Component
     use WithPagination;
 
     public $cliente;
+    public $clienteId; 
     public $search = '';
     public $showModal = false;
     public $empresaSeleccionada = '';
 
     public function mount($clienteId)
     {
+        $this->clienteId = $clienteId;
         $this->cliente = Cliente::findOrFail($clienteId);
     }
 
@@ -31,7 +33,7 @@ class ClienteEmpresasAsociadas extends Component
             })
             ->paginate(10);
 
-        $empresasDisponibles = EmpresaAsociada::whereDoesntHave('clientes', function($query) {
+        $empresasDisponibles = EmpresaAsociada::whereDoesntHave('cliente', function($query) {
             $query->where('cliente_id', $this->cliente->id);
         })->get();
         return view('livewire.cliente-empresas-asociadas', [

@@ -1,15 +1,8 @@
+
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">
-            @if($clienteEspecifico)
-                Empresas Asociadas a {{ $clienteEspecifico->nombre }}
-                <a href="{{ route('crear.cliente') }}" 
-                   class="text-blue-400 text-sm ml-2 hover:underline">
-                   Volver al listado
-                </a>
-            @else
-                Empresas Asociadas
-            @endif
+                Listado de Empresas
         </h2>
         <button wire:click="openModal"
                 class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium">
@@ -29,18 +22,6 @@
                    placeholder="Nombre, Cliente..."
                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
         </div>
-        <!-- Filtro cliente -->
-        @if(!$clienteEspecifico)
-        <div>
-            <label class="block text-sm mb-1">Filtrar por Cliente</label>
-            <select wire:model.live="clienteFilter" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                <option value="">Todos los clientes</option>
-                @foreach($clientesDisponibles as $cliente)
-                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                @endforeach
-            </select>
-        </div>
-        @endif
 
         <div class="flex items-end">
             <button wire:click="clearFilters" 
@@ -57,7 +38,6 @@
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Nombre</th>
-                    <th class="px-4 py-2 text-left">Cliente</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
             </thead>
@@ -66,27 +46,6 @@
                     <tr class="border-b border-gray-700 hover:bg-gray-800">
                         <td class="px-4 py-2">
                             <div class="text-sm">{{ $empresa->nombre ?? 'N/A' }}</div>
-                        </td>
-                        <td class="px-4 py-2">
-                            @if($empresa->clientes->count() > 0)
-                                @foreach($empresa->clientes as $cliente)
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-sm bg-blue-600 text-white px-2 py-1 rounded text-xs">
-                                            {{ $cliente->nombre }}
-                                        </span>
-                                        <button wire:click="desasociarDeCliente({{ $empresa->id }}, {{ $cliente->id }})"
-                                                onclick="return confirm('¿Está seguro de que desea desasociar esta empresa del cliente {{ $cliente->nombre }}?')"
-                                                class="text-red-400 hover:text-red-300 ml-2"
-                                                title="Desasociar de cliente">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                @endforeach
-                            @else
-                                <span class="text-gray-400 text-sm">Sin asociar</span>
-                            @endif
                         </td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-2">
@@ -112,11 +71,11 @@
                     <tr>
                         <td colspan="11" class="text-center px-4 py-8 text-gray-400">
                             <div class="flex flex-col items-center">
-                                <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
                                 </svg>
                                 <p>No se encontraron empresas asociadas a clientes</p>
-                                <p class="text-sm">Intenta ajustar los filtros o agrega un nuevo dispositivo</p>
+                                <p class="text-sm">Intenta ajustar los filtros o crea una nueva.</p>
                             </div>
                         </td>
                     </tr>

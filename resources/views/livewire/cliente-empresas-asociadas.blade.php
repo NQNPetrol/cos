@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">
             Empresas Asociadas a {{ $cliente->nombre }}
-            <a href="{{ route('clientes.index') }}" 
+            <a href="{{ route('crear.cliente') }}" 
                class="text-blue-400 text-sm ml-2 hover:underline">
                ← Volver al listado de clientes
             </a>
@@ -12,7 +12,7 @@
             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
-            Asociar Empresa
+            Asociar Empresas
         </button>
     </div>
 
@@ -20,8 +20,6 @@
     <div class="bg-gray-800 p-4 rounded mb-6">
         <h3 class="text-lg font-medium mb-2">Información del Cliente</h3>
         <div class="grid grid-cols-2 gap-4 text-sm">
-            <div><strong>CUIT:</strong> {{ $cliente->cuit ?? 'N/A' }}</div>
-            <div><strong>Domicilio:</strong> {{ $cliente->domicilio ?? 'N/A' }}</div>
             <div><strong>Ciudad:</strong> {{ $cliente->ciudad ?? 'N/A' }}</div>
             <div><strong>Provincia:</strong> {{ $cliente->provincia ?? 'N/A' }}</div>
         </div>
@@ -80,8 +78,8 @@
                                     onclick="return confirm('¿Está seguro de que desea desasociar esta empresa del cliente? La empresa no será eliminada, solo se quitará la asociación.')"
                                     class="text-red-400 hover:text-red-300"
                                     title="Desasociar empresa">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14L21 3m0 0l-6.5 6.5M21 3l-3.5 3.5M13 7l6-6m-6 6v6.5m0 0V21l3.5-3.5M13 13.5L16.5 10" />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.181 8.68a4.503 4.503 0 0 1 1.903 6.405m-9.768-2.782L3.56 14.06a4.5 4.5 0 0 0 6.364 6.365l3.129-3.129m5.614-5.615 1.757-1.757a4.5 4.5 0 0 0-6.364-6.365l-4.5 4.5c-.258.26-.479.541-.661.84m1.903 6.405a4.495 4.495 0 0 1-1.242-.88 4.483 4.483 0 0 1-1.062-1.683m6.587 2.345 5.907 5.907m-5.907-5.907L8.898 8.898M2.991 2.99 8.898 8.9" />
                                 </svg>
                             </button>
                         </td>
