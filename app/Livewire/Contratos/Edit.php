@@ -5,6 +5,7 @@ namespace App\Livewire\Contratos;
 use Livewire\Component;
 use App\Models\Contrato;
 use App\Models\Cliente;
+use Carbon\Carbon;
 
 class Edit extends Component
 {
@@ -32,10 +33,13 @@ class Edit extends Component
         $this->localidad = $contrato->localidad;
         $this->provincia = $contrato->provincia;
         $this->observaciones = $contrato->observaciones;
-        $this->fecha_inicio = $contrato->fecha_inicio?->format('Y-m-d');
+        $this->fecha_inicio = $this->contrato->fecha_inicio 
+            ? Carbon::parse($this->contrato->fecha_inicio)->format('Y-m-d')
+            : null;
         
         // Cargar empresas asociadas iniciales
         $this->cargarEmpresas($this->cliente_id);
+        $this->dispatch('empresas-cargadas');
     }
 
     public function cargarEmpresas($clienteId)

@@ -1,5 +1,5 @@
 <div class="bg-gray-900 text-gray-50 p-6 rounded-lg shadow">
-    <h2 class="text-2xl font-bold mb-6">Editar Contrato</h2>
+    <h2 class="text-2xl font-bold mb-6">Editar Contrato "{{ $contrato->nombre_proyecto }}"</h2>
 
     <form wire:submit.prevent="update">
         <!-- Cliente -->
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Empresa Asociada -->
-        <div class="mb-4">
+        <div class="mb-4" wire:init="cargarEmpresas({{ $cliente_id }})">
             <label class="block mb-1">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
             <select wire:model="empresa_asociada_id"
                     class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2"

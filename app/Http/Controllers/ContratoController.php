@@ -41,7 +41,7 @@ class ContratoController extends Controller
 
     public function edit(Contrato $contrato)
     {
-        return redirect()->route('contratos.edit-livewire', $contrato);
+        return view('contratos.edit', ['contrato' => $contrato]);
     }
 
     public function update(Request $request, Contrato $contrato)
