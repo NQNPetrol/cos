@@ -14,19 +14,19 @@
 
             <div class="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-sm mb-1">Nombre *</label>
+                    <label class="block text-sm mb-1">Nombre</label>
                     <input type="text" name="nombre" value="{{ old('nombre', $cliente->nombre) }}"
                            class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                     @error('nombre') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm mb-1">CUIT *</label>
+                    <label class="block text-sm mb-1">CUIT</label>
                     <input type="text" name="cuit" value="{{ old('cuit', $cliente->cuit) }}"
                            class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                     @error('cuit') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm mb-1">Domicilio *</label>
+                    <label class="block text-sm mb-1">Domicilio</label>
                     <input type="text" name="domicilio" value="{{ old('domicilio', $cliente->domicilio) }}"
                            class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                     @error('domicilio') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
@@ -52,10 +52,12 @@
                            class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
                 </div>
             </div>
-
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
-                Guardar Cambios
-            </button>
+            <div class="mt-4">
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+                    Guardar Cambios
+                </button>
+                <a href="{{ route('crear.cliente') }}" class="ml-3 text-gray-300 hover:underline">Cancelar</a>
+            </div>
         </form>
     </div>
 </x-app-layout>

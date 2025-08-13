@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\EmpresaAsociada;
+use App\Models\ClienteEmpresaAsociada;
 
 class Cliente extends Model
 {
@@ -13,12 +15,18 @@ class Cliente extends Model
         'ciudad',
         'provincia',
         'categoria',
-        'convenio',
+        'convenio'
     ];
 
     public function personal()
     {
         return $this->hasMany(Personal::class);
+    }
+
+    public function empresasAsociadas()
+    {
+        return $this->belongsToMany(EmpresaAsociada::class, 'cliente_empresa_asociada')
+                    ->using(ClienteEmpresaAsociada::class);
     }
 
 }

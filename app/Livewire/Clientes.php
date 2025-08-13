@@ -54,10 +54,15 @@ class Clientes extends Component
         $this->successMessage = null;
     }
 
+    public function verEmpresasAsociadas($clienteId)
+    {
+        return redirect()->route('livewire.cliente-empresas-asociadas', $clienteId);
+    }
+
     public function render()
     {
         return view('livewire.clientes', [
-            'clientes' => Cliente::orderBy('created_at', 'desc')->paginate(5),
+            'clientes' => Cliente::withCount('empresasAsociadas')->paginate(5),
         ]);
     }
 }

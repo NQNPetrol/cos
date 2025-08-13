@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Objetivo;
 use App\Models\Cliente;
 use App\Models\Contrato;
+use App\Models\EmpresaAsociada;
 
 class ManageObjetivos extends Component
 {
@@ -26,13 +27,17 @@ class ManageObjetivos extends Component
     public $clientes;
     public $allContratos;
     public $contratos;
+    public $empresa_asociada_id = null;
+    public $empresasFiltradas = [];
 
-    protected $rules = [
-        'nombre' => 'required|string|max:255',
-        'contrato_id' => 'required|exists:contratos,id',
-        'cliente_id' => 'required|exists:clientes,id',
-        'latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
-        'longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
+    public $form = [
+        'nombre' => '',
+        'contrato_id' => '',
+        'cliente_id' => '',
+        'latitud' => '',
+        'longitud' => '',
+        'localidad' => '',
+        'empresa_asociada_id' => null
     ];
 
     protected $queryString = [
@@ -66,12 +71,37 @@ class ManageObjetivos extends Component
             ->orderBy('localidad')
             ->pluck('localidad')
             ->toArray();
+        $this->empresasFiltradas = collect();
+        $this->resetFilters();
+    }
+
+    public function cargarEmpresas($clienteId)
+    {
+        $this->form['cliente_id'] = $clienteId;
+        $this->form['empresa_asociada_id'] = null; 
+
+        if (empty($clienteId)) {
+            $this->empresasFiltradas = collect();
+            return;
+        }
+
+        $cliente = Cliente::with('empresasAsociadas')->find($clienteId);
+
+        $this->empresasFiltradas = $cliente ? $cliente->empresasAsociadas : collect();
+
     }
 
     public function resetFilters()
     {
-        $this->reset(['search', 'cliente_id', 'contrato_id', 'localidad']);
+        $this->reset([
+        'search', 
+        'cliente_id', 
+        'contrato_id', 
+        'localidad',
+        'empresa_asociada_id'
+        ]);
         $this->contratos = $this->allContratos;
+        $this->empresasFiltradas = collect();
         $this->resetPage();
     }
 
@@ -83,18 +113,19 @@ class ManageObjetivos extends Component
 
     public function save()
     {
-        $this->validate();
-
-        Objetivo::create([
-            'nombre' => $this->nombre,
-            'contrato_id' => $this->contrato_id,
-            'cliente_id' => $this->cliente_id,
-            'latitud' => $this->latitud,
-            'longitud' => $this->longitud,
-            'localidad' => $this->localidad,
+        $this->validate([
+            'form.nombre' => 'required|string|max:255',
+            'form.contrato_id' => 'required|exists:contratos,id',
+            'form.cliente_id' => 'required|exists:clientes,id',
+            'form.latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
+            'form.longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
+            'form.empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
         ]);
 
+        Objetivo::create($this->form);
+
         $this->resetForm();
+        $this->resetFilters();
         $this->closeModal();
 
         session()->flash('success', 'Objetivo creado correctamente.');
@@ -104,31 +135,39 @@ class ManageObjetivos extends Component
     {
         $objetivo = Objetivo::findOrFail($id);
         $this->editingId = $objetivo->id;
-        $this->nombre = $objetivo->nombre;
-        $this->contrato_id = $objetivo->contrato_id;
-        $this->cliente_id = $objetivo->cliente_id;
-        $this->latitud = $objetivo->latitud;
-        $this->longitud = $objetivo->longitud;
-        $this->localidad = $objetivo->localidad;
+        $this->form = [
+            'nombre' => $objetivo->nombre,
+            'contrato_id' => $objetivo->contrato_id,
+            'cliente_id' => $objetivo->cliente_id,
+            'latitud' => $objetivo->latitud,
+            'longitud' => $objetivo->longitud,
+            'localidad' => $objetivo->localidad,
+            'empresa_asociada_id' => $objetivo->empresa_asociada_id
+        ];
         $this->showModal = true;
+
+        if($this->form['cliente_id']) {
+            $this->cargarEmpresas($this->form['cliente_id']);
+        }
     }
 
     public function update()
     {
-        $this->validate();
+        $this->validate([
+            'form.nombre' => 'required|string|max:255',
+            'form.contrato_id' => 'required|exists:contratos,id',
+            'form.cliente_id' => 'required|exists:clientes,id',
+            'form.latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
+            'form.longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
+            'form.empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
+        ]);
 
         $objetivo = Objetivo::findOrFail($this->editingId);
 
-        $objetivo->update([
-            'nombre' => $this->nombre,
-            'contrato_id' => $this->contrato_id,
-            'cliente_id' => $this->cliente_id,
-            'latitud' => $this->latitud,
-            'longitud' => $this->longitud,
-            'localidad' => $this->localidad,
-        ]);
+        $objetivo->update($this->form);
 
         $this->resetForm();
+        $this->resetFilters();
         $this->closeModal();
 
         session()->flash('success', 'Objetivo actualizado correctamente.');
@@ -143,12 +182,16 @@ class ManageObjetivos extends Component
     public function resetForm()
     {
         $this->editingId = null;
-        $this->nombre = '';
-        $this->contrato_id = '';
-        $this->cliente_id = '';
-        $this->latitud = '';
-        $this->longitud = '';
-        $this->localidad = '';
+        $this-> form = [
+            'nombre' => '',
+            'contrato_id' => '',
+            'cliente_id' => '',
+            'latitud' => '',
+            'longitud' => '',
+            'localidad' => '',
+            'empresa_asociada_id' => null
+        ];
+        $this->empresasFiltradas = collect();
         $this->resetErrorbag();
     }
 
@@ -166,7 +209,9 @@ class ManageObjetivos extends Component
 
     public function render()
     {
-        $objetivos = Objetivo::with('cliente', 'contrato')
+        $clientes = Cliente::orderby('nombre')->get();
+
+        $objetivos = Objetivo::with(['cliente', 'contrato', 'empresaAsociada'])
             ->when($this->search, function($query) {
                 $query->where(function($q){
                     $q->where('nombre', 'like', '%'.$this->search.'%')
@@ -183,9 +228,15 @@ class ManageObjetivos extends Component
             ->when($this->localidad, function($query) {
                 $query->where('localidad', $this->localidad);
             })
+            ->when($this->empresa_asociada_id, function ($query) {
+                $query->where('empresa_asociada_id', $this->empresa_asociada_id);
+            })
             ->orderBy('id', 'desc')
             ->paginate(10);
 
-        return view('livewire.objetivos.manage-objetivos', compact('objetivos'));
+        return view('livewire.objetivos.manage-objetivos', [
+            'objetivos' => $objetivos,
+            'clientes'  => $clientes,
+        ]);
     }
 }

@@ -74,6 +74,8 @@ Route::middleware([
     Route::get('/contratos/{contrato}/edit', [App\Http\Controllers\ContratoController::class, 'edit'])
         ->middleware('can:editar.contratos')
         ->name('contratos.edit');
+    Route::get('/contratos/{contrato}/edit-livewire', \App\Livewire\Contratos\Edit::class)
+        ->name('contratos.edit-livewire');
 
     // UPDATE
     Route::put('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'update'])
@@ -84,6 +86,17 @@ Route::middleware([
     Route::delete('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'destroy'])
         ->middleware('can:borrar.contratos')
         ->name('contratos.destroy');
+
+    //EMPRESAS ASOCIADAS A CLIENTES
+
+    Route::get('/empresas-asociadas', function() {
+        $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
+        return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
+    })->name('empresas-asociadas.index');
+
+    
+    Route::get('/clientes/{clienteId}/empresas-asociadas', [App\Http\Controllers\ClienteEmpresasAsociadasController::class, 'index'])
+    ->name('cliente-empresas-asociadas.index');
 
     //OBJETIVOS    
     Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])
