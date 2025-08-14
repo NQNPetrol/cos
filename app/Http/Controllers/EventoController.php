@@ -8,6 +8,7 @@ use App\Models\Cliente;
 use App\Models\Personal;
 use App\Models\Categoria;
 use App\Models\Media;
+use App\Models\EmpresaAsociada;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,9 @@ class EventoController extends Controller
 
         $clientes = Cliente::orderBy('nombre')->get();
 
-        return view('eventos.index', compact('eventos', 'clientes'));
+        $empresas = collect();
+
+        return view('eventos.index', compact(['eventos', 'clientes', 'empresas']));
     }
 
     public function create()
@@ -40,7 +43,9 @@ class EventoController extends Controller
         $clientes = \App\Models\Cliente::all();
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
-        return view('eventos.nuevo', compact('clientes', 'supervisores','categorias'));
+        $empresas = collect();
+
+        return view('eventos.nuevo', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
 
     public function store(Request $request)
@@ -58,7 +63,8 @@ class EventoController extends Controller
             ],
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
-            'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048' //2MB max
+            'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
         ]);
 
         [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -68,6 +74,8 @@ class EventoController extends Controller
         $validated['user_id'] = auth()->id();
         
         $evento = Evento::create($validated);
+
+        $empresas = EmpresaAsociada::all();
 
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
@@ -93,12 +101,14 @@ class EventoController extends Controller
         $clientes = Cliente::all();
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
+        $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
         return view('eventos.edit', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
-            'categorias' => $categorias
+            'categorias' => $categorias,
+            'empresas' => $empresas
         ]);
     }
 
@@ -116,7 +126,8 @@ class EventoController extends Controller
         ],
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
-        'media.*' => 'nullable|image|mimes:jpeg,png|max:2048'
+        'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
+        'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
     ]);
 
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));

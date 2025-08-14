@@ -116,12 +116,30 @@
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" @if($evento->cliente_id == $cliente->id) selected @endif>
+                                    <option value="{{ $cliente->id }}" @if($evento->cliente_id == $cliente->id) selected @endif
+                                        data-empresas="{{ $cliente->empresasAsociadas->pluck('nombre', 'id') }}">
                                         {{ $cliente->nombre }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('cliente_id')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Sección 5.1: Empresa Asociada -->
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente <span class="text-red-500">*</span></h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                <option value="">Seleccione una empresa asociada al cliente</option>
+                                @foreach($empresas as $empresa)
+                                    <option value="{{ $empresa->id }}" @if($evento->empresa_asociada_id == $empresa->id) selected @endif>
+                                        {{ $empresa->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('empresa_asociada_id')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -327,6 +345,45 @@
                 cargarTipos(categoriaSeleccionada.dataset.nombre);
             }
         });
+
+        // Campo dinamico de empresa asociada
+        const clienteSelect = document.getElementById('cliente_id');
+        const empresaSelect = document.getElementById('empresa_asociada_id');
+
+        if (clienteSelect && empresaSelect) {
+            clienteSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                
+                // Limpiar opciones actuales
+                empresaSelect.innerHTML = '<option value="">Seleccione una empresa asociada</option>';
+                
+                if (this.value) {
+                    // Obtener empresas del data-attribute
+                    const empresas = JSON.parse(selectedOption.getAttribute('data-empresas') || '{}');
+                    
+                    // Agregar nuevas opciones
+                    Object.entries(empresas).forEach(([id, nombre]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = nombre;
+                        empresaSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // Disparar el evento change si hay un cliente seleccionado
+            if (clienteSelect.value) {
+                clienteSelect.dispatchEvent(new Event('change'));
+                
+                // Seleccionar la empresa asociada si existe
+                const empresaId = "{{ $evento->empresa_asociada_id }}";
+                if (empresaId) {
+                    setTimeout(() => {
+                        empresaSelect.value = empresaId;
+                    }, 100);
+                }
+            }
+        }
 
         // Vista previa de nuevas imágenes
         document.getElementById('media').addEventListener('change', function(e) {

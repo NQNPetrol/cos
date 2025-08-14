@@ -19,6 +19,7 @@ class Evento extends Model
         'user_id',
         'categoria_id',
         'tipo',
+        'empresa_asociada_id',
     ];
 
     public function seguimientos()
@@ -58,5 +59,10 @@ class Evento extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');
+    }
+
+    public function empresaAsociada()
+    {
+        return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
     }
 }
