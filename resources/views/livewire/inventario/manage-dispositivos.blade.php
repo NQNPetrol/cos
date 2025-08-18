@@ -44,11 +44,13 @@
         </div>
 
         <div>
-            <label class="block text-sm mb-1">Tipo de Dispositivo</label>
-            <input type="text"
-                   wire:model.live="deviceTypeFilter"
-                   placeholder="cámara_ip,nvr_dvr,control_acceso,intercomunicador,switch_poe,sensor_alarma,dispositivo_reconocimiento,gps,otros"
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+            <label class="block text-sm mb-1">Conectado a Hik</label>
+            <select wire:model.live="hikConnectFilter"
+                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                <option value="">Todos</option>
+                <option value="Conectado">Conectado</option>
+                <option value="Por Conectar">Por Conectar</option>
+            </select>
         </div>
 
         <div>
@@ -86,12 +88,13 @@
                 <tr>
                     <th class="px-4 py-2 text-left">Tipo</th>
                     <th class="px-4 py-2 text-left">IP</th>
+                    <th class="px-4 py-2 text-left">N° Serie</th>
                     <th class="px-4 py-2 text-left">Cliente</th>
                     <th class="px-4 py-2 text-left">Ubicación</th>
                     <th class="px-4 py-2 text-left">Estado</th>
-                    <th class="px-4 py-2 text-left">Version SW</th>
+                    <th class="px-4 py-2 text-left">Conectado a Hik</th>
                     <th class="px-4 py-2 text-left">Mantenimiento</th>
-                    <th class="px-4 py-2 text-left">Actualización</th>
+                    <th class="px-4 py-2 text-left">Observaciones</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
             </thead>
@@ -108,6 +111,9 @@
                             @endif
                         </td>
                         <td class="px-4 py-2">
+                            <div class="text-sm">{{ $dispositivo->numero_serie ?: 'N/A' }}</div>
+                        </td>
+                        <td class="px-4 py-2">
                             <div class="text-sm">{{ $dispositivo->cliente->nombre ?? 'Sin asignar' }}</div>
                         </td>
                         <td class="px-4 py-2">
@@ -119,7 +125,15 @@
                             </span>
                         </td>
                         <td class="px-4 py-2">
-                            <div class="text-sm">{{ $dispositivo->version_software ?: 'N/A' }}</div>
+                            @if($dispositivo->estado_hikconnect == 'Conectado')
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {{ $dispositivo->estado_hikconnect }}
+                                </span>
+                            @elseif($dispositivo->estado_hikconnect == 'Por Conectar')
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    {{ $dispositivo->estado_hikconnect }}
+                                </span>
+                            @endif
                         </td>
                         <td class="px-4 py-2">
                             @if($dispositivo->necesita_mantenimiento)
@@ -138,15 +152,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-2">
-                            @if($dispositivo->necesita_actualizacion)
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    Pendiente
-                                </span>
-                            @else
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                    Actualizado
-                                </span>
-                            @endif
+                            <div class="text-sm"> {{ $dispositivo->observaciones ?: 'Sin observaciones' }}
                         </td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-2">
@@ -215,54 +221,56 @@
                             </h4>
                         </div>
 
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Tipo de Dispositivo <span class="text-red-500">*</span></label>
-                            <select wire:model="tipo" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                <option value="">Seleccionar...</option>
-                                <option value="cámara_ip">Cámara IP</option>
-                                <option value="nvr_dvr">NVR/DVR</option>
-                                <option value="control_acceso">Control de Acceso</option>
-                                <option value="intercomunicador">Intercomunicador</option>
-                                <option value="switch_poe">Switch PoE</option>
-                                <option value="sensor_alarma">Sensor de Alarma</option>
-                                <option value="dispositivo_reconocimiento">Reconocimiento Facial</option>
-                                <option value="gps">GPS</option>
-                                <option value="otros">Otros</option>
-                            </select>
-                            @error('tipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 col-span-full">
+                            <div>
+                                <label class="block text-sm mb-1 text-gray-300">Tipo de Dispositivo <span class="text-red-500">*</span></label>
+                                <select wire:model="tipo" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="cámara_ip">Cámara IP</option>
+                                    <option value="nvr_dvr">NVR/DVR</option>
+                                    <option value="control_acceso">Control de Acceso</option>
+                                    <option value="intercomunicador">Intercomunicador</option>
+                                    <option value="switch_poe">Switch PoE</option>
+                                    <option value="sensor_alarma">Sensor de Alarma</option>
+                                    <option value="dispositivo_reconocimiento">Reconocimiento Facial</option>
+                                    <option value="gps">GPS</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                                @error('tipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Fecha de Instalación</label>
-                            <input type="date" wire:model="fecha_instalacion"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                            @error('fecha_instalacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label class="block text-sm mb-1 text-gray-300">Fecha de Instalación</label>
+                                <input type="date" wire:model="fecha_instalacion"
+                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                @error('fecha_instalacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Cliente</label>
-                            <select wire:model="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                <option value="">Sin asignar</option>
-                                @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                                @endforeach
-                            </select>
-                            @error('cliente_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label class="block text-sm mb-1 text-gray-300">Cliente</label>
+                                <select wire:model="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                    <option value="">Sin asignar</option>
+                                    @foreach($clientes as $cliente)
+                                        <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                                    @endforeach
+                                </select>
+                                @error('cliente_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div>
-                            <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
-                            <input type="text" wire:model="ubicacion"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                   placeholder="Oficina Principal - Recepción">
-                            @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
+                                <input type="text" wire:model="ubicacion"
+                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                    placeholder="Oficina Principal - Recepción">
+                                @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div class="col-span-full">
-                            <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
-                            <textarea wire:model="observaciones" rows="3"
-                                      class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
-                                      placeholder="Notas adicionales sobre el dispositivo..."></textarea>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
+                                <textarea wire:model="observaciones" rows="3"
+                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        placeholder="Notas adicionales sobre el dispositivo..."></textarea>
+                            </div>
                         </div>
 
 
@@ -287,6 +295,14 @@
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
                                    placeholder="8000">
                             @error('puerto') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Número de Serie</label>
+                            <input type="text" wire:model="numero_serie"
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   placeholder="ABC123456789">
+                            @error('numero_serie') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
 

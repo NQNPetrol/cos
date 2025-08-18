@@ -22,7 +22,7 @@ class ObjetivoController extends Controller
     public function create()
     {
         $clientes = Cliente::all();
-        $contratos = Contrato::all();
+        $contratos = collect();
         $empresas_asociadas = collect();
 
         return view('objetivos.create', compact(['clientes', 'contratos', 'empresas_asociadas']));
@@ -48,7 +48,8 @@ class ObjetivoController extends Controller
     public function edit(Objetivo $objetivo)
     {
         $clientes = Cliente::all();
-        $contratos = Contrato::all();
+        $contratos = $objetivo->cliente ? $objetivo->cliente->contratos : collect();
+        $empresas_asociadas = $objetivo->cliente ? $objetivo->cliente->empresasAsociadas : collect();
 
         return view('objetivos.edit', compact('objetivo', 'clientes', 'contratos', 'empresas_asociadas'));
     }

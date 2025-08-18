@@ -17,6 +17,7 @@ class Dispositivo extends Model
         'modelo',
         'direccion_ip',
         'puerto',
+        'numero_serie',
         'version_software',
         'direccion_ipv6',
         'estado_hikconnect',
@@ -125,7 +126,6 @@ class Dispositivo extends Model
         return Carbon::now()->diffInDays($this->proximo_mantenimiento, false);
     }
 
-    // Métodos de utilidad
     public function estaVencidoMantenimiento()
     {
         return $this->proximo_mantenimiento && Carbon::now()->gt($this->proximo_mantenimiento);
