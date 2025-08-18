@@ -118,6 +118,12 @@ Route::middleware([
     Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])->name('eventos.update');
     Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
     
+    //REPORTES
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteController::class, 'preview'])->name('eventos.reporte.preview');
+        Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteController::class, 'generate'])->name('eventos.reporte.generate');
+    });
+    
     //MEDIA
     Route::get('/eventos/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
         ->name('media.eventos.destroy');

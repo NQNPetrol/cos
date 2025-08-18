@@ -121,6 +121,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
+                                            <a href="{{ route('eventos.reporte.preview', $evento) }}"
+                                                class="text-green-600 hover:text-green-900 dark:text-green-400"
+                                                title="Generar Reporte">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </a>
                                             <a href="{{ route('eventos.edit', $evento) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
                                                 title="Editar">
