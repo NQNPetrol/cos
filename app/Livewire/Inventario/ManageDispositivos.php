@@ -23,11 +23,12 @@ class ManageDispositivos extends Component
     public $deviceTypeFilter = '';
     public $mantenimientoFilter = '';
     public $actualizacionFilter = '';
+    public $hikConnectFilter = '';
 
     // Propiedades para el formulario
     public $tipo = '';
     public $puerto = '8000';
- 
+    public $numero_serie = '';
     public $version_software = '';
     public $direccion_ip = '';
     public $fecha_instalacion = '';
@@ -53,7 +54,7 @@ class ManageDispositivos extends Component
         'fecha_instalacion' => 'nullable|date',
         'ultimo_mantenimiento' => 'nullable|date',
         'proximo_mantenimiento' => 'nullable|date|after_or_equal:today',
-        'estado_hikconnect' => 'nullable|in:Conectado, Por Conectar',
+        'estado_hikconnect' => 'nullable|in:Conectado,Por Conectar',
         'estado_inventario' => 'required|in:En stock,Instalado,En mantenimiento,Dado de baja'
     ];
 
@@ -91,6 +92,7 @@ class ManageDispositivos extends Component
         $this->deviceTypeFilter = '';
         $this->mantenimientoFilter = '';
         $this->actualizacionFilter = '';
+        $this->hikConnectFilter = '';
         $this->resetPage();
     }
 
@@ -115,6 +117,7 @@ class ManageDispositivos extends Component
             'tipo' => $this->tipo,
             'direccion_ip' => $this->direccion_ip,
             'puerto' => $this->puerto,
+            'numero_serie' => $this->numero_serie,
             'version_software' => $this->version_software,
             'estado_hikconnect' => $this->estado_hikconnect,
             'cliente_id' => $this->cliente_id ?: null,
@@ -148,7 +151,9 @@ class ManageDispositivos extends Component
         
         $this->editingId = $dispositivo->id;
         $this->tipo = $dispositivo->tipo;
+        $this->direccion_ip = $dispositivo->direccion_ip;
         $this->puerto = $dispositivo->puerto;
+        $this->numero_serie = $dispositivo->numero_serie;
         $this->version_software = $dispositivo->version_software;
         $this->estado_hikconnect = $dispositivo->estado_hikconnect;
         $this->cliente_id = $dispositivo->cliente_id;
@@ -174,7 +179,7 @@ class ManageDispositivos extends Component
     {
         $this->reset([
             'tipo', 'cliente_id', 'ubicacion', 'fecha_instalacion', 
-            'observaciones', 'direccion_ip', 'puerto', 'version_software',
+            'observaciones', 'direccion_ip', 'puerto', 'numero_serie', 'version_software',
             'estado_hikconnect', 'necesita_actualizacion', 'necesita_mantenimiento',
             'ultimo_mantenimiento', 'proximo_mantenimiento', 'estado_inventario'
         ]);
@@ -220,6 +225,10 @@ class ManageDispositivos extends Component
             $query->where('necesita_actualizacion', true);
         } elseif ($this->actualizacionFilter === 'no') {
             $query->where('necesita_actualizacion', false);
+        }
+
+        if ($this->hikConnectFilter) {
+            $query->where('estado_hikconnect', 'like', '%' . $this->hikConnectFilter . '%');
         }
 
         $dispositivos = $query->orderBy('id', 'desc')->paginate(15);
