@@ -29,6 +29,7 @@ class ManageObjetivos extends Component
     public $contratos;
     public $empresa_asociada_id = null;
     public $empresasFiltradas = [];
+    public $contratosFiltrados = [];
 
     public $form = [
         'nombre' => '',
@@ -64,7 +65,8 @@ class ManageObjetivos extends Component
     {
         $this->clientes = Cliente::all();
         $this->allContratos = Contrato::all();
-        $this->contratos = $this->allContratos; // Mostrar todos los contratos inicialmente
+        $this->contratos = $this->allContratos;
+        $this->contratosFiltrados = collect();
         $this->localidades = Objetivo::select('localidad')
             ->distinct()
             ->whereNotNull('localidad')
@@ -78,18 +80,44 @@ class ManageObjetivos extends Component
     public function cargarEmpresas($clienteId)
     {
         $this->form['cliente_id'] = $clienteId;
-        $this->form['empresa_asociada_id'] = null; 
+        $currentEmpresa = $this->form['empresa_asociada_id'] 
+            ? EmpresaAsociada::find($this->form['empresa_asociada_id'])
+            : null;
+
+        $cliente = Cliente::with(['empresasAsociadas'])->find($clienteId);
+        $this->empresasFiltradas = $cliente ? $cliente->empresasAsociadas : collect();
+        
 
         if (empty($clienteId)) {
             $this->empresasFiltradas = collect();
+            $this->contratosFiltrados = collect();
             return;
         }
 
-        $cliente = Cliente::with('empresasAsociadas')->find($clienteId);
+        $cliente = Cliente::with(['empresasAsociadas'])->find($clienteId);
 
         $this->empresasFiltradas = $cliente ? $cliente->empresasAsociadas : collect();
+        $this->contratosFiltrados = $cliente ? Contrato::where('cliente_id', $clienteId)->get() : collect();
 
     }
+
+    public function cargarContratos($empresaId)
+    {
+        $this->form['empresa_asociada_id'] = $empresaId;
+        $currentContrato = $this->form['contrato_id'] ? Contrato::find($this->form['contrato_id']) : null;
+
+        if (empty($empresaId)) {
+            $this->contratosFiltrados = $this->form['cliente_id'] 
+                ? Contrato::where('cliente_id', $this->form['cliente_id'])->get()
+                : collect();
+            return;
+        }
+
+        $this->contratosFiltrados = Contrato::where('cliente_id', $this->form['cliente_id'])
+            ->where('empresa_asociada_id', $empresaId)
+            ->get();
+    }
+
 
     public function resetFilters()
     {
@@ -133,7 +161,7 @@ class ManageObjetivos extends Component
 
     public function edit($id)
     {
-        $objetivo = Objetivo::findOrFail($id);
+        $objetivo = Objetivo::with(['cliente', 'empresaAsociada', 'contrato'])->findOrFail($id);
         $this->editingId = $objetivo->id;
         $this->form = [
             'nombre' => $objetivo->nombre,
@@ -148,6 +176,11 @@ class ManageObjetivos extends Component
 
         if($this->form['cliente_id']) {
             $this->cargarEmpresas($this->form['cliente_id']);
+            if($this->form['empresa_asociada_id']) {
+                $this->cargarContratos($this->form['empresa_asociada_id']);
+
+                $this->dispatch('contratos-cargados');
+            }
         }
     }
 

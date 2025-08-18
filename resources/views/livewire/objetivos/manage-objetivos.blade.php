@@ -43,16 +43,6 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
-                        <label class="block mb-1 text-sm">Localidad</label>
-                        <select wire:model.live="localidad" type="text" placeholder="Filtrar por localidad" 
-                            class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
-                            <option value="">Todas</option>
-                            @foreach ($localidades as $loc)
-                                <option value="{{ $loc  }}">{{ $loc }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="flex items-end">
                         <button wire:click="resetFilters" 
                                 class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded h-[42px] w-full">
@@ -166,6 +156,7 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
                                 <select wire:model="form.empresa_asociada_id"
+                                        wire:change="cargarContratos($event.target.value)"
                                         class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
                                         @if(!$form['cliente_id']) disabled @endif>
                                     <option value="">Seleccione una empresa asociada</option>
@@ -182,10 +173,13 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Contrato <span class="text-red-500">*</span></label>
                                 <select wire:model="form.contrato_id"
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                       @if(!$form['empresa_asociada_id']) disabled @endif>
                                     <option value="">Seleccione un contrato</option>
-                                    @foreach ($contratos as $contrato)
-                                        <option value="{{ $contrato->id }}">{{ $contrato->nombre_proyecto }}</option>
+                                    @foreach ($contratosFiltrados as $contrato)
+                                        <option value="{{ $contrato->id }}"
+                                            @if($contrato->id == $form['contrato_id']) selected @endif>
+                                        {{ $contrato->nombre_proyecto }}</option>
                                     @endforeach
                                 </select>
                                 @error('form.contrato_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
