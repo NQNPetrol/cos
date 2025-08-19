@@ -15,7 +15,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold mb-6">Vista Previa del Evento</h1>
-                        <p class="text-slate-600 mt-1">Revisa y genera reportes para el evento
+                        <p class="text-slate-600 mt-1">Revisa en la vista previa que todos los datos del evento sean correctos antes de generar un reporte.
                     </div>
                     <div class="flex items-center space-x-3">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -51,7 +51,11 @@
                         </div>
                         <div class="p-8 bg-slate-50">
                             <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                                @include('reportes.template', ['evento' => $evento])
+                                <iframe 
+                                    src="{{ route('eventos.reporte.preview-iframe', $evento) }}" 
+                                    class="w-full h-96 border-none"
+                                    onload="this.style.height = this.contentWindow.document.body.scrollHeight + 'px';">
+                                </iframe>
                             </div>
                         </div>
                     </div>
@@ -77,7 +81,7 @@
                                     <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M7 13h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2z"/>
                                     </svg>
-                                    Generar PDF
+                                    Descargar PDF
                                 </button>
                             </form>
                             @if($reportesGenerados->count())
@@ -131,12 +135,12 @@
                                                 Por {{ $reporte->usuario->name ?? 'Usuario desconocido' }}
                                             </p>
                                         </div>
-                                        <a href="{{ route('reportes.download', $reporte) }}" 
+                                        <a href="{{ route('reportes.view', $reporte) }}" target="_blank"
                                            class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium group-hover:scale-105 transform duration-200">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                                             </svg>
-                                            Descargar
+                                            Abrir
                                         </a>
                                     </div>
                                     <div class="text-xs text-slate-400">

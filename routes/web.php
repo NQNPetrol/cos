@@ -122,6 +122,9 @@ Route::middleware([
     Route::middleware(['auth'])->group(function () {
         Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteController::class, 'preview'])->name('eventos.reporte.preview');
         Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteController::class, 'generate'])->name('eventos.reporte.generate');
+        Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteController::class, 'download'])->name('reportes.download');
+        Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteController::class, 'view'])->name('reportes.view');
+        Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteController::class, 'previewIframe'])->name('eventos.reporte.preview-iframe');
     });
     
     //MEDIA
