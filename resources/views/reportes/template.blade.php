@@ -2,250 +2,264 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Evento #{{ $evento->id }}</title>
+    <title>Reporte de Evento o Incidente</title>
     <style>
-        * {
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.4;
+            color: #334155;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
         
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #334155;
-            background-color: #f8fafc;
+        .reserved-header {
+            background: #d1d5db;
+            color: #374151;
+            padding: 8px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            border-bottom: 2px solid #9ca3af;
         }
         
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 100%;
             background: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: #2563eb;
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
-            position: relative;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
         }
         
         .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
         
         .header .subtitle {
-            font-size: 1.1rem;
+            font-size: 12px;
             opacity: 0.9;
-            position: relative;
-            z-index: 1;
         }
         
         .event-badge {
-            display: inline-block;
             background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-top: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-top: 8px;
+            display: inline-block;
         }
         
         .content {
-            padding: 40px;
+            padding: 20px;
         }
         
         .section {
-            margin-bottom: 32px;
-            padding: 24px;
+            margin-bottom: 15px;
+            padding: 15px;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 5px;
             background: #f8fafc;
-            position: relative;
-        }
-        
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
-            border-radius: 2px;
+            page-break-inside: avoid;
         }
         
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: bold;
             color: #1e293b;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            padding-left: 16px;
-        }
-        
-        .section-title::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #3b82f6;
-            border-radius: 50%;
-            margin-right: 12px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 5px;
         }
         
         .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding-left: 16px;
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
         }
         
-        .detail-item {
-            background: white;
-            padding: 16px;
-            border-radius: 8px;
+        .detail-grid td {
+            padding: 8px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: white;
+            vertical-align: top;
+            width: 25%;
         }
         
         .detail-label {
-            font-weight: 600;
+            font-weight: bold;
             color: #475569;
-            font-size: 0.875rem;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
+            display: block;
         }
         
         .detail-value {
-            font-size: 1rem;
+            font-size: 11px;
             color: #1e293b;
-            font-weight: 500;
         }
         
         .description {
-            padding-left: 16px;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 12px;
             border: 1px solid #e2e8f0;
-            line-height: 1.7;
-            font-size: 1rem;
+            line-height: 1.5;
+            font-size: 11px;
             color: #475569;
         }
         
-        .images-info {
-            padding-left: 16px;
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #f59e0b;
-            display: flex;
-            align-items: center;
+        .images-section {
+            page-break-inside: avoid;
         }
         
-        .images-info::before {
-            content: '';
-            font-size: 1.5rem;
-            margin-right: 12px;
+        .image-container {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+        
+        .image-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #f3f4f6;
+            border: 2px dashed #d1d5db;
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+            font-size: 11px;
+        }
+        
+        .image-caption {
+            font-size: 10px;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+        
+        .inventory-table th,
+        .inventory-table td {
+            border: 1px solid #d1d5db;
+            padding: 6px;
+            text-align: left;
+        }
+        
+        .inventory-table th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+        
+        .inventory-table td {
+            background: white;
+        }
+        
+        .inventory-placeholder {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            font-size: 10px;
+            padding: 20px;
+            background: #f9fafb;
+            border: 1px dashed #d1d5db;
         }
         
         .footer {
             background: #f1f5f9;
-            padding: 24px 40px;
+            padding: 15px 20px;
             border-top: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #64748b;
         }
         
         .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            width: 100%;
         }
         
-        .generated-by {
-            font-size: 0.875rem;
-            color: #64748b;
-            display: flex;
-            align-items: center;
+        .footer-content table {
+            width: 100%;
         }
         
-        .generated-by::before {
-            content: '';
-            margin-right: 8px;
+        .footer-content .generated-by {
+            text-align: left;
         }
         
-        .timestamp {
-            font-size: 0.875rem;
-            color: #64748b;
-            display: flex;
-            align-items: center;
+        .footer-content .timestamp {
+            text-align: right;
         }
         
-        .timestamp::before {
-            content: '';
-            margin-right: 8px;
+        /* Prioridades */
+        .priority-high { background: #fef2f2; border-color: #ef4444; }
+        .priority-medium { background: #fef3c7; border-color: #f59e0b; }
+        .priority-low { background: #f0fdf4; border-color: #22c55e; }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
         }
-        
-        .priority-high {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-color: #ef4444;
+
+        .actual-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            page-break-inside: avoid;
         }
-        
-        .priority-medium {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-color: #f59e0b;
+
+        .image-wrapper {
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
-        
-        .priority-low {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border-color: #22c55e;
+
+        .image-caption {
+            font-size: 9px;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 4px;
+            font-style: italic;
+            page-break-inside: avoid;
         }
-        
-        /* Print styles */
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .container {
-                box-shadow: none;
-                border-radius: 0;
-            }
-            
-            .section {
-                break-inside: avoid;
-            }
+
+        /* Forzar salto de página después de cada par de imágenes */
+        .images-grid::after {
+            content: "";
+            display: table;
+            clear: both;
+            page-break-after: always;
+        }
+
+        /* Asegurar que las imágenes no se corten entre páginas */
+        .image-wrapper {
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
     </style>
 </head>
 <body>
+    <div class="reserved-header">
+        RESERVADO PARA SSP - CENTRO DE OPERACIONES DE SEGURIDAD
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Reporte de Incidente</h1>
-            <p class="subtitle">Documento Oficial del Sistema de Gestión</p>
+            <p class="subtitle">Documento Oficial del Centro de Operaciones de Seguridad</p>
             <div class="event-badge">
                 Evento ID: {{ $evento->id }}
             </div>
@@ -255,40 +269,73 @@
             <!-- Sección de Detalles Principales -->
             <div class="section {{ isset($evento->prioridad) ? 'priority-' . strtolower($evento->prioridad) : '' }}">
                 <h2 class="section-title">Información del Evento</h2>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">Tipo de Evento</div>
-                        <div class="detail-value">{{ $evento->tipo ?? 'No especificado' }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Fecha del Evento</div>
-                        <div class="detail-value">
-                            {{ $evento->fecha ? $evento->fecha->format('d/m/Y H:i') : 'Fecha no especificada' }}
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Ubicación</div>
-                        <div class="detail-value">{{ $evento->ubicacion ?? 'Ubicación no especificada' }}</div>
-                    </div>
-                    @if(isset($evento->prioridad))
-                    <div class="detail-item">
-                        <div class="detail-label">Prioridad</div>
-                        <div class="detail-value">{{ ucfirst($evento->prioridad) }}</div>
-                    </div>
-                    @endif
-                    @if(isset($evento->estado))
-                    <div class="detail-item">
-                        <div class="detail-label">Estado</div>
-                        <div class="detail-value">{{ ucfirst($evento->estado) }}</div>
-                    </div>
-                    @endif
-                    @if(isset($evento->responsable))
-                    <div class="detail-item">
-                        <div class="detail-label">Responsable</div>
-                        <div class="detail-value">{{ $evento->responsable }}</div>
-                    </div>
-                    @endif
-                </div>
+                <table class="detail-grid">
+                    <tr>
+                        <td>
+                            <span class="detail-label">Categoría</span>
+                            <span class="detail-value">{{ $evento->categoria->nombre ?? 'No especificado' }}</span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Tipo de Evento</span>
+                            <span class="detail-value">{{ $evento->tipo ?? 'No especificado' }}</span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Fecha del Evento</span>
+                            <span class="detail-value">
+                                {{ $evento->fecha_hora ? $evento->fecha_hora->format('d/m/Y H:i') : 'Fecha no especificada' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Ubicación</span>
+                            <span class="detail-value">
+                                @if($evento->latitud && $evento->longitud)
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ $evento->latitud }},{{ $evento->longitud }}">
+                                        Ubicación en Google Maps
+                                    </a>
+                                    <br>
+                                    <small style="font-size: 9px; color: #6b7280;">
+                                        (Lat: {{ $evento->latitud }}, Long: {{ $evento->longitud }})
+                                    </small>
+                                @else
+                                    Ubicación no especificada
+                                @endif
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                
+                @if(isset($evento->prioridad) || isset($evento->estado) || isset($evento->responsable))
+                <table class="detail-grid" style="margin-top: 10px;">
+                    <tr>
+                        @if(isset($evento->prioridad))
+                        <td>
+                            <span class="detail-label">Prioridad</span>
+                            <span class="detail-value">{{ ucfirst($evento->prioridad) }}</span>
+                        </td>
+                        @endif
+                        @if(isset($evento->estado))
+                        <td>
+                            <span class="detail-label">Estado</span>
+                            <span class="detail-value">{{ ucfirst($evento->estado) }}</span>
+                        </td>
+                        @endif
+                        @if(isset($evento->responsable))
+                        <td>
+                            <span class="detail-label">Responsable</span>
+                            <span class="detail-value">{{ $evento->responsable }}</span>
+                        </td>
+                        @endif
+                        <!-- Relleno para celdas faltantes -->
+                        @php
+                            $cellCount = (isset($evento->prioridad) ? 1 : 0) + (isset($evento->estado) ? 1 : 0) + (isset($evento->responsable) ? 1 : 0);
+                            $emptyCells = 4 - $cellCount;
+                        @endphp
+                        @for($i = 0; $i < $emptyCells; $i++)
+                            <td></td>
+                        @endfor
+                    </tr>
+                </table>
+                @endif
             </div>
             
             <!-- Sección de Descripción -->
@@ -302,18 +349,26 @@
             @endif
             
             <!-- Sección de Evidencia -->
-            @if(isset($evento->imagenes) && $evento->imagenes->count())
-            <div class="section">
-                <h2 class="section-title">Evidencia Fotográfica</h2>
-                <div class="images-info">
-                    <div>
-                        <strong>{{ $evento->imagenes->count() }}</strong> imagen(es) adjunta(s) disponible(s) en el sistema digital.
-                        <br>
-                        <small>Las imágenes pueden ser consultadas en la plataforma web para mayor detalle.</small>
+            <div class="section images-section">
+                <h2 class="section-title">Evidencia Gráfica</h2>
+
+                @if(isset($imagenesBase64) && count($imagenesBase64) > 0)
+                    <div class="images-grid">
+                        @foreach($imagenesBase64 as $index => $imagen)
+                        <div class="image-wrapper">
+                            <img src="{{ $imagen['data'] }}" alt="{{ $imagen['name'] }}" class="actual-image" style="max-width: 100%; height: auto; max-height: 320px;">
+                            <div class="image-caption">
+                                Evidencia {{ $index + 1 }} - {{ $imagen['name'] }}
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
-                </div>
+                @else
+                    <div class="image-placeholder">
+                        No hay imágenes adjuntas para este evento
+                    </div>
+                @endif
             </div>
-            @endif
             
             <!-- Sección de Observaciones Adicionales -->
             @if(isset($evento->observaciones) && $evento->observaciones)
@@ -324,16 +379,51 @@
                 </div>
             </div>
             @endif
+
+            <!-- Sección de Inventario de Elementos Sustraídos -->
+            <div class="section">
+                <h2 class="section-title">Inventario de Elementos Sustraídos</h2>
+                
+                <div class="inventory-placeholder">
+                    [INVENTARIO] No se registraron elementos sustraídos en este incidente
+                </div>
+                
+                <!-- Tabla de ejemplo -->
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                    </tbody>
+                </table>
+            </div>
         </div>
         
         <div class="footer">
             <div class="footer-content">
-                <div class="generated-by">
-                    Generado por: {{ auth()->user()->name ?? 'Sistema' }}
-                </div>
-                <div class="timestamp">
-                    {{ now()->format('d/m/Y H:i:s') }}
-                </div>
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="generated-by">
+                            Elaborado por {{ auth()->user()->name ?? 'Sistema' }}
+                        </td>
+                        <td class="timestamp">
+                            {{ now()->format('d/m/Y H:i:s') }}
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

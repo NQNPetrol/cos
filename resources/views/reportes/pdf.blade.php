@@ -5,7 +5,7 @@
     <title>Reporte de Evento o Incidente</title>
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             line-height: 1.4;
             color: #334155;
             margin: 0;
@@ -77,18 +77,17 @@
         }
         
         .detail-grid {
-            display: table;
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 10px;
         }
         
-        .detail-item {
-            display: table-cell;
+        .detail-grid td {
             padding: 8px;
             border: 1px solid #e2e8f0;
             background: white;
             vertical-align: top;
+            width: 25%;
         }
         
         .detail-label {
@@ -103,15 +102,6 @@
         .detail-value {
             font-size: 11px;
             color: #1e293b;
-        }
-        
-        .location-link {
-            color: #2563eb;
-            text-decoration: underline;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
         
         .description {
@@ -137,12 +127,10 @@
             height: 150px;
             background: #f3f4f6;
             border: 2px dashed #d1d5db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
             color: #6b7280;
             font-size: 11px;
-            text-align: center;
         }
         
         .image-caption {
@@ -195,16 +183,18 @@
         }
         
         .footer-content {
-            display: table;
             width: 100%;
         }
         
-        .generated-by, .timestamp {
-            display: table-cell;
-            vertical-align: middle;
+        .footer-content table {
+            width: 100%;
         }
         
-        .timestamp {
+        .footer-content .generated-by {
+            text-align: left;
+        }
+        
+        .footer-content .timestamp {
             text-align: right;
         }
         
@@ -212,6 +202,53 @@
         .priority-high { background: #fef2f2; border-color: #ef4444; }
         .priority-medium { background: #fef3c7; border-color: #f59e0b; }
         .priority-low { background: #f0fdf4; border-color: #22c55e; }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .actual-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            page-break-inside: avoid;
+        }
+
+        .image-wrapper {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .image-caption {
+            font-size: 9px;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 4px;
+            font-style: italic;
+            page-break-inside: avoid;
+        }
+
+        /* Forzar salto de página después de cada par de imágenes */
+        .images-grid::after {
+            content: "";
+            display: table;
+            clear: both;
+            page-break-after: always;
+        }
+
+        /* Asegurar que las imágenes no se corten entre páginas */
+        .image-wrapper {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
     </style>
 </head>
 <body>
@@ -232,53 +269,72 @@
             <!-- Sección de Detalles Principales -->
             <div class="section {{ isset($evento->prioridad) ? 'priority-' . strtolower($evento->prioridad) : '' }}">
                 <h2 class="section-title">Información del Evento</h2>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <span class="detail-label">Categoría</span>
-                        <span class="detail-value">{{ $evento->categoria_id->nombre ?? 'No especificado' }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Tipo de Evento</span>
-                        <span class="detail-value">{{ $evento->tipo ?? 'No especificado' }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Fecha del Evento</span>
-                        <span class="detail-value">
-                            {{ $evento->fecha ? $evento->fecha->format('d/m/Y H:i') : 'Fecha no especificada' }}
-                        </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Ubicación</span>
-                        <span class="detail-value">
-                            @if($evento->ubicacion && filter_var($evento->ubicacion, FILTER_VALIDATE_URL))
-                                Ubicación en Google Maps
-                            @else
-                                {{ $evento->ubicacion ?? 'Ubicación no especificada' }}
-                            @endif
-                    </div>
-                </div>
+                <table class="detail-grid">
+                    <tr>
+                        <td>
+                            <span class="detail-label">Categoría</span>
+                            <span class="detail-value">{{ $evento->categoria->nombre ?? 'No especificado' }}</span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Tipo de Evento</span>
+                            <span class="detail-value">{{ $evento->tipo ?? 'No especificado' }}</span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Fecha del Evento</span>
+                            <span class="detail-value">
+                                {{ $evento->fecha_hora ? $evento->fecha_hora->format('d/m/Y H:i') : 'Fecha no especificada' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="detail-label">Ubicación</span>
+                            <span class="detail-value">
+                                @if($evento->latitud && $evento->longitud)
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ $evento->latitud }},{{ $evento->longitud }}">
+                                        Ubicación en Google Maps
+                                    </a>
+                                    <br>
+                                    <small style="font-size: 9px; color: #6b7280;">
+                                        (Lat: {{ $evento->latitud }}, Long: {{ $evento->longitud }})
+                                    </small>
+                                @else
+                                    Ubicación no especificada
+                                @endif
+                            </span>
+                        </td>
+                    </tr>
+                </table>
                 
                 @if(isset($evento->prioridad) || isset($evento->estado) || isset($evento->responsable))
-                <div class="detail-grid" style="margin-top: 10px;">
-                    @if(isset($evento->prioridad))
-                    <div class="detail-item">
-                        <span class="detail-label">Prioridad</span>
-                        <span class="detail-value">{{ ucfirst($evento->prioridad) }}</span>
-                    </div>
-                    @endif
-                    @if(isset($evento->estado))
-                    <div class="detail-item">
-                        <span class="detail-label">Estado</span>
-                        <span class="detail-value">{{ ucfirst($evento->estado) }}</span>
-                    </div>
-                    @endif
-                    @if(isset($evento->responsable))
-                    <div class="detail-item">
-                        <span class="detail-label">Responsable</span>
-                        <span class="detail-value">{{ $evento->responsable }}</span>
-                    </div>
-                    @endif
-                </div>
+                <table class="detail-grid" style="margin-top: 10px;">
+                    <tr>
+                        @if(isset($evento->prioridad))
+                        <td>
+                            <span class="detail-label">Prioridad</span>
+                            <span class="detail-value">{{ ucfirst($evento->prioridad) }}</span>
+                        </td>
+                        @endif
+                        @if(isset($evento->estado))
+                        <td>
+                            <span class="detail-label">Estado</span>
+                            <span class="detail-value">{{ ucfirst($evento->estado) }}</span>
+                        </td>
+                        @endif
+                        @if(isset($evento->responsable))
+                        <td>
+                            <span class="detail-label">Responsable</span>
+                            <span class="detail-value">{{ $evento->responsable }}</span>
+                        </td>
+                        @endif
+                        <!-- Relleno para celdas faltantes -->
+                        @php
+                            $cellCount = (isset($evento->prioridad) ? 1 : 0) + (isset($evento->estado) ? 1 : 0) + (isset($evento->responsable) ? 1 : 0);
+                            $emptyCells = 4 - $cellCount;
+                        @endphp
+                        @for($i = 0; $i < $emptyCells; $i++)
+                            <td></td>
+                        @endfor
+                    </tr>
+                </table>
                 @endif
             </div>
             
@@ -296,22 +352,17 @@
             <div class="section images-section">
                 <h2 class="section-title">Evidencia Gráfica</h2>
 
-                @php
-                    $imagenes = $evento->media ?? colect([]);
-                @endphp
-
-                @if($imagenes->count() > 0)
-                    @foreach($imagenes as $index => $imagen)
-                    <div class="image-container">
-                        <div class="image-placeholder">
-                            Imagen {{ $index + 1 }}: {{ $imagen->file_name }}<br>
-                            <small>(Disponible en el sistema digital)</small>
+                @if(isset($imagenesBase64) && count($imagenesBase64) > 0)
+                    <div class="images-grid">
+                        @foreach($imagenesBase64 as $index => $imagen)
+                        <div class="image-wrapper">
+                            <img src="{{ $imagen['data'] }}" alt="{{ $imagen['name'] }}" class="actual-image" style="max-width: 100%; height: auto; max-height: 320px;">
+                            <div class="image-caption">
+                                Evidencia {{ $index + 1 }} - {{ $imagen['name'] }}
+                            </div>
                         </div>
-                        <div class="image-caption">
-                            Evidencia {{ $index + 1 }} - {{ $imagen->file_name }}
-                        </div>
+                        @endforeach
                     </div>
-                    @endforeach
                 @else
                     <div class="image-placeholder">
                         No hay imágenes adjuntas para este evento
@@ -334,18 +385,16 @@
                 <h2 class="section-title">Inventario de Elementos Sustraídos</h2>
                 
                 <div class="inventory-placeholder">
-                    🔍 No se registraron elementos sustraídos en este incidente
+                    [INVENTARIO] No se registraron elementos sustraídos en este incidente
                 </div>
                 
-                <!-- Tabla de ejemplo (puedes personalizar según necesites) -->
+                <!-- Tabla de ejemplo -->
                 <table class="inventory-table">
                     <thead>
                         <tr>
                             <th>Item</th>
                             <th>Descripción</th>
                             <th>Cantidad</th>
-                            <th>Valor Aprox.</th>
-                            <th>Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -353,16 +402,11 @@
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
                         </tr>
                         <tr>
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -370,12 +414,16 @@
         
         <div class="footer">
             <div class="footer-content">
-                <div class="generated-by">
-                    Elaborado por {{ auth()->user()->name ?? 'Sistema' }}
-                </div>
-                <div class="timestamp">
-                    {{ now()->format('d/m/Y H:i:s') }}
-                </div>
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="generated-by">
+                            Elaborado por {{ auth()->user()->name ?? 'Sistema' }}
+                        </td>
+                        <td class="timestamp">
+                            {{ now()->format('d/m/Y H:i:s') }}
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
