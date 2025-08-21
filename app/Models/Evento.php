@@ -22,6 +22,13 @@ class Evento extends Model
         'empresa_asociada_id',
     ];
 
+        protected $casts = [
+        'fecha_hora' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
+    ];
+
+
     public function seguimientos()
     {
         return $this->hasMany(Seguimiento::class);
@@ -64,5 +71,10 @@ class Evento extends Model
     public function empresaAsociada()
     {
         return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
+    }
+
+    public function reportesGenerados()
+    {
+        return $this->hasMany(ReporteGenerado::class);
     }
 }

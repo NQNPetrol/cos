@@ -87,4 +87,9 @@ class User extends Authenticatable
         
         return $initials ?: strtoupper(substr($this->email, 0, 1)); // Fallback to first letter of email
     }
+
+    public function reportesGenerados()
+    {
+        return $this->hasMany(ReporteGenerado::class);
+    }
 }
