@@ -145,7 +145,7 @@
                             <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos (opcional).</p>
                             
                             <div id="elementos-container">
-                                <div class="elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div class="elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 fila-original">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                                         <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
@@ -349,9 +349,10 @@
     // Función para actualizar visibilidad de botones de eliminar
     function updateRemoveButtons() {
         const rows = document.querySelectorAll('.elemento-row');
-        rows.forEach((row, index) => {
+        rows.forEach((row) => {
             const removeBtn = row.querySelector('.remove-elemento-btn');
-            if (rows.length > 1) {
+            // Solo mostrar botón de eliminar en filas que NO son la original
+            if (!row.classList.contains('fila-original')) {
                 removeBtn.style.display = 'block';
             } else {
                 removeBtn.style.display = 'none';

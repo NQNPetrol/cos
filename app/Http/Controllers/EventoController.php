@@ -196,6 +196,12 @@ class EventoController extends Controller
 
     public function destroy(Evento $evento)
     {
+        // Eliminar reportes generados asociados al evento primero
+        foreach($evento->reportesGenerados as $reporte) {
+            $reporte->delete();
+        }
+
+        
         foreach($evento->media as $media) {
             Storage::disk('public')->delete($media->file_path);
             $media->delete();

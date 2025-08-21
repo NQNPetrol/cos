@@ -375,33 +375,32 @@
             <div class="section">
                 <h2 class="section-title">Inventario de Elementos Sustraídos</h2>
                 
-                <div class="inventory-placeholder">
-                    [INVENTARIO] No se registraron elementos sustraídos en este incidente
-                </div>
-                
-                <!-- Tabla de ejemplo -->
-                <table class="inventory-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                    </tbody>
-                </table>
+                @if(!empty($evento->elementos_sustraidos) && !empty($evento->cantidad) && count($evento->elementos_sustraidos) > 0)
+                <!-- Tabla-->
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for($i = 0; $i < count($evento->elementos_sustraidos); $i++)
+                                @if(isset($evento->elementos_sustraidos[$i]) && isset($evento->cantidad[$i]))
+                                    <tr>
+                                        <td>{{ $evento->elementos_sustraidos[$i] }}</td>
+                                        <td>{{ $evento->cantidad[$i] }}</td>
+                                    </tr>
+                                @endif
+                            @endfor
+                        </tbody>
+                    </table>
+                @else
+                    <div class="inventory-placeholder">
+                        [INVENTARIO] No se registraron elementos sustraídos en este incidente
+                    </div>
+                @endif
             </div>
-        </div>
 
         <!-- Sección de Observaciones Adicionales -->
         @if(isset($evento->observaciones) && $evento->observaciones)
