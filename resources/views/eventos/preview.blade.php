@@ -2,19 +2,19 @@
     <div class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
         <div class="bg-slate-800 border-b border-slate-700 sticky top-0 z-10">
             <div class="container mx-auto px-6 py-4">
-                <nav class="flex items-center space-x-2 text-sm text-slate-400 mb-2">
-                    <a href="{{ route('eventos.index') }}" class="hover:text-blue-400 transition-colors">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                <nav class="flex items-center space-x-2 text-sm text-slate-300 mb-2">
+                    <a href="{{ route('eventos.index') }}" class="hover:text-blue-400 transition-colors flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
                         Eventos
                     </a>
                     <span class="text-slate-500">/</span>
-                    <span class="text-slate-200 font-medium">Vista Previa del Reporte del Evento #{{ $evento->id }}</span>
+                    <span class="text-slate-400 font-medium">Vista Previa del Reporte del Evento #{{ $evento->id }}</span>
                 </nav>
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-white mb-6">Vista Previa del Evento</h1>
+                        <h1 class="text-3xl font-bold text-white mb-1">Vista Previa del Evento</h1>
                         <p class="text-slate-400 mt-1">Revisa en la vista previa que todos los datos del evento sean correctos antes de generar un reporte.
                     </div>
                     <div class="flex items-center space-x-3">
