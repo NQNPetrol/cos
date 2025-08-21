@@ -50,10 +50,10 @@
                             </div>
                         </div>
                         <div class="p-8 bg-slate-700/50">
-                            <div class="bg-slate-800 rounded-lg shadow-inner border border-slate-600 p-6">
+                            <div class="bg-slate-800 rounded-lg shadow-inner border border-slate-600 p-6 h-[1122px] overflow-y-auto scrollbar-dark" style="height: 1122px;">
                                 <iframe 
                                     src="{{ route('eventos.reporte.preview-iframe', $evento) }}" 
-                                    class="w-full h-96 border-none rounded"
+                                    class="w-full border-none rounded"
                                     onload="this.style.height = this.contentWindow.document.body.scrollHeight + 'px';" style="background: #1e293b;">
                                 </iframe>
                             </div>
@@ -113,7 +113,7 @@
                             <p class="text-slate-400 text-sm mb-4">
                                 Versiones anteriores de reportes generados para este evento.
                             </p>
-                            <div class="space-y-3 max-h-96 overflow-y-auto">
+                            <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-dark">
                                 @foreach($reportesGenerados->sortByDesc('created_at') as $index => $reporte)
                                 <div class="group border border-slate-700 rounded-lg p-4 hover:border-blue-600 hover:bg-slate-700/50 transition-all duration-200">
                                     <div class="flex items-start justify-between mb-2">
@@ -192,4 +192,30 @@
         }, 5000);
     </script>
     @endif
+    <style>
+        /* Estilos personalizados para la barra de scroll */
+        .scrollbar-dark::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .scrollbar-dark::-webkit-scrollbar-track {
+            background: #334155; /* slate-700 */
+            border-radius: 4px;
+        }
+        
+        .scrollbar-dark::-webkit-scrollbar-thumb {
+            background: #475569; /* slate-600 */
+            border-radius: 4px;
+        }
+        
+        .scrollbar-dark::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+        
+        /* Para Firefox */
+        .scrollbar-dark {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #334155;
+        }
+    </style>
 </x-app-layout>

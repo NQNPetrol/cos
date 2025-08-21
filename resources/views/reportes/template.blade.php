@@ -258,7 +258,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>Reporte de Incidente</h1>
+            <h1>Informe de {{ $evento->tipo }}</h1>
             <p class="subtitle">Documento Oficial del Centro de Operaciones de Seguridad</p>
             <div class="event-badge">
                 Evento ID: {{ $evento->id }}
