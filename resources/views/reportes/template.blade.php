@@ -339,7 +339,7 @@
             </div>
             
             <!-- Sección de Descripción -->
-            @if($evento->descripcion)
+            @if(isset($evento->descripcion))
             <div class="section">
                 <h2 class="section-title">Descripción Detallada</h2>
                 <div class="description">
@@ -370,15 +370,6 @@
                 @endif
             </div>
             
-            <!-- Sección de Observaciones Adicionales -->
-            @if(isset($evento->observaciones) && $evento->observaciones)
-            <div class="section">
-                <h2 class="section-title">Observaciones Adicionales</h2>
-                <div class="description">
-                    {{ $evento->observaciones }}
-                </div>
-            </div>
-            @endif
 
             <!-- Sección de Inventario de Elementos Sustraídos -->
             <div class="section">
@@ -411,6 +402,16 @@
                 </table>
             </div>
         </div>
+
+        <!-- Sección de Observaciones Adicionales -->
+        @if(isset($evento->observaciones) && $evento->observaciones)
+        <div class="section">
+            <h2 class="section-title">Observaciones Adicionales</h2>
+            <div class="description">
+                {{ $evento->observaciones }}
+            </div>
+        </div>
+        @endif
         
         <div class="footer">
             <div class="footer-content">
