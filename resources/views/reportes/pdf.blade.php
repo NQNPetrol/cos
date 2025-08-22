@@ -65,6 +65,18 @@
             border-radius: 5px;
             background: #f8fafc;
             page-break-inside: avoid;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section-flow {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background: #f8fafc;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .section-title {
@@ -74,6 +86,7 @@
             margin-bottom: 10px;
             border-bottom: 2px solid #3b82f6;
             padding-bottom: 5px;
+            padding: 15px 15px 5px 15px;
         }
         
         .detail-grid {
@@ -111,6 +124,11 @@
             line-height: 1.5;
             font-size: 11px;
             color: #475569;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
         }
         
         .images-section {
@@ -249,6 +267,18 @@
             page-break-inside: avoid;
             break-inside: avoid;
         }
+
+        .section > table,
+        .section > .description {
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .section > *:not(.section-title) {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -339,10 +369,10 @@
             </div>
             
             <!-- Sección de Descripción -->
-            @if($evento->descripcion)
-            <div class="section">
+            @if(isset($evento->descripcion))
+            <div class="section-flow">
                 <h2 class="section-title">Descripción Detallada</h2>
-                <div class="description">
+                <div class="description" style="white-space: pre-line;">
                     {{ $evento->descripcion }}
                 </div>
             </div>
@@ -370,47 +400,47 @@
                 @endif
             </div>
             
-            <!-- Sección de Observaciones Adicionales -->
-            @if(isset($evento->observaciones) && $evento->observaciones)
-            <div class="section">
-                <h2 class="section-title">Observaciones Adicionales</h2>
-                <div class="description">
-                    {{ $evento->observaciones }}
-                </div>
-            </div>
-            @endif
 
             <!-- Sección de Inventario de Elementos Sustraídos -->
             <div class="section">
                 <h2 class="section-title">Inventario de Elementos Sustraídos</h2>
                 
-                <div class="inventory-placeholder">
-                    [INVENTARIO] No se registraron elementos sustraídos en este incidente
-                </div>
-                
-                <!-- Tabla de ejemplo -->
-                <table class="inventory-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                    </tbody>
-                </table>
+                @if(!empty($evento->elementos_sustraidos) && !empty($evento->cantidad) && count($evento->elementos_sustraidos) > 0)
+                <!-- Tabla-->
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for($i = 0; $i < count($evento->elementos_sustraidos); $i++)
+                                @if(isset($evento->elementos_sustraidos[$i]) && isset($evento->cantidad[$i]))
+                                    <tr>
+                                        <td>{{ $evento->elementos_sustraidos[$i] }}</td>
+                                        <td>{{ $evento->cantidad[$i] }}</td>
+                                    </tr>
+                                @endif
+                            @endfor
+                        </tbody>
+                    </table>
+                @else
+                    <div class="inventory-placeholder">
+                        [INVENTARIO] No se registraron elementos sustraídos en este incidente
+                    </div>
+                @endif
+            </div>
+            
+        <!-- Sección de Observaciones Adicionales -->
+        @if(isset($evento->observaciones) && $evento->observaciones)
+        <div class="section">
+            <h2 class="section-title">Observaciones Adicionales</h2>
+            <div class="description" style="white-space: pre-line;">
+                {{ $evento->observaciones }}
             </div>
         </div>
+        @endif
         
         <div class="footer">
             <div class="footer-content">

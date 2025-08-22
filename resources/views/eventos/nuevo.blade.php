@@ -133,16 +133,60 @@
                             @enderror
                         </div>
 
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
+                            <textarea name="descripcion" id="descripcion"
+                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                        </div>
+
+                        <div class="bg-gray-700 p-4 rounded-lg" id="elementos-sustraidos" >
+                            <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Sustraídos</h3>
+                            <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos (opcional).</p>
+                            
+                            <div id="elementos-container">
+                                <div class="elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 fila-original">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                                        <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                                        <div class="flex">
+                                            <input type="number" name="cantidades[]" min="1" value="1"
+                                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="add-elemento-btn" 
+                                class="mt-2 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
+                            <i class="bi bi-plus-circle mr-1"></i> Añadir
+                        </button>
+                            
+                            @error('elementos')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                            @error('cantidades')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Sección 7: Observaciones -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">7. Observaciones</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
                                       class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">8. Link del reporte</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">9. Link del reporte</h3>
                             <input type="url" name="reporte_url" id="url_reporte" placeholder="https://drive.google.com/..."
                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('reporte_url') }}">
@@ -150,7 +194,7 @@
 
                         <!-- Sección 9: Multimedia -->
                          <div class="bg-gray-700 p-4 rounded-lg">
-                             <h3 class="text-lg font-medium text-white mb-4">9. Multimedia</h3>
+                             <h3 class="text-lg font-medium text-white mb-4">10. Multimedia</h3>
                              <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Imágenes (JPG, PNG - Máx. 2MB c/u)</label>
                                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
@@ -239,6 +283,7 @@
 
     // Función para cargar tipos basados en categoría seleccionada
     function cargarTipos(categoria) {
+        console.log(categoria);
         const tiposContainer = document.getElementById('tipos-container');
         tiposContainer.innerHTML = '';
         
@@ -266,6 +311,57 @@
         });
     }
 
+    
+
+    // Función para añadir nueva fila de elemento
+    function addElementoRow() {
+        const container = document.getElementById('elementos-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+        newRow.innerHTML = `
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                       class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                <div class="flex">
+                    <input type="number" name="cantidades[]" min="1" value="1"
+                           class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                    <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(newRow);
+        
+        // Añadir listener al botón de eliminar
+        const removeBtn = newRow.querySelector('.remove-elemento-btn');
+        removeBtn.addEventListener('click', function() {
+            newRow.remove();
+            updateRemoveButtons();
+        });
+        
+        updateRemoveButtons();
+    }
+
+    // Función para actualizar visibilidad de botones de eliminar
+    function updateRemoveButtons() {
+        const rows = document.querySelectorAll('.elemento-row');
+        rows.forEach((row) => {
+            const removeBtn = row.querySelector('.remove-elemento-btn');
+            // Solo mostrar botón de eliminar en filas que NO son la original
+            if (!row.classList.contains('fila-original')) {
+                removeBtn.style.display = 'block';
+            } else {
+                removeBtn.style.display = 'none';
+            }
+        });
+    }
+
     // Escuchar cambios en la selección de categoría
     document.querySelectorAll('input[name="categoria_id"]').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -273,6 +369,8 @@
             cargarTipos(nombreCategoria);
         });
     });
+
+    document.getElementById('add-elemento-btn').addEventListener('click', addElementoRow);
 
     // Inicializar el formulario si hay valores antiguos
     document.addEventListener('DOMContentLoaded', function() {
@@ -286,12 +384,48 @@
             setTimeout(() => {
                 if (tipoSeleccionado) {
                     const tipoInput = document.querySelector(`input[name="tipo"][value="${tipoSeleccionado}"]`);
+                    console.log(tipoSeleccionado);
                     if (tipoInput) {
                         tipoInput.checked = true;
+                        mostrarElementosSustraidos(tipoSeleccionado);
                     }
                 }
             }, 100);
         }
+        // Cargar elementos sustraídos existentes
+        @if(old('elementos'))
+            const elementosOld = @json(old('elementos'));
+            const cantidadesOld = @json(old('cantidades'));
+            
+            if (elementosOld && elementosOld.length > 0) {
+                const container = document.getElementById('elementos-container');
+                container.innerHTML = '';
+                
+                elementosOld.forEach((elemento, index) => {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+                    newRow.innerHTML = `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                            <input type="text" name="elementos[]" value="${elemento}" placeholder="Ej: rueda, batería, linterna..."
+                                   class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                            <div class="flex">
+                                <input type="number" name="cantidades[]" min="1" value="${cantidadesOld[index] || 1}"
+                                       class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(newRow);
+                });
+                updateRemoveButtons();
+            }
+        @endif
     });
 
     //vista previa imagenes

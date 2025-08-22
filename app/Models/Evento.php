@@ -14,18 +14,23 @@ class Evento extends Model
         'supervisor_id',
         'longitud',
         'latitud',
+        'descripcion',
         'observaciones',
         'url_reporte',
         'user_id',
         'categoria_id',
         'tipo',
         'empresa_asociada_id',
+        'elementos_sustraidos',
+        'cantidad',
     ];
 
         protected $casts = [
         'fecha_hora' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'elementos_sustraidos' => 'array',
+        'cantidad' => 'array',
     ];
 
 

@@ -61,10 +61,15 @@ class EventoController extends Controller
                 'required',
                 'regex:/^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/'
             ],
+            'descripcion' => 'nullable|string',
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
             'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
             'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'elementos' => 'nullable|array',
+            'elementos.*' => 'nullable|string|max:255',
+            'cantidades' => 'nullable|array',
+            'cantidades.*' => 'nullable|integer|min:1',
         ]);
 
         [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -72,6 +77,19 @@ class EventoController extends Controller
         $validated['longitud'] = $lng;
 
         $validated['user_id'] = auth()->id();
+
+        // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
+        if ($request->tipo == "Robo o intento de robo" && $request->has('elementos')) {
+            $elementos = array_filter($request->elementos);
+            $cantidades = array_filter($request->cantidades);
+            
+            // Asegurarse de que ambos arrays tengan la misma longitud
+            $validated['elementos_sustraidos'] = array_values($elementos);
+            $validated['cantidad'] = array_slice(array_values($cantidades), 0, count($elementos));
+        } else {
+            $validated['elementos_sustraidos'] = null;
+            $validated['cantidad'] = null;
+        }
         
         $evento = Evento::create($validated);
 
@@ -124,10 +142,15 @@ class EventoController extends Controller
             'required',
             'regex:/^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/'
         ],
+        'descripcion' => 'nullable|string',
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
         'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
         'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+        'elementos' => 'nullable|array',
+        'elementos.*' => 'nullable|string|max:255',
+        'cantidades' => 'nullable|array',
+        'cantidades.*' => 'nullable|integer|min:1',
     ]);
 
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -135,6 +158,18 @@ class EventoController extends Controller
     $validated['longitud'] = $lng;
 
     $validated['user_id'] = auth()->id();
+
+    // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
+    if ($request->tipo == "Robo o intento de robo" && $request->has('elementos')) {
+        $elementos = array_filter($request->elementos);
+        $cantidades = array_filter($request->cantidades);
+        
+        $validated['elementos_sustraidos'] = array_values($elementos);
+        $validated['cantidad'] = array_slice(array_values($cantidades), 0, count($elementos));
+    } else {
+        $validated['elementos_sustraidos'] = null;
+        $validated['cantidad'] = null;
+    }
 
     $evento->update($validated);
 
@@ -161,6 +196,12 @@ class EventoController extends Controller
 
     public function destroy(Evento $evento)
     {
+        // Eliminar reportes generados asociados al evento primero
+        foreach($evento->reportesGenerados as $reporte) {
+            $reporte->delete();
+        }
+
+        
         foreach($evento->media as $media) {
             Storage::disk('public')->delete($media->file_path);
             $media->delete();
