@@ -406,7 +406,7 @@
 
             <!-- Sección de Inventario de Elementos Sustraídos -->
             <div class="section">
-                <h2 class="section-title">Inventario de Elementos Sustraídos</h2>
+                <h2 class="section-title">Elementos involucrados en el evento</h2>
                 
                 @if(!empty($evento->elementos_sustraidos) && !empty($evento->cantidad) && count($evento->elementos_sustraidos) > 0)
                 <!-- Tabla-->
@@ -430,7 +430,7 @@
                     </table>
                 @else
                     <div class="inventory-placeholder">
-                        [INVENTARIO] No se registraron elementos sustraídos en este incidente
+                        [INVENTARIO] No se registraron elementos en este incidente
                     </div>
                 @endif
             </div>

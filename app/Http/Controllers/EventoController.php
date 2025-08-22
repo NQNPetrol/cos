@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\DB;
 
 class EventoController extends Controller
 {
+    const TIPOS_CON_ELEMENTOS = [
+        'Robo o intento de robo',
+        'Sabotaje o vandalismo',
+        'Daños a instalaciones o equipos',
+        'Hallazgo de objetos sospechosos'
+    ];
+
     public function index(Request $request)
     {
         $query = Evento::with(['creador', 'cliente', 'categoria'])->latest('fecha_hora');
@@ -79,7 +86,7 @@ class EventoController extends Controller
         $validated['user_id'] = auth()->id();
 
         // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
-        if ($request->tipo == "Robo o intento de robo" && $request->has('elementos')) {
+        if (in_array($request->tipo, self::TIPOS_CON_ELEMENTOS) && $request->has('elementos')) {
             $elementos = array_filter($request->elementos);
             $cantidades = array_filter($request->cantidades);
             
@@ -160,7 +167,7 @@ class EventoController extends Controller
     $validated['user_id'] = auth()->id();
 
     // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
-    if ($request->tipo == "Robo o intento de robo" && $request->has('elementos')) {
+    if (in_array($request->tipo, self::TIPOS_CON_ELEMENTOS) && $request->has('elementos')) {
         $elementos = array_filter($request->elementos);
         $cantidades = array_filter($request->cantidades);
         
