@@ -56,6 +56,8 @@
         
         .content {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .section {
@@ -65,6 +67,18 @@
             border-radius: 5px;
             background: #f8fafc;
             page-break-inside: avoid;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section-flow {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background: #f8fafc;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .section-title {
@@ -73,7 +87,8 @@
             color: #1e293b;
             margin-bottom: 10px;
             border-bottom: 2px solid #3b82f6;
-            padding-bottom: 5px;
+            padding-bottom: 2px solid #3b82f6;
+            padding: 15px 15px 5px 15px;
         }
         
         .detail-grid {
@@ -111,6 +126,10 @@
             line-height: 1.5;
             font-size: 11px;
             color: #475569;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0;
         }
         
         .images-section {
@@ -180,6 +199,8 @@
             border-top: 1px solid #e2e8f0;
             font-size: 10px;
             color: #64748b;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .footer-content {
@@ -248,6 +269,18 @@
         .image-wrapper {
             page-break-inside: avoid;
             break-inside: avoid;
+        }
+
+        .section > table,
+        .section > .description {
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .section > *:not(.section-title) {
+            padding-left: 15px;
+            padding-right: 15px;
         }
     </style>
 </head>
@@ -325,7 +358,7 @@
                             <span class="detail-value">{{ $evento->responsable }}</span>
                         </td>
                         @endif
-                        <!-- Relleno para celdas faltantes -->
+                       
                         @php
                             $cellCount = (isset($evento->prioridad) ? 1 : 0) + (isset($evento->estado) ? 1 : 0) + (isset($evento->responsable) ? 1 : 0);
                             $emptyCells = 4 - $cellCount;
@@ -340,9 +373,9 @@
             
             <!-- Sección de Descripción -->
             @if(isset($evento->descripcion))
-            <div class="section">
+            <div class="section-flow">
                 <h2 class="section-title">Descripción Detallada</h2>
-                <div class="description">
+                <div class="description" style="white-space: pre-line;">
                     {{ $evento->descripcion }}
                 </div>
             </div>
@@ -406,7 +439,7 @@
         @if(isset($evento->observaciones) && $evento->observaciones)
         <div class="section">
             <h2 class="section-title">Observaciones Adicionales</h2>
-            <div class="description">
+            <div class="description" style="white-space: pre-line;">
                 {{ $evento->observaciones }}
             </div>
         </div>

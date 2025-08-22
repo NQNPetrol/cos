@@ -165,7 +165,7 @@
                             <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
                             <textarea name="descripcion" id="descripcion"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('descripcion', $evento->descripcion) }}</textarea>
                         </div>
 
                         <div class="bg-gray-700 p-4 rounded-lg">
@@ -209,7 +209,7 @@
                         <div class="bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones', $evento->observaciones) }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
@@ -389,6 +389,104 @@
                 cargarTipos(categoriaSeleccionada.dataset.nombre);
             }
         });
+
+        // Cargar elementos sustraídos existentes al editar
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($evento->elementos_sustraidos && $evento->cantidad)
+                const elementos = @json($evento->elementos_sustraidos);
+                const cantidades = @json($evento->cantidad);
+                
+                if (elementos && elementos.length > 0) {
+                    const container = document.getElementById('elementos-container');
+                    container.innerHTML = ''; // Limpiar contenedor
+                    
+                    elementos.forEach((elemento, index) => {
+                        if (elemento && cantidades[index]) {
+                            const newRow = document.createElement('div');
+                            newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+                            newRow.innerHTML = `
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                                    <input type="text" name="elementos[]" value="${elemento}" placeholder="Ej: rueda, batería, linterna..."
+                                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                                    <div class="flex items-center">
+                                        <input type="number" name="cantidades[]" min="1" value="${cantidades[index]}"
+                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                        <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(newRow);
+                            
+                            // Añadir listener al botón de eliminar
+                            const removeBtn = newRow.querySelector('.remove-elemento-btn');
+                            removeBtn.addEventListener('click', function() {
+                                newRow.remove();
+                                updateRemoveButtons();
+                            });
+                        }
+                    });
+                    
+                    updateRemoveButtons();
+                }
+            @endif
+        });
+
+        // Función para actualizar visibilidad de botones de eliminar
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.elemento-row');
+            rows.forEach((row, index) => {
+                const removeBtn = row.querySelector('.remove-elemento-btn');
+                if (rows.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+        }
+
+        // Función para añadir nueva fila de elemento
+        function addElementoRow() {
+            const container = document.getElementById('elementos-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+            newRow.innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                    <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                    <div class="flex items-center">
+                        <input type="number" name="cantidades[]" min="1" value="1"
+                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            
+            // Añadir listener al botón de eliminar
+            const removeBtn = newRow.querySelector('.remove-elemento-btn');
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+                updateRemoveButtons();
+            });
+            
+            updateRemoveButtons();
+        }
+
+        // Event listener para el botón de agregar elemento
+        document.getElementById('add-elemento-btn').addEventListener('click', addElementoRow);
 
         // Campo dinamico de empresa asociada
         const clienteSelect = document.getElementById('cliente_id');

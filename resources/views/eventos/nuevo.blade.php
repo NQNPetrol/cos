@@ -140,7 +140,7 @@
                                       class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
                         </div>
 
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-gray-700 p-4 rounded-lg" id="elementos-sustraidos" >
                             <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Sustraídos</h3>
                             <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos (opcional).</p>
                             
@@ -283,6 +283,7 @@
 
     // Función para cargar tipos basados en categoría seleccionada
     function cargarTipos(categoria) {
+        console.log(categoria);
         const tiposContainer = document.getElementById('tipos-container');
         tiposContainer.innerHTML = '';
         
@@ -310,6 +311,7 @@
         });
     }
 
+    
 
     // Función para añadir nueva fila de elemento
     function addElementoRow() {
@@ -382,6 +384,7 @@
             setTimeout(() => {
                 if (tipoSeleccionado) {
                     const tipoInput = document.querySelector(`input[name="tipo"][value="${tipoSeleccionado}"]`);
+                    console.log(tipoSeleccionado);
                     if (tipoInput) {
                         tipoInput.checked = true;
                         mostrarElementosSustraidos(tipoSeleccionado);
