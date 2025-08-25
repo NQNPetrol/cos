@@ -2,14 +2,53 @@
 
     <h2 class="text-2xl font-bold mb-6">Listado de Personal</h2>
 
-    <div class="mb-4">
-        <label class="block text-sm mb-1">Buscar por Nombre o Apellido</label>
-        <input type="text"
-               wire:model.debounce.500ms="search"
-               placeholder="Ingrese nombre o apellido"
-               class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-    </div>
 
+    <div class="flex flex-col md:flex-row gap-4 mb-6 items-end">
+        <!-- Buscar -->
+        <div class="flex-1 min-w-[150px]">
+            <label class="block text-sm mb-1">Buscar</label>
+            <input type="text"
+                wire:model.live="search"
+                placeholder="Nombre o apellido"
+                class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+        </div>
+
+        <!-- Filtro por Cliente -->
+        <div class="flex-1 min-w-[180px]">
+            <label class="block text-sm mb-1">Cliente</label>
+            <select wire:model="cliente_id" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+                <option value="">Todos los clientes</option>
+                @foreach($clientes as $cliente)
+                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Filtro por Convenio -->
+        <div class="flex-1 min-w-[150px]">
+            <label class="block text-sm mb-1">Convenio</label>
+            <select wire:model="convenio" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+                <option value="">Todos</option>
+                @foreach($convenios as $convenioItem)
+                    <option value="{{ $convenioItem }}">{{ $convenioItem }}</option>
+                @endforeach
+            </select>
+        </div>
+
+   
+        <div class="flex space-x-2">
+            <button wire:click="aplicarFiltros" 
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded transition-colors text-sm whitespace-nowrap">
+                Aplicar
+            </button>
+            <button wire:click="limpiarFiltros" 
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors text-sm whitespace-nowrap">
+                Limpiar
+            </button>
+        </div>
+    </div> 
+
+    
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-800 text-gray-300">
