@@ -8,12 +8,20 @@ use App\Models\Cliente;
 use App\Models\Personal;
 use App\Models\Categoria;
 use App\Models\Media;
+use App\Models\EmpresaAsociada;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EventoController extends Controller
 {
+    const TIPOS_CON_ELEMENTOS = [
+        'Robo o intento de robo',
+        'Sabotaje o vandalismo',
+        'Daños a instalaciones o equipos',
+        'Hallazgo de objetos sospechosos'
+    ];
+
     public function index(Request $request)
     {
         $query = Evento::with(['creador', 'cliente', 'categoria'])->latest('fecha_hora');
@@ -32,7 +40,9 @@ class EventoController extends Controller
 
         $clientes = Cliente::orderBy('nombre')->get();
 
-        return view('eventos.index', compact('eventos', 'clientes'));
+        $empresas = collect();
+
+        return view('eventos.index', compact(['eventos', 'clientes', 'empresas']));
     }
 
     public function create()
@@ -40,7 +50,9 @@ class EventoController extends Controller
         $clientes = \App\Models\Cliente::all();
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
-        return view('eventos.nuevo', compact('clientes', 'supervisores','categorias'));
+        $empresas = collect();
+
+        return view('eventos.nuevo', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
 
     public function store(Request $request)
@@ -56,9 +68,15 @@ class EventoController extends Controller
                 'required',
                 'regex:/^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/'
             ],
+            'descripcion' => 'nullable|string',
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
-            'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048' //2MB max
+            'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'elementos' => 'nullable|array',
+            'elementos.*' => 'nullable|string|max:255',
+            'cantidades' => 'nullable|array',
+            'cantidades.*' => 'nullable|integer|min:1',
         ]);
 
         [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -66,8 +84,23 @@ class EventoController extends Controller
         $validated['longitud'] = $lng;
 
         $validated['user_id'] = auth()->id();
+
+        // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
+        if (in_array($request->tipo, self::TIPOS_CON_ELEMENTOS) && $request->has('elementos')) {
+            $elementos = array_filter($request->elementos);
+            $cantidades = array_filter($request->cantidades);
+            
+            // Asegurarse de que ambos arrays tengan la misma longitud
+            $validated['elementos_sustraidos'] = array_values($elementos);
+            $validated['cantidad'] = array_slice(array_values($cantidades), 0, count($elementos));
+        } else {
+            $validated['elementos_sustraidos'] = null;
+            $validated['cantidad'] = null;
+        }
         
         $evento = Evento::create($validated);
+
+        $empresas = EmpresaAsociada::all();
 
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
@@ -93,12 +126,14 @@ class EventoController extends Controller
         $clientes = Cliente::all();
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
+        $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
         return view('eventos.edit', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
-            'categorias' => $categorias
+            'categorias' => $categorias,
+            'empresas' => $empresas
         ]);
     }
 
@@ -114,9 +149,15 @@ class EventoController extends Controller
             'required',
             'regex:/^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/'
         ],
+        'descripcion' => 'nullable|string',
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
-        'media.*' => 'nullable|image|mimes:jpeg,png|max:2048'
+        'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
+        'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+        'elementos' => 'nullable|array',
+        'elementos.*' => 'nullable|string|max:255',
+        'cantidades' => 'nullable|array',
+        'cantidades.*' => 'nullable|integer|min:1',
     ]);
 
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -124,6 +165,18 @@ class EventoController extends Controller
     $validated['longitud'] = $lng;
 
     $validated['user_id'] = auth()->id();
+
+    // Procesar elementos sustraídos si el tipo es "Robo o intento de robo"
+    if (in_array($request->tipo, self::TIPOS_CON_ELEMENTOS) && $request->has('elementos')) {
+        $elementos = array_filter($request->elementos);
+        $cantidades = array_filter($request->cantidades);
+        
+        $validated['elementos_sustraidos'] = array_values($elementos);
+        $validated['cantidad'] = array_slice(array_values($cantidades), 0, count($elementos));
+    } else {
+        $validated['elementos_sustraidos'] = null;
+        $validated['cantidad'] = null;
+    }
 
     $evento->update($validated);
 
@@ -150,6 +203,12 @@ class EventoController extends Controller
 
     public function destroy(Evento $evento)
     {
+        // Eliminar reportes generados asociados al evento primero
+        foreach($evento->reportesGenerados as $reporte) {
+            $reporte->delete();
+        }
+
+        
         foreach($evento->media as $media) {
             Storage::disk('public')->delete($media->file_path);
             $media->delete();

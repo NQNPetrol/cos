@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Objetivo;
 use App\Models\Cliente;
 use App\Models\Contrato;
+use App\Models\EmpresaAsociada;
 
 class ObjetivoController extends Controller
 {
@@ -21,9 +22,10 @@ class ObjetivoController extends Controller
     public function create()
     {
         $clientes = Cliente::all();
-        $contratos = Contrato::all();
+        $contratos = collect();
+        $empresas_asociadas = collect();
 
-        return view('objetivos.create', compact('clientes', 'contratos'));
+        return view('objetivos.create', compact(['clientes', 'contratos', 'empresas_asociadas']));
     }
 
     public function store(Request $request)
@@ -35,6 +37,7 @@ class ObjetivoController extends Controller
             'latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
             'longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
             'localidad' => 'required|string|max:255',
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
         ]);
 
         Objetivo::create($validated);
@@ -45,9 +48,10 @@ class ObjetivoController extends Controller
     public function edit(Objetivo $objetivo)
     {
         $clientes = Cliente::all();
-        $contratos = Contrato::all();
+        $contratos = $objetivo->cliente ? $objetivo->cliente->contratos : collect();
+        $empresas_asociadas = $objetivo->cliente ? $objetivo->cliente->empresasAsociadas : collect();
 
-        return view('objetivos.edit', compact('objetivo', 'clientes', 'contratos'));
+        return view('objetivos.edit', compact('objetivo', 'clientes', 'contratos', 'empresas_asociadas'));
     }
 
     public function update(Request $request, Objetivo $objetivo)
@@ -59,6 +63,7 @@ class ObjetivoController extends Controller
             'latitud' => 'required|string|max:255',
             'longitud' => 'required|string|max:255',
             'localidad' => 'required|string|max:255',
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
         ]);
 
         $objetivo->update($validated);

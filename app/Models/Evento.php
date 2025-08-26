@@ -14,12 +14,25 @@ class Evento extends Model
         'supervisor_id',
         'longitud',
         'latitud',
+        'descripcion',
         'observaciones',
         'url_reporte',
         'user_id',
         'categoria_id',
         'tipo',
+        'empresa_asociada_id',
+        'elementos_sustraidos',
+        'cantidad',
     ];
+
+        protected $casts = [
+        'fecha_hora' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'elementos_sustraidos' => 'array',
+        'cantidad' => 'array',
+    ];
+
 
     public function seguimientos()
     {
@@ -58,5 +71,15 @@ class Evento extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');
+    }
+
+    public function empresaAsociada()
+    {
+        return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
+    }
+
+    public function reportesGenerados()
+    {
+        return $this->hasMany(ReporteGenerado::class);
     }
 }

@@ -13,6 +13,7 @@ class Objetivo extends Model
         'longitud',
         'localidad',
         'cliente_id',
+        'empresa_asociada_id',
     ];
 
     public function cliente()
@@ -23,5 +24,10 @@ class Objetivo extends Model
     public function contrato()
     {
         return $this->belongsTo(Contrato::class);
+    }
+
+    public function empresaAsociada()
+    {
+        return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
     }
 }

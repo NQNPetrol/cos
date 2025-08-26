@@ -8,6 +8,7 @@ class Contrato extends Model
 {
     protected $fillable = [
         'cliente_id',
+        'empresa_asociada_id',
         'nombre_proyecto',
         'localidad',
         'provincia',
@@ -18,5 +19,10 @@ class Contrato extends Model
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function empresaAsociada()
+    {
+        return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
     }
 }

@@ -31,13 +31,13 @@
 
                 <div>
                     <label class="block text-sm mb-1">Documento</label>
-                    <input type="text" name="documento" value="{{ old('documento') }}"
+                    <input type="text" name="nro_doc" value="{{ old('nro_doc') }}"
                         class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Fecha de Inicio</label>
-                    <input type="date" name="fecha_inicio" value="{{ old('fecha_inicio') }}"
+                    <input type="date" name="fecha_ing" value="{{ old('fecha_ing') }}"
                         class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
                 </div>
 

@@ -5,25 +5,27 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\Contrato;
+use App\Models\EmpresaAsociada;
 
 class ContratoController extends Controller
 {
     public function index()
     {
         return view('contratos.index');
-        // Nota: Ideal para cargar un componente Livewire
     }
 
     public function create()
     {
         $clientes = Cliente::all();
-        return view('contratos.create', compact('clientes'));
+        $empresas_asociadas = collect();
+        return view('contratos.create', compact(['clientes', 'empresas_asociadas']));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'cliente_id'      => 'required|exists:clientes,id',
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
             'nombre_proyecto' => 'required|string|max:255',
             'localidad'       => 'nullable|string|max:255',
             'provincia'       => 'nullable|string|max:255',
@@ -39,14 +41,14 @@ class ContratoController extends Controller
 
     public function edit(Contrato $contrato)
     {
-        $clientes = Cliente::all();
-        return view('contratos.edit', compact('contrato', 'clientes'));
+        return view('contratos.edit', ['contrato' => $contrato]);
     }
 
     public function update(Request $request, Contrato $contrato)
     {
         $validated = $request->validate([
             'cliente_id'      => 'required|exists:clientes,id',
+            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
             'nombre_proyecto' => 'required|string|max:255',
             'localidad'       => 'nullable|string|max:255',
             'provincia'       => 'nullable|string|max:255',

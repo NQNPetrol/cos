@@ -116,12 +116,30 @@
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" @if($evento->cliente_id == $cliente->id) selected @endif>
+                                    <option value="{{ $cliente->id }}" @if($evento->cliente_id == $cliente->id) selected @endif
+                                        data-empresas="{{ $cliente->empresasAsociadas->pluck('nombre', 'id') }}">
                                         {{ $cliente->nombre }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('cliente_id')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Sección 5.1: Empresa Asociada -->
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente <span class="text-red-500">*</span></h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                <option value="">Seleccione una empresa asociada al cliente</option>
+                                @foreach($empresas as $empresa)
+                                    <option value="{{ $empresa->id }}" @if($evento->empresa_asociada_id == $empresa->id) selected @endif>
+                                        {{ $empresa->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('empresa_asociada_id')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -143,16 +161,60 @@
                             @enderror
                         </div>
 
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
+                            <textarea name="descripcion" id="descripcion"
+                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('descripcion', $evento->descripcion) }}</textarea>
+                        </div>
+
+                        <div class="bg-gray-700 p-4 rounded-lg" id="elementos-sustraidos">
+                            <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Sustraídos</h3>
+                            <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos (opcional).</p>
+                            
+                            <div id="elementos-container">
+                                <div class="elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                                        <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                                        <div class="flex">
+                                            <input type="number" name="cantidades[]" min="1" value="1"
+                                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="add-elemento-btn" 
+                                class="mt-2 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
+                            <i class="bi bi-plus-circle mr-1"></i> Añadir
+                        </button>
+                            
+                            @error('elementos')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                            @error('cantidades')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
                         <!-- Sección 7: Observaciones -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">7. Observaciones</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ $evento->observaciones }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones', $evento->observaciones) }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">8. Link del reporte</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">9. Link del reporte</h3>
                             <input type="url" name="url_reporte" id="url_reporte" placeholder="https://drive.google.com/..."
                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ $evento->url_reporte }}">
@@ -160,7 +222,7 @@
 
                         <!-- Sección 9: Multimedia -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">9. Multimedia</h3>
+                            <h3 class="text-lg font-medium text-white mb-4">10. Multimedia</h3>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Agregar más imágenes (JPG, PNG - Máx. 2MB c/u)</label>
                                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
@@ -292,6 +354,8 @@
                     input.value = tipo;
                     input.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600';
                     input.required = true;
+
+                    input.addEventListener('change', toggleElementosSustraidos);
                     
                     // Marcar como seleccionado si coincide con el tipo actual
                     if (tipo === "{{ $evento->tipo }}") {
@@ -307,6 +371,8 @@
                     div.appendChild(label);
                     tiposContainer.appendChild(div);
                 });
+
+                setTimeout(toggleElementosSustraidos, 100);
             } else {
                 tiposContainer.innerHTML = '<p class="text-gray-400 italic">Seleccione primero una categoría</p>';
             }
@@ -327,6 +393,191 @@
                 cargarTipos(categoriaSeleccionada.dataset.nombre);
             }
         });
+
+        //mostrar/oculatar elementos
+        function toggleElementosSustraidos() {
+            const elementosSection = document.getElementById('elementos-sustraidos');
+            
+            const tiposConElementos = [
+                'tipo-robo-o-intento-de-robo',
+                'tipo-sabotaje-o-vandalismo',
+                'tipo-daños-a-instalaciones-o-equipos',
+                'tipo-hallazgo-de-objetos-sospechosos'
+            ];
+            
+            // Verificar si alguno de los tipos relevantes está seleccionado
+            let mostrarSeccion = false;
+            tiposConElementos.forEach(tipoId => {
+                const radioElement = document.getElementById(tipoId);
+                if (radioElement && radioElement.checked) {
+                    mostrarSeccion = true;
+                }
+            });
+            
+            if (mostrarSeccion) {
+                elementosSection.classList.remove('hidden');
+            } else {
+                elementosSection.classList.add('hidden');
+                // Limpiar los campos si se oculta la sección
+                document.getElementById('elementos-container').innerHTML = `
+                    <div class="elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                            <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                            <div class="flex items-center">
+                                <input type="number" name="cantidades[]" min="1" value="1"
+                                    class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+
+        // Cargar elementos sustraídos existentes al editar
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($evento->elementos_sustraidos && $evento->cantidad)
+                const elementos = @json($evento->elementos_sustraidos);
+                const cantidades = @json($evento->cantidad);
+                
+                if (elementos && elementos.length > 0) {
+                    const container = document.getElementById('elementos-container');
+                    container.innerHTML = ''; // Limpiar contenedor
+                    
+                    elementos.forEach((elemento, index) => {
+                        if (elemento && cantidades[index]) {
+                            const newRow = document.createElement('div');
+                            newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+                            newRow.innerHTML = `
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                                    <input type="text" name="elementos[]" value="${elemento}" placeholder="Ej: rueda, batería, linterna..."
+                                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                                    <div class="flex items-center">
+                                        <input type="number" name="cantidades[]" min="1" value="${cantidades[index]}"
+                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                        <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(newRow);
+                            
+                            // Añadir listener al botón de eliminar
+                            const removeBtn = newRow.querySelector('.remove-elemento-btn');
+                            removeBtn.addEventListener('click', function() {
+                                newRow.remove();
+                                updateRemoveButtons();
+                            });
+                        }
+                    });
+                    
+                    updateRemoveButtons();
+                }
+            @endif
+        });
+
+        // Función para actualizar visibilidad de botones de eliminar
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.elemento-row');
+            rows.forEach((row, index) => {
+                const removeBtn = row.querySelector('.remove-elemento-btn');
+                if (rows.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+        }
+
+        // Función para añadir nueva fila de elemento
+        function addElementoRow() {
+            const container = document.getElementById('elementos-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'elemento-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4';
+            newRow.innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
+                    <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
+                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
+                    <div class="flex items-center">
+                        <input type="number" name="cantidades[]" min="1" value="1"
+                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            
+            // Añadir listener al botón de eliminar
+            const removeBtn = newRow.querySelector('.remove-elemento-btn');
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+                updateRemoveButtons();
+            });
+            
+            updateRemoveButtons();
+        }
+
+        // Event listener para el botón de agregar elemento
+        document.getElementById('add-elemento-btn').addEventListener('click', addElementoRow);
+
+        // Campo dinamico de empresa asociada
+        const clienteSelect = document.getElementById('cliente_id');
+        const empresaSelect = document.getElementById('empresa_asociada_id');
+
+        if (clienteSelect && empresaSelect) {
+            clienteSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                
+                // Limpiar opciones actuales
+                empresaSelect.innerHTML = '<option value="">Seleccione una empresa asociada</option>';
+                
+                if (this.value) {
+                    // Obtener empresas del data-attribute
+                    const empresas = JSON.parse(selectedOption.getAttribute('data-empresas') || '{}');
+                    
+                    // Agregar nuevas opciones
+                    Object.entries(empresas).forEach(([id, nombre]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = nombre;
+                        empresaSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // Disparar el evento change si hay un cliente seleccionado
+            if (clienteSelect.value) {
+                clienteSelect.dispatchEvent(new Event('change'));
+                
+                // Seleccionar la empresa asociada si existe
+                const empresaId = "{{ $evento->empresa_asociada_id }}";
+                if (empresaId) {
+                    setTimeout(() => {
+                        empresaSelect.value = empresaId;
+                    }, 100);
+                }
+            }
+        }
 
         // Vista previa de nuevas imágenes
         document.getElementById('media').addEventListener('change', function(e) {

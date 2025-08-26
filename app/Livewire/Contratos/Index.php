@@ -4,6 +4,7 @@ namespace App\Livewire\Contratos;
 
 use App\Models\Contrato;
 use App\Models\Cliente;
+use App\Models\EmpresaAsociada;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,29 +16,23 @@ class Index extends Component
     public $searchNombre = '';
     public $sortField = 'nombre_proyecto';
     public $sortDirection = 'asc';
+    public $empresa_asociada_id = null;
 
-    public $casts = [
-        'searchCliente' => 'integer',
+    protected $queryString = [
+        'searchNombre' => ['except' => ''],
+        'searchCliente' => ['except' => null],
+        'empresa_asociada_id' => ['except' => null],
+        'sortField' => ['except' => 'nombre_proyecto'],
+        'sortDirection' => ['except' => 'asc'],
     ];
 
-    public function filtrarCliente($value)
+    public function clearFilters()
     {
-        $this->searchCliente = $value === '' ? null : (int) $value;
-
+        $this->searchNombre = '';
+        $this->searchCliente = '';
         $this->resetPage();
     }
 
-    public function loadContratos($cliente)
-    {
-        $cliente = Cliente::find($this->cliente_id);
-        
-        // Asegúrate de que $client no sea nulo antes de intentar acceder a wells
-        if ($cliente) {
-            $this->contratos = $cliente->contratos;
-        } else {
-            $this->contratos = collect(); // Si no hay cliente seleccionado, retorna una colección vacía
-        }
-    }
 
     public function updatingSearchNombre()
     {
@@ -54,18 +49,35 @@ class Index extends Component
         }
     }
 
+    public function delete($id)
+    {
+        Contrato::find($id)->delete();
+        session()->flash('message', 'Contrato eliminado correctamente');
+    }
+    
+
     public function render()
     {
-        $clientes = Cliente::all();
-        $query = Contrato::with('cliente');
+        $clientes = Cliente::orderBy('nombre')->get();
 
-        $contratos = Contrato::with('cliente')
-            ->when($this->searchCliente, fn($q) =>
-                $q->where('cliente_id', $this->searchCliente)
-            )
-            ->when($this->searchNombre, fn($q) =>
-                $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
-            )
+        $contratos = Contrato::with(['cliente', 'empresaAsociada'])
+            ->when($this->searchCliente, function($query) {
+                $query->where('cliente_id', $this->searchCliente);
+            })
+            ->when($this->empresa_asociada_id, function ($query) {
+                $query->where('empresa_asociada_id', $this->empresa_asociada_id);
+            })
+            ->when($this->searchNombre, function($query) {
+                $query->where(function($q) {
+                    $q->where('nombre_proyecto', 'like', '%' . $this->searchNombre . '%')
+                      ->orWhereHas('empresaAsociada', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
+                    })
+                    ->orWhereHas('cliente', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->searchNombre.'%');
+                    });
+                });
+            })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 
@@ -75,3 +87,4 @@ class Index extends Component
         ]);
     }
 }
+

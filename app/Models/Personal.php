@@ -14,12 +14,15 @@ class Personal extends Model
     protected $fillable = [
         'nombre',
         'apellido',
-        'documento',
         'cliente_id',
         'cargo',
         'puesto',
         'convenio',
-        'fecha_inicio',
+        'fecha_ing',
+        'tipo_doc',
+        'nro_doc',
+        'telefono',
+        'legajo'
     ];
 
     public function categoria()

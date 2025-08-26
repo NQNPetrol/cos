@@ -43,16 +43,6 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
-                        <label class="block mb-1 text-sm">Localidad</label>
-                        <select wire:model.live="localidad" type="text" placeholder="Filtrar por localidad" 
-                            class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
-                            <option value="">Todas</option>
-                            @foreach ($localidades as $loc)
-                                <option value="{{ $loc  }}">{{ $loc }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="flex items-end">
                         <button wire:click="resetFilters" 
                                 class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded h-[42px] w-full">
@@ -70,6 +60,7 @@
                             <th class="px-4 py-2 text-left">Nombre</th>
                             <th class="px-4 py-2 text-left">Ubicación</th>
                             <th class="px-4 py-2 text-left">Cliente</th>
+                            <th class="px-4 py-2 text-left">Empresa Asociada</th>
                             <th class="px-4 py-2 text-left">Contrato</th>
                             <th class="px-4 py-2 text-left">Localidad</th>
                             <th class="px-4 py-2 text-left">Acciones</th>
@@ -91,6 +82,7 @@
                                     </a>
                                 </td>
                                 <td class="px-4 py-2">{{ $obj->cliente->nombre ?? 'N/A' }}</td>
+                                <td class="px-4 py-2 text-center">{{ $obj->empresaAsociada->nombre ?? 'N/A' }}</td>
                                 <td class="px-4 py-2">{{ $obj->contrato->nombre_proyecto ?? 'N/A' }}</td>
                                 <td class="px-4 py-2">{{ $obj->localidad }}</td>
                                 <td class="px-4 py-2">
@@ -144,54 +136,74 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Nombre <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model.defer="nombre" 
+                                <input type="text" wire:model.defer="form.nombre" 
                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                @error('nombre') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.nombre') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-                                <label class="block text-sm mb-1 text-gray-300">Cliente <span class="text-red-500">*</span></label>
-                                <select wire:model="cliente_id" wire:change="selectClient($event.target.value)"
+                                <label class="block text-sm mb-1 text-gray-300">Seleccione un Cliente <span class="text-red-500">*</span></label>
+                                <select wire:model="form.cliente_id" wire:change="cargarEmpresas($event.target.value)"
                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                                     <option value="">Seleccione un cliente</option>
                                     @foreach ($clientes as $cliente)
                                         <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
                                     @endforeach
                                 </select>
-                                @error('cliente_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.cliente_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1 text-gray-300">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
+                                <select wire:model="form.empresa_asociada_id"
+                                        wire:change="cargarContratos($event.target.value)"
+                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        @if(!$form['cliente_id']) disabled @endif>
+                                    <option value="">Seleccione una empresa asociada</option>
+                                    @foreach ($empresasFiltradas as $empresa)
+                                        <option value="{{ $empresa->id }}"
+                                                @if($empresa->id == $form['empresa_asociada_id']) selected @endif>
+                                            {{ $empresa->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('form.empresa_asociada_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Contrato <span class="text-red-500">*</span></label>
-                                <select wire:model="contrato_id"
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <select wire:model="form.contrato_id"
+                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                       @if(!$form['empresa_asociada_id']) disabled @endif>
                                     <option value="">Seleccione un contrato</option>
-                                    @foreach ($contratos as $contrato)
-                                        <option value="{{ $contrato->id }}">{{ $contrato->nombre_proyecto }}</option>
+                                    @foreach ($contratosFiltrados as $contrato)
+                                        <option value="{{ $contrato->id }}"
+                                            @if($contrato->id == $form['contrato_id']) selected @endif>
+                                        {{ $contrato->nombre_proyecto }}</option>
                                     @endforeach
                                 </select>
-                                @error('contrato_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.contrato_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Latitud <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model.defer="latitud" 
+                                <input type="text" wire:model.defer="form.latitud" 
                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                @error('latitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.latitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Longitud <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model.defer="longitud" 
+                                <input type="text" wire:model.defer="form.longitud" 
                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                @error('longitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.longitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Localidad</label>
-                                <input type="text" wire:model.defer="localidad" 
+                                <input type="text" wire:model.defer="form.localidad" 
                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                                @error('localidad') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('form.localidad') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
