@@ -13,6 +13,7 @@ Route::get('/personal', [PersonalImportController::class, 'index']);
 
 
 Route::post('/personal', [PersonalImportController::class, 'store'])
+    ->middleware('auth:sanctum')
     ->name('api.personal.import');
 
 

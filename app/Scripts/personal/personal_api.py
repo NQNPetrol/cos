@@ -2,13 +2,14 @@ import requests
 import pandas as pd
 
 
-def importar_datos(df, api_url):
+def importar_datos(df, api_url, api_token):
     """
     Agarra un dataframe, lo parsea a json y lo importa a la tabla de personal de la app
     
     Parametros
     df: dataframe con los datos a importar
     api_url: el url del endpoint de la api
+    api_toke: api key de acceso
 
     Retorna
     Un diccionario con el resultado de la importación
@@ -16,14 +17,20 @@ def importar_datos(df, api_url):
 
     datos = preparar_datos(df)
 
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
+
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+        print("🔐 Usando autenticación por token")
+
     try:
         response = requests.post(
             api_url,
             json=datos,
-            headers={
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
+            headers= headers,
             timeout=30
         )
 
@@ -37,7 +44,8 @@ def importar_datos(df, api_url):
             return {
                 'success': False,
                 'message': f'Error: {response.status_code}',
-                'error': response.text
+                'error': response.text,
+                'headers_sent': headers
             }
         
     except requests.exceptions.RequestException as e:
