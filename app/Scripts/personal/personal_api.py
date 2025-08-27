@@ -24,7 +24,7 @@ def importar_datos(df, api_url, api_token):
 
     if api_token:
         headers['Authorization'] = f'Bearer {api_token}'
-        print("🔐 Usando autenticación por token")
+        print("Usando autenticación por token")
 
     try:
         response = requests.post(
@@ -87,3 +87,48 @@ def preparar_datos(df):
     df_limpio = df_limpio.where(pd.notnull(df_limpio), None)
 
     return df_limpio.to_dict('records')
+
+
+def verificar_registros(df, api_url):
+    """
+
+    Verifica múltiples registros contra la API de verificación masiva
+
+    """
+    datos = preparar_datos(df)
+    
+    try:
+        response = requests.post(
+            api_url,  
+            json=datos,
+            headers={
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout=60
+        )
+        
+        if response.status_code == 200:
+            resultado = response.json()
+            return {
+                'success': True,
+                'estadisticas': {
+                    'total': resultado['total_registros'],
+                    'existentes': resultado['registros_existentes'],
+                    'nuevos': resultado['registros_nuevos'],
+                    'errores': resultado['errores']
+                },
+                'resultados': resultado['resultados']
+            }
+        else:
+            return {
+                'success': False,
+                'message': f"Error API: {response.status_code}",
+                'error': response.text
+            }
+            
+    except Exception as e:
+        return {
+            'success': False,
+            'message': f"Error conexión: {str(e)}"
+        }

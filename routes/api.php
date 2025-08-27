@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\Api\PersonalImportController;
+use App\Http\Controllers\Api\PersonalCompareController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -11,6 +12,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/personal', [PersonalImportController::class, 'index']);
 
+Route::post('/personal/verificar', [PersonalCompareController::class, 'verificarExistencia']);
 
 Route::post('/personal', [PersonalImportController::class, 'store'])
     ->middleware('auth:sanctum')
