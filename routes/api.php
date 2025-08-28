@@ -18,6 +18,8 @@ Route::post('/personal', [PersonalImportController::class, 'store'])
     ->middleware('auth:sanctum')
     ->name('api.personal.import');
 
+Route::post('/personal/verificar/importar', [PersonalCompareController::class, 'store']);
+
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);
 Route::get('eventos/barras', [EventoController::class, 'eventosBarras']);

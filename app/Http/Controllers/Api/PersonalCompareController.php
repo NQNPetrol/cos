@@ -77,18 +77,27 @@ class PersonalCompareController extends Controller
                 }
 
                 $personal = Personal::create([
-                    'nombre' => $request->nombre,
-                    'apellido' => $request->apellido,
-                    'fecha_ing' => $request->fecha_ing ?? now(),
-                    'puesto' => $request->puesto ?? 'Sin definir',
-                    'convenio' => $request->convenio ?? '',
-                    'cargo' => $request->cargo ?? 'Sin definir',
-                    'cliente_id' => $request->cliente_id ?? 1,
-                    'tipo_doc' => $request->tipo_doc ?? 'DU',
-                    'nro_doc' => $request->nro_doc ?? '',
-                    'telefono' => $request->telefono ?? '',
-                    'legajo' => $request->legajo ?? ''
+                    'nombre' => $item['nombre'],
+                    'apellido' => $item['apellido'],
+                    'fecha_ing' => $item['fecha_ing'] ?? now(),
+                    'puesto' => $item['puesto'] ?? 'Sin definir',
+                    'convenio' => $item['convenio'] ?? '',
+                    'cargo' => $item['cargo'] ?? 'Sin definir',
+                    'cliente_id' => $item['cliente_id'] ?? 1,
+                    'tipo_doc' => $item['tipo_doc'] ?? 'DU',
+                    'nro_doc' => $item['nro_doc'] ?? '',
+                    'telefono' => $item['telefono'] ?? '',
+                    'legajo' => $item['legajo'] ?? null
                 ]);
+            
+                \Log::info("Registro creado exitosamente:", [
+                    'indice' => $index,
+                    'id' => $personal->id,
+                    'nombre' => $personal->nombre,
+                    'apellido' => $personal->apellido,
+                    'legajo' => $personal->legajo
+                ]);
+                
                 $registros_nuevos[] = $personal;
 
             } catch (\Exception $e) {
