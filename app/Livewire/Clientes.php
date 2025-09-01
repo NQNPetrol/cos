@@ -65,4 +65,19 @@ class Clientes extends Component
             'clientes' => Cliente::withCount('empresasAsociadas')->paginate(5),
         ]);
     }
+
+    public function delete($clienteId)
+    {
+        $cliente = Cliente::findOrFail($clienteId);
+        
+        // Verifica si el cliente tiene empresas asociadas antes de eliminar
+        if ($cliente->empresasAsociadas()->count() > 0) {
+            $this->successMessage = "No se puede eliminar el cliente porque tiene empresas asociadas.";
+            return;
+        }
+        
+        $cliente->delete();
+        
+        $this->successMessage = "Cliente eliminado exitosamente.";
+    }
 }
