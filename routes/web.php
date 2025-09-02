@@ -170,6 +170,9 @@ Route::middleware([
     Route::get('/patrullas/{patrulla}/dispositivos', [DispositivoPatrullaController::class, 'index'])
     ->name('patrullas.dispositivos');
 
+    //TICKETS
+    Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'index'])->name('tickets.nuevo');
+
 });
 
 
