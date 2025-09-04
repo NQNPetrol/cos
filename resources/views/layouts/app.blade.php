@@ -371,8 +371,7 @@
 
                 <!-- Submenú -->
                 <div id="submenuTickets" class="pl-6 space-y-1 hidden">
-                    <a href="" class="block text-gray-600 hover:text-gray-900 p-2">Mis Tickets</a>
-                    <a href="{{ route('tickets.nuevo') }}" class="block text-gray-600 hover:text-gray-900 p-2">Nuevo Ticket</a>
+                    <a href="{{ route('tickets.nuevo') }}" class="block text-gray-600 hover:text-gray-900 p-2">Gestionar Tickets</a>
                 </div>
 
                 <!-- Usuarios -->
