@@ -21,7 +21,6 @@ class AssignPermissionsToRoles extends Component
     {
         $this->roles = Role::all();
         $this->permissions = Permission::all();
-        $this->permissions = Permission::where('guard_name', 'web')->get();
 
         if ($selectedRole) {
             $this->currentRoleId = $selectedRole;
@@ -34,7 +33,9 @@ class AssignPermissionsToRoles extends Component
         $this->currentRoleId = $roleId;
 
         if ($roleId) {
-            $role = Role::findOrFail($roleId);
+            $role = Role::where('id', $roleId)
+                        ->where('guard_name', 'web')
+                        ->firstOrFail();
             
             $this->selectedPermissions = $role->permissions()
                 ->where('guard_name', 'web')
@@ -54,45 +55,32 @@ class AssignPermissionsToRoles extends Component
             'currentRoleId' => 'required|exists:roles,id'
         ]);
 
-        $role = Role::findOrFail($this->currentRoleId);
+        try{
+            $role = Role::where('id', $this->currentRoleId)
+                        ->where('guard_name', 'web')
+                        ->firstOrFail();
 
-        $validPermissions = Permission::where('guard_name', 'web')
-            ->whereIn('name', $this->selectedPermissions)
-            ->pluck('name')
-            ->toArray();
+            $permissionsIds = [];
+            foreach ($this->selectedPermissions as $permissionName) {
+                $permission = Permission::where('name', $permissionName)
+                                      ->where('guard_name', 'web')
+                                      ->first();
+                if ($permission) {
+                    $permissionIds[] = $permission->id;
+                }
+            }
 
-        $role->syncPermissions($validPermissions);
+        $role->syncPermissions($permissionIds);
 
         $this->successMessage = "Permisos actualizados para el rol: {$role->name}";
 
         // Opcional: recargar datos
         $this->roles = Role::all();
-    }
+        $this->permissions = Permission::all();
 
-    public function createNewRole()
-    {
-        $this->validate([
-            'newRoleName' => 'required|unique:roles,name'
-        ]);
-
-        $role = Role::create([
-            'name' => $this->newRoleName,
-            'guard_name' => 'web' // Especificar el guard_name
-        ]);
-        
-        $this->newRoleName = '';
-        $this->showCreateRoleModal = false;
-        
-        // Recargar roles y seleccionar automáticamente el nuevo rol
-        $this->roles = Role::all();
-        $this->currentRoleId = $role->id;
-        $this->selectedPermissions = [];
-        
-        $this->successMessage = "Rol creado correctamente. Ahora puedes asignarle permisos.";
-    }
-    public function loadRoles()
-    {
-        $this->roles = Role::all();
+        } catch (\Exception $e) {
+            $this->addError('permissions', 'Error al actualizar permisos: ' . $e->getMessage());
+        }
     }
 
     public function render()

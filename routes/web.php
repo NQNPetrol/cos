@@ -238,9 +238,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/permisos', [App\Http\Controllers\SistemaController::class, 'asignar_permisos'])
     ->middleware('role:admin')
     ->name('asignar.permisos');
-    Route::get('/admin/asignar-permisos', function () {
-        return view('sistema.permisos');
-    })->name('asignar.permisos');
     
 });
 

@@ -30,10 +30,14 @@ class ManageRoles extends Component
             'name' => 'required|unique:roles,name'
         ]);
 
-        Role::create(['name' => $this->name]);
+        // Asegurar que siempre se use guard_name = 'web'
+        Role::create([
+            'name' => $this->name,
+            'guard_name' => 'web'
+        ]);
+        
         $this->name = '';
         $this->loadRoles();
-
         session()->flash('success', 'Rol creado correctamente.');
     }
 
@@ -60,7 +64,10 @@ class ManageRoles extends Component
         ]);
 
         $role = Role::findOrFail($roleId);
-        $role->update(['name' => $this->editName]);
+        $role->update([
+            'name' => $this->editName,
+            'guard_name' => 'web'
+        ]);
         
         $this->cancelEdit();
         $this->loadRoles();
