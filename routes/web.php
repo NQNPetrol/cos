@@ -59,6 +59,10 @@ Route::middleware([
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
+    //ROLES
+    Route::get('/roles', function () {
+        return view('admin.roles');
+    })->name('crear.roles');
 
     //CONTRATOS
     // INDEX
@@ -234,6 +238,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/permisos', [App\Http\Controllers\SistemaController::class, 'asignar_permisos'])
     ->middleware('role:admin')
     ->name('asignar.permisos');
+    Route::get('/admin/asignar-permisos', function () {
+        return view('sistema.permisos');
+    })->name('asignar.permisos');
     
 });
 

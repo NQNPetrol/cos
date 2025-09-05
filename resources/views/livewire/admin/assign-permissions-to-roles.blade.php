@@ -9,14 +9,22 @@
     @endif
 
     <div class="mb-6">
-        <label for="role" class="block mb-2 text-sm font-medium">Seleccionar Rol:</label>
-        <select wire:model="currentRoleId" wire:change="loadPermissions($event.target.value)"
-                class="bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2 w-full">
-            <option value="">-- Selecciona un Rol --</option>
-            @foreach ($roles as $role)
-                <option value="{{ $role->id }}">{{ $role->name }}</option>
-            @endforeach
-        </select>
+        <div class="flex items-end gap-3">
+            <div class="flex-1">
+                <label for="role" class="block mb-2 text-sm font-medium">Seleccionar Rol:</label>
+                <select wire:model="currentRoleId" wire:change="loadPermissions($event.target.value)"
+                        class="bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2 w-full">
+                    <option value="">-- Selecciona un Rol --</option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <a href="{{ route('crear.roles') }}" 
+                class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+                Crear Rol
+            </a>
+        </div>
     </div>
 
     @if ($currentRoleId)

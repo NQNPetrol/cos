@@ -359,6 +359,7 @@
                 <div id="submenuConfiguracion" class="pl-6 space-y-1 hidden">
                     <a href="{{ route('sistema.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Permisos</a>
                     <a href="{{ route('asignar.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Asignacion de Permisos</a>
+                    <a href="{{ route('crear.roles') }}" class="block text-gray-600 hover:text-gray-900 p-2">Roles</a>
                 </div>
 
                 <!-- Tickets -->

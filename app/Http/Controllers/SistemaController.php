@@ -16,8 +16,9 @@ class SistemaController extends Controller
     }
 
     
-    public function asignar_permisos()
+    public function asignar_permisos(Request $request)
     {
-        return view('sistema.permisos');
+        $roleId = $request->query('role');
+        return view('sistema.permisos', ['selectedRole' => $roleId]);
     }
 }
