@@ -59,6 +59,10 @@ Route::middleware([
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
+    //ROLES
+    Route::get('/roles', function () {
+        return view('admin.roles');
+    })->name('crear.roles');
 
     //CONTRATOS
     // INDEX
