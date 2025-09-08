@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
 require __DIR__.'/auth.php';
 
 Route::middleware([
-    'auth:sanctum',
+    'auth',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
@@ -62,7 +62,7 @@ Route::middleware([
     //ROLES
     Route::get('/roles', function () {
         return view('admin.roles');
-    })->name('crear.roles');
+    })->middleware('can:administrar.roles')->name('crear.roles');
 
     //CONTRATOS
     // INDEX
