@@ -59,6 +59,14 @@ Route::middleware([
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
+    
+    Route::get('/usuarios/asignar-clientes', [App\Http\Controllers\UserController::class, 'asignarClientes'])
+        //->middleware('can:asignar.clientes.usuarios')
+        ->name('usuarios.asignar-clientes');
+
+    Route::post('/usuarios/asignar-clientes', [App\Http\Controllers\UserController::class, 'storeAsignacionClientes'])
+        //->middleware('can:asignar.clientes.usuarios')
+        ->name('usuarios.store-asignacion-clientes');
     //ROLES
     Route::get('/roles', function () {
         return view('admin.roles');

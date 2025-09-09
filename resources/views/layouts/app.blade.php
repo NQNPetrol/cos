@@ -390,6 +390,10 @@
                         <i class="bi bi-people mr-2"></i>
                         Administrar Usuarios
                     </a>
+                    <a href="{{ route('usuarios.asignar-clientes') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-people mr-2"></i>
+                        Asignar clientes a Usuarios
+                    </a>
                 </div>
 
                 <!-- Personal -->

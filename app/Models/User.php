@@ -11,6 +11,9 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Cliente;
 
 class User extends Authenticatable
 {
@@ -84,6 +87,30 @@ class User extends Authenticatable
     public function assignedTickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'asignado_a');
+    }
+
+    /**
+     * Clientes asociados a este usuario
+     */
+    public function clientes(): BelongsToMany
+    {
+        return $this->belongsToMany(Cliente::class, 'users_has_cliente_id');
+    }
+
+     /**
+     * Verifica si el usuario es del COS (staff interno)
+     */
+    public function esCOS(): bool
+    {
+        return $this->clientes()->where('cliente_id', 2)->exists();
+    }
+
+    /**
+     * Verifica si el usuario pertenece a un cliente específico
+     */
+    public function perteneceACliente(int $clienteId): bool
+    {
+        return $this->clientes()->where('cliente_id', $clienteId)->exists();
     }
 
     /**
