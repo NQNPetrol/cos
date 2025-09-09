@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Centro de Operaciones de Seguridad') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,10 +16,35 @@
 
         <!-- Styles -->
         @livewireStyles
-    </head>
-    <body class="font-sans antialiased bg-gray-900 text-gray-100">
-        {{ $slot }}
 
+        <style>
+            .auth-gradient {
+                background: linear-gradient(135deg, #031779ff 0%, rgba(29, 69, 155, 0.47) 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+            }
+            .auth-card {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+                width: 100%;
+                max-width: 420px;
+                padding: 2.5rem;
+            }
+            .input-focus:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                outline: none;
+            }
+        </style>
+    </head>
+    <body class="font-sans antialiased auth-gradient">
+        <div class="auth-card">
+            {{ $slot }}
+        </div>
         @livewireScripts
     </body>
 </html>
