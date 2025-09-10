@@ -1,139 +1,216 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Asignar Clientes a Usuarios') }}
-        </h2>
-    </x-slot>
-
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-100">
+
+                    <!-- Título más pequeño y sin icono -->
+                    <div class="mb">
+                        <h2 class="text-3xl font-bold text-gray-100 mb-2">
+                            Asignación de Clientes a Usuarios
+                        </h2>
+                        <p class="text-sm text-gray-300 mb-5">
+                            Asignación y administración de clientes a usuarios del sistema
+                        </p>
+                    </div>
 
                     <!-- Mensajes de estado -->
                     @if(session('success'))
-                        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        <div class="mb-4 bg-green-800 border border-green-600 text-green-200 px-4 py-3 rounded relative">
                             {{ session('success') }}
+                            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
+                                <span class="text-green-200">&times;</span>
+                            </button>
                         </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <div class="mb-4 bg-red-800 border border-red-600 text-red-200 px-4 py-3 rounded relative">
                             {{ session('error') }}
+                            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
+                                <span class="text-red-200">&times;</span>
+                            </button>
                         </div>
                     @endif
 
-                    <!-- Formulario -->
-                    <div class="mb-6">
-                        <form id="asignacionForm" method="POST" action="{{ route('usuarios.store-asignacion-clientes') }}">
-                            @csrf
-                            
-                            <!-- Selector de usuario -->
-                            <div class="mb-6">
-                                <label for="user_select" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Seleccionar Usuario:
-                                </label>
-                                <select id="user_select" name="user_id" 
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">-- Seleccionar usuario --</option>
-                                    @foreach($usuarios as $usuario)
-                                        <option value="{{ $usuario->id }}">
-                                            {{ $usuario->name }} ({{ $usuario->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    @if(session('info'))
+                        <div class="mb-4 bg-blue-800 border border-blue-600 text-blue-200 px-4 py-3 rounded relative">
+                            {{ session('info') }}
+                            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
+                                <span class="text-blue-200">&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
-                            <!-- Lista de clientes -->
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Clientes Asignados:
-                                </label>
-                                <div class="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto">
-                                    <div class="space-y-2">
-                                        @foreach($clientes as $cliente)
-                                            <label class="flex items-center p-2 hover:bg-gray-50 rounded">
-                                                <input type="checkbox" 
-                                                       name="clientes[]" 
-                                                       value="{{ $cliente->id }}" 
-                                                       class="cliente-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                                <span class="ml-2 text-sm text-gray-900">
-                                                    {{ $cliente->nombre }}
-                                                    @if($cliente->esCOS())
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2">
-                                                            COS
-                                                        </span>
-                                                    @endif
+                    @if($errors->any())
+                        <div class="mb-4 bg-red-800 border border-red-600 text-red-200 px-4 py-3 rounded relative">
+                            <ul class="list-disc list-inside">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
+                                <span class="text-red-200">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    <!-- Lista de clientes (Checklist) -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-sm font-medium text-gray-200">
+                                Clientes Disponibles:
+                            </label>
+                            <button type="button" id="limpiarSeleccion" 
+                                    class="text-sm text-blue-400 hover:text-blue-300 font-medium">
+                                Limpiar Selección
+                            </button>
+                        </div>
+                        <div class="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" id="clientesContainer">
+                                @foreach($clientes as $cliente)
+                                    <label class="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition-colors">
+                                        <input type="checkbox" 
+                                               name="clientes_seleccionados[]" 
+                                               value="{{ $cliente->id }}" 
+                                               class="cliente-checkbox w-4 h-4 text-blue-500 bg-gray-600 border-gray-500 rounded focus:ring-blue-400 focus:ring-2">
+                                        <span class="ml-2 text-sm text-gray-100">
+                                            {{ $cliente->nombre }}
+                                            @if($cliente->esCOS())
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-800 text-blue-200 ml-1">
+                                                    COS
                                                 </span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
                             </div>
-
-                            <!-- Botones -->
-                            <div class="flex space-x-3">
-                                <button type="submit" 
-                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                    Asignar Clientes
-                                </button>
-                                <a href="{{ route('usuarios.index') }}" 
-                                   class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                    Volver
-                                </a>
-                            </div>
-                        </form>
+                        </div>
+                        <div id="clientesSeleccionados" class="mt-2 text-sm text-gray-300">
+                            <span class="font-medium">Seleccionados:</span> 
+                            <span id="contadorClientes" class="text-blue-400">0</span>
+                        </div>
                     </div>
 
-                    <!-- Tabla de usuarios actuales -->
-                    <div class="mt-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Estado Actual de Asignaciones</h3>
+                    <!-- Filtros de usuarios -->
+                    <div class="mb-6 bg-gray-700 p-4 rounded-lg">
+                        <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
+                            <div class="flex-1">
+                                <label for="filtroNombre" class="block text-sm font-medium text-gray-200 mb-1">
+                                    Buscar por nombre:
+                                </label>
+                                <input type="text" id="filtroNombre" 
+                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
+                                       placeholder="Escriba el nombre del usuario...">
+                            </div>
+                            <div class="flex-1">
+                                <label for="filtroEmail" class="block text-sm font-medium text-gray-200 mb-1">
+                                    Buscar por email:
+                                </label>
+                                <input type="text" id="filtroEmail" 
+                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
+                                       placeholder="Escriba el email del usuario...">
+                            </div>
+                            <div class="flex-shrink-0 mt-6 md:mt-6">
+                                <button type="button" id="limpiarFiltros" 
+                                        class="bg-gray-600 hover:bg-gray-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                    Limpiar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de usuarios -->
+                    <div class="bg-gray-800 rounded-lg border border-gray-600">
+                        <div class="px-6 py-4 border-b border-gray-600">
+                            <h3 class="text-lg font-medium text-gray-100">Usuarios del Sistema</h3>
+                            <p class="text-sm text-gray-300 mt-1">
+                                Presione "Asignar" para asignar los clientes seleccionados al usuario correspondiente.
+                            </p>
+                        </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-600">
+                                <thead class="bg-gray-700">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Usuario
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Email
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Clientes Asignados
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            Clientes Actuales
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Acciones
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="tablaUsuarios">
                                     @foreach($usuarios as $usuario)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {{ $usuario->name }}
+                                        <tr class="usuario-row hover:bg-gray-700" 
+                                            data-nombre="{{ strtolower($usuario->name) }}" 
+                                            data-email="{{ strtolower($usuario->email) }}">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-8 w-8">
+                                                        <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                                                            <span class="text-sm font-medium text-white">
+                                                                {{ $usuario->initials() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <div class="text-sm font-medium text-gray-100">
+                                                            {{ $usuario->name }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                 {{ $usuario->email }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                 @if($usuario->clientes->isEmpty())
-                                                    <span class="text-gray-400 italic">Sin clientes asignados</span>
+                                                    <span class="text-gray-500 italic">Sin clientes asignados</span>
                                                 @else
                                                     <div class="flex flex-wrap gap-1">
                                                         @foreach($usuario->clientes as $cliente)
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                                         {{ $cliente->esCOS() ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                                                                         {{ $cliente->esCOS() ? 'bg-blue-800 text-blue-200' : 'bg-gray-600 text-gray-200' }}">
                                                                 {{ $cliente->nombre }}
                                                             </span>
                                                         @endforeach
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <button onclick="editarAsignacion({{ $usuario->id }})" 
-                                                        class="text-blue-600 hover:text-blue-900">
-                                                    Editar
-                                                </button>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex space-x-2">
+                                                    <!-- Botón Asignar -->
+                                                    <button type="button" 
+                                                            class="asignar-btn bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                                            data-usuario-id="{{ $usuario->id }}"
+                                                            data-usuario-nombre="{{ $usuario->name }}"
+                                                            disabled>
+                                                        Asignar
+                                                    </button>
+                                                    
+                                                    <!-- Botón Desasignar (solo mostrar si tiene clientes) -->
+                                                    @if(!$usuario->clientes->isEmpty())
+                                                    <form action="{{ route('user-cliente.removeAll') }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <input type="hidden" name="user_id" value="{{ $usuario->id }}">
+                                                        <button type="submit" 
+                                                                class="bg-red-600 hover:bg-red-500 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                                                                onclick="return confirm('¿Está seguro de desasignar TODOS los clientes de {{ $usuario->name }}?')"
+                                                                title="Desasignar todos los clientes">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -146,35 +223,128 @@
         </div>
     </div>
 
+    <!-- Meta tag para CSRF token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const userSelect = document.getElementById('user_select');
             const clienteCheckboxes = document.querySelectorAll('.cliente-checkbox');
+            const asignarBtns = document.querySelectorAll('.asignar-btn');
+            const limpiarSeleccionBtn = document.getElementById('limpiarSeleccion');
+            const contadorClientes = document.getElementById('contadorClientes');
+            const filtroNombre = document.getElementById('filtroNombre');
+            const filtroEmail = document.getElementById('filtroEmail');
+            const limpiarFiltrosBtn = document.getElementById('limpiarFiltros');
+            const usuarioRows = document.querySelectorAll('.usuario-row');
 
-            // Cuando se selecciona un usuario, cargar sus clientes asignados
-            userSelect.addEventListener('change', function() {
-                const userId = this.value;
+            // Función para actualizar contador y estado de botones
+            function actualizarEstadoBotones() {
+                const clientesSeleccionados = document.querySelectorAll('.cliente-checkbox:checked');
+                const count = clientesSeleccionados.length;
                 
-                // Limpiar checkboxes
+                contadorClientes.textContent = count;
+                
+                // Habilitar/deshabilitar botones de asignar
+                asignarBtns.forEach(btn => {
+                    btn.disabled = count === 0;
+                });
+            }
+
+            // Event listeners para checkboxes de clientes
+            clienteCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', actualizarEstadoBotones);
+            });
+
+            // Limpiar selección de clientes
+            limpiarSeleccionBtn.addEventListener('click', function() {
                 clienteCheckboxes.forEach(checkbox => {
                     checkbox.checked = false;
                 });
-
-                
+                actualizarEstadoBotones();
             });
+
+            // Función para filtrar usuarios
+            function filtrarUsuarios() {
+                const filtroNombreValue = filtroNombre.value.toLowerCase().trim();
+                const filtroEmailValue = filtroEmail.value.toLowerCase().trim();
+
+                usuarioRows.forEach(row => {
+                    const nombre = row.getAttribute('data-nombre');
+                    const email = row.getAttribute('data-email');
+                    
+                    const coincideNombre = filtroNombreValue === '' || nombre.includes(filtroNombreValue);
+                    const coincideEmail = filtroEmailValue === '' || email.includes(filtroEmailValue);
+                    
+                    if (coincideNombre && coincideEmail) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            // Event listeners para filtros
+            filtroNombre.addEventListener('input', filtrarUsuarios);
+            filtroEmail.addEventListener('input', filtrarUsuarios);
+
+            // Limpiar filtros
+            limpiarFiltrosBtn.addEventListener('click', function() {
+                filtroNombre.value = '';
+                filtroEmail.value = '';
+                filtrarUsuarios();
+            });
+
+            // Función para asignar clientes
+            asignarBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const usuarioId = this.getAttribute('data-usuario-id');
+                    const usuarioNombre = this.getAttribute('data-usuario-nombre');
+                    const clientesSeleccionados = Array.from(document.querySelectorAll('.cliente-checkbox:checked'))
+                        .map(checkbox => checkbox.value);
+
+                    if (clientesSeleccionados.length === 0) {
+                        alert('Por favor, seleccione al menos un cliente.');
+                        return;
+                    }
+
+                    // Confirmar asignación
+                    if (!confirm(`¿Está seguro de asignar ${clientesSeleccionados.length} cliente(s) a ${usuarioNombre}?`)) {
+                        return;
+                    }
+
+                    // Guardar referencia al botón
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route("user-cliente.store") }}';
+
+                    // Mostrar estado de carga
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    form.appendChild(csrfToken);
+
+                    const userIdInput = document.createElement('input');
+                    userIdInput.type = 'hidden';
+                    userIdInput.name = 'user_id';
+                    userIdInput.value = usuarioId;
+                    form.appendChild(userIdInput);
+
+                    clientesSeleccionados.forEach(clienteId => {
+                        const clienteInput = document.createElement('input');
+                        clienteInput.type = 'hidden';
+                        clienteInput.name = 'clientes[]';
+                        clienteInput.value = clienteId;
+                        form.appendChild(clienteInput);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            });
+
+            // Inicializar estado de botones
+            actualizarEstadoBotones();
         });
-
-        // Función para editar desde la tabla
-        function editarAsignacion(userId) {
-            const userSelect = document.getElementById('user_select');
-            userSelect.value = userId;
-            userSelect.dispatchEvent(new Event('change'));
-            
-            // Scroll al formulario
-            document.getElementById('asignacionForm').scrollIntoView({ behavior: 'smooth' });
-        }
     </script>
-
-    <!-- Meta tag para CSRF token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 </x-app-layout>

@@ -9,6 +9,7 @@ use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\UserClienteController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -60,14 +61,17 @@ Route::middleware([
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
     
-    Route::get('/usuarios/asignar-clientes', [App\Http\Controllers\UserController::class, 'asignarClientes'])
-        //->middleware('can:asignar.clientes.usuarios')
-        ->name('usuarios.asignar-clientes');
-
-    Route::post('/usuarios/asignar-clientes', [App\Http\Controllers\UserController::class, 'storeAsignacionClientes'])
-        //->middleware('can:asignar.clientes.usuarios')
-        ->name('usuarios.store-asignacion-clientes');
-    //ROLES
+        //CLIENTE-USUARIO
+        Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
+        Route::post('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'store'])->middleware('can:asignar.clientes')->name('user-cliente.store');
+        Route::delete('usuarios/remover-cliente', [App\Http\Controllers\UserClienteController::class, 'destroy'])->middleware('can:asignar.clientes')->name('user-cliente.destroy');
+        Route::get('/usuarios/{user}/clientes', [App\Http\Controllers\UserClienteController::class, 'getClientesPorUsuario'])->middleware('can:asignar.clientes')->name('user-cliente.clientes-por-usuario');
+        Route::get('/clientes/{cliente}/usuarios', [App\Http\Controllers\UserClienteController::class, 'getUsuariosPorCliente'])->middleware('can:asignar.clientes')->name('user-cliente.usuarios-por-cliente');
+        Route::post('/admin/user-clientes/remove-all', [UserClienteController::class, 'removeAllClientesFromUser'])
+        ->name('user-cliente.removeAll')
+        ->middleware(['auth', 'role:admin']);
+    
+        //ROLES
     Route::get('/roles', function () {
         return view('admin.roles');
     })->middleware('can:administrar.roles')->name('crear.roles');
