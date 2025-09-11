@@ -91,12 +91,60 @@
 
                 <div class="hidden sm:flex sm:items-center sm:ml-6">
                     <!-- Notifications -->
-                    <button class="inline-block relative">
-                        <svg class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <span class="animate-ping absolute top-1 right-0.5 block h-1 w-1 rounded-full ring-2 ring-green-200 bg-green-600"></span>
-                    </button>
+                    <div class="hidden sm:flex sm:items-center sm:ml-6">
+                    <!-- Notifications Button -->
+                    <div class="relative mr-4">
+                        <button id="notificationBtn" class="inline-block relative p-2 hover:bg-slate-700 rounded-full transition-colors duration-200">
+                            <svg class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span id="notificationBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"></span>
+                        </button>
+                        
+                        <!-- Notification Modal -->
+                        <div id="notificationModal" class="hidden absolute right-0 mt-2 w-96 bg-slate-800 rounded-lg shadow-xl border border-gray-600 z-50">
+                            <div class="p-4 border-b border-gray-600">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-white font-semibold text-lg">Notificaciones</h3>
+                                    <div class="flex space-x-2">
+                                        <button id="markAllReadBtn" class="text-sm text-blue-400 hover:text-blue-300 px-2 py-1 rounded">
+                                            Marcar todas como leídas
+                                        </button>
+                                        <button id="closeModal" class="text-gray-400 hover:text-white">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="max-h-96 overflow-y-auto">
+                                <div id="notificationList" class="divide-y divide-gray-600">
+                                    <!-- Loading state -->
+                                    <div id="loadingState" class="p-4 text-center text-gray-400">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                                        <p class="mt-2">Cargando notificaciones...</p>
+                                    </div>
+                                    
+                                    <!-- Empty state -->
+                                    <div id="emptyState" class="hidden p-6 text-center text-gray-400">
+                                        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                        </svg>
+                                        <p>No tienes notificaciones</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Load More Button -->
+                                <div id="loadMoreContainer" class="hidden p-4 text-center border-t border-gray-600">
+                                    <button id="loadMoreBtn" class="text-blue-400 hover:text-blue-300 text-sm">
+                                        Cargar más notificaciones
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Teams Dropdown -->
                     @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                         <div class="ml-3 relative">
@@ -360,6 +408,7 @@
                     <a href="{{ route('sistema.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Permisos</a>
                     <a href="{{ route('asignar.permisos') }}" class="block text-gray-600 hover:text-gray-900 p-2">Asignacion de Permisos</a>
                     <a href="{{ route('crear.roles') }}" class="block text-gray-600 hover:text-gray-900 p-2">Roles</a>
+                    <a href="{{ route('notifications.admin') }}" class="block text-gray-600 hover:text-gray-900 p-2">Admin Notificaciones</a>
                 </div>
 
                 <!-- Tickets -->
@@ -445,10 +494,331 @@
         </main>
     </div>
 
+    <!-- Notifications JavaScript -->
+    <script>
+        class NotificationManager {
+            constructor() {
+                this.currentPage = 1;
+                this.hasMorePages = false;
+                this.isLoading = false;
+                this.modal = document.getElementById('notificationModal');
+                this.button = document.getElementById('notificationBtn');
+                this.badge = document.getElementById('notificationBadge');
+                this.list = document.getElementById('notificationList');
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateUnreadCount();
+                this.setupCSRF();
+            }
+
+            setupCSRF() {
+                this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            }
+
+            setupEventListeners() {
+                // Toggle modal
+                this.button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleModal();
+                });
+
+                // Close modal
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    this.closeModal();
+                });
+
+                // Close modal when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!this.modal.contains(e.target) && !this.button.contains(e.target)) {
+                        this.closeModal();
+                    }
+                });
+
+                // Mark all as read
+                document.getElementById('markAllReadBtn').addEventListener('click', () => {
+                    this.markAllAsRead();
+                });
+
+                // Load more notifications
+                document.getElementById('loadMoreBtn').addEventListener('click', () => {
+                    this.loadMoreNotifications();
+                });
+            }
+
+            async toggleModal() {
+                if (this.modal.classList.contains('hidden')) {
+                    await this.openModal();
+                } else {
+                    this.closeModal();
+                }
+            }
+
+            async openModal() {
+                this.modal.classList.remove('hidden');
+                if (this.currentPage === 1) {
+                    await this.loadNotifications();
+                }
+            }
+
+            closeModal() {
+                this.modal.classList.add('hidden');
+            }
+
+            async loadNotifications(page = 1) {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                this.showLoadingState();
+
+                try {
+                    const response = await fetch(`/notificaciones?page=${page}`);
+                    const data = await response.json();
+
+                    if (page === 1) {
+                        this.list.innerHTML = '';
+                    }
+
+                    this.renderNotifications(data.data);
+                    this.currentPage = data.current_page;
+                    this.hasMorePages = data.has_more;
+                    this.updateLoadMoreButton();
+                    this.hideLoadingState();
+
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                    this.showErrorState();
+                } finally {
+                    this.isLoading = false;
+                }
+            }
+
+            async loadMoreNotifications() {
+                if (this.hasMorePages && !this.isLoading) {
+                    await this.loadNotifications(this.currentPage + 1);
+                }
+            }
+
+            renderNotifications(notifications) {
+                if (notifications.length === 0 && this.currentPage === 1) {
+                    this.showEmptyState();
+                    return;
+                }
+
+                notifications.forEach(notification => {
+                    const element = this.createNotificationElement(notification);
+                    this.list.appendChild(element);
+                });
+            }
+
+            createNotificationElement(notification) {
+                const div = document.createElement('div');
+                div.className = `notification-item p-4 hover:bg-slate-700 transition-colors duration-200 ${
+                    notification.is_read ? 'opacity-75' : 'border-l-4 border-blue-500'
+                }`;
+                div.dataset.id = notification.id;
+
+                const priorityColors = {
+                    'high': 'text-red-400',
+                    'normal': 'text-blue-400',
+                    'low': 'text-green-400'
+                };
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 mr-3">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <h4 class="text-white font-semibold text-sm">${notification.title}</h4>
+                                <span class="w-2 h-2 rounded-full ${priorityColors[notification.priority]}"></span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">${notification.message}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-xs">${notification.created_at_human}</span>
+                                <div class="flex space-x-2">
+                                    ${!notification.is_read ? `
+                                        <button class="mark-read-btn text-blue-400 hover:text-blue-300 text-xs" data-id="${notification.id}">
+                                            Marcar como leída
+                                        </button>
+                                    ` : ''}
+                                    <button class="dismiss-btn text-red-400 hover:text-red-300 text-xs" data-id="${notification.id}">
+                                        Descartar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add event listeners to buttons
+                const markReadBtn = div.querySelector('.mark-read-btn');
+                const dismissBtn = div.querySelector('.dismiss-btn');
+
+                if (markReadBtn) {
+                    markReadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.markAsRead(notification.id, div);
+                    });
+                }
+
+                dismissBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.dismissNotification(notification.id, div);
+                });
+
+                return div;
+            }
+
+            async markAsRead(notificationId, element) {
+                try {
+                    const response = await fetch(`/notificaciones/${notificationId}/leer`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': this.csrfToken
+                        }
+                    });
+
+                    if (response.ok) {
+                        element.classList.add('opacity-75');
+                        element.classList.remove('border-l-4', 'border-blue-500');
+                        const markReadBtn = element.querySelector('.mark-read-btn');
+                        if (markReadBtn) markReadBtn.remove();
+                        this.updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            }
+
+            async dismissNotification(notificationId, element) {
+                try {
+                    const response = await fetch(`/notificaciones/${notificationId}/descartar`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': this.csrfToken
+                        }
+                    });
+
+                    if (response.ok) {
+                        element.style.animation = 'fadeOut 0.3s ease-out';
+                        setTimeout(() => {
+                            element.remove();
+                            this.updateUnreadCount();
+                        }, 300);
+                    }
+                } catch (error) {
+                    console.error('Error dismissing notification:', error);
+                }
+            }
+
+            async markAllAsRead() {
+                try {
+                    const response = await fetch('/notificaciones/leer-todas', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': this.csrfToken
+                        }
+                    });
+
+                    if (response.ok) {
+                        // Update UI
+                        const notifications = this.list.querySelectorAll('.notification-item');
+                        notifications.forEach(item => {
+                            item.classList.add('opacity-75');
+                            item.classList.remove('border-l-4', 'border-blue-500');
+                            const markReadBtn = item.querySelector('.mark-read-btn');
+                            if (markReadBtn) markReadBtn.remove();
+                        });
+                        this.updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error marking all notifications as read:', error);
+                }
+            }
+
+            async updateUnreadCount() {
+                try {
+                    const response = await fetch('/notificaciones/contador');
+                    const data = await response.json();
+                    
+                    if (data.count > 0) {
+                        this.badge.textContent = data.count > 99 ? '99+' : data.count;
+                        this.badge.classList.remove('hidden');
+                    } else {
+                        this.badge.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error('Error updating unread count:', error);
+                }
+            }
+
+            updateLoadMoreButton() {
+                const container = document.getElementById('loadMoreContainer');
+                if (this.hasMorePages) {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+
+            showLoadingState() {
+                document.getElementById('loadingState').classList.remove('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+            }
+
+            hideLoadingState() {
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+
+            showEmptyState() {
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+
+            showErrorState() {
+                this.list.innerHTML = `
+                    <div class="p-6 text-center text-red-400">
+                        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <p>Error al cargar las notificaciones</p>
+                        <button onclick="notificationManager.loadNotifications(1)" class="mt-2 text-blue-400 hover:text-blue-300 text-sm">
+                            Intentar nuevamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-100%); }
+            }
+            
+            .notification-item {
+                transition: all 0.2s ease;
+            }
+            
+            .notification-item:hover {
+                transform: translateX(2px);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize notification manager when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.notificationManager = new NotificationManager();
+        });
+    </script>
+
     <!-- JS: toggle sidebar -->
     <script>
-
-        
         const toggleBtn = document.getElementById('toggleSidebar');
         const sidebar = document.getElementById('sidebar');
 
@@ -543,8 +913,17 @@
             iconInventario.classList.toggle('rotate-180');
         });
 
-    </script>
+        //Notificaiones
+        const toggleNotif = document.getElementById('toggleNotif');
+        const submenuNotif = document.getElementById('submenuNotif');
+        const iconNotif = document.getElementById('iconNotif');
 
+        toggleNotif.addEventListener('click', () => {
+            submenuNotif.classList.toggle('hidden');
+            iconNotif.classList.toggle('rotate-180');
+        });
+
+    </script>
     @stack('scripts')
 </body>
 </html>

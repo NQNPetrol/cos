@@ -7,6 +7,7 @@ use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
@@ -239,6 +240,30 @@ Route::middleware([
     Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'index'])
         ->middleware('can:ver.tickets')
         ->name('tickets.nuevo');
+
+    //NOTIFICACIONES
+    Route::get('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'admin'])
+        ->middleware('can:administrar.notificaciones')
+        ->name('notifications.admin');
+    
+    Route::get('/admin/notificaciones/crear', [App\Http\Controllers\NotificationController::class, 'create'])
+        ->middleware('can:crear.notificaciones')
+        ->name('admin.nueva-notif');
+    
+    Route::post('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'store'])
+        ->middleware('can:crear.notificaciones')
+        ->name('notifications.store');
+
+    Route::post('/admin/notificaciones/{notification}/toggle', [App\Http\Controllers\NotificationController::class, 'toggle'])->name('notifications.toggle');
+    
+    Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    
+    Route::put('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'update'])->name('notifications.update');
+
+    Route::get('/admin/notificaciones/{notification}/editar-datos', [App\Http\Controllers\NotificationController::class, 'editData'])
+    ->middleware('can:administrar.notificaciones')
+    ->name('notifications.edit.data');
+
 
 });
 
