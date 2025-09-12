@@ -103,15 +103,16 @@
                         </button>
                         
                         <!-- Notification Modal -->
-                        <div id="notificationModal" class="hidden absolute right-0 mt-2 w-96 bg-slate-800 rounded-lg shadow-xl border border-gray-600 z-50">
-                            <div class="p-4 border-b border-gray-600">
+                        <div id="notificationModal" class="hidden absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                            <!-- Header con borde más destacado -->
+                            <div class="p-4 border-b-2 border-gray-300 bg-gray-50">
                                 <div class="flex justify-between items-center">
-                                    <h3 class="text-white font-semibold text-lg">Notificaciones</h3>
+                                    <h3 class="text-gray-800 font-bold text-lg">Notificaciones</h3>
                                     <div class="flex space-x-2">
-                                        <button id="markAllReadBtn" class="text-sm text-blue-400 hover:text-blue-300 px-2 py-1 rounded">
-                                            Marcar todas como leídas
+                                        <button id="markAllReadBtn" class="text-sm text-blue-600 hover:text-blue-800 px-3 py-1 rounded transition-colors bg-blue-50 hover:bg-blue-100 font-medium">
+                                            Marcar todas
                                         </button>
-                                        <button id="closeModal" class="text-gray-400 hover:text-white">
+                                        <button id="closeModal" class="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-200">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
@@ -120,16 +121,17 @@
                                 </div>
                             </div>
                             
-                            <div class="max-h-96 overflow-y-auto">
-                                <div id="notificationList" class="divide-y divide-gray-600">
+                            <!-- Contenido - Prevenir scroll horizontal -->
+                            <div class="max-h-96 overflow-y-auto overflow-x-hidden">
+                                <div id="notificationList" class="divide-y divide-gray-200">
                                     <!-- Loading state -->
-                                    <div id="loadingState" class="p-4 text-center text-gray-400">
+                                    <div id="loadingState" class="p-4 text-center text-gray-500">
                                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                                         <p class="mt-2">Cargando notificaciones...</p>
                                     </div>
                                     
                                     <!-- Empty state -->
-                                    <div id="emptyState" class="hidden p-6 text-center text-gray-400">
+                                    <div id="emptyState" class="hidden p-6 text-center text-gray-500">
                                         <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                                         </svg>
@@ -138,8 +140,8 @@
                                 </div>
                                 
                                 <!-- Load More Button -->
-                                <div id="loadMoreContainer" class="hidden p-4 text-center border-t border-gray-600">
-                                    <button id="loadMoreBtn" class="text-blue-400 hover:text-blue-300 text-sm">
+                                <div id="loadMoreContainer" class="hidden p-4 text-center border-t border-gray-200 bg-gray-50">
+                                    <button id="loadMoreBtn" class="text-blue-600 hover:text-blue-800 text-sm transition-colors font-medium">
                                         Cargar más notificaciones
                                     </button>
                                 </div>
@@ -648,35 +650,52 @@
 
             createNotificationElement(notification) {
                 const div = document.createElement('div');
-                div.className = `notification-item p-4 hover:bg-slate-700 transition-colors duration-200 ${
-                    notification.is_read ? 'opacity-75' : 'border-l-4 border-blue-500'
+                div.className = `notification-item p-4 hover:bg-gray-50 transition-colors duration-200 ${
+                    notification.is_read ? 'opacity-75 bg-gray-50' : 'bg-white'
                 }`;
                 div.dataset.id = notification.id;
 
                 const priorityColors = {
-                    'high': 'text-red-400',
-                    'normal': 'text-blue-400',
-                    'low': 'text-green-400'
+                    'high': 'text-red-500',
+                    'normal': 'text-blue-500',
+                    'low': 'text-green-500'
+                };
+                const priorityText = {
+                    'high': 'ALTA',
+                    'normal': 'NORMAL', 
+                    'low': 'BAJA'
                 };
 
                 div.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-1 mr-3">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <h4 class="text-white font-semibold text-sm">${notification.title}</h4>
-                                <span class="w-2 h-2 rounded-full ${priorityColors[notification.priority]}"></span>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-gray-800 font-semibold text-sm">${notification.title}</h4>
+                                <span class="text-xs font-medium px-2 py-1 rounded-full ${priorityColors[notification.priority]} bg-opacity-20">
+                                    ${priorityText[notification.priority]}
+                                </span>
                             </div>
-                            <p class="text-gray-300 text-sm mb-2">${notification.message}</p>
+                            <p class="text-gray-600 text-sm mb-3">${notification.message}</p>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-400 text-xs">${notification.created_at_human}</span>
                                 <div class="flex space-x-2">
                                     ${!notification.is_read ? `
-                                        <button class="mark-read-btn text-blue-400 hover:text-blue-300 text-xs" data-id="${notification.id}">
-                                            Marcar como leída
+                                        <button class="mark-read-btn group p-1 text-blue-600 hover:text-blue-800 transition-colors" 
+                                                data-id="${notification.id}"
+                                                title="Marcar como leída">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4">
+                                                <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+                                                <path fill-rule="evenodd" d="M1.38 8.28a.87.87 0 0 1 0-.566 7.003 7.003 0 0 1 13.238.006.87.87 0 0 1 0 .566A7.003 7.003 0 0 1 1.379 8.28ZM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd" />
+                                            </svg>
                                         </button>
                                     ` : ''}
-                                    <button class="dismiss-btn text-red-400 hover:text-red-300 text-xs" data-id="${notification.id}">
-                                        Descartar
+                                    <button class="dismiss-btn group p-1 text-red-600 hover:text-red-800 transition-colors" 
+                                            data-id="${notification.id}"
+                                            title="Descartar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4">
+                                            <path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3Z" />
+                                            <path fill-rule="evenodd" d="M13 6H3v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V6ZM5.72 7.47a.75.75 0 0 1 1.06 0L8 8.69l1.22-1.22a.75.75 0 1 1 1.06 1.06L9.06 9.75l1.22 1.22a.75.75 0 1 1-1.06 1.06L8 10.81l-1.22 1.22a.75.75 0 0 1-1.06-1.06l1.22-1.22-1.22-1.22a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -839,12 +858,74 @@
                 to { opacity: 0; transform: translateX(-100%); }
             }
             
+            /* Animación de pulsación para botones */
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            
+            @keyframes bounce {
+                0%, 20%, 53%, 80%, 100% {
+                    transform: translate3d(0, 0, 0);
+                }
+                40%, 43% {
+                    transform: translate3d(0, -8px, 0);
+                }
+                70% {
+                    transform: translate3d(0, -4px, 0);
+                }
+                90% {
+                    transform: translate3d(0, -2px, 0);
+                }
+            }
+            
             .notification-item {
                 transition: all 0.2s ease;
             }
             
             .notification-item:hover {
                 transform: translateX(2px);
+            }
+            
+            /* Tooltip styles */
+            .tooltip-text {
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .mark-read-btn, .dismiss-btn {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            
+            /* Animaciones para botones de iconos */
+            .mark-read-btn:hover {
+                animation: pulse 0.5s ease-in-out;
+                color: #2563eb !important;
+            }
+            
+            .dismiss-btn:hover {
+                animation: bounce 0.5s ease-in-out;
+                color: #dc2626 !important;
+            }
+            
+            /* Efecto de elevación al hover */
+            .mark-read-btn:hover svg,
+            .dismiss-btn:hover svg {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            }
+            
+            /* Prevenir scroll horizontal en todo el modal */
+            #notificationModal * {
+                max-width: 100%;
+                overflow-wrap: break-word;
+            }
+            
+            /* Asegurar que el contenido no cause overflow */
+            .notification-content {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
         `;
         document.head.appendChild(style);
