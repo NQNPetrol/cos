@@ -561,14 +561,32 @@
             }
 
             async openModal() {
+                // Mostrar el modal pero inicialmente invisible
                 this.modal.classList.remove('hidden');
+                
+                // Forzar reflow para que la animación funcione
+                void this.modal.offsetWidth;
+                
+                // Aplicar animación de entrada (solo esto es nuevo)
+                this.modal.classList.remove('opacity-0', 'scale-95');
+                this.modal.classList.add('opacity-100', 'scale-100');
+                
                 if (this.currentPage === 1) {
                     await this.loadNotifications();
                 }
             }
 
             closeModal() {
-                this.modal.classList.add('hidden');
+                // Animación de salida (solo esto es nuevo)
+                this.modal.classList.remove('opacity-100', 'scale-100');
+                this.modal.classList.add('opacity-0', 'scale-95');
+                
+                // Ocultar después de que termine la animación
+                setTimeout(() => {
+                    if (this.modal.classList.contains('opacity-0')) {
+                        this.modal.classList.add('hidden');
+                    }
+                }, 300);
             }
 
             async loadNotifications(page = 1) {
@@ -928,6 +946,34 @@
                 overflow-wrap: break-word;
             }
         `;
+
+        style.textContent += `
+        /* Animación Jetstream para el modal */
+        #notificationModal {
+            transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+        }
+        
+        #notificationModal.opacity-0 {
+            opacity: 0;
+        }
+        
+        #notificationModal.opacity-100 {
+            opacity: 1;
+        }
+        
+        #notificationModal.scale-95 {
+            transform: scale(0.95);
+        }
+        
+        #notificationModal.scale-100 {
+            transform: scale(1);
+        }
+        
+        /* Asegurar que el modal esté posicionado correctamente durante la animación */
+        #notificationModal.transform {
+            transform-origin: top right;
+        }
+    `;
         document.head.appendChild(style);
 
         // Initialize notification manager when DOM is loaded
