@@ -35,7 +35,7 @@
                                 <p class="text-sm text-gray-300">Gestión de notificaciones globales del sistema</p>
                             </div>
                             <a href="{{ route('admin.nueva-notif') }}" 
-                               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                               class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-4 py-2 hover:border-bg-blue-700 rounded-lg transition-colors flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -46,28 +46,54 @@
 
                     <!-- Filtros y Estadísticas -->
                     <div class="bg-gray-700 rounded-lg p-4 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="text-center p-3 bg-gray-600 rounded">
-                                <div class="text-2xl font-bold text-blue-400">{{ $notifications->total() }}</div>
-                                <div class="text-sm text-gray-300">Total</div>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                            <!-- Filtro por tipo -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
+                                <select name="filter_type" id="filterType" class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="global" {{ request('filter_type') == 'global' ? 'selected' : '' }}>GLOBAL</option>
+                                    <option value="user" {{ request('filter_type') == 'user' ? 'selected' : '' }}>DE USUARIO</option>
+                                    <option value="client" {{ request('filter_type') == 'client' ? 'selected' : '' }}>DE CLIENTE</option>
+                                </select>
                             </div>
-                            <div class="text-center p-3 bg-gray-600 rounded">
-                                <div class="text-2xl font-bold text-green-400">
-                                    {{ $notifications->where('is_active', true)->count() }}
-                                </div>
-                                <div class="text-sm text-gray-300">Activas</div>
+
+                            <!-- Filtro por prioridad -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
+                                <select name="filter_priority" id="filterPriority" class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                    <option value="">Todas las prioridades</option>
+                                    <option value="BAJA" {{ request('filter_priority') == 'BAJA' ? 'selected' : '' }}>BAJA</option>
+                                    <option value="NORMAL" {{ request('filter_priority') == 'NORMAL' ? 'selected' : '' }}>MEDIA</option>
+                                    <option value="ALTA" {{ request('filter_priority') == 'ALTA' ? 'selected' : '' }}>ALTA</option>
+                                </select>
                             </div>
-                            <div class="text-center p-3 bg-gray-600 rounded">
-                                <div class="text-2xl font-bold text-yellow-400">
-                                    {{ $notifications->where('type', 'global')->count() }}
-                                </div>
-                                <div class="text-sm text-gray-300">Globales</div>
+
+                            <!-- Filtro por fecha desde -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Desde</label>
+                                <input type="date" name="filter_date_from" id="filterDateFrom" 
+                                    value="{{ request('filter_date_from') }}"
+                                    class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
                             </div>
-                            <div class="text-center p-3 bg-gray-600 rounded">
-                                <div class="text-2xl font-bold text-red-400">
-                                    {{ $notifications->where('priority', 'ALTA')->count() }}
-                                </div>
-                                <div class="text-sm text-gray-300">Alta Prioridad</div>
+
+                            <!-- Filtro por fecha hasta -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Hasta</label>
+                                <input type="date" name="filter_date_to" id="filterDateTo" 
+                                    value="{{ request('filter_date_to') }}"
+                                    class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                            </div>
+
+                            <!-- Botón limpiar - OCUPA EL ESPACIO DEL FILTRO ELIMINADO -->
+                            <div class="md:col-span-1">
+                                <button id="clearFilters" 
+                                        class="w-full bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center mt-2 md:mt-0">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Limpiar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -106,23 +132,42 @@
                                                 <div class="text-sm text-gray-300 truncate max-w-xs">{{ $notification->message }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                                    {{ $notification->type === 'global' ? 'bg-blue-800 text-blue-200' : 
-                                                       ($notification->type === 'user' ? 'bg-green-800 text-green-200' : 'bg-purple-800 text-purple-200') }}">
-                                                    {{ $notification->type }}
+                                                @php
+                                                    $typeLabels = [
+                                                        'global' => 'GLOBAL',
+                                                        'user' => 'DE USUARIO', 
+                                                        'client' => 'DE CLIENTE'
+                                                    ];
+                                                    $typeColors = [
+                                                        'global' => 'bg-blue-900/30 text-blue-300 border border-blue-600/50',
+                                                        'user' => 'bg-green-900/30 text-green-300 border border-green-600/50',
+                                                        'client' => 'bg-purple-900/30 text-purple-300 border border-purple-600/50'
+                                                    ];
+                                                @endphp
+                                                <span class="px-2 py-1 text-xs font-medium rounded {{ $typeColors[$notification->type] }}">
+                                                    {{ $typeLabels[$notification->type] }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                                    {{ $notification->priority === 'ALTA' ? 'bg-red-800 text-red-200' : 
-                                                       ($notification->priority === 'NORMAL' ? 'bg-yellow-800 text-yellow-200' : 'bg-green-800 text-green-200') }}">
-                                                    {{ $notification->priority }}
+                                                @php
+                                                    $priorityLabels = [
+                                                        'BAJA' => 'BAJA',
+                                                        'NORMAL' => 'MEDIA',
+                                                        'ALTA' => 'ALTA'
+                                                    ];
+                                                    $priorityColors = [
+                                                        'BAJA' => 'bg-green-900/30 text-green-300 border border-green-600/50',
+                                                        'NORMAL' => 'bg-yellow-900/30 text-yellow-300 border border-yellow-600/50',
+                                                        'ALTA' => 'bg-red-900/30 text-red-300 border border-red-600/50'
+                                                    ];
+                                                @endphp
+                                                <span class="px-2 py-1 text-xs font-medium rounded {{ $priorityColors[$notification->priority] }}">
+                                                    {{ $priorityLabels[$notification->priority] ?? $notification->priority }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                                    {{ $notification->is_active ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-200' }}">
-                                                    {{ $notification->is_active ? 'Activa' : 'Inactiva' }}
+                                                <span class="px-2 py-1 text-xs font-medium rounded {{ $notification->is_active ? 'bg-green-900/30 text-green-300 border border-green-600/50' : 'bg-red-900/30 text-red-300 border border-red-600/50' }}">
+                                                    {{ $notification->is_active ? 'ACTIVA' : 'INACTIVA' }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -137,7 +182,7 @@
                                                         @method('POST')
                                                         <input type="hidden" name="activate" value="{{ $notification->is_active ? '0' : '1' }}">
                                                         <button type="submit"
-                                                                class="p-2 rounded {{ $notification->is_active ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-green-600 hover:bg-green-500' }}"
+                                                                class="p-1.5 rounded-lg {{ $notification->is_active ? 'text-yellow-100 hover:text-yellow-200 hover:bg-yellow-200/30' : 'text-green-400 hover:text-green-200 hover:bg-green-200/30' }} transition-colors"
                                                                 title="{{ $notification->is_active ? 'Desactivar' : 'Activar' }}">
                                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -148,7 +193,7 @@
 
                                                     <!-- Botón para editar (abre modal) -->
                                                     <button onclick="openEditModal({{ $notification->id }})"
-                                                            class="p-2 bg-blue-600 hover:bg-blue-500 rounded"
+                                                            class="p-1.5 rounded-lg text-blue-400 hover:text-blue-200 hover:bg-blue-200/30 transition-colors"
                                                             title="Editar">
                                                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -162,7 +207,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
-                                                                class="p-2 bg-red-600 hover:bg-red-500 rounded"
+                                                                class="p-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-300/30 transition-colors"
                                                                 title="Eliminar">
                                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -188,16 +233,15 @@
                     <!-- Paginación -->
                     @if($notifications->hasPages())
                         <div class="mt-6">
-                            {{ $notifications->links() }}
+                            {{ $notifications->appends(request()->except('page'))->links() }}
                         </div>
                     @endif
-
                 </div>
             </div>
         </div>
     </div>
     <!-- Modal de Edición -->
-    <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+    <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center hidden z-50">
         <div class="bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-90vh overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
@@ -265,9 +309,9 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
                             <select name="priority" id="editPriority" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
-                                <option value="BAJA">Baja</option>
-                                <option value="NORMAL">Normal</option>
-                                <option value="ALTA">Alta</option>
+                                <option value="BAJA">BAJA</option>
+                                <option value="NORMAL">MEDIA</option>
+                                <option value="ALTA">ALTA</option>
                             </select>
                         </div>
 
@@ -287,7 +331,7 @@
                             Cancelar
                         </button>
                         <button type="submit" 
-                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg transition-colors">
+                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
                             Guardar Cambios
                         </button>
                     </div>
@@ -298,6 +342,60 @@
 
     <!-- JavaScript para las acciones -->
      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSelects = document.querySelectorAll('.filter-select');
+            const clearButton = document.getElementById('clearFilters');
+            let filterTimeout;
+
+            // Función para aplicar filtros automáticamente
+            function applyFilters() {
+                clearTimeout(filterTimeout);
+                
+                filterTimeout = setTimeout(() => {
+                    const filters = {
+                        filter_type: document.getElementById('filterType').value,
+                        filter_priority: document.getElementById('filterPriority').value,
+                        filter_date_from: document.getElementById('filterDateFrom').value,
+                        filter_date_to: document.getElementById('filterDateTo').value
+                    };
+
+                    // Construir URL con parámetros de filtro
+                    const url = new URL(window.location.href);
+                    Object.keys(filters).forEach(key => {
+                        if (filters[key]) {
+                            url.searchParams.set(key, filters[key]);
+                        } else {
+                            url.searchParams.delete(key);
+                        }
+                    });
+
+                    // Recargar la página con los nuevos filtros
+                    window.location.href = url.toString();
+                }, 800); // Debounce de 800ms para evitar recargas excesivas
+            }
+
+            // Limpiar todos los filtros
+            clearButton.addEventListener('click', function() {
+                // Resetear todos los selects e inputs
+                document.getElementById('filterType').value = '';
+                document.getElementById('filterPriority').value = '';
+                document.getElementById('filterDateFrom').value = '';
+                document.getElementById('filterDateTo').value = '';
+                
+                // Recargar sin filtros
+                window.location.href = "{{ route('notifications.admin') }}";
+            });
+
+            // Event listeners para cambios en los filtros
+            filterSelects.forEach(select => {
+                select.addEventListener('change', applyFilters);
+            });
+
+            // Event listeners para inputs de fecha
+            document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
+            document.getElementById('filterDateTo').addEventListener('change', applyFilters);
+        });
+        
         async function openEditModal(notificationId) {
             try {
                 // Cargar datos de la notificación via AJAX

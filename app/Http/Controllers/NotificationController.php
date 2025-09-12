@@ -113,13 +113,35 @@ class NotificationController extends Controller
     }
 
     // vista p administrar notis
-    public function admin(): View
+    public function admin(Request $request): View
     {
         
-        $notifications = Notification::with(['user', 'cliente'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Notification::with(['user', 'cliente']);
+    
+        if ($request->has('filter_type') && $request->filter_type != '') {
+            $query->where('type', $request->filter_type);
+        }
+        if ($request->has('filter_priority') && $request->filter_priority != '') {
+            $query->where('priority', $request->filter_priority);
+        }
 
+        if ($request->has('filter_status') && $request->filter_status != '') {
+            if ($request->filter_status == 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->filter_status == 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        if ($request->has('filter_date_from') && $request->filter_date_from != '') {
+            $query->whereDate('created_at', '>=', $request->filter_date_from);
+        }
+        
+        if ($request->has('filter_date_to') && $request->filter_date_to != '') {
+            $query->whereDate('created_at', '<=', $request->filter_date_to);
+        }
+
+        $notifications = $query->orderBy('created_at', 'desc')->paginate(15);
         $users = User::all();
         $clientes = Cliente::all();
 
@@ -144,7 +166,7 @@ class NotificationController extends Controller
                 'type' => 'required|in:global,user,client',
                 'user_id' => 'nullable|exists:users,id',
                 'client_id' => 'nullable|exists:clientes,id',
-                'priority' => 'required|in:low,normal,high',
+                'priority' => 'required|in:BAJA,NORMAL,ALTA',
             ]);
 
             $notification = Notification::create($validated);
@@ -178,7 +200,7 @@ class NotificationController extends Controller
                 'type' => 'required|in:global,user,client',
                 'user_id' => 'nullable|exists:users,id',
                 'client_id' => 'nullable|exists:clientes,id',
-                'priority' => 'required|in:low,normal,high',
+                'priority' => 'required|in:BAJA,NORMAL,ALTA',
                 'is_active' => 'required|boolean'
             ]);
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('type', ['global', 'user', 'client'])->default('global');
             $table->unsignedBigInteger('user_id')->nullable(); // Para notificaciones específicas de usuario
             $table->unsignedBigInteger('client_id')->nullable(); // Para notificaciones de cliente
-            $table->enum('priority', ['low', 'normal', 'high'])->default('normal');
+            $table->enum('priority', ['BAJA', 'NORMAL', 'ALTA'])->default('NORMAL');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

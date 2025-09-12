@@ -86,9 +86,9 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
                             <select name="priority" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
-                                <option value="low">Baja</option>
-                                <option value="normal" selected>Normal</option>
-                                <option value="high">Alta</option>
+                                <option value="BAJA">BAJA</option>
+                                <option value="NORMAL" selected>MEDIA</option>
+                                <option value="ALTA">ALTA</option>
                             </select>
                         </div>
 
