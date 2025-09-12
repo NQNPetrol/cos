@@ -264,6 +264,29 @@ Route::middleware([
     ->middleware('can:administrar.notificaciones')
     ->name('notifications.edit.data');
 
+    // RUTAS API
+    Route::middleware('auth')->group(function () {
+        // Obtener notificaciones del usuario actual
+        Route::get('/notificaciones', [App\Http\Controllers\NotificationController::class, 'index'])
+            ->name('notifications.index');
+        
+        // Contador de notificaciones sin leer
+        Route::get('/notificaciones/contador', [App\Http\Controllers\NotificationController::class, 'unreadCount'])
+            ->name('notifications.unread.count');
+        
+        // Marcar notificación como leída
+        Route::post('/notificaciones/{notification}/leer', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark.read');
+        
+        // Descartar notificación
+        Route::delete('/notificaciones/{notification}/descartar', [App\Http\Controllers\NotificationController::class, 'dismiss'])
+            ->name('notifications.dismiss');
+        
+        // Marcar todas las notificaciones como leídas
+        Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.mark.all.read');
+    });
+
 
 });
 

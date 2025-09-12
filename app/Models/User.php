@@ -94,7 +94,7 @@ class User extends Authenticatable
      */
     public function clientes(): BelongsToMany
     {
-        return $this->belongsToMany(Cliente::class, 'users_has_cliente_id');
+        return $this->belongsToMany(Cliente::class, 'users_has_cliente_id', 'user_id', 'cliente_id');
     }
 
      /**

@@ -47,7 +47,7 @@ class Cliente extends Model
      */
     public function usuarios(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'users_has_cliente_id');
+        return $this->belongsToMany(User::class, 'users_has_cliente_id', 'cliente_id', 'user_id');
     }
 
     /**

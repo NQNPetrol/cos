@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Default Title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -575,21 +576,52 @@
                 this.showLoadingState();
 
                 try {
+                    console.log('Solicitando notificaciones, página:', page);
                     const response = await fetch(`/notificaciones?page=${page}`);
-                    const data = await response.json();
+                    
+                    console.log('Respuesta HTTP:', response.status, response.statusText);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP! estado: ${response.status}`);
+                    }
+                    
+                    const responseText = await response.text();
+                    console.log('Respuesta textual:', responseText);
+                    
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                        console.log('Datos parseados:', data);
+                    } catch (parseError) {
+                        console.error('Error parseando JSON:', parseError);
+                        throw new Error('Respuesta JSON inválida del servidor');
+                    }
 
-                    if (page === 1) {
+                    // Verificar estructura de datos
+                    if (!data || typeof data !== 'object') {
+                        console.error('Estructura de datos inválida:', data);
+                        throw new Error('Respuesta del servidor inválida');
+                    }
+
+                    if (page === 1 && this.list) {
                         this.list.innerHTML = '';
                     }
 
-                    this.renderNotifications(data.data);
-                    this.currentPage = data.current_page;
-                    this.hasMorePages = data.has_more;
-                    this.updateLoadMoreButton();
+                    if (data.data && Array.isArray(data.data)) {
+                        console.log('Notificaciones recibidas:', data.data.length);
+                        this.renderNotifications(data.data);
+                        this.currentPage = data.current_page || 1;
+                        this.hasMorePages = data.has_more || false;
+                        this.updateLoadMoreButton();
+                    } else {
+                        console.error('Estructura de datos incorrecta, falta propiedad data:', data);
+                        throw new Error('Estructura de datos inválida');
+                    }
+
                     this.hideLoadingState();
 
                 } catch (error) {
-                    console.error('Error loading notifications:', error);
+                    console.error('Error completo en loadNotifications:', error);
                     this.showErrorState();
                 } finally {
                     this.isLoading = false;
@@ -779,17 +811,23 @@
             }
 
             showErrorState() {
-                this.list.innerHTML = `
-                    <div class="p-6 text-center text-red-400">
-                        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
-                        <p>Error al cargar las notificaciones</p>
-                        <button onclick="notificationManager.loadNotifications(1)" class="mt-2 text-blue-400 hover:text-blue-300 text-sm">
-                            Intentar nuevamente
-                        </button>
-                    </div>
-                `;
+                // Primero ocultar el estado de carga
+                this.hideLoadingState();
+                
+                // Luego mostrar error dentro del listado
+                if (this.list) {
+                    this.list.innerHTML = `
+                        <div class="p-6 text-center text-red-400">
+                            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            <p>Error al cargar las notificaciones</p>
+                            <button onclick="window.notificationManager.loadNotifications(1)" class="mt-2 text-blue-400 hover:text-blue-300 text-sm">
+                                Intentar nuevamente
+                            </button>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -911,16 +949,6 @@
         toggleInventario.addEventListener('click', () => {
             submenuInventario.classList.toggle('hidden');
             iconInventario.classList.toggle('rotate-180');
-        });
-
-        //Notificaiones
-        const toggleNotif = document.getElementById('toggleNotif');
-        const submenuNotif = document.getElementById('submenuNotif');
-        const iconNotif = document.getElementById('iconNotif');
-
-        toggleNotif.addEventListener('click', () => {
-            submenuNotif.classList.toggle('hidden');
-            iconNotif.classList.toggle('rotate-180');
         });
 
     </script>

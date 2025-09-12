@@ -18,7 +18,7 @@ class NotificationController extends Controller
         $perPage = 10;
 
         // Obtenemos las notificaciones visibles para el usuario
-        $notifications = $this->getUserNotifications($user)
+        $notifications = $this->getUserVisibleNotifications($user)
             ->with(['users' => function($query) use ($user) {
                 $query->where('user_id', $user->id);
             }])
@@ -56,17 +56,23 @@ class NotificationController extends Controller
     public function unreadCount(): JsonResponse
     {
         $user = auth()->user();
-        $count = $this->getUserNotifications($user)
-            ->whereDoesntHave('users', function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->where(function ($q) {
-                          $q->where('is_read', true)
-                            ->orWhere('is_dismissed', true);
-                      });
-            })
+        
+        // Primero obtenemos todas las notificaciones visibles para el usuario
+        $visibleNotificationIds = $this->getUserVisibleNotifications($user)->pluck('id');
+        
+        if ($visibleNotificationIds->isEmpty()) {
+            return response()->json(['count' => 0]);
+        }
+        
+        // Contamos las notificaciones visibles que NO están leídas NI descartadas
+        $unreadCount = \DB::table('notification_user')
+            ->where('user_id', $user->id)
+            ->whereIn('notification_id', $visibleNotificationIds)
+            ->where('is_read', false)
+            ->where('is_dismissed', false)
             ->count();
 
-        return response()->json(['count' => $count]);
+        return response()->json(['count' => $unreadCount]);
     }
 
     // metodo para marar una notif como leida
@@ -102,14 +108,24 @@ class NotificationController extends Controller
 
     public function markAllAsRead(): JsonResponse
     {
-        $user = auth()->user();
-        $notifications = $this->getUserNotifications($user)->get();
+        try {
+            $user = auth()->user();
+            
+            // Obtener notificaciones visibles
+            $visibleNotifications = $this->getUserVisibleNotifications($user)->get();
 
-        foreach ($notifications as $notification) {
-            $notification->markAsReadForUser($user);
+            foreach ($visibleNotifications as $notification) {
+                // Solo marcar como leída si no está descartada
+                if (!$notification->isDismissedByUser($user)) {
+                    $notification->markAsReadForUser($user);
+                }
+            }
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
-
-        return response()->json(['success' => true]);
     }
 
     // vista p administrar notis
@@ -265,8 +281,8 @@ class NotificationController extends Controller
             }
     }
 
-    //obtener notificaciones p un usuario
-    private function getUserNotifications(User $user)
+    //obtener notificaciones visibles p un usuario
+    private function getUserVisibleNotifications(User $user)
     {
         $userClientIds = $user->clientes()->pluck('cliente_id')->toArray();
 
