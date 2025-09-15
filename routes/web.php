@@ -7,8 +7,10 @@ use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\UserClienteController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -59,7 +61,18 @@ Route::middleware([
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
-    //ROLES
+    
+        //CLIENTE-USUARIO
+        Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
+        Route::post('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'store'])->middleware('can:asignar.clientes')->name('user-cliente.store');
+        Route::delete('usuarios/remover-cliente', [App\Http\Controllers\UserClienteController::class, 'destroy'])->middleware('can:asignar.clientes')->name('user-cliente.destroy');
+        Route::get('/usuarios/{user}/clientes', [App\Http\Controllers\UserClienteController::class, 'getClientesPorUsuario'])->middleware('can:asignar.clientes')->name('user-cliente.clientes-por-usuario');
+        Route::get('/clientes/{cliente}/usuarios', [App\Http\Controllers\UserClienteController::class, 'getUsuariosPorCliente'])->middleware('can:asignar.clientes')->name('user-cliente.usuarios-por-cliente');
+        Route::post('/admin/user-clientes/remove-all', [UserClienteController::class, 'removeAllClientesFromUser'])
+        ->name('user-cliente.removeAll')
+        ->middleware(['auth', 'role:admin']);
+    
+        //ROLES
     Route::get('/roles', function () {
         return view('admin.roles');
     })->middleware('can:administrar.roles')->name('crear.roles');
@@ -227,6 +240,53 @@ Route::middleware([
     Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'index'])
         ->middleware('can:ver.tickets')
         ->name('tickets.nuevo');
+
+    //NOTIFICACIONES
+    Route::get('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'admin'])
+        ->middleware('can:administrar.notificaciones')
+        ->name('notifications.admin');
+    
+    Route::get('/admin/notificaciones/crear', [App\Http\Controllers\NotificationController::class, 'create'])
+        ->middleware('can:crear.notificaciones')
+        ->name('admin.nueva-notif');
+    
+    Route::post('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'store'])
+        ->middleware('can:crear.notificaciones')
+        ->name('notifications.store');
+
+    Route::post('/admin/notificaciones/{notification}/toggle', [App\Http\Controllers\NotificationController::class, 'toggle'])->name('notifications.toggle');
+    
+    Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    
+    Route::put('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'update'])->name('notifications.update');
+
+    Route::get('/admin/notificaciones/{notification}/editar-datos', [App\Http\Controllers\NotificationController::class, 'editData'])
+    ->middleware('can:administrar.notificaciones')
+    ->name('notifications.edit.data');
+
+    // RUTAS API
+    Route::middleware('auth')->group(function () {
+        // Obtener notificaciones del usuario actual
+        Route::get('/notificaciones', [App\Http\Controllers\NotificationController::class, 'index'])
+            ->name('notifications.index');
+        
+        // Contador de notificaciones sin leer
+        Route::get('/notificaciones/contador', [App\Http\Controllers\NotificationController::class, 'unreadCount'])
+            ->name('notifications.unread.count');
+        
+        // Marcar notificación como leída
+        Route::post('/notificaciones/{notification}/leer', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark.read');
+        
+        // Descartar notificación
+        Route::delete('/notificaciones/{notification}/descartar', [App\Http\Controllers\NotificationController::class, 'dismiss'])
+            ->name('notifications.dismiss');
+        
+        // Marcar todas las notificaciones como leídas
+        Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.mark.all.read');
+    });
+
 
 });
 

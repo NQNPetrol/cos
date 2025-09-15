@@ -42,4 +42,20 @@ class Cliente extends Model
         return $this->hasMany(Ticket::class);
     }
 
+    /**
+     * Usuarios asociados a este cliente
+     */
+    public function usuarios(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'users_has_cliente_id', 'cliente_id', 'user_id');
+    }
+
+    /**
+     * Verifica si este es el cliente COS 
+     */
+    public function esCOS(): bool
+    {
+        return $this->id === 2;
+    }
+
 }
