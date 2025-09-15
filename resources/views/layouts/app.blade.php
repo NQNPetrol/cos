@@ -674,14 +674,14 @@
                 div.dataset.id = notification.id;
 
                 const priorityColors = {
-                    'high': 'text-red-500',
-                    'normal': 'text-blue-500',
-                    'low': 'text-green-500'
+                    'ALTA': 'text-red-500',
+                    'NORMAL': 'text-blue-500',
+                    'BAJA': 'text-green-500'
                 };
                 const priorityText = {
-                    'high': 'ALTA',
-                    'normal': 'NORMAL', 
-                    'low': 'BAJA'
+                    'ALTA': 'PRIORIDAD: ALTA',
+                    'NORMAL': 'PRIORIDAD: NORMAL', 
+                    'BAJA': 'PRIORIDAD: BAJA'
                 };
 
                 div.innerHTML = `
