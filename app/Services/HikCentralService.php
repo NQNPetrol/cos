@@ -17,10 +17,10 @@ class HikCentralService
         $this->apiSecret = env('HIKCENTRAL_API_SECRET');
     }
 
-    protected function signRequest(string $method, string $contentType, string $path, int $timestamp): string
+    protected function signRequest(string $method, string $accept, string $contentType, string $path, int $timestamp): string
     {
         $stringToSign = strtoupper($method) . "\n" .
-                    "" . "\n" .
+                    $accept . "\n" .
                     $contentType . "\n" .
                     "x-ca-key:" . $this->apiKey . "\n" .
                     "x-ca-timestamp:" . $timestamp . "\n" .
@@ -33,14 +33,15 @@ class HikCentralService
     {
         $path = '/artemis/api/resource/v1/encodeDevice/encodeDeviceList';
         $url  = $this->baseUrl.$path;
+        $accept = 'application/json';
 
         $timestamp  = round(microtime(true) * 1000);
-        $contentType = 'application/json;charset=UTF-8';
-        $signature = $this->signRequest('POST', $contentType, $path, $timestamp);
+        $contentType = 'application/json';
+        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
 
         $response = Http::withOptions(['verify' => false])
          ->withHeaders([
-            'Accept'          => '*/*',
+            'Accept'          => $accept,
             'Content-Type'    => $contentType,
             'x-ca-key'        => $this->apiKey,
             'x-ca-signature'  => $signature,
