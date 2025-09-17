@@ -486,6 +486,10 @@
                         <i class="bi bi-search mr-2"></i>
                         Ver Inventario
                     </a>
+                    <a href="{{ route('cameras.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-search mr-2"></i>
+                        Cámaras
+                    </a>
             
                 </div>
             </nav>

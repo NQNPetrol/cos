@@ -13,4 +13,33 @@ class EncodingDevice extends Model
         'port',
         'status',
     ];
+
+    protected $casts = [
+        'status' => 'integer',
+        'port' => 'integer'
+    ];
+
+    public function cameras()
+    {
+        return $this->hasMany(Camera::class, 'encode_dev_index_code', 'encode_dev_index_code');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    public function getStatusTextAttribute()
+    {
+        return match($this->status) {
+            1 => 'Activo',
+            2 => 'Inactivo',
+            default => 'Desconocido'
+        };
+    }
+
+    public function getFullAddressAttribute()
+    {
+        return $this->ip . ($this->port ? ':' . $this->port : '');
+    }
 }

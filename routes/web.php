@@ -287,6 +287,10 @@ Route::middleware([
             ->name('notifications.mark.all.read');
     });
 
+    // CAMARAS LIST Y LIVEVIEW
+    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index');
+    Route::get('/streaming/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('streaming.show');
+    Route::post('/api/cameras/import', [App\Http\Controllers\CameraController::class, 'import']);
 
 });
 
