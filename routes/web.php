@@ -7,11 +7,13 @@ use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\UserClienteController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -29,30 +31,51 @@ Route::middleware(['auth'])->group(function () {
 require __DIR__.'/auth.php';
 
 Route::middleware([
-    'auth:sanctum',
+    'auth',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
     //CLIENTES
     Route::get('/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])
-        // ->middleware('can:crear.cliente')
+        ->middleware('can:crear.cliente')
         ->name('crear.cliente');
+
     Route::get('/clientes/{cliente}/edit', [App\Http\Controllers\ClienteController::class, 'edit'])
-        // ->middleware('can:crear.cliente')
+        ->middleware('can:editar.cliente')
         ->name('clientes.edit');
+
     Route::put('/clientes/{cliente}', [App\Http\Controllers\ClienteController::class, 'update'])
+        ->middleware('can:editar.cliente')
         ->name('clientes.update');
 
     Route::get('/configuracion/permisos', [App\Http\Controllers\SistemaController::class, 'crear_permiso'])
+        ->middleware('can:crear.permiso')
         ->name('crear.permiso');
+
     //USUARIOS
     Route::get('/usuarios', [App\Http\Controllers\UserController::class, 'index'])
-        // ->middleware('can:administrar.usuarios')
+        ->middleware('can:administrar.usuarios')
         ->name('usuarios.index');
 
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
+        ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
+    
+        //CLIENTE-USUARIO
+        Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
+        Route::post('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'store'])->middleware('can:asignar.clientes')->name('user-cliente.store');
+        Route::delete('usuarios/remover-cliente', [App\Http\Controllers\UserClienteController::class, 'destroy'])->middleware('can:asignar.clientes')->name('user-cliente.destroy');
+        Route::get('/usuarios/{user}/clientes', [App\Http\Controllers\UserClienteController::class, 'getClientesPorUsuario'])->middleware('can:asignar.clientes')->name('user-cliente.clientes-por-usuario');
+        Route::get('/clientes/{cliente}/usuarios', [App\Http\Controllers\UserClienteController::class, 'getUsuariosPorCliente'])->middleware('can:asignar.clientes')->name('user-cliente.usuarios-por-cliente');
+        Route::post('/admin/user-clientes/remove-all', [UserClienteController::class, 'removeAllClientesFromUser'])
+        ->name('user-cliente.removeAll')
+        ->middleware(['auth', 'role:admin']);
+    
+        //ROLES
+    Route::get('/roles', function () {
+        return view('admin.roles');
+    })->middleware('can:administrar.roles')->name('crear.roles');
 
     //CONTRATOS
     // INDEX
@@ -74,6 +97,7 @@ Route::middleware([
     Route::get('/contratos/{contrato}/edit', [App\Http\Controllers\ContratoController::class, 'edit'])
         ->middleware('can:editar.contratos')
         ->name('contratos.edit');
+        
     Route::get('/contratos/{contrato}/edit-livewire', \App\Livewire\Contratos\Edit::class)
         ->name('contratos.edit-livewire');
 
@@ -84,7 +108,7 @@ Route::middleware([
 
     // DELETE
     Route::delete('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'destroy'])
-        ->middleware('can:borrar.contratos')
+        ->middleware('can:eliminar.contratos')
         ->name('contratos.destroy');
 
     //EMPRESAS ASOCIADAS A CLIENTES
@@ -92,11 +116,12 @@ Route::middleware([
     Route::get('/empresas-asociadas', function() {
         $empresas = \App\Models\EmpresaAsociada::with('cliente')->paginate(10);
         return view('clientes.nueva-empresa-asociada', ['empresas' => $empresas]);
-    })->name('empresas-asociadas.index');
+    })->middleware('can:crear.empresas')->name('empresas-asociadas.index');
 
     
     Route::get('/clientes/{clienteId}/empresas-asociadas', [App\Http\Controllers\ClienteEmpresasAsociadasController::class, 'index'])
-    ->name('cliente-empresas-asociadas.index');
+        ->middleware('can:ver.empresas')
+        ->name('cliente-empresas-asociadas.index');
 
     //OBJETIVOS    
     Route::get('/objetivos', [App\Http\Controllers\ObjetivoController::class, 'index'])
@@ -105,70 +130,163 @@ Route::middleware([
     
     //SEGUIMIENTOS
     Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'index'])
+        ->middleware('can:ver.seguimientos')
         ->name('seguimientos.index');
+
     Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'create'])
+        ->middleware('can:crear.seguimientos')
         ->name('seguimientos.create');
-    Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->name('seguimientos.store');
+
+    Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->middleware('can:crear.seguimientos')->name('seguimientos.store');
 
     //EVENTOS
-    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
-    Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
-    Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
-    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoController::class, 'edit'])->name('eventos.edit');
-    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])->name('eventos.update');
-    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
+    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoController::class, 'create'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.create');
+
+    Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])
+        ->middleware('can:ver.eventos')
+        ->name('eventos.index');
+
+    Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.store');
+
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoController::class, 'edit'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.edit');
+
+    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.update');
+
+    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])
+        ->middleware('can:eliminar.eventos')
+        ->name('eventos.destroy');
     
     //REPORTES
     Route::middleware(['auth'])->group(function () {
-        Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteController::class, 'preview'])->name('eventos.reporte.preview');
-        Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteController::class, 'generate'])->name('eventos.reporte.generate');
-        Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteController::class, 'download'])->name('reportes.download');
-        Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteController::class, 'view'])->name('reportes.view');
-        Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteController::class, 'previewIframe'])->name('eventos.reporte.preview-iframe');
+        Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteController::class, 'preview'])->middleware('can:ver.reportes')->name('eventos.reporte.preview');
+        Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteController::class, 'generate'])->middleware('can:generar.reportes')->name('eventos.reporte.generate');
+        Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteController::class, 'download'])->middleware('can:generar.reportes')->name('reportes.download');
+        Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteController::class, 'view'])->middleware('can:ver.reportes')->name('reportes.view');
+        Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteController::class, 'previewIframe'])->middleware('can:ver.reportes')->name('eventos.reporte.preview-iframe');
     });
     
     //MEDIA
     Route::get('/eventos/media/{media}', [\App\Http\Controllers\EventoController::class, 'destroyMedia'])
+        ->middleware('can:eliminar.media')
         ->name('media.eventos.destroy');
 
     
     //PERSONAL
     Route::get('/personal', [\App\Http\Controllers\PersonalController::class, 'index'])
+        ->middleware('can:ver.personal')
         ->name('personal.index');
+
     Route::get('/personal/create', [\App\Http\Controllers\PersonalController::class, 'create'])
+        ->middleware('can:crear.personal')
         ->name('personal.create');
+
     Route::post('/personal/store/', [\App\Http\Controllers\PersonalController::class, 'store'])
+        ->middleware('can:crear.personal')
         ->name('personal.store');
+
     Route::get('/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])
-        //->middleware('can:editar.personal')
+        ->middleware('can:editar.personal')
         ->name('personal.edit');
+
     Route::put('/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])
-        //->middleware('can:editar.personal')
+        ->middleware('can:editar.personal')
         ->name('personal.update');
+
 
     //INVENTARIO
     Route::get('/inventario', [\App\Http\Controllers\InventarioController::class, 'index'])
+        ->middleware('can:ver.inventario')
         ->name('inventario.index');
+
     Route::get('/inventario/create', [\App\Http\Controllers\InventarioController::class, 'create'])
+        ->middleware('can:crear.inventario')
         ->name('inventario.create');
+
     Route::post('/inventario/store/', [\App\Http\Controllers\InventarioController::class, 'store'])
+        ->middleware('can:crear.inventario')
         ->name('inventario.store');
+
     Route::get('/inventario/{id}/edit', [App\Http\Controllers\InventarioController::class, 'edit'])
-        //->middleware('can:editar.inventario')
+        ->middleware('can:editar.inventario')
         ->name('inventario.edit');
+
     Route::put('/inventario/{id}', [App\Http\Controllers\InventarioController::class, 'update'])
-        //->middleware('can:editar.inventario')
+        ->middleware('can:editar.inventario')
         ->name('inventario.update');
 
     //PATRULLAS
     Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'index'])
+        ->middleware('can:ver.patrullas')
         ->name('patrullas.index');
+
     Route::get('/livewire/patrullas', [\App\Http\Controllers\PatrullaController::class, 'create'])
+        ->middleware('can:crear.patrullas')
         ->name('patrullas.create');
 
     //DISPOSiTIVO-PATRULLA
     Route::get('/patrullas/{patrulla}/dispositivos', [DispositivoPatrullaController::class, 'index'])
-    ->name('patrullas.dispositivos');
+        ->middleware('can:asignar.dispositivos')
+        ->name('patrullas.dispositivos');
+
+    //TICKETS
+    Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'index'])
+        ->middleware('can:ver.tickets')
+        ->name('tickets.nuevo');
+
+    //NOTIFICACIONES
+    Route::get('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'admin'])
+        ->middleware('can:administrar.notificaciones')
+        ->name('notifications.admin');
+    
+    Route::get('/admin/notificaciones/crear', [App\Http\Controllers\NotificationController::class, 'create'])
+        ->middleware('can:crear.notificaciones')
+        ->name('admin.nueva-notif');
+    
+    Route::post('/admin/notificaciones', [App\Http\Controllers\NotificationController::class, 'store'])
+        ->middleware('can:crear.notificaciones')
+        ->name('notifications.store');
+
+    Route::post('/admin/notificaciones/{notification}/toggle', [App\Http\Controllers\NotificationController::class, 'toggle'])->name('notifications.toggle');
+    
+    Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    
+    Route::put('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'update'])->name('notifications.update');
+
+    Route::get('/admin/notificaciones/{notification}/editar-datos', [App\Http\Controllers\NotificationController::class, 'editData'])
+    ->middleware('can:administrar.notificaciones')
+    ->name('notifications.edit.data');
+
+    // RUTAS API
+    Route::middleware('auth')->group(function () {
+        // Obtener notificaciones del usuario actual
+        Route::get('/notificaciones', [App\Http\Controllers\NotificationController::class, 'index'])
+            ->name('notifications.index');
+        
+        // Contador de notificaciones sin leer
+        Route::get('/notificaciones/contador', [App\Http\Controllers\NotificationController::class, 'unreadCount'])
+            ->name('notifications.unread.count');
+        
+        // Marcar notificación como leída
+        Route::post('/notificaciones/{notification}/leer', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark.read');
+        
+        // Descartar notificación
+        Route::delete('/notificaciones/{notification}/descartar', [App\Http\Controllers\NotificationController::class, 'dismiss'])
+            ->name('notifications.dismiss');
+        
+        // Marcar todas las notificaciones como leídas
+        Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.mark.all.read');
+    });
+
 
 });
 
