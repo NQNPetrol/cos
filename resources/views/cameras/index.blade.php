@@ -56,7 +56,7 @@
                                             ID
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Dispositivo
+                                            Tipo Dispositivo
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Estado
@@ -79,12 +79,7 @@
                                                 <div class="text-sm text-gray-300">{{ $camera->camera_index_code }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                @if($camera->encodingDevice)
-                                                    <div class="text-sm text-gray-300">{{ $camera->encodingDevice->name }}</div>
-                                                    <div class="text-xs text-gray-400">{{ $camera->encodingDevice->ip }}:{{ $camera->encodingDevice->port }}</div>
-                                                @else
-                                                    <span class="text-xs text-red-400">Sin dispositivo</span>
-                                                @endif
+                                                    <div class="text-sm text-gray-300">{{ $camera->dev_resource_type }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 py-1 text-xs font-medium rounded {{ $camera->status == 1 ? 'bg-green-900/30 text-green-300 border border-green-600/50' : 'bg-red-900/30 text-red-300 border border-red-600/50' }}">
@@ -97,16 +92,14 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
                                                     <!-- Botón para ver detalles -->
-                                                    <a href="#" 
-                                                       class="p-1.5 rounded-lg text-blue-400 hover:text-blue-200 hover:bg-blue-200/30 transition-colors"
-                                                       title="Ver Detalles">
+                                                    <button onclick="alert('Detalles de la camara:\n\nNombre: {{ $camera->camera_name }}')"
+                                                            class="p-1.5 rounded-lg text-blue-400 hover:text-blue-200 hover:bg-blue-200/30 transition-colors" 
+                                                            title="Ver detalles">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                         </svg>
-                                                    </a>
+                                                    </button>
 
                                                     <!-- Botón para ver liveview -->
                                                     @if($camera->status == 1)

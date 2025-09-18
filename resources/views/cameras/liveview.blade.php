@@ -37,7 +37,7 @@
                             @if($camera->stream && $camera->stream->url && $camera->status == 1)
                                 <!-- Video en vivo -->
                                 <div class="w-full max-w-4xl">
-                                    <h3 class="text-lg font-semibold text-white mb-3 text-center">Transmisión en vivo</h3>
+                                    <h3 class="text-lg font-semibold text-white mb-3 text-center">Liveview</h3>
                                     <div class="bg-black rounded-lg overflow-hidden">
                                         <iframe 
                                             src="{{ $camera->stream->url }}"
