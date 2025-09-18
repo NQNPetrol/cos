@@ -53,4 +53,9 @@ class Camera extends Model
     {
         return $query->where('dev_resource_type', $type);
     }
+
+    public function stream()
+    {
+        return $this->hasOne(StreamUrl::class, 'camera_index_code', 'camera_index_code');
+    }
 }

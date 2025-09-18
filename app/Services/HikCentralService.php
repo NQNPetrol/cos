@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Models\StreamUrl;
+use App\Models\Camera;
 
 class HikCentralService
 {
@@ -12,9 +15,16 @@ class HikCentralService
 
     public function __construct()
     {
+        $url = env('HIKCENTRAL_URL', '');
         $this->baseUrl   = rtrim(env('HIKCENTRAL_URL', ''), '/');
         $apiKey = env('HIKCENTRAL_API_KEY');  
         $apiSecret = env('HIKCENTRAL_API_SECRET');
+
+        Log::info('HikCentral ENV Debug', [
+            'url' => $url,
+            'api_key' => $apiKey ? 'SET' : 'NOT SET',
+            'api_secret' => $apiSecret ? 'SET' : 'NOT SET'
+        ]);
 
         if (!$apiKey || !$apiSecret) {
             throw new \Exception('Las variables de entorno HIKCENTRAL_API_KEY y HIKCENTRAL_API_SECRET son requeridas');
@@ -105,6 +115,8 @@ class HikCentralService
 
     public function getCameraList(): array
     {
+        Log::info('Iniciando getCameraList()');
+
         // Método para obtener las cámaras con la relación correcta
         $path = '/artemis/api/resource/v1/cameras';
         $url  = $this->baseUrl.$path;
@@ -113,6 +125,13 @@ class HikCentralService
         $timestamp  = round(microtime(true) * 1000);
         $contentType = 'application/json';
         $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+
+        Log::info('HikCentral Request Debug', [
+            'url' => $url,
+            'timestamp' => $timestamp,
+            'api_key' => substr($this->apiKey, 0, 4) . '***', // Solo primeros 4 caracteres por seguridad
+            'signature' => substr($signature, 0, 10) . '...'
+        ]);
 
         $response = Http::withOptions(['verify' => false])
          ->withHeaders([
@@ -131,11 +150,58 @@ class HikCentralService
 
         if ($response->successful()) {
             $data = $response->json();
+
+            Log::info('Response JSON structure', [
+                'has_code' => isset($data['code']),
+                'code_value' => $data['code'] ?? 'not set',
+                'has_data' => isset($data['data']),
+                'has_list' => isset($data['data']['list']),
+                'list_count' => isset($data['data']['list']) ? count($data['data']['list']) : 0
+            ]);
+
             if (isset($data['code']) && $data['code'] === '0') {
                 return $data['data']['list'] ?? [];
             }
+
+            throw new \Exception('API devolvió código de error: ' . ($data['code'] ?? 'unknown') . '. Response: ' . $response->body());
         }
 
         throw new \Exception('Error obteniendo lista de cámaras: '.$response->body());
+    }
+
+    public function importAllStreamingUrls(): array
+    {
+        $cameras = Camera::all();
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => []
+        ];
+
+        foreach ($cameras as $camera) {
+            try {
+                $streamData = $this->getStreamingUrl($camera->camera_index_code);
+                
+                if (!empty($streamData['url'])) {
+                    StreamUrl::updateOrCreate(
+                        ['camera_index_code' => $camera->camera_index_code],
+                        [
+                            'url' => $streamData['url'],
+                            'authentication' => $streamData['authentication'] ?? null,
+                            'protocol' => 'rtsp',
+                            'stream_type' => 0,
+                            'is_active' => true,
+                            'last_updated' => now()
+                        ]
+                    );
+                    $results['success']++;
+                }
+            } catch (\Exception $e) {
+                $results['failed']++;
+                $results['errors'][$camera->camera_index_code] = $e->getMessage();
+            }
+        }
+
+        return $results;
     }
 }

@@ -32,9 +32,10 @@ Route::post('/encoding-devices/import', [EncodingDeviceController::class, 'impor
 // API PARA IMPORTAR CAMERA LIST
 Route::prefix('cameras')->group(function () {
     Route::get('/', [CameraController::class, 'index']);
-    Route::post('/cameras/import', [CameraController::class, 'import']);
+    Route::post('/import', [CameraController::class, 'import']);
     Route::get('/with-devices', [CameraController::class, 'camerasWithDevices']);
-    Route::get('/{cameraIndexCode}/stream', [CameraController::class, 'getStreamingUrl']);
+    Route::post('/import-streams', [CameraController::class, 'importStreamingUrls']);
+    Route::get('/{cameraIndexCode}/stream-url', [CameraController::class, 'getStreamUrl']);
     Route::get('/encoding-device/{encodeDevIndexCode}', [CameraController::class, 'findByEncodingDevice']);
 });
 

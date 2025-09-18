@@ -11,6 +11,11 @@ class CameraController extends Controller
 {
     protected HikCentralService $hikCentral;
 
+    public function __construct(HikCentralService $hikCentral)
+    {
+        $this->hikCentral = $hikCentral;
+    }
+
     public function index()
     {
         $cameras = Camera::with('encodingDevice')->paginate(10);
@@ -20,7 +25,9 @@ class CameraController extends Controller
     public function import()
     {
         try {
+            \Log::info('Iniciando importación de cámaras...');
             $cameras = $this->hikCentral->getCameraList();
+            \Log::info('Cámaras obtenidas: ' . count($cameras));
 
             $imported = 0;
             $updated = 0;
@@ -58,32 +65,36 @@ class CameraController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Log::error('Error en importación: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Error importando cámaras: ' . $e->getMessage()
             ], 500);
         }
     }
 
-    public function getStreamingUrl($cameraIndexCode)
+    public function getStreamUrl($cameraIndexCode)
     {
         try {
-            // Verificar que la cámara existe en la base de datos
-            $camera = Camera::where('camera_index_code', $cameraIndexCode)->first();
+            $stream = StreamUrl::where('camera_index_code', $cameraIndexCode)->first();
             
-            if (!$camera) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Cámara no encontrada en la base de datos'
-                ], 404);
+            if (!$stream) {
+                // Si no existe, obtenerla de HikCentral
+                $streamData = $this->hikCentral->getStreamingUrl($cameraIndexCode);
+                
+                $stream = StreamUrl::create([
+                    'camera_index_code' => $cameraIndexCode,
+                    'url' => $streamData['url'],
+                    'authentication' => $streamData['authentication'] ?? null,
+                    'protocol' => 'rtsp',
+                    'stream_type' => 0,
+                    'is_active' => true
+                ]);
             }
 
-            // Obtener la URL de streaming desde HikCentral
-            $streamingData = $this->hikCentral->getStreamingUrl($cameraIndexCode);
-            
             return response()->json([
                 'success' => true,
-                'camera' => $camera,
-                'streaming' => $streamingData
+                'stream_url' => $stream->url,
+                'authentication' => $stream->authentication
             ]);
 
         } catch (\Exception $e) {
@@ -94,15 +105,32 @@ class CameraController extends Controller
         }
     }
 
+    public function importStreamingUrls()
+    {
+        try {
+            $results = $this->hikCentral->importAllStreamingUrls();
+            
+            return response()->json([
+                'message' => "Importación de URLs completada: {$results['success']} exitosas, {$results['failed']} fallidas",
+                'results' => $results
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error importando URLs: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function showStream($cameraIndexCode)
     {
-        $camera = Camera::where('camera_index_code', $cameraIndexCode)->first();
+        $camera = Camera::with('stream')->where('camera_index_code', $cameraIndexCode)->first();
         
         if (!$camera) {
             abort(404, 'Cámara no encontrada');
         }
 
-        return view('streaming.show', compact('camera'));
+        return view('cameras.liveview', compact('camera'));
     }
 
     public function camerasWithDevices()

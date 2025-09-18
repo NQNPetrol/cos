@@ -289,8 +289,24 @@ Route::middleware([
 
     // CAMARAS LIST Y LIVEVIEW
     Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index');
-    Route::get('/streaming/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('streaming.show');
-    Route::post('/api/cameras/import', [App\Http\Controllers\CameraController::class, 'import']);
+    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('cameras.stream');
+    
+    Route::get('/test-env', function () {
+        return [
+            'HIKCENTRAL_URL' => env('HIKCENTRAL_URL'),
+            'HIKCENTRAL_API_KEY' => env('HIKCENTRAL_API_KEY'),
+            'HIKCENTRAL_API_SECRET' => env('HIKCENTRAL_API_SECRET'),
+        ];
+    });
+
+    Route::get('/debug-env', function() {
+        return [
+            'HIKCENTRAL_URL' => env('HIKCENTRAL_URL'),
+            'HIKCENTRAL_API_KEY' => env('HIKCENTRAL_API_KEY') ? 'SET' : 'NOT SET',
+            'HIKCENTRAL_API_SECRET' => env('HIKCENTRAL_API_SECRET') ? 'SET' : 'NOT SET',
+            'environment' => app()->environment()
+        ];
+    });
 
 });
 
