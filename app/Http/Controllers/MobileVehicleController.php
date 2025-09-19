@@ -213,9 +213,17 @@ class MobileVehicleController extends Controller
         $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
         
         // Obtener ubicaciones actuales
-        $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+        $result = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+        $locations = $result['locations'];
+        $latestTimestamp = $result['latest_timestamp'];
+        $dataDate = $result['data_date'] ?? now()->format('Y-m-d');
         
-        return view('patrullas.location', compact('mobileVehicles', 'locations'));
+        // Formatear la última actualización para la vista
+        $lastUpdate = $latestTimestamp ? 
+            date('d/m/Y H:i:s', $latestTimestamp) : 
+            'No hay datos disponibles';
+        
+        return view('patrullas.location', compact('mobileVehicles', 'locations', 'lastUpdate', 'dataDate'));
     }
 
     /**
@@ -225,8 +233,29 @@ class MobileVehicleController extends Controller
     {
         try {
             $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
+
+            Log::debug('Vehículos en BD', [
+                'count' => count($vehicleIndexCodes),
+                'codes' => $vehicleIndexCodes
+            ]);
+
+            if (empty($vehicleIndexCodes)) {
+                Log::warning('No hay vehículos móviles en la base de datos');
+                return response()->json([
+                    'success' => true,
+                    'locations' => [],
+                    'timestamp' => now()->toISOString(),
+                    'message' => 'No hay vehículos móviles registrados'
+                ]);
+            }
+
             $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
             
+            Log::debug('Ubicaciones obtenidas', [
+                'count' => count($locations),
+                'locations' => $locations
+            ]);
+
             return response()->json([
                 'success' => true,
                 'locations' => $locations,

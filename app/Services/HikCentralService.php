@@ -404,14 +404,26 @@ class HikCentralService
      */
     public function getLatestGpsLocations(array $mobileVehicleIndexCodes): array
     {
-        // Obtener timestamp actual y de hace 10 minutos
-        $endTime = now()->format('Y-m-d\TH:i:sP');
-        $startTime = now()->subMinutes(10)->format('Y-m-d\TH:i:sP');
+        $timezone = '-03:00';
+        
+        $today = now();
+        $startTime = $today->copy()->startOfDay()->format('Y-m-d\TH:i:s') . $timezone;
+        $endTime = $today->copy()->endOfDay()->format('Y-m-d\TH:i:s') . $timezone;
+
+        Log::debug('Solicitando ubicaciones GPS de HOY', [
+            'vehicles_count' => count($mobileVehicleIndexCodes),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'timezone' => $timezone,
+            'today' => $today->format('Y-m-d'),
+            'today_argentina' => $today->setTimezone('America/Argentina/Buenos_Aires')->format('Y-m-d H:i:s')
+        ]);
 
         try {
             $gpsData = $this->getGpsStatistics($mobileVehicleIndexCodes, $startTime, $endTime, 1, 5);
             
             $locations = [];
+            $latestTimestamp = null;
             
             if (!empty($gpsData['list'])) {
                 foreach ($gpsData['list'] as $vehicleData) {
@@ -419,8 +431,18 @@ class HikCentralService
                     
                     // Obtener el último punto GPS (más reciente)
                     if (!empty($vehicleData['gpsInfo'])) {
-                        $latestGps = end($vehicleData['gpsInfo']);
-                        
+                        $gpsInfo = $vehicleData['gpsInfo'];
+                        usort($gpsInfo, function($a, $b) {
+                            return strtotime($b['occurTime']) - strtotime($a['occurTime']);
+                        });
+
+                        $latestGps = $gpsInfo[0];
+
+                        $gpsTime = strtotime($latestGps['occurTime']);
+                        if ($latestTimestamp === null || $gpsTime > $latestTimestamp) {
+                            $latestTimestamp = $gpsTime;
+                        }
+                            
                         $locations[$vehicleCode] = [
                             'longitude' => $latestGps['longitude'],
                             'latitude' => $latestGps['latitude'],
@@ -428,17 +450,34 @@ class HikCentralService
                             'direction' => $latestGps['direction'],
                             'speed' => $latestGps['speed'],
                             'plateNo' => $vehicleData['plateNo'] ?? '',
-                            'regionIndexCode' => $vehicleData['regionIndexCode'] ?? ''
+                            'regionIndexCode' => $vehicleData['regionIndexCode'] ?? '',
+                            'timestamp' => $gpsTime
                         ];
+
+                        Log::debug('Datos GPS para vehículo', [
+                            'vehicle' => $vehicleCode,
+                            'time' => $latestGps['occurTime'],
+                            'coordinates' => $latestGps['latitude'] . ', ' . $latestGps['longitude']
+                        ]);
+                    } else {
+                        Log::warning('Vehículo sin datos GPS HOY', ['vehicle' => $vehicleCode]);
                     }
                 }
+            }  else {
+                Log::warning('No se encontraron datos GPS en la respuesta');
             }
             
-            return $locations;
+            return [
+                'locations' => $locations,
+                'latest_timestamp' => $latestTimestamp
+            ];
             
         } catch (\Exception $e) {
             Log::error('Error obteniendo ubicaciones GPS: ' . $e->getMessage());
-            return [];
+            return [
+                'locations' => [],
+                'latest_timestamp' => null
+            ];
         }
     }
 }

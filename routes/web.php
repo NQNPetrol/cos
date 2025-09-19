@@ -231,7 +231,7 @@ Route::middleware([
         ->middleware('can:crear.patrullas')
         ->name('patrullas.create');
 
-    Route::get('/patrullas/location', [\App\Http\Controllers\MobileVehicleController::class, 'index'])
+    Route::get('/patrullas/location', [\App\Http\Controllers\MobileVehicleController::class, 'location'])
         // ->middleware('can:ver.location')
         ->name('patrullas.location');
 

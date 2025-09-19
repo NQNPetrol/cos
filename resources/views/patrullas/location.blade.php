@@ -11,6 +11,29 @@
                     </div>
                 </div>
             @endif
+            
+            <!-- Última actualización -->
+            <div class="bg-blue-900 text-blue-200 p-4 rounded-lg mb-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <span class="font-semibold">Datos del:</span>
+                            <span class="ml-2">{{ isset($dataDate) ? \Carbon\Carbon::parse($dataDate)->format('d/m/Y') : now()->format('d/m/Y') }}</span>
+                            <span class="block text-sm mt-1">
+                                <span class="font-semibold">Última actualización:</span>
+                                <span class="ml-2">{{ $lastUpdate ?? 'No hay datos disponibles' }}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="refresh-counter" class="bg-blue-800 text-blue-200 px-3 py-1 rounded text-sm">
+                        Actualizando en: <span id="countdown">10</span>s
+                    </div>
+                </div>
+            </div>
+
             <!-- Header -->
             <div class="bg-slate-900 overflow-hidden shadow-xl sm:rounded-lg p-6 mb-6">
                 <div class="p-6 text-gray-100">
@@ -21,12 +44,21 @@
                                 <h2 class="text-3xl font-bold text-white mb-2">Vehículos Móviles</h2>
                                 <p class="text-sm text-gray-300">Seguimiento y localización de patrullas en tiempo real</p>
                             </div>
+                            <div class="flex space-x-2">
+                                <button onclick="refreshData()" 
+                                   class="bg-blue-700 hover:bg-blue-600 text-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Actualizar ahora
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Contenedor del Mapa -->
                     <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                        <h3 class="text-lg font-semibold text-white mb-4">Mapa de Localización</h3>
+                        <h3 class="text-lg font-semibold text-white mb-4">Mapa de Localización - {{ isset($dataDate) ? \Carbon\Carbon::parse($dataDate)->format('d/m/Y') : now()->format('d/m/Y') }}</h3>
                         <div class="h-96 bg-gray-700 rounded-lg" id="map-container">
                             <div id="map" style="height: 100%; width: 100%;"></div>
                         </div>
@@ -50,11 +82,14 @@
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Estado
                                         </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            Última ubicación
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600">
+                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="vehicles-table-body">
                                     @forelse($mobileVehicles as $vehicle)
-                                        <tr class="hover:bg-gray-750 transition-colors">
+                                        <tr class="hover:bg-gray-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-white">{{ $vehicle->mobile_vehicle_index_code }}</div>
                                             </td>
@@ -69,10 +104,24 @@
                                                     {{ $vehicle->status == 1 ? 'ACTIVO' : 'INACTIVO' }}
                                                 </span>
                                             </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
+                                                    @if(isset($locations[$vehicle->mobile_vehicle_index_code]))
+                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['latitude'] ?? 0, 6) }}, 
+                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['longitude'] ?? 0, 6) }}
+                                                        <br>
+                                                        <small class="text-gray-400">
+                                                            {{ $locations[$vehicle->mobile_vehicle_index_code]['occurTime'] ?? 'N/A' }}
+                                                        </small>
+                                                    @else
+                                                        Sin datos de ubicación
+                                                    @endif
+                                                </div>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="px-6 py-4 text-center text-gray-400">
+                                            <td colspan="5" class="px-6 py-4 text-center text-gray-400">
                                                 No hay vehículos móviles registrados.
                                             </td>
                                         </tr>
@@ -92,7 +141,8 @@
             </div>
         </div>
     </div>
-     <!-- Google Maps API -->
+
+    <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap" async defer></script>
     
     <script>
@@ -101,6 +151,7 @@
         let refreshInterval;
         let countdownInterval;
         let countdownValue = 10;
+        let isMapInitialized = false;
         
         // Inicializar el mapa
         function initMap() {
@@ -126,6 +177,8 @@
                 ]
             });
             
+            isMapInitialized = true;
+            
             // Cargar datos iniciales
             loadMapData();
             
@@ -136,13 +189,15 @@
         // Cargar datos del mapa desde la API
         async function loadMapData() {
             try {
+                console.log('Cargando datos del mapa...');
                 const response = await fetch('/api/mobile-vehicles/map-data');
                 const data = await response.json();
                 
                 if (data.success) {
+                    console.log('Datos recibidos:', data.data.length, 'vehículos');
                     updateMap(data.data);
                     updateTable(data.data);
-                    updateLastUpdateTime();
+                    updateLastUpdateTime(data.latest_timestamp);
                 } else {
                     console.error('Error loading map data:', data.message);
                 }
@@ -153,6 +208,10 @@
         
         // Actualizar el mapa con nuevos marcadores
         function updateMap(vehiclesData) {
+            if (!isMapInitialized) return;
+            
+            console.log('Actualizando mapa con', vehiclesData.length, 'vehículos');
+            
             // Limpiar marcadores antiguos
             Object.values(markers).forEach(marker => marker.setMap(null));
             markers = {};
@@ -180,11 +239,13 @@
                     // Info window con detalles del vehículo
                     const infoWindow = new google.maps.InfoWindow({
                         content: `
-                            <div class="text-gray-800">
-                                <h3 class="font-bold">${vehicle.vehicle_name}</h3>
-                                <p>Patente: ${vehicle.plate_no}</p>
-                                <p>Velocidad: ${vehicle.speed} km/h</p>
-                                <p>Última actualización: ${vehicle.occur_time}</p>
+                            <div class="text-gray-800 p-2">
+                                <h3 class="font-bold text-lg">${vehicle.vehicle_name}</h3>
+                                <p class="text-sm"><strong>Patente:</strong> ${vehicle.plate_no}</p>
+                                <p class="text-sm"><strong>Velocidad:</strong> ${vehicle.speed} km/h</p>
+                                <p class="text-sm"><strong>Dirección:</strong> ${vehicle.direction}°</p>
+                                <p class="text-sm"><strong>Última actualización:</strong> ${vehicle.occur_time}</p>
+                                <p class="text-sm"><strong>Coordenadas:</strong> ${vehicle.latitude.toFixed(6)}, ${vehicle.longitude.toFixed(6)}</p>
                             </div>
                         `
                     });
@@ -230,16 +291,26 @@
         }
         
         // Actualizar el tiempo de última actualización
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            document.querySelector('#last-update span').textContent = timeString;
+        function updateLastUpdateTime(timestamp) {
+            let timeString;
+            if (timestamp) {
+                const date = new Date(timestamp * 1000);
+                timeString = date.toLocaleDateString('es-AR') + ' ' + date.toLocaleTimeString('es-AR');
+                
+                // Actualizar el texto en el header
+                const lastUpdateElement = document.querySelector('#last-update span');
+                if (lastUpdateElement) {
+                    lastUpdateElement.textContent = timeString;
+                }
+            } else {
+                timeString = 'No hay datos disponibles';
+            }
+            console.log('Última actualización:', timeString);
         }
         
         // Iniciar actualización automática
         function startAutoRefresh() {
-            // Mostrar contador
-            document.getElementById('refresh-counter').classList.remove('hidden');
+            console.log('Iniciando auto-refresh cada 10 segundos');
             
             // Configurar intervalo de actualización (10 segundos)
             refreshInterval = setInterval(() => {
@@ -269,23 +340,46 @@
         
         // Actualizar visualización del contador
         function updateCountdown() {
-            document.getElementById('countdown').textContent = countdownValue;
+            const countdownElement = document.getElementById('countdown');
+            if (countdownElement) {
+                countdownElement.textContent = countdownValue;
+            }
         }
         
         // Función para actualizar manualmente
         function refreshData() {
+            console.log('Actualización manual solicitada');
             loadMapData();
             resetCountdown();
         }
         
-        // Cargar datos iniciales cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof google !== 'undefined' && google.maps) {
-                // Google Maps ya está cargado, inicializar
+        // Verificar si Google Maps está cargado y inicializar
+        function checkGoogleMaps() {
+            if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
                 initMap();
             } else {
-                // Esperar a que Google Maps se cargue
-                window.initMap = initMap;
+                // Reintentar después de un breve delay
+                setTimeout(checkGoogleMaps, 100);
+            }
+        }
+        
+        // Iniciar cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM cargado, inicializando mapa...');
+            checkGoogleMaps();
+        });
+        
+        // Manejar visibilidad de la página para optimizar recursos
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Página oculta, pausar actualizaciones
+                if (refreshInterval) clearInterval(refreshInterval);
+                if (countdownInterval) clearInterval(countdownInterval);
+                console.log('Actualizaciones pausadas (página oculta)');
+            } else {
+                // Página visible, reanudar actualizaciones
+                startAutoRefresh();
+                console.log('Actualizaciones reanudadas (página visible)');
             }
         });
     </script>

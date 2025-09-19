@@ -40,7 +40,7 @@ Route::prefix('cameras')->group(function () {
     Route::get('/encoding-device/{encodeDevIndexCode}', [CameraController::class, 'findByEncodingDevice']);
 });
 
-//API PARA IMPORTAR VEHICLE LIST
+//API PARA IMPORTAR VEHICLE LIST Y OBTENER GPS INFO
 Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function () {
     Route::get('/', [MobileVehicleController::class, 'api'])->name('index');
     Route::get('/{id}', [MobileVehicleController::class, 'apiShow'])->name('show');
