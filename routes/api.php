@@ -46,6 +46,8 @@ Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function 
     Route::get('/{id}', [MobileVehicleController::class, 'apiShow'])->name('show');
     Route::post('/import', [MobileVehicleController::class, 'import'])->name('mobile-vehicles.import');
     Route::post('/relink', [MobileVehicleController::class, 'relinkAll'])->name('relink');
+    Route::get('/map/data', [MobileVehicleController::class, 'apiMapData'])->name('map-data');
+    Route::get('/locations/current', [MobileVehicleController::class, 'apiLocations'])->name('locations');
 });
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);

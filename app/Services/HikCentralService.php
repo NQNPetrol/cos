@@ -339,4 +339,106 @@ class HikCentralService
 
         return $results;
     }
+
+    /**
+     * Obtiene las estadísticas GPS de los dispositivos móviles
+     */
+    public function getGpsStatistics(array $mobileVehicleIndexCodes, string $startTime, string $endTime, int $pageNo = 1, int $pageSize = 100): array
+    {
+        $path = '/artemis/api/mobilesurveillance/v1/gpsDetails';
+        $url  = $this->baseUrl . $path;
+        $accept = 'application/json';
+
+        $timestamp = round(microtime(true) * 1000);
+        $contentType = 'application/json';
+        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+
+        // Convertir array de códigos a string separado por comas
+        $indexCodesString = implode(',', $mobileVehicleIndexCodes);
+
+        $requestBody = [
+            'pageNo' => $pageNo,
+            'pageSize' => $pageSize,
+            'mobilevehicleIndexCodes' => $indexCodesString,
+            'startTime' => $startTime,
+            'endTime' => $endTime
+        ];
+
+        Log::info('Solicitando datos GPS', [
+            'vehicles' => $indexCodesString,
+            'startTime' => $startTime,
+            'endTime' => $endTime
+        ]);
+
+        $response = Http::withOptions(['verify' => false])
+            ->timeout(30) // Aumentar timeout para esta solicitud
+            ->withHeaders([
+                'Accept' => $accept,
+                'Content-Type' => $contentType,
+                'x-ca-key' => $this->apiKey,
+                'x-ca-signature' => $signature,
+                'x-ca-timestamp' => $timestamp,
+            ])->post($url, $requestBody);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            
+            if (isset($data['code']) && $data['code'] === '0') {
+                Log::info('Datos GPS obtenidos exitosamente', [
+                    'total' => $data['data']['total'] ?? 0,
+                    'vehicles' => count($data['data']['list'] ?? [])
+                ]);
+                return $data['data'] ?? [];
+            }
+            
+            Log::error('Error en respuesta GPS', ['response' => $data]);
+            throw new \Exception('API devolvió código de error: ' . ($data['code'] ?? 'unknown'));
+        }
+
+        Log::error('Error en solicitud GPS', ['response' => $response->body()]);
+        throw new \Exception('Error obteniendo datos GPS: ' . $response->body());
+    }
+
+    /**
+     * Obtiene la última ubicación conocida de cada vehículo
+     */
+    public function getLatestGpsLocations(array $mobileVehicleIndexCodes): array
+    {
+        // Obtener timestamp actual y de hace 10 minutos
+        $endTime = now()->format('Y-m-d\TH:i:sP');
+        $startTime = now()->subMinutes(10)->format('Y-m-d\TH:i:sP');
+
+        try {
+            $gpsData = $this->getGpsStatistics($mobileVehicleIndexCodes, $startTime, $endTime, 1, 5);
+            
+            $locations = [];
+            
+            if (!empty($gpsData['list'])) {
+                foreach ($gpsData['list'] as $vehicleData) {
+                    $vehicleCode = $vehicleData['mobilevehicleIndexCode'];
+                    
+                    // Obtener el último punto GPS (más reciente)
+                    if (!empty($vehicleData['gpsInfo'])) {
+                        $latestGps = end($vehicleData['gpsInfo']);
+                        
+                        $locations[$vehicleCode] = [
+                            'longitude' => $latestGps['longitude'],
+                            'latitude' => $latestGps['latitude'],
+                            'occurTime' => $latestGps['occurTime'],
+                            'direction' => $latestGps['direction'],
+                            'speed' => $latestGps['speed'],
+                            'plateNo' => $vehicleData['plateNo'] ?? '',
+                            'regionIndexCode' => $vehicleData['regionIndexCode'] ?? ''
+                        ];
+                    }
+                }
+            }
+            
+            return $locations;
+            
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo ubicaciones GPS: ' . $e->getMessage());
+            return [];
+        }
+    }
 }

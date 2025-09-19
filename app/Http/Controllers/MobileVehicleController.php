@@ -30,6 +30,11 @@ class MobileVehicleController extends Controller
         return view('patrullas.location', compact('mobileVehicles'));
     }
 
+    public function show_map(GpsInfo $gpsInfo)
+    {
+        // metodo que hace peticion get a la api y trate la info de localizacion del vehiculo
+    }
+
     /**
      * Importa los vehículos móviles desde HikCentral
      */
@@ -195,5 +200,96 @@ class MobileVehicleController extends Controller
         ];
 
         return response()->json($stats);
+    }
+
+    public function location()
+    {
+        // Obtener vehículos móviles
+        $mobileVehicles = MobileVehicle::with('patrulla')
+            ->orderBy('mobile_vehicle_name')
+            ->paginate(20);
+
+        // Obtener códigos de índice de todos los vehículos
+        $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
+        
+        // Obtener ubicaciones actuales
+        $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+        
+        return view('patrullas.location', compact('mobileVehicles', 'locations'));
+    }
+
+    /**
+     * API: Obtiene las ubicaciones actuales de los vehículos
+     */
+    public function apiLocations()
+    {
+        try {
+            $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
+            $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+            
+            return response()->json([
+                'success' => true,
+                'locations' => $locations,
+                'timestamp' => now()->toISOString()
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error en apiLocations: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error obteniendo ubicaciones: ' . $e->getMessage(),
+                'timestamp' => now()->toISOString()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Obtiene datos para el mapa de Google Maps
+     */
+    public function apiMapData()
+    {
+        try {
+            $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
+            $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+            
+            // Obtener información adicional de los vehículos
+            $vehicles = MobileVehicle::whereIn('mobile_vehicle_index_code', array_keys($locations))
+                ->get()
+                ->keyBy('mobile_vehicle_index_code');
+            
+            $mapData = [];
+            
+            foreach ($locations as $vehicleCode => $location) {
+                $vehicle = $vehicles->get($vehicleCode);
+                
+                $mapData[] = [
+                    'vehicle_code' => $vehicleCode,
+                    'vehicle_name' => $vehicle ? $vehicle->mobile_vehicle_name : 'Desconocido',
+                    'plate_no' => $location['plateNo'],
+                    'latitude' => $location['latitude'],
+                    'longitude' => $location['longitude'],
+                    'occur_time' => $location['occurTime'],
+                    'direction' => $location['direction'],
+                    'speed' => $location['speed'],
+                    'status' => $vehicle ? $vehicle->status : 0
+                ];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $mapData,
+                'timestamp' => now()->toISOString()
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error en apiMapData: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error obteniendo datos del mapa: ' . $e->getMessage(),
+                'timestamp' => now()->toISOString()
+            ], 500);
+        }
     }
 }
