@@ -231,8 +231,12 @@ Route::middleware([
         ->middleware('can:crear.patrullas')
         ->name('patrullas.create');
 
+    Route::get('/patrullas/location', [\App\Http\Controllers\MobileVehicleController::class, 'index'])
+        // ->middleware('can:ver.location')
+        ->name('patrullas.location');
+
     //DISPOSiTIVO-PATRULLA
-    Route::get('/patrullas/{patrulla}/dispositivos', [DispositivoPatrullaController::class, 'index'])
+    Route::get('/patrullas/{patrulla}/dispositivos', [\App\Http\Controllers\DispositivoPatrullaController::class, 'index'])
         ->middleware('can:asignar.dispositivos')
         ->name('patrullas.dispositivos');
 

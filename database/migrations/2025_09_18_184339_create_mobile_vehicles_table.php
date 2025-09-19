@@ -19,16 +19,19 @@ return new class extends Migration
             $table->string('dev_index_code');
             $table->string('region_index_code');
             $table->string('plate_no');
-            $table->string('person_family_name');
-            $table->string('person_given_name');
-            $table->string('person_name');
-            $table->string('phone_no');
-            $table->integer('vehicle_type');
-            $table->integer('vehicle_brand');
-            $table->integer('vehicle_color');
+            $table->string('person_family_name')->nullable();
+            $table->string('person_given_name')->nullable();
+            $table->string('person_name')->nullable();
+            $table->string('phone_no')->nullable();
+            $table->integer('vehicle_type')->nullable();
+            $table->integer('vehicle_brand')->nullable();
+            $table->integer('vehicle_color')->nullable();
 
-            $table->foreignId('')
+            $table->foreignId('patrulla_id')->nullable()->constrained('patrullas')->onDelete('set null');
             $table->timestamps();
+
+            $table->index('plate_no');
+            $table->index('status');
         });
     }
 

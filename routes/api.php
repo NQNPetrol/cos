@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\CameraController;
+use App\Http\Controllers\MobileVehicleController;
 use App\Http\Controllers\Api\PersonalImportController;
 use App\Http\Controllers\Api\PersonalCompareController;
 use App\Http\Controllers\EncodingDeviceController;
@@ -37,6 +38,14 @@ Route::prefix('cameras')->group(function () {
     Route::post('/import-streams', [CameraController::class, 'importStreamingUrls']);
     Route::get('/{cameraIndexCode}/stream-url', [CameraController::class, 'getStreamUrl']);
     Route::get('/encoding-device/{encodeDevIndexCode}', [CameraController::class, 'findByEncodingDevice']);
+});
+
+//API PARA IMPORTAR VEHICLE LIST
+Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function () {
+    Route::get('/', [MobileVehicleController::class, 'api'])->name('index');
+    Route::get('/{id}', [MobileVehicleController::class, 'apiShow'])->name('show');
+    Route::post('/import', [MobileVehicleController::class, 'import'])->name('mobile-vehicles.import');
+    Route::post('/relink', [MobileVehicleController::class, 'relinkAll'])->name('relink');
 });
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);

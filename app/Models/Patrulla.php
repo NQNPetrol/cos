@@ -15,4 +15,24 @@ class Patrulla extends Model
                     ->withPivot('fecha_asignacion')
                     ->withTimestamps();
     }
+
+    public function mobileVehicle()
+    {
+        return $this->hasOne(MobileVehicle::class);
+    }
+
+    public function scopeWithMobileVehicle($query)
+    {
+        return $query->whereHas('mobileVehicle');
+    }
+
+    public function hasMobileVehicle()
+    {
+        return $this->mobileVehicle()->exists();
+    }
+
+    public function getMobileVehicleIndexCode()
+    {
+        return $this->mobileVehicle?->mobile_vehicle_index_code;
+    }
 }

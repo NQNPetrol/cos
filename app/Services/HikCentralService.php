@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\StreamUrl;
 use App\Models\Camera;
+use App\Models\MobileVehicle;
+use App\Models\Patrulla;
 
 class HikCentralService
 {
@@ -200,6 +202,139 @@ class HikCentralService
                 $results['failed']++;
                 $results['errors'][$camera->camera_index_code] = $e->getMessage();
             }
+        }
+
+        return $results;
+    }
+
+    public function getMobileVehicleList(int $pageNo = 1, int $pageSize = 50): array
+    {
+        $path = '/artemis/api/resource/v1/mobilevehicle/mobilevehicleList';
+        $url  = $this->baseUrl . $path;
+        $accept = 'application/json';
+
+        $timestamp = round(microtime(true) * 1000);
+        $contentType = 'application/json';
+        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+
+        Log::info('HikCentral MobileVehicle Request', [
+            'url' => $url,
+            'pageNo' => $pageNo,
+            'pageSize' => $pageSize
+        ]);
+
+        $response = Http::withOptions(['verify' => false])
+            ->withHeaders([
+                'Accept' => $accept,
+                'Content-Type' => $contentType,
+                'x-ca-key' => $this->apiKey,
+                'x-ca-signature' => $signature,
+                'x-ca-timestamp' => $timestamp,
+            ])->post($url, [
+                'pageNo' => $pageNo,
+                'pageSize' => $pageSize,
+            ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            if (isset($data['code']) && $data['code'] === '0') {
+                return $data['data'] ?? [];
+            }
+        }
+
+        throw new \Exception('Error obteniendo lista de vehículos móviles: ' . $response->body());
+    }
+
+    public function importMobileVehicles(): array
+    {
+        $results = [
+            'total_imported' => 0,
+            'total_updated' => 0,
+            'total_linked' => 0,
+            'total_processed' => 0,
+            'errors' => []
+        ];
+
+        try {
+            $pageNo = 1;
+            $pageSize = 50;
+            $allVehicles = [];
+
+            // Obtener todos los vehículos paginando
+            do {
+                Log::info("Obteniendo página {$pageNo}");
+                $vehicleData = $this->getMobileVehicleList($pageNo, $pageSize);
+                
+                if (empty($vehicleData['list'])) {
+                    break;
+                }
+
+                $allVehicles = array_merge($allVehicles, $vehicleData['list']);
+                $pageNo++;
+
+            } while (count($vehicleData['list']) === $pageSize && isset($vehicleData['total']) && count($allVehicles) < $vehicleData['total']);
+
+            Log::info("Total de vehículos obtenidos: " . count($allVehicles));
+
+            // Procesar cada vehículo
+            foreach ($allVehicles as $vehicleInfo) {
+                try {
+                    $results['total_processed']++;
+
+                    // Buscar si ya existe el vehículo
+                    $mobileVehicle = MobileVehicle::where('mobile_vehicle_index_code', $vehicleInfo['mobilevehicleIndexCode'])->first();
+
+                    $vehicleData = [
+                        'mobile_vehicle_index_code' => $vehicleInfo['mobilevehicleIndexCode'],
+                        'mobile_vehicle_name' => $vehicleInfo['mobilevehicleName'],
+                        'status' => $vehicleInfo['status'],
+                        'dev_index_code' => $vehicleInfo['DevIndexCode'],
+                        'region_index_code' => $vehicleInfo['regionIndexCode'],
+                        'plate_no' => $vehicleInfo['plateNo'],
+                        'person_family_name' => !empty($vehicleInfo['personFamilyName']) ? $vehicleInfo['personFamilyName'] : null,
+                        'person_given_name' => !empty($vehicleInfo['personGivenName']) ? $vehicleInfo['personGivenName'] : null,
+                        'person_name' => !empty($vehicleInfo['personName']) ? $vehicleInfo['personName'] : null,
+                        'phone_no' => !empty($vehicleInfo['phoneNo']) ? $vehicleInfo['phoneNo'] : null,
+                        'vehicle_type' => $vehicleInfo['vehicleType'] !== -1 ? $vehicleInfo['vehicleType'] : null,
+                        'vehicle_brand' => $vehicleInfo['vehicleBrand'] !== -1 ? $vehicleInfo['vehicleBrand'] : null,
+                        'vehicle_color' => $vehicleInfo['vehicleColor'] !== -1 ? $vehicleInfo['vehicleColor'] : null,
+                    ];
+
+                    // Buscar patrulla correspondiente por patente
+                    $patrulla = Patrulla::where('patente', $vehicleInfo['plateNo'])->first();
+                    if ($patrulla) {
+                        $vehicleData['patrulla_id'] = $patrulla->id;
+                        $results['total_linked']++;
+                    }
+
+                    if ($mobileVehicle) {
+                        // si existe actualizar registro
+                        $mobileVehicle->update($vehicleData);
+                        $results['total_updated']++;
+                        Log::info("Vehículo actualizado: {$vehicleInfo['plateNo']}");
+                    } else {
+                        // Crear nuevo vehículo
+                        MobileVehicle::create($vehicleData);
+                        $results['total_imported']++;
+                        Log::info("Vehículo importado: {$vehicleInfo['plateNo']}");
+                    }
+
+                } catch (\Exception $e) {
+                    $results['errors'][] = [
+                        'vehicle' => $vehicleInfo['plateNo'] ?? 'Unknown',
+                        'error' => $e->getMessage()
+                    ];
+                    Log::error("Error procesando vehículo: " . $e->getMessage(), [
+                        'vehicle_data' => $vehicleInfo
+                    ]);
+                }
+            }
+
+            Log::info('Importación de vehículos completada', $results);
+
+        } catch (\Exception $e) {
+            Log::error('Error en importación de vehículos: ' . $e->getMessage());
+            throw $e;
         }
 
         return $results;
