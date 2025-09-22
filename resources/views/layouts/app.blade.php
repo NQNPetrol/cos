@@ -441,12 +441,9 @@
                 <div id="submenuUsuarios" class="pl-6 space-y-1 hidden">
                     <a href="{{ route('usuarios.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-people mr-2"></i>
-                        Asignar roles a Usuarios
+                        Gestionar Usuarios
                     </a>
-                    <a href="{{ route('user-cliente.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
-                        <i class="bi bi-people mr-2"></i>
-                        Asignar clientes a Usuarios
-                    </a>
+                    
                 </div>
 
                 <!-- Personal -->
