@@ -397,6 +397,7 @@
                 <!-- Submenú -->
                 <div id="submenuPatrullas" class="pl-6 space-y-1 hidden">
                     <a href="{{ route('patrullas.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">Administrar Patrullas</a>
+                    <a href="{{ route('patrullas.location') }}" class="block text-gray-600 hover:text-gray-900 p-2">Ver en el Mapa</a>
                 </div>
 
                 <button id="toggleConfiguracion" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded flex justify-between items-center">
@@ -485,6 +486,10 @@
                     <a href="{{ route('inventario.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
                         <i class="bi bi-search mr-2"></i>
                         Ver Inventario
+                    </a>
+                    <a href="{{ route('cameras.index') }}" class="block text-gray-600 hover:text-gray-900 p-2">
+                        <i class="bi bi-search mr-2"></i>
+                        Cámaras
                     </a>
             
                 </div>
