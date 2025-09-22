@@ -1,6 +1,7 @@
 <x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
             @if(session('error'))
                 <div class="bg-red-600 text-white p-4 rounded-lg mb-6">
                     <div class="flex items-center">
@@ -20,11 +21,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <div>
-                            <span class="font-semibold">Datos del:</span>
-                            <span class="ml-2">{{ isset($dataDate) ? \Carbon\Carbon::parse($dataDate)->format('d/m/Y') : now()->format('d/m/Y') }}</span>
-                            <span class="block text-sm mt-1">
-                                <span class="font-semibold">Última actualización:</span>
-                                <span class="ml-2">{{ $lastUpdate ?? 'No hay datos disponibles' }}</span>
+                            <span class="font-semibold">Ultimos datos del</span>
+                            <span class="ml-2">{{ $lastUpdate ?? 'No hay datos disponibles' }}</span>
                             </span>
                         </div>
                     </div>
@@ -39,10 +37,17 @@
                 <div class="p-6 text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
+                        <a href="{{ route('patrullas.index') }}" 
+                        class="flex items-center text-blue-400 hover:text-blue-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Ver Patrullas
+                        </a>
                         <div class="flex justify-between items-center">
                             <div>
-                                <h2 class="text-3xl font-bold text-white mb-2">Vehículos Móviles</h2>
-                                <p class="text-sm text-gray-300">Seguimiento y localización de patrullas en tiempo real</p>
+                                <h2 class="text-3xl font-bold text-white mb-2">Mapa de vehiculos Moviles</h2>
+                                <p class="text-sm text-gray-300">Localización de on-board devices y patrullas</p>
                             </div>
                             <div class="flex space-x-2">
                                 <button onclick="refreshData()" 
@@ -58,7 +63,7 @@
 
                     <!-- Contenedor del Mapa -->
                     <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                        <h3 class="text-lg font-semibold text-white mb-4">Mapa de Localización - {{ isset($dataDate) ? \Carbon\Carbon::parse($dataDate)->format('d/m/Y') : now()->format('d/m/Y') }}</h3>
+                        
                         <div class="h-96 bg-gray-700 rounded-lg" id="map-container">
                             <div id="map" style="height: 100%; width: 100%;"></div>
                         </div>
@@ -95,7 +100,22 @@
                                                 <div class="text-sm text-blue-400 font-medium">{{ $vehicle->mobile_vehicle_name }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-300">{{ $vehicle->region_index_code }}</div>
+                                                <div class="text-sm text-gray-300">
+                                                    @switch($vehicle->region_index_code)
+                                                        @case('6')
+                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">TECHINT</span>
+                                                            @break
+                                                        @case('11')
+                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">PECOM</span>
+                                                            @break
+                                                        @case('23')
+                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                                            @break
+                                                        @default
+                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                                    @endswitch
+                                                    
+                                                </div>
                                             </td>
                                             
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -159,20 +179,16 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
                 center: initialCenter,
-                styles: [
-                    {
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#242f3e" }]
-                    },
-                    {
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#746855" }]
-                    },
-                    {
-                        "elementType": "labels.text.stroke",
-                        "stylers": [{ "color": "#242f3e" }]
-                    }
-                ]
+                mapTypeId: google.maps.MapTypeId.SATELLITE,
+                mapTypeControl: true, // Permitir cambiar entre tipos de mapa
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                    position: google.maps.ControlPosition.TOP_RIGHT
+                },
+                zoomControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+                
             });
             
             isMapInitialized = true;
