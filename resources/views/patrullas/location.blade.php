@@ -79,9 +79,7 @@
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Región
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Estado
-                                        </th>
+                                        
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Última ubicación
                                         </th>
@@ -99,22 +97,22 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-300">{{ $vehicle->region_index_code }}</div>
                                             </td>
+                                            
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 py-1 text-xs font-medium rounded {{ $vehicle->status == 1 ? 'bg-green-900/30 text-green-300 border border-green-600/50' : 'bg-red-900/30 text-red-300 border border-red-600/50' }}">
-                                                    {{ $vehicle->status == 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
-                                                    @if(isset($locations[$vehicle->mobile_vehicle_index_code]))
-                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['latitude'] ?? 0, 6) }}, 
-                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['longitude'] ?? 0, 6) }}
+                                                <div class="text-sm text-green-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
+                                                    @if(isset($locations[$vehicle->mobile_vehicle_index_code]) && $locations[$vehicle->mobile_vehicle_index_code]['latitude'])
+                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['latitude'], 6) }}, 
+                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['longitude'], 6) }}
                                                         <br>
                                                         <small class="text-gray-400">
-                                                            {{ $locations[$vehicle->mobile_vehicle_index_code]['occurTime'] ?? 'N/A' }}
+                                                            {{ $locations[$vehicle->mobile_vehicle_index_code]['occurTime'] }}
+                                                        </small>
+                                                        <br>
+                                                        <small class="text-blue-400">
+                                                            Velocidad: {{ $locations[$vehicle->mobile_vehicle_index_code]['speed'] }} km/h
                                                         </small>
                                                     @else
-                                                        Sin datos de ubicación
+                                                        <span class="text-red-300">Sin datos de ubicación recientes</span>
                                                     @endif
                                                 </div>
                                             </td>
@@ -190,19 +188,74 @@
         async function loadMapData() {
             try {
                 console.log('Cargando datos del mapa...');
-                const response = await fetch('/api/mobile-vehicles/map-data');
+                const response = await fetch('/api/mobile-vehicles/locations/current');
                 const data = await response.json();
+
+                console.log('Respuesta de locations/current API:', data);
                 
-                if (data.success) {
-                    console.log('Datos recibidos:', data.data.length, 'vehículos');
-                    updateMap(data.data);
-                    updateTable(data.data);
-                    updateLastUpdateTime(data.latest_timestamp);
+                
+                if (data.success && data.locations) {
+                    console.log('Datos recibidos:', Object.keys(data.locations).length, 'vehículos');
+                    const mapData = await convertLocationsToMapData(data.locations);
+                    console.log('Datos convertidos para mapa:', mapData);
+                    updateMap(mapData);
+                    updateTable(mapData);
+                    updateLastUpdateTime(data.latest_timestamp || data.timestamp);
                 } else {
                     console.error('Error loading map data:', data.message);
                 }
             } catch (error) {
                 console.error('Error fetching map data:', error);
+            }
+        }
+
+        async function convertLocationsToMapData(locations) {
+            try {
+                console.log('Convirtiendo formato de datos...');
+                console.log('Estructura de locations recibida:', locations);
+                
+                // Primero obtener información de todos los vehículos
+                const vehiclesResponse = await fetch('/api/mobile-vehicles/');
+                const vehiclesData = await vehiclesResponse.json();
+                
+                // Crear mapa de vehículos por código
+                const vehiclesMap = {};
+                vehiclesData.forEach(vehicle => {
+                    vehiclesMap[vehicle.mobile_vehicle_index_code] = vehicle;
+                });
+                
+                const mapData = [];
+                
+                // Procesar cada ubicación - locations ahora es un objeto plano
+                for (const [vehicleCode, location] of Object.entries(locations)) {
+                    const vehicle = vehiclesMap[vehicleCode];
+                    
+                    // Validar que la ubicación tenga coordenadas
+                    if (location && location.latitude && location.longitude) {
+                        mapData.push({
+                            'vehicle_code': vehicleCode,
+                            'vehicle_name': vehicle ? vehicle.mobile_vehicle_name : 'Desconocido',
+                            'plate_no': location.plateNo || '',
+                            'latitude': parseFloat(location.latitude),
+                            'longitude': parseFloat(location.longitude),
+                            'occur_time': location.occurTime,
+                            'direction': location.direction || 0,
+                            'speed': location.speed || 0,
+                            'status': vehicle ? vehicle.status : 0
+                        });
+                        
+                        console.log('Vehículo procesado:', vehicleCode, location.latitude, location.longitude);
+                    } else {
+                        console.warn('Vehículo sin coordenadas válidas:', vehicleCode, location);
+                    }
+                }
+                
+                console.log('Conversión completada:', mapData.length, 'vehículos válidos');
+                return mapData;
+                
+            } catch (error) {
+                console.error('Error convirtiendo datos:', error);
+                return [];
             }
         }
         
@@ -275,6 +328,7 @@
         
         // Actualizar la tabla con la información de ubicación
         function updateTable(vehiclesData) {
+            console.log('📝 Actualizando tabla con:', vehiclesData.length, 'vehículos');
             vehiclesData.forEach(vehicle => {
                 const locationElement = document.querySelector(`.location-data[data-vehicle-id="${vehicle.vehicle_code}"]`);
                 if (locationElement) {
@@ -283,8 +337,14 @@
                             ${vehicle.latitude.toFixed(6)}, ${vehicle.longitude.toFixed(6)}<br>
                             <small class="text-gray-400">${vehicle.occur_time}</small>
                         `;
+
+                        const statusElement = locationElement.closest('tr').querySelector('.px-2.py-1.text-xs.font-medium.rounded');
+                        if (statusElement && vehicle.status === 1) {
+                            statusElement.className = 'px-2 py-1 text-xs font-medium rounded bg-green-900/30 text-green-300 border border-green-600/50';
+                            statusElement.textContent = 'ACTIVO';
+                        }
                     } else {
-                        locationElement.textContent = 'Sin datos de ubicación';
+                        locationElement.innerHTML = '<span class="text-yellow-400">Sin datos de ubicación</span>';
                     }
                 }
             });
@@ -294,7 +354,9 @@
         function updateLastUpdateTime(timestamp) {
             let timeString;
             if (timestamp) {
-                const date = new Date(timestamp * 1000);
+                const date = typeof timestamp === 'string' ? 
+                    new Date(timestamp) : 
+                    new Date(timestamp * 1000);
                 timeString = date.toLocaleDateString('es-AR') + ' ' + date.toLocaleTimeString('es-AR');
                 
                 // Actualizar el texto en el header

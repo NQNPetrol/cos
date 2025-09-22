@@ -216,7 +216,17 @@ class MobileVehicleController extends Controller
         $result = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
         $locations = $result['locations'];
         $latestTimestamp = $result['latest_timestamp'];
-        $dataDate = $result['data_date'] ?? now()->format('Y-m-d');
+
+        Log::debug('Datos para vista location', [
+            'vehicles_count' => $mobileVehicles->count(),
+            'locations_count' => count($locations),
+            'latest_timestamp' => $latestTimestamp,
+            'locations_keys' => array_keys($locations)
+        ]);
+
+        $dataDate = $latestTimestamp ? 
+            date('Y-m-d', $latestTimestamp) : 
+            now()->format('Y-m-d');
         
         // Formatear la última actualización para la vista
         $lastUpdate = $latestTimestamp ? 
@@ -234,7 +244,7 @@ class MobileVehicleController extends Controller
         try {
             $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
 
-            Log::debug('Vehículos en BD', [
+            Log::debug('Vehículos en BD para locations', [
                 'count' => count($vehicleIndexCodes),
                 'codes' => $vehicleIndexCodes
             ]);
@@ -249,16 +259,20 @@ class MobileVehicleController extends Controller
                 ]);
             }
 
-            $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+            $result = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
+            $locations = $result['locations'];
             
-            Log::debug('Ubicaciones obtenidas', [
+            Log::debug('Ubicaciones obtenidas para API', [
                 'count' => count($locations),
-                'locations' => $locations
+                'vehicles_with_data' => array_keys($locations),
+                'sample_data' => !empty($locations) ? reset($locations) : 'No data'
             ]);
 
+            // CORRECCIÓN: Devolver la estructura plana correcta
             return response()->json([
                 'success' => true,
-                'locations' => $locations,
+                'locations' => $locations, // ← Directamente las locations
+                'latest_timestamp' => $result['latest_timestamp'],
                 'timestamp' => now()->toISOString()
             ]);
             
