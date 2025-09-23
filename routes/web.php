@@ -77,6 +77,9 @@ Route::middleware([
     Route::delete('/usuarios/{user}', [App\Http\Controllers\UserController::class, 'destroy'])
         ->middleware('can:administrar.usuarios')
         ->name('usuarios.destroy');
+
+    //resetar contraseña
+    Route::put('/usuarios/{user}/reset-password', [App\Http\Controllers\UserController::class, 'resetPassword'])->name('usuarios.reset-password');
     
     //CLIENTE-USUARIO
     Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');

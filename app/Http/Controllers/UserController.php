@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use App\Models\Cliente;
@@ -11,7 +13,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $usuarios = User::with('roles')->get();
+        $usuarios = User::with(['roles', 'clientes'])->get();
         return view('usuarios.manage-users', compact('usuarios'));
     }
     public function roles()
@@ -26,7 +28,7 @@ class UserController extends Controller
         $request->validate(['rol' => 'required|exists:roles,name']);
         $user->syncRoles([$request->rol]);
 
-        return redirect()->route('usuarios.index')->with('success', 'Rol asignado correctamente.');
+        return redirect()->route('usuarios.admin-roles')->with('success', 'Rol asignado correctamente.');
     }
 
     public function store(Request $request)
@@ -66,6 +68,23 @@ class UserController extends Controller
             return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('usuarios.index')->with('error', 'Error al actualizar el usuario: ' . $e->getMessage());
+        }
+    }
+
+    public function resetPassword(Request $request, User $user)
+    {
+        $request->validate([
+            'new_password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        try {
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            return redirect()->route('usuarios.index')->with('success', 'Contraseña reseteada exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('usuarios.index')->with('error', 'Error al resetear la contraseña: ' . $e->getMessage());
         }
     }
 
