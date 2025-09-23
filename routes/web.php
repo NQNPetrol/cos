@@ -58,42 +58,63 @@ Route::middleware([
         ->middleware('can:administrar.usuarios')
         ->name('usuarios.index');
 
+    Route::get('/usuarios/administrar/roles', [App\Http\Controllers\UserController::class, 'roles'])
+        ->middleware('can:administrar.usuarios')
+        ->name('usuarios.admin-roles');
+
     Route::post('/usuarios/{user}/roles', [App\Http\Controllers\UserController::class, 'asignarRol'])
         ->middleware('can:administrar.roles')
         ->name('usuarios.roles');
+    // Crear, editar y eliminar usuarios
+    Route::post('/usuarios', [App\Http\Controllers\UserController::class, 'store'])
+        ->middleware('can:administrar.usuarios')
+        ->name('usuarios.store');
+
+    Route::put('/usuarios/{user}', [App\Http\Controllers\UserController::class, 'update'])
+        ->middleware('can:administrar.usuarios')
+        ->name('usuarios.update');
+
+    Route::delete('/usuarios/{user}', [App\Http\Controllers\UserController::class, 'destroy'])
+        ->middleware('can:administrar.usuarios')
+        ->name('usuarios.destroy');
+
+    //resetar contraseña
+    Route::put('/usuarios/{user}/reset-password', [App\Http\Controllers\UserController::class, 'resetPassword'])->name('usuarios.reset-password');
     
-        //CLIENTE-USUARIO
-        Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
-        Route::post('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'store'])->middleware('can:asignar.clientes')->name('user-cliente.store');
-        Route::delete('usuarios/remover-cliente', [App\Http\Controllers\UserClienteController::class, 'destroy'])->middleware('can:asignar.clientes')->name('user-cliente.destroy');
-        Route::get('/usuarios/{user}/clientes', [App\Http\Controllers\UserClienteController::class, 'getClientesPorUsuario'])->middleware('can:asignar.clientes')->name('user-cliente.clientes-por-usuario');
-        Route::get('/clientes/{cliente}/usuarios', [App\Http\Controllers\UserClienteController::class, 'getUsuariosPorCliente'])->middleware('can:asignar.clientes')->name('user-cliente.usuarios-por-cliente');
-        Route::post('/admin/user-clientes/remove-all', [UserClienteController::class, 'removeAllClientesFromUser'])
+    //CLIENTE-USUARIO
+    Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
+        
+    Route::post('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'store'])->middleware('can:asignar.clientes')->name('user-cliente.store');
+        
+    Route::delete('usuarios/remover-cliente', [App\Http\Controllers\UserClienteController::class, 'destroy'])->middleware('can:asignar.clientes')->name('user-cliente.destroy');
+        
+    Route::get('/usuarios/{user}/clientes', [App\Http\Controllers\UserClienteController::class, 'getClientesPorUsuario'])->middleware('can:asignar.clientes')->name('user-cliente.clientes-por-usuario');
+        
+    Route::get('/clientes/{cliente}/usuarios', [App\Http\Controllers\UserClienteController::class, 'getUsuariosPorCliente'])->middleware('can:asignar.clientes')->name('user-cliente.usuarios-por-cliente');
+        
+    Route::post('/admin/user-clientes/remove-all', [UserClienteController::class, 'removeAllClientesFromUser'])
         ->name('user-cliente.removeAll')
         ->middleware(['auth', 'role:admin']);
     
-        //ROLES
+    //ROLES
     Route::get('/roles', function () {
         return view('admin.roles');
     })->middleware('can:administrar.roles')->name('crear.roles');
 
     //CONTRATOS
-    // INDEX
     Route::get('/contratos', [App\Http\Controllers\ContratoController::class, 'index'])
         ->middleware('can:ver.contratos')
         ->name('contratos.index');
 
-    // CREATE
     Route::get('/contratos/create', [App\Http\Controllers\ContratoController::class, 'create'])
         ->middleware('can:crear.contratos')
         ->name('contratos.create');
 
-    // STORE
+ 
     Route::post('/contratos', [App\Http\Controllers\ContratoController::class, 'store'])
         ->middleware('can:crear.contratos')
         ->name('contratos.store');
 
-    // EDIT
     Route::get('/contratos/{contrato}/edit', [App\Http\Controllers\ContratoController::class, 'edit'])
         ->middleware('can:editar.contratos')
         ->name('contratos.edit');
@@ -101,12 +122,11 @@ Route::middleware([
     Route::get('/contratos/{contrato}/edit-livewire', \App\Livewire\Contratos\Edit::class)
         ->name('contratos.edit-livewire');
 
-    // UPDATE
     Route::put('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'update'])
         ->middleware('can:editar.contratos')
         ->name('contratos.update');
 
-    // DELETE
+  
     Route::delete('/contratos/{contrato}', [App\Http\Controllers\ContratoController::class, 'destroy'])
         ->middleware('can:eliminar.contratos')
         ->name('contratos.destroy');

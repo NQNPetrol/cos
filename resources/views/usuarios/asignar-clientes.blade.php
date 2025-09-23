@@ -1,8 +1,15 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
+                    <a href="{{ route('usuarios.index') }}" 
+                        class="flex items-center text-blue-400 hover:text-blue-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Volver a Usuarios
+                        </a>
 
                     <!-- Título más pequeño y sin icono -->
                     <div class="mb">
