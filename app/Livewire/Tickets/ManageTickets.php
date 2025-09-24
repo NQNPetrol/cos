@@ -137,6 +137,9 @@ class ManageTickets extends Component
         $this->resetForm();
         $this->showModal = true;
         $this->editMode = false;
+
+        //disparar evento js para actualizar campos
+        $this->dispatch('modal-opened');
     }
 
     public function closeModal()
@@ -156,27 +159,38 @@ class ManageTickets extends Component
     {
         $this->validate();
 
+        logger([
+            'emitido_por' => $this->emitido_por,
+            'cliente_id' => $this->cliente_id,
+            'asignado_a' => $this->asignado_a,
+            'user_id' => auth()->id()
+        ]);
+
         $user = auth()->user();
         $cosCliente = Cliente::where('nombre', 'COS')->first();
 
-        // Restricciones solo aplican para tickets internos (COS)
-        if ($this->emitido_por === 'COS') {
-            // Verificar si el usuario tiene permisos para crear tickets internos
-            if (!$cosCliente || !UserCliente::where('user_id', $user->id)->where('cliente_id', $cosCliente->id)->exists()) {
-                session()->flash('error', 'No tienes permisos para crear tickets internos.');
+         // Si es ticket de CLIENTE, verificar permisos
+        if ($this->emitido_por === 'CLIENTE' && $this->cliente_id) {
+            $userHasCliente = UserCliente::where('user_id', $user->id)
+                ->where('cliente_id', $this->cliente_id)
+                ->exists();
+            
+            if (!$userHasCliente) {
+                session()->flash('error', 'No tienes permisos para crear tickets para este cliente.');
                 return;
             }
-        } else {
-            // Para tickets de CLIENTE, verificar que el usuario pertenezca al cliente seleccionado
-            if ($this->cliente_id) {
-                $userHasCliente = UserCliente::where('user_id', $user->id)
-                    ->where('cliente_id', $this->cliente_id)
-                    ->exists();
-                
-                if (!$userHasCliente) {
-                    session()->flash('error', 'No tienes permisos para crear tickets para este cliente.');
-                    return;
-                }
+        }
+
+        // Restricciones solo aplican para tickets internos (COS)
+        if ($this->emitido_por === 'COS') {
+            $cosCliente = Cliente::where('nombre', 'COS')->first();
+            $userHasCOS = $cosCliente && UserCliente::where('user_id', $user->id)
+                ->where('cliente_id', $cosCliente->id)
+                ->exists();
+            
+            if (!$userHasCOS && !$user->hasRole('admin') && !$user->hasRole('operador')) {
+                session()->flash('error', 'No tienes permisos para crear tickets internos.');
+                return;
             }
         }
 
