@@ -8,6 +8,8 @@ use App\Models\Ticket;
 use App\Models\Cliente;
 use App\Models\User;
 use App\Models\UserCliente;
+use App\Models\Notification;
+use Illuminate\Support\Str;
 
 class ManageTickets extends Component
 {
@@ -197,7 +199,7 @@ class ManageTickets extends Component
         $cliente_id = ($this->emitido_por === 'COS') ? null : $this->cliente_id;
         $asignado_a = ($this->emitido_por === 'CLIENTE') ? null : $this->asignado_a;
 
-        Ticket::create([
+        $ticket = Ticket::create([
             'titulo' => $this->titulo,
             'descripcion' => $this->descripcion,
             'categoria' => $this->categoria,
@@ -209,9 +211,114 @@ class ManageTickets extends Component
             'fecha_cierre' => null,
         ]);
 
+        //Crear notificacion si el ticket esta asignado a un usuario especifico
+        if ($this->emitido_por === 'COS' && $asignado_a) {
+            // Notificación para usuario asignado (ticket interno)
+            $this->createAssignmentNotification($ticket, $asignado_a);
+        } elseif ($this->emitido_por === 'CLIENTE') {
+            // Notificación para todos los usuarios del COS (ticket de cliente)
+            $this->createClientTicketNotification($ticket, $user);
+        }
+
         $this->closeModal();
         session()->flash('message', 'Ticket creado exitosamente.');
     }
+
+    private function createAssignmentNotification(Ticket $ticket, $assignedUserId)
+    {
+        try {
+            $assignedUser = User::find($assignedUserId);
+            $creatorUser = auth()->user();
+
+            if (!$assignedUser) {
+                logger('Usuario asignado no encontrado: ' . $assignedUserId);
+                return;
+            }
+
+            // Determinar la prioridad de la notificación basada en la prioridad del ticket
+            $notificationPriority = $this->mapPrioridades($ticket->prioridad);
+
+            // Crear la notificación
+            $notification = Notification::create([
+                'title' => 'Nuevo Ticket Asignado',
+                'message' => "Se te ha asignado un nuevo ticket: '{$ticket->titulo}'. Prioridad: " . ucfirst($ticket->prioridad),
+                'type' => 'user', // Notificación específica para el usuario
+                'user_id' => $assignedUser->id, // Usuario al que se le asignó el ticket
+                'client_id' => null, // No es específica de cliente
+                'priority' => $notificationPriority,
+                'is_active' => true,
+            ]);
+
+            logger('Notificación creada exitosamente para el usuario: ' . $assignedUser->name);
+
+        } catch (\Exception $e) {
+            logger('Error al crear notificación de asignación: ' . $e->getMessage());
+        }
+    }
+
+    private function createClientTicketNotification(Ticket $ticket, User $creatorUser)
+    {
+        try {
+            // Obtener el cliente asociado al ticket
+            $cliente = $ticket->cliente;
+            
+            if (!$cliente) {
+                logger('Cliente no encontrado para el ticket: ' . $ticket->id);
+                return;
+            }
+
+            // Obtener el cliente COS
+            $cosCliente = Cliente::where('nombre', 'COS')->first();
+            
+            if (!$cosCliente) {
+                logger('Cliente COS no encontrado en la base de datos');
+                return;
+            }
+
+            // Determinar la prioridad de la notificación
+            $notificationPriority = $this->mapPrioridades($ticket->prioridad);
+
+            // Crear el mensaje con la información solicitada
+            $message = "► TICKET: {$ticket->titulo}\n";
+            $message .= "► USUARIO: {$creatorUser->name}\n";
+            $message .= "► EMAIL: {$creatorUser->email}\n";
+            $message .= "► CLIENTE: {$cliente->nombre}\n";
+            $message .= "► PRIORIDAD: " . ucfirst($ticket->prioridad) . "\n";
+            $message .= "► CATEGORÍA: {$ticket->categoria}\n";
+            $message .= "Contactar al usuario para seguimiento.";
+
+            logger('Creando notificación GLOBAL para usuarios del COS');
+
+            // CORRECCIÓN: Crear una sola notificación GLOBAL para el cliente COS
+            $notification = Notification::create([
+                'title' => 'Nuevo Ticket de Cliente',
+                'message' => $message,
+                'type' => 'client',           // Notificación de tipo CLIENTE
+                'user_id' => null,            // No es para usuario específico
+                'client_id' => $cosCliente->id, // Para el cliente COS (se busca dinámicamente)
+                'priority' => $notificationPriority,
+                'is_active' => true,
+            ]);
+
+            logger('Notificación global de ticket de cliente creada para el COS (ID: ' . $cosCliente->id . ')');
+
+        } catch (\Exception $e) {
+            logger('Error al crear notificación de ticket de cliente: ' . $e->getMessage());
+        }
+    }
+
+    private function mapPrioridades($ticketPriority)
+    {
+        $priorityMap = [
+            'baja' => 'BAJA',
+            'media' => 'NORMAL', 
+            'alta' => 'ALTA',
+            'urgente' => 'ALTA'
+        ];
+
+        return $priorityMap[$ticketPriority] ?? 'NORMAL';
+    }
+
 
     public function edit($id)
     {
@@ -265,6 +372,8 @@ class ManageTickets extends Component
 
         $this->validate();
 
+        $previousAssignedTo = $ticket->asignado_a;
+
         $updateData = [
             'titulo' => $this->titulo,
             'descripcion' => $this->descripcion,
@@ -283,17 +392,46 @@ class ManageTickets extends Component
             }
         }
 
-        //si estado se cambia  a cerrado se completa fecha de cierre
-        if ($this->estado === 'cerrado' && $ticket->estado !== 'cerrado') {
-            $updateData['fecha_cierre'] = now();
-        } elseif ($this->estado !== 'cerrado') {
-            $updateData['fecha_cierre'] = null;
-        }
-
         $ticket->update($updateData);
+
+        // Crear notificación si se cambió la asignación
+        if ($previousAssignedTo != $this->asignado_a) {
+            // Si se removió la asignación
+            if ($previousAssignedTo && !$this->asignado_a) {
+                $this->notifAsignada($ticket, $previousAssignedTo);
+            }
+            // Si se asignó a un nuevo usuario
+            elseif ($this->asignado_a) {
+                $this->notifAsignada($ticket, $this->asignado_a);
+            }
+        }
 
         $this->closeModal();
         session()->flash('message', 'Ticket actualizado exitosamente.');
+    }
+
+    //funcion por si se cambia el usuario asignado al ticket
+    private function notifAsignada(Ticket $ticket, $previousAssignedUserId)
+    {
+        try {
+            $previousUser = User::find($previousAssignedUserId);
+        
+        if (!$previousUser) return;
+
+        $notification = Notification::create([
+            'title' => 'Ticket Desasignado',
+            'message' => "Se te ha removido la asignación del ticket: '{$ticket->titulo}'",
+            'type' => 'user',
+            'user_id' => $previousUser->id,
+            'client_id' => null,
+            'priority' => 'NORMAL',
+            'is_active' => true,
+        ]);
+
+        logger('Notificación de desasignación creada para: ' . $previousUser->name);
+        } catch (\Exception $e) {
+            logger('Error al crear notificación de desasignación: ' . $e->getMessage());
+        }
     }
 
     public function delete($id)
@@ -326,6 +464,8 @@ class ManageTickets extends Component
             return;
         }
 
+        $viejoEstado = $ticket->estado;
+
         if ($estado === 'cerrado') {
             $ticket->update([
                 'estado' => $estado,
@@ -338,8 +478,37 @@ class ManageTickets extends Component
             ]);
         }
 
+        // Notificar al usuario asignado sobre el cambio de estado
+        if ($ticket->asignado_a && $viejoEstado !== $estado) {
+            $this->notifCambioEstado($ticket, $viejoEstado, $estado);
+        }
+
         session()->flash('message', 'Estado del ticket actualizado.');
     }
+
+    private function notifCambioEstado(Ticket $ticket, $viejoEstado, $nuevoEstado)
+{
+    try {
+        $estados = $this->getEstados();
+        $viejoEstadoLabel = $estados[$viejoEstado] ?? $viejoEstado;
+        $nuevoEstadoLabel = $estados[$nuevoEstado] ?? $nuevoEstado;
+
+        $notification = Notification::create([
+            'title' => 'Estado del Ticket Actualizado',
+            'message' => "El ticket '{$ticket->titulo}' cambió de estado: {$viejoEstadoLabel} → {$nuevoEstadoLabel}",
+            'type' => 'user',
+            'user_id' => $ticket->asignado_a,
+            'client_id' => null,
+            'priority' => 'NORMAL',
+            'is_active' => true,
+        ]);
+
+        logger('Notificación de cambio de estado creada para el ticket: ' . $ticket->id);
+
+    } catch (\Exception $e) {
+        logger('Error al crear notificación de cambio de estado: ' . $e->getMessage());
+    }
+}
 
     private function canEditTicket($user, $ticket)
     {
