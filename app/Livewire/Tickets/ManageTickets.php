@@ -478,37 +478,129 @@ class ManageTickets extends Component
             ]);
         }
 
-        // Notificar al usuario asignado sobre el cambio de estado
-        if ($ticket->asignado_a && $viejoEstado !== $estado) {
-            $this->notifCambioEstado($ticket, $viejoEstado, $estado);
+
+        // Notificaciones multiples usuarios
+        if ($viejoEstado !== $estado){
+            $this->cambioEstadoNotif($ticket, $viejoEstado, $estado, $user);
         }
 
         session()->flash('message', 'Estado del ticket actualizado.');
     }
 
-    private function notifCambioEstado(Ticket $ticket, $viejoEstado, $nuevoEstado)
-{
-    try {
-        $estados = $this->getEstados();
-        $viejoEstadoLabel = $estados[$viejoEstado] ?? $viejoEstado;
-        $nuevoEstadoLabel = $estados[$nuevoEstado] ?? $nuevoEstado;
+    private function cambioEstadoNotif(Ticket $ticket, $viejoEstado, $nuevoEstado, User $userWhoChanged)
+    {
+        try {
+            $estados = $this->getEstados();
+            $viejoEstadoLabel = $estados[$viejoEstado] ?? $viejoEstado;
+            $nuevoEstadoLabel = $estados[$nuevoEstado] ?? $nuevoEstado;
 
-        $notification = Notification::create([
-            'title' => 'Estado del Ticket Actualizado',
-            'message' => "El ticket '{$ticket->titulo}' cambió de estado: {$viejoEstadoLabel} → {$nuevoEstadoLabel}",
-            'type' => 'user',
-            'user_id' => $ticket->asignado_a,
-            'client_id' => null,
-            'priority' => 'NORMAL',
-            'is_active' => true,
-        ]);
+            $message = "El ticket '{$ticket->titulo}' cambió de estado: {$viejoEstadoLabel} → {$nuevoEstadoLabel}";
+            $message .= "\nModificado por: {$userWhoChanged->name}";
 
-        logger('Notificación de cambio de estado creada para el ticket: ' . $ticket->id);
+            // 1. Notificar al USUARIO ASIGNADO (si existe)
+            if ($ticket->asignado_a) {
+                $this->estadoCambiado(
+                    $ticket, 
+                    $viejoEstado, 
+                    $nuevoEstado, 
+                    $ticket->asignado_a,
+                    'Estado del Ticket Actualizado',
+                    $message
+                );
+            }
 
-    } catch (\Exception $e) {
-        logger('Error al crear notificación de cambio de estado: ' . $e->getMessage());
+            // 2. Notificar al CREADOR DEL TICKET (si es diferente al usuario asignado y al que cambió el estado)
+            if ($ticket->user_id && 
+                $ticket->user_id !== $ticket->asignado_a && 
+                $ticket->user_id !== $userWhoChanged->id) {
+                
+                $this->estadoCambiado(
+                    $ticket, 
+                    $viejoEstado, 
+                    $nuevoEstado, 
+                    $ticket->user_id,
+                    'Estado de tu Ticket Actualizado',
+                    $message . "\n\nTu ticket ha sido actualizado por nuestro equipo."
+                );
+            }
+
+            // 3. Si es un ticket de CLIENTE, notificar a todos los usuarios del COS
+            if ($ticket->cliente_id) {
+                $this->estadoClienteCambiado($ticket, $viejoEstado, $nuevoEstado, $userWhoChanged);
+            }
+
+            logger('Notificaciones de cambio de estado enviadas para el ticket: ' . $ticket->id);
+
+        } catch (\Exception $e) {
+            logger('Error al enviar notificaciones de cambio de estado: ' . $e->getMessage());
+        }
     }
-}
+
+    private function estadoCambiado(Ticket $ticket, $viejoEstado, $nuevoEstado, $userId, $title, $message)
+    {
+        try {
+            $user = User::find($userId);
+            if (!$user) return;
+
+            $notification = Notification::create([
+                'title' => $title,
+                'message' => $message,
+                'type' => 'user',
+                'user_id' => $userId,
+                'client_id' => null,
+                'priority' => 'NORMAL',
+                'is_active' => true,
+            ]);
+
+            logger("Notificación de cambio de estado enviada a: {$user->name} (ID: {$user->id})");
+
+        } catch (\Exception $e) {
+            logger("Error al crear notificación para usuario {$userId}: " . $e->getMessage());
+        }
+    }
+
+    private function estadoClienteCambiado(Ticket $ticket, $viejoEstado, $nuevoEstado, User $userWhoChanged)
+    {
+        try {
+            $cliente = $ticket->cliente;
+            $cosCliente = Cliente::where('nombre', 'COS')->first();
+            
+            if (!$cliente || !$cosCliente) {
+                logger('Cliente no encontrado para la notificación de cambio de estado');
+                return;
+            }
+
+            $estados = $this->getEstados();
+            $viejoEstadoLabel = $estados[$viejoEstado] ?? $viejoEstado;
+            $nuevoEstadoLabel = $estados[$nuevoEstado] ?? $nuevoEstado;
+
+            $message = "📊 **CAMBIO DE ESTADO - TICKET DE CLIENTE**\n\n";
+            $message .= "► TICKET: {$ticket->titulo}\n";
+            $message .= "► CLIENTE: {$cliente->nombre}\n";
+            $message .= "► ESTADO ANTERIOR: {$viejoEstadoLabel}\n";
+            $message .= "► NUEVO ESTADO: {$nuevoEstadoLabel}\n";
+            $message .= "► MODIFICADO POR: {$userWhoChanged->name}\n";
+            $message .= "► FECHA: " . now()->format('d/m/Y H:i') . "\n\n";
+            $message .= "El ticket ha sido actualizado por el equipo del COS.";
+
+            // Crear notificación global para el COS
+            $notification = Notification::create([
+                'title' => '🔄 Estado de Ticket de Cliente Actualizado',
+                'message' => $message,
+                'type' => 'client',
+                'user_id' => null,
+                'client_id' => $cosCliente->id,
+                'priority' => 'NORMAL',
+                'is_active' => true,
+            ]);
+
+            logger('Notificación global de cambio de estado creada para el COS');
+
+        } catch (\Exception $e) {
+            logger('Error al crear notificación de cambio de estado para cliente: ' . $e->getMessage());
+        }
+    }
+
 
     private function canEditTicket($user, $ticket)
     {
