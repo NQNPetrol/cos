@@ -9,6 +9,8 @@ use App\Models\Cliente;
 use App\Models\User;
 use App\Models\UserCliente;
 use App\Models\Notification;
+use App\Mail\TicketCreatedNotification;
+use Illuminate\Support\Facades\Mail; 
 use Illuminate\Support\Str;
 
 class ManageTickets extends Component
@@ -161,15 +163,20 @@ class ManageTickets extends Component
     {
         $this->validate();
 
-        logger([
+        logger('Store method called', [
             'emitido_por' => $this->emitido_por,
             'cliente_id' => $this->cliente_id,
-            'asignado_a' => $this->asignado_a,
             'user_id' => auth()->id()
         ]);
 
         $user = auth()->user();
         $cosCliente = Cliente::where('nombre', 'COS')->first();
+
+        logger('User info', [
+            'user_id' => $user->id,
+            'user_roles' => $user->getRoleNames()->toArray(),
+            'emitido_por' => $this->emitido_por
+        ]);
 
          // Si es ticket de CLIENTE, verificar permisos
         if ($this->emitido_por === 'CLIENTE' && $this->cliente_id) {
@@ -218,10 +225,44 @@ class ManageTickets extends Component
         } elseif ($this->emitido_por === 'CLIENTE') {
             // Notificación para todos los usuarios del COS (ticket de cliente)
             $this->createClientTicketNotification($ticket, $user);
+            $this->sendTicketCreatedEmail($ticket, $user);
+        }
+
+        if ($this->emitido_por === 'CLIENTE') {
+            logger('Creando ticket de CLIENTE - debería enviar email');
+            
+        } else {
+            logger('Creando ticket de COS - NO debería enviar email');
         }
 
         $this->closeModal();
-        session()->flash('message', 'Ticket creado exitosamente.');
+        
+        if ($this->emitido_por === 'CLIENTE') {
+            logger('Mostrando mensaje con email');
+            session()->flash('message', 'Ticket creado exitosamente. Se ha enviado un email de confirmación a tu correo.');
+        } else {
+            logger('Mostrando mensaje sin email');
+            session()->flash('message', 'Ticket creado exitosamente.');
+        }
+    }
+
+    private function sendTicketCreatedEmail(Ticket $ticket, User $user)
+    {
+        try {
+            logger('Intentando enviar email', [
+                'to' => $user->email,
+                'ticket_id' => $ticket->id,
+                'user_name' => $user->name
+            ]);
+            Mail::to($user->email)
+                ->send(new TicketCreatedNotification($ticket, $user->name));
+            
+            logger('Email de confirmación enviado a: ' . $user->email);
+            
+        } catch (\Exception $e) {
+            logger('Error al enviar email de confirmación: ' . $e->getMessage());
+            // No mostrar error al usuario para no interrumpir el flujo
+        }
     }
 
     private function createAssignmentNotification(Ticket $ticket, $assignedUserId)
