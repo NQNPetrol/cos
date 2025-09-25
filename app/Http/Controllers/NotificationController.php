@@ -185,14 +185,12 @@ class NotificationController extends Controller
                 'priority' => 'required|in:BAJA,NORMAL,ALTA',
             ]);
 
+            $validated['is_active'] = $request->has('is_active') ? true : false;
+
             $notification = Notification::create($validated);
 
             return redirect()->route('notifications.admin')
                 ->with('success', 'Notificación creada exitosamente');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->errors())
-                ->withInput();
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error al crear la notificación: ' . $e->getMessage())
@@ -217,19 +215,14 @@ class NotificationController extends Controller
                 'user_id' => 'nullable|exists:users,id',
                 'client_id' => 'nullable|exists:clientes,id',
                 'priority' => 'required|in:BAJA,NORMAL,ALTA',
-                'is_active' => 'required|boolean'
             ]);
+            $validated['is_active'] = $request->has('is_active') ? true : false;
 
             $notification->update($validated);
 
 
             return redirect()->route('notifications.admin')
                 ->with('success', 'Notificación actualizada exitosamente');
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->errors())
-                ->withInput();
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -245,14 +238,16 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function toggle(Request $request, Notification $notification)
+    public function toggle(Request $request, $id)
     {
         try {
+            $notification = Notification::findOrFail($id);
+            
             $request->validate([
-                'activate' => 'required|boolean'
+                'activate' => 'required|in:0,1'
             ]);
 
-            $notification->update(['is_active' => $request->activate]);
+            $notification->update(['is_active' => (bool)$request->activate]);
 
             $message = $request->activate 
                 ? 'Notificación activada exitosamente' 

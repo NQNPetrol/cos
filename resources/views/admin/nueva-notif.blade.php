@@ -92,11 +92,15 @@
                             </select>
                         </div>
 
-                        <!-- Estado -->
+                        <!-- Checkbox activa -->
                         <div>
                             <label class="flex items-center">
-                                <input type="checkbox" name="is_active" value="1" checked
-                                       class="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500">
+                                <!-- Campo hidden que siempre se envía -->
+                                <input type="hidden" name="is_active" value="0">
+                                <!-- Checkbox que sobrescribe el valor cuando está marcado -->
+                                <input type="checkbox" name="is_active" value="1" 
+                                    {{ old('is_active', true) ? 'checked' : '' }}
+                                    class="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-300">Notificación activa</span>
                             </label>
                         </div>

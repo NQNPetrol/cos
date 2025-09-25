@@ -278,7 +278,7 @@ Route::middleware([
         ->middleware('can:crear.notificaciones')
         ->name('notifications.store');
 
-    Route::post('/admin/notificaciones/{notification}/toggle', [App\Http\Controllers\NotificationController::class, 'toggle'])->name('notifications.toggle');
+    Route::post('/notificaciones/{notification}/toggle', [NotificationController::class, 'toggle'])->name('notifications.toggle');
     
     Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
     
@@ -331,6 +331,54 @@ Route::middleware([
             'environment' => app()->environment()
         ];
     });
+
+    // EMAILS
+    Route::get('/preview-email', function () {
+        $ticket = App\Models\Ticket::first();
+        $user = App\Models\User::first();
+        
+        return new App\Mail\TicketCreatedNotification($ticket, $user->name);
+    });
+
+    Route::get('env', function () {
+        return [
+            'MAIL_MAILER' => env('MAIL_MAILER'),
+            'MAIL_HOST' => env('MAIL_HOST'),
+            'MAIL_PORT' => env('MAIL_PORT'),
+            'MAIL_USERNAME' => env('MAIL_USERNAME'),
+            'MAIL_PASSWORD' => env('MAIL_PASSWORD'),
+            'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS'),
+            'environment' => app()->environment()
+        ];
+    });
+
+    Route::get('/test-email/{ticketId}', function ($ticketId) {
+        $ticket = App\Models\Ticket::find($ticketId);
+        $user = App\Models\User::first();
+        
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket no encontrado'], 404);
+        }
+        
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)
+                ->send(new App\Mail\TicketCreatedNotification($ticket, $user->name));
+                
+            return response()->json([
+                'success' => true,
+                'message' => 'Email enviado exitosamente',
+                'to' => $user->email,
+                'ticket_id' => $ticket->id
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    });
+
 
 });
 

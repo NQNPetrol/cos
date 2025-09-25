@@ -97,6 +97,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Cliente::class, 'users_has_cliente_id', 'user_id', 'cliente_id');
     }
 
+    public function userClientes()
+    {
+        return $this->hasMany(UserCliente::class);
+    }
+
      /**
      * Verifica si el usuario es del COS (staff interno)
      */
