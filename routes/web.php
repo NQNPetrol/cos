@@ -185,40 +185,40 @@ Route::middleware([
         ->name('eventos.destroy');
 
     //EVENTOS PARA GUEST LAYOUT
-    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoGuestController::class, 'create'])
+    Route::get('/eventos/nuevo/cliente', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos')
-        ->name('eventos.create-guest');
+        ->name('eventos.create-client');
 
-    Route::get('/eventos', [\App\Http\Controllers\EventoGuestController::class, 'index'])
+    Route::get('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'index'])
         ->middleware('can:ver.eventos')
-        ->name('eventos.index-guest');
+        ->name('eventos.index-client');
 
-    Route::post('/eventos', [\App\Http\Controllers\EventoGuestController::class, 'store'])
+    Route::post('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'store'])
         ->middleware('can:crear.eventos')
-        ->name('eventos.store-guest');
+        ->name('eventos.store-client');
 
-    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoGuestController::class, 'edit'])
+    Route::get('/eventos/{evento}/edit/cliente', [\App\Http\Controllers\EventoClientController::class, 'edit'])
         ->middleware('can:editar.eventos')
-        ->name('eventos.edit-guest');
+        ->name('eventos.edit-client');
 
-    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoGuestController::class, 'update'])
+    Route::put('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'update'])
         ->middleware('can:editar.eventos')
-        ->name('eventos.update-guest');
+        ->name('eventos.update-client');
 
-    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoGuestController::class, 'destroy'])
+    Route::delete('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
-        ->name('eventos.destroy-guest');
+        ->name('eventos.destroy-client');
     
     //SEGUIMIENTOS PARA GUEST LAYOUT
-    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'index'])
+    Route::get('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class,'index'])
         ->middleware('can:ver.seguimientos')
-        ->name('seguimientos.index-guest');
+        ->name('seguimientos.index-client');
 
-    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'create'])
+    Route::get('/seguimientos/nuevo/cliente', [\App\Http\Controllers\SeguimientoController::class,'create'])
         ->middleware('can:crear.seguimientos')
-        ->name('seguimientos.create-guest');
+        ->name('seguimientos.create-client');
 
-    Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->middleware('can:crear.seguimientos')->name('seguimientos.store-guest');
+    Route::post('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class, 'store'])->middleware('can:crear.seguimientos')->name('seguimientos.store-client');
 
     
     //REPORTES
