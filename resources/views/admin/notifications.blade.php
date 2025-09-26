@@ -333,7 +333,7 @@
                             Cancelar
                         </button>
                         <button type="submit" 
-                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
+                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg transition-colors">
                             Guardar Cambios
                         </button>
                     </div>
