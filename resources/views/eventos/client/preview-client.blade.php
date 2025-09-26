@@ -1,4 +1,5 @@
-<x-client-layout>
+@extends('layouts.cliente')
+@section('content')
     <div class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
         <div class="bg-slate-800 border-b border-slate-700 sticky top-0 z-10">
             <div class="container mx-auto px-6 py-4">
@@ -218,4 +219,4 @@
             scrollbar-color: #475569 #334155;
         }
     </style>
-</x-client-layout>
+@endsection

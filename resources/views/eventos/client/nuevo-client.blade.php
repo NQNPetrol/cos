@@ -1,4 +1,5 @@
-<x-client-layout>
+@extends('layouts.cliente')
+@section('content')
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
@@ -665,4 +666,4 @@
     });
 </script>
 @endpush
-</x-client-layout>
+@endsection
