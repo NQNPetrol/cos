@@ -183,6 +183,43 @@ Route::middleware([
     Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
+
+    //EVENTOS PARA GUEST LAYOUT
+    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoGuestController::class, 'create'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.create-guest');
+
+    Route::get('/eventos', [\App\Http\Controllers\EventoGuestController::class, 'index'])
+        ->middleware('can:ver.eventos')
+        ->name('eventos.index-guest');
+
+    Route::post('/eventos', [\App\Http\Controllers\EventoGuestController::class, 'store'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.store-guest');
+
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoGuestController::class, 'edit'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.edit-guest');
+
+    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoGuestController::class, 'update'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.update-guest');
+
+    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoGuestController::class, 'destroy'])
+        ->middleware('can:eliminar.eventos')
+        ->name('eventos.destroy-guest');
+    
+    //SEGUIMIENTOS PARA GUEST LAYOUT
+    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'index'])
+        ->middleware('can:ver.seguimientos')
+        ->name('seguimientos.index-guest');
+
+    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'create'])
+        ->middleware('can:crear.seguimientos')
+        ->name('seguimientos.create-guest');
+
+    Route::post('/seguimientos', [\App\Http\Controllers\SeguimientoController::class, 'store'])->middleware('can:crear.seguimientos')->name('seguimientos.store-guest');
+
     
     //REPORTES
     Route::middleware(['auth'])->group(function () {
