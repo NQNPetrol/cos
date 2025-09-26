@@ -150,20 +150,18 @@
                     <!-- Texto del sistema -->
                     <div class="flex items-center space-x-4">
                         <div class="hidden sm:block">
-                            <h1 class="text-xl font-bold text-white">Centro de Operaciones</h1>
-                            <p class="text-sm text-white/70">de Seguridad</p>
+                            <h1 class="text-xl font-bold text-white">CENTRO DE OPERACIONES</h1>
+                            <p class="text-sm text-white/70">DE SEGURIDAD</p>
                         </div>
                     </div>
 
                     <!-- Enlaces de navegación -->
-                    <div class="hidden space-x-8 sm:flex lg:ml-10">
-                        <x-nav-link class="text-white active:bg-slate-100 flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-white/10 transition-all duration-300 font-medium" href="/dashboard" :active="request()->routeIs('dashboard')">
-                            <i class="bi bi-house text-lg"></i>
-                            <span>Inicio</span>
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex  lg:px-36">
+                        <x-nav-link class="text-white active:bg-slate-100" href="/dashboard" :active="request()->routeIs('dashboard')">
+                            Inicio
                         </x-nav-link>
-                        <x-nav-link class="text-white flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-white/10 transition-all duration-300 font-medium" href="#" :active="request()->routeIs('dashboard')">
-                            <i class="bi bi-graph-up text-lg"></i>
-                            <span>Dashboard</span>
+                        <x-nav-link class="text-white" href="#" :active="request()->routeIs('dashboard')">
+                            Dashboard
                         </x-nav-link>
                     </div>
                 </div>
@@ -400,13 +398,13 @@
         <aside id="sidebar" class="sidebar w-72 h-full shadow-2xl fixed hidden md:block z-40 animate-slideIn">
             <div class="p-6">
                 <!-- Logo solamente (sin texto) -->
-                <div class="mb-8 text-center">
+                <div class="mb-4 text-center">
                     <div class="flex items-center justify-center">
                         <img src="{{ asset('cyh.png') }}" 
-                             alt="Logo Centro de Operaciones de Seguridad" 
-                             class="h-20 w-auto mb-4 transition-transform duration-300 hover:scale-105"
-                             onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
-                        
+                            alt="Logo Centro de Operaciones de Seguridad" 
+                            class="h-28 w-auto mb-4 transition-transform duration-300 hover:scale-105"
+                            onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
+                                                
                         <div id="fallbackLogo" class="h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 hidden">
                             <svg class="h-10 w-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -476,17 +474,7 @@
                         </div>
                     </div>
 
-                    <!-- Objetivos - Sin submenu, va directo -->
-                    <div>
-                        <a href="{{ route('objetivos.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                    <i class="bi bi-bullseye text-white text-sm"></i>
-                                </div>
-                                <span>Objetivos</span>
-                            </div>
-                        </a>
-                    </div>
+    
 
                     <!-- Patrullas -->
                     <div>
@@ -548,30 +536,6 @@
                         </div>
                     </div>
 
-                    <!-- Tickets - Sin submenu, va directo -->
-                    <div>
-                        <a href="{{ route('tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                    <i class="bi bi-bookmarks-fill text-white text-sm"></i>
-                                </div>
-                                <span>Tickets</span>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Usuarios - Sin submenu, va directo -->
-                    <div>
-                        <a href="{{ route('usuarios.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                    <i class="bi bi-person-fill text-white text-sm"></i>
-                                </div>
-                                <span>Usuarios</span>
-                            </div>
-                        </a>
-                    </div>
-
                     <!-- Personal -->
                     <div>
                         <button id="togglePersonal" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
@@ -623,6 +587,43 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Tickets - Sin submenu, va directo -->
+                    <div>
+                        <a href="{{ route('tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <i class="bi bi-bookmarks-fill text-white text-sm"></i>
+                                </div>
+                                <span>Tickets</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div>
+                        <a href="{{ route('objetivos.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <i class="bi bi-bullseye text-white text-sm"></i>
+                                </div>
+                                <span>Objetivos</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Usuarios - Sin submenu, va directo -->
+                    <div>
+                        <a href="{{ route('usuarios.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <i class="bi bi-person-fill text-white text-sm"></i>
+                                </div>
+                                <span>Usuarios</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    
                 </nav>
             </div>
         </aside>
