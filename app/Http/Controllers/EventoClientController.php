@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class EventoController extends Controller
+class EventoClientController extends Controller
 {
     const TIPOS_CON_ELEMENTOS = [
         'Robo o intento de robo',
@@ -80,7 +80,7 @@ class EventoController extends Controller
 
         $empresas = collect();
 
-        return view('eventos.index-guest', compact(['eventos', 'clientes', 'empresas']));
+        return view('eventos.client.index-client', compact(['eventos', 'clientes', 'empresas']));
     }
 
     public function create()
@@ -97,7 +97,7 @@ class EventoController extends Controller
         $categorias = Categoria::all();
         $empresas = collect();
 
-        return view('eventos.nuevo-guest', compact(['clientes', 'supervisores','categorias', 'empresas']));
+        return view('client.eventos.nuevo', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
 
     public function store(Request $request)
@@ -171,13 +171,13 @@ class EventoController extends Controller
         }
 
 
-        return redirect()->route('eventos.index-guest')->with('success', 'Evento creado correctamente.');
+        return redirect()->route('client.eventos.index')->with('success', 'Evento creado correctamente.');
     }
 
     public function edit(Evento $evento)
     {
         if (!$this->userHasAccessToCliente($evento->cliente_id)) {
-            return redirect()->route('eventos.index-guest')->with('error', 'No tienes acceso a este evento.');
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
         }
 
         $clienteIds = $this->getClienteIds();
@@ -187,7 +187,7 @@ class EventoController extends Controller
         $categorias = Categoria::all();
         $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
-        return view('eventos.edit-guest', [
+        return view('client.eventos.edit', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
@@ -199,7 +199,7 @@ class EventoController extends Controller
     public function update(Request $request, Evento $evento)
     {
         if (!$this->userHasAccessToCliente($evento->cliente_id)) {
-            return redirect()->route('eventos.index-guest')->with('error', 'No tienes acceso a este evento.');
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
         }
 
         // Verificar que el usuario tenga acceso al nuevo cliente si se cambió
@@ -264,7 +264,7 @@ class EventoController extends Controller
         }
     }
 
-    return redirect()->route('eventos.index-guest')->with('success', 'Evento actualizado correctamente.');
+    return redirect()->route('client.eventos.index')->with('success', 'Evento actualizado correctamente.');
     
     }
 
@@ -272,7 +272,7 @@ class EventoController extends Controller
     public function destroy(Evento $evento)
     {
         if (!$this->userHasAccessToCliente($evento->cliente_id)) {
-            return redirect()->route('eventos.index-guest')->with('error', 'No tienes acceso a este evento.');
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
         }
 
         // Eliminar reportes generados asociados al evento primero
@@ -288,7 +288,7 @@ class EventoController extends Controller
 
         $evento->delete();
 
-        return redirect()->route('eventos.index-guest')->with('success', 'Evento eliminado correctamente');
+        return redirect()->route('client.eventos.index')->with('success', 'Evento eliminado correctamente');
     }
 
     public function destroyMedia(Media $media)

@@ -431,15 +431,15 @@
                         </button>
 
                         <div id="submenuEventos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                            <a href="{{ route('eventos.index-client') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.eventos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-search text-lg"></i>
                                 <span>Listado</span>
                             </a>
-                            <a href="{{ route('eventos.create-client') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.eventos.create') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-plus text-lg"></i>
                                 <span>Nuevo</span>
                             </a>
-                            <a href="{{ route('seguimientos.index-client') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.seguimientos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-search text-lg"></i>
                                 <span>Administrar Seguimientos</span>
                             </a>
@@ -463,11 +463,11 @@
                         </button>
 
                         <div id="submenuPatrullas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                            <a href="{{ route('patrullas.index-client') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.patrullas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-gear text-lg"></i>
                                 <span>Administrar Patrullas</span>
                             </a>
-                            <a href="{{ route('patrullas.location-client') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.patrullas.location') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-geo-alt text-lg"></i>
                                 <span>Ver en el Mapa</span>
                             </a>
@@ -476,7 +476,7 @@
 
                     <!-- Tickets - Sin submenu, va directo -->
                     <div>
-                        <a href="{{ route('tickets.nuevo-guest') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                        <a href="" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
                             <div class="flex items-center space-x-3">
                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                                     <i class="bi bi-bookmarks-fill text-white text-sm"></i>
@@ -489,10 +489,7 @@
             </div>
         </aside>
 
-        <!-- Contenido principal -->
-        <main class="flex-1 p-6 ml-0 md:ml-72">
-            {{ $slot }}
-        </main>
+        
     </div>
 
     <!-- Notifications JavaScript -->

@@ -12,17 +12,70 @@ use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
 
+
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// LAYOUT CLIENTES
+Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->group(function () {
+    //DASHBOARD
+    Route::get('/client-dashboard', function () {
+        return view('client.dashboard');
+    })->name('dashboard');
+
+    //EVENTOS
+    Route::get('/eventos/nuevo/cliente', [\App\Http\Controllers\EventoClientController::class, 'create'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.create');
+
+    Route::get('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'index'])
+        ->middleware('can:ver.eventos')
+        ->name('eventos.index');
+
+    Route::post('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'store'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.store');
+
+    Route::get('/eventos/{evento}/edit/cliente', [\App\Http\Controllers\EventoClientController::class, 'edit'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.edit');
+
+    Route::put('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'update'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.update');
+
+    Route::delete('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
+        ->middleware('can:eliminar.eventos')
+        ->name('eventos.destroy');
+        
+    //SEGUIMIENTOS
+    Route::get('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
+        ->middleware('can:ver.seguimientos')
+        ->name('seguimientos.index');
+
+    Route::get('/seguimientos/nuevo/cliente', [\App\Http\Controllers\SeguimientoController::class,'createClientLayout'])
+        ->middleware('can:crear.seguimientos')
+        ->name('seguimientos.create');
+
+    Route::post('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class, 'storeClientLayout'])
+        ->middleware('can:crear.seguimientos')
+        ->name('seguimientos.store');
+
+    // PATRULLAS 
+    Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
+        ->name('patrullas.index');
+
+    Route::get('/patrullas/mapa/cliente', [\App\Http\Controllers\PatrullaController::class, 'locationClient'])
+        ->name('patrullas.location');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
-
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
@@ -183,43 +236,6 @@ Route::middleware([
     Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
-
-    //EVENTOS PARA GUEST LAYOUT
-    Route::get('/eventos/nuevo/cliente', [\App\Http\Controllers\EventoClientController::class, 'create'])
-        ->middleware('can:crear.eventos')
-        ->name('eventos.create-client');
-
-    Route::get('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'index'])
-        ->middleware('can:ver.eventos')
-        ->name('eventos.index-client');
-
-    Route::post('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'store'])
-        ->middleware('can:crear.eventos')
-        ->name('eventos.store-client');
-
-    Route::get('/eventos/{evento}/edit/cliente', [\App\Http\Controllers\EventoClientController::class, 'edit'])
-        ->middleware('can:editar.eventos')
-        ->name('eventos.edit-client');
-
-    Route::put('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'update'])
-        ->middleware('can:editar.eventos')
-        ->name('eventos.update-client');
-
-    Route::delete('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
-        ->middleware('can:eliminar.eventos')
-        ->name('eventos.destroy-client');
-    
-    //SEGUIMIENTOS PARA GUEST LAYOUT
-    Route::get('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class,'index'])
-        ->middleware('can:ver.seguimientos')
-        ->name('seguimientos.index-client');
-
-    Route::get('/seguimientos/nuevo/cliente', [\App\Http\Controllers\SeguimientoController::class,'create'])
-        ->middleware('can:crear.seguimientos')
-        ->name('seguimientos.create-client');
-
-    Route::post('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class, 'store'])->middleware('can:crear.seguimientos')->name('seguimientos.store-client');
-
     
     //REPORTES
     Route::middleware(['auth'])->group(function () {
@@ -415,8 +431,6 @@ Route::middleware([
             ], 500);
         }
     });
-
-
 });
 
 
