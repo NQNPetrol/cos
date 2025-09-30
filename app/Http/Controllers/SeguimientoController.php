@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Evento;
 use App\Models\Seguimiento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SeguimientoController extends Controller
 {
@@ -170,7 +171,7 @@ class SeguimientoController extends Controller
         $seguimientos = $query->paginate(10);
         $eventos = Evento::whereIn('cliente_id', $clienteIds)->get();
 
-        return view('seguimientos.index-client', [
+        return view('seguimientos.client.index', [
             'seguimientos' => $seguimientos,
             'eventos' => $eventos,
             'filtros' => $request->only(['estado', 'evento_id', 'busqueda'])

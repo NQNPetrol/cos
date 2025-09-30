@@ -97,7 +97,7 @@ class EventoClientController extends Controller
         $categorias = Categoria::all();
         $empresas = collect();
 
-        return view('client.eventos.nuevo', compact(['clientes', 'supervisores','categorias', 'empresas']));
+        return view('eventos.client.nuevo-client', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
 
     public function store(Request $request)
@@ -187,7 +187,7 @@ class EventoClientController extends Controller
         $categorias = Categoria::all();
         $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
-        return view('client.eventos.edit', [
+        return view('eventos.client.edit-client', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
