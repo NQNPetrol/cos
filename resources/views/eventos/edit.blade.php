@@ -129,8 +129,8 @@
 
                         <!-- Sección 5.1: Empresa Asociada -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente <span class="text-red-500">*</span></h3>
-                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente</h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id"
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)

@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         return view('client.dashboard');
     })->name('dashboard');
 
-    //EVENTOS
+    //EVENTOS (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos')
         ->name('eventos.create');
@@ -58,8 +58,26 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
+
+    //REPORTES (USA CONTROLADOR DIFERENTE)
+    Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteClientController::class, 'preview'])
+        ->middleware('can:ver.reportes')
+        ->name('eventos.reporte.preview');
+    Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteClientController::class, 'generate'])
+        ->middleware('can:generar.reportes')
+        ->name('eventos.reporte.generate');
+    Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteClientController::class, 'download'])
+        ->middleware('can:generar.reportes')
+        ->name('reportes.download');
+    Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteClientController::class, 'view'])
+        ->middleware('can:ver.reportes')
+        ->name('reportes.view');
+    Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteClientController::class, 'previewIframe'])
+        ->middleware('can:ver.reportes')
+        ->name('eventos.reporte.preview-iframe');
+    
         
-    //SEGUIMIENTOS
+    //SEGUIMIENTOS (USA MISMO CONTROLADOR)
     Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
         ->middleware('can:ver.seguimientos')
         ->name('seguimientos.index');
@@ -72,7 +90,7 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->middleware('can:crear.seguimientos')
         ->name('seguimientos.store');
 
-    // PATRULLAS 
+    // PATRULLAS (USA MISMO CONTROLADOR)
     Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
         ->name('patrullas.index');
     

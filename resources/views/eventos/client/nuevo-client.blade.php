@@ -78,7 +78,7 @@
 
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Registrar Nuevo Evento</h2>
-                        <a href="{{ route('eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        <a href="{{ route('client.eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
                             <i class="bi bi-arrow-left mr-2"></i> Volver al listado
                         </a>
                     </div>

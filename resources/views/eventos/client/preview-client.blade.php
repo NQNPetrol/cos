@@ -4,7 +4,7 @@
         <div class="bg-slate-800 border-b border-slate-700 sticky top-0 z-10">
             <div class="container mx-auto px-6 py-4">
                 <nav class="flex items-center space-x-2 text-sm text-slate-300 mb-2">
-                    <a href="{{ route('eventos.index') }}" class="hover:text-blue-400 transition-colors flex items-center">
+                    <a href="{{ route('client.eventos.index') }}" class="hover:text-blue-400 transition-colors flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="size-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
@@ -76,7 +76,7 @@
                             <p class="text-slate-400 text-sm mb-4">
                                 Genera un reporte PDF con todos los detalles del evento para compartir o archivar.
                             </p>
-                            <form action="{{ route('eventos.reporte.generate', $evento) }}" method="POST">
+                            <form action="{{ route('client.eventos.reporte.generate', $evento) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center group">
                                     <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@
                                                 Por {{ $reporte->usuario->name ?? 'Usuario desconocido' }}
                                             </p>
                                         </div>
-                                        <a href="{{ route('reportes.view', $reporte) }}" target="_blank"
+                                        <a href="{{ route('client.reportes.view', $reporte) }}" target="_blank"
                                            class="inline-flex items-center px-3 py-1 bg-blue-900/30 text-blue-300 rounded-lg hover:bg-blue-800/50 transition-colors text-sm font-medium group-hover:scale-105 transform duration-200 border border-blue-700/50">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />

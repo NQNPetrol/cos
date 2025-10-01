@@ -6,14 +6,14 @@
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Editar Evento #{{ str_pad($evento->id, 4, '0', STR_PAD_LEFT) }}</h2>
-                        <a href="{{ route('eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        <a href="{{ route('client.eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
                             <i class="bi bi-arrow-left mr-2"></i> Volver al listado
                         </a>
                     </div>
 
                     <div id="debug-output" class="mb-4 p-3 bg-gray-800 text-sm text-gray-300 rounded-md"></div>
 
-                    <form id="evento-edit-form" action="{{ route('eventos.update', $evento) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                    <form id="evento-edit-form" action="{{ route('client.eventos.update', $evento) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -130,8 +130,8 @@
 
                         <!-- Sección 5.1: Empresa Asociada -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente <span class="text-red-500">*</span></h3>
-                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente</h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id"
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
@@ -271,7 +271,7 @@
 
                         <!-- Botones de acción -->
                         <div class="flex justify-end space-x-4 pt-4">
-                            <a href="{{ route('eventos.index') }}" 
+                            <a href="{{ route('client.eventos.index') }}" 
                                onclick="return confirm('¿Estás seguro de cancelar los cambios? Los cambios no guardados se perderán.')"
                                class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600">
                                Cancelar
