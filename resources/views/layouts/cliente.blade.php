@@ -393,7 +393,7 @@
         </div>
     </nav>
 
-    <!-- Contenedor principal -->
+    <!-- Contenedor principal --> 
     <div class="flex pt-16 min-h-screen">
         <!-- Sidebar mejorado -->
         <aside id="sidebar" class="sidebar w-72 h-full shadow-2xl fixed hidden md:block z-40 animate-slideIn">
@@ -488,8 +488,10 @@
                 </nav>
             </div>
         </aside>
-
-        
+        <!-- Contenido principal -->
+        <main class="md:ml-72 flex-1 p-6 mt-4">
+            @yield('content')
+        </main>                                        
     </div>
 
     <!-- Notifications JavaScript -->

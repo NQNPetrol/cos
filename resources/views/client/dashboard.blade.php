@@ -3,13 +3,7 @@
 @section('title', 'Dashboard - Área Cliente')
 
 @section('content')
-<x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-50 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <div class="flex items-center justify-center h-[70vh] bg-gray-700">
+     <div class="flex items-center justify-center h-[70vh] bg-gray-700">
         <div class="text-center bg-gray-900 p-8 rounded-lg shadow-lg max-w-lg">
             <h1 class="text-3xl font-bold text-emerald-400 mb-4">🚧 En Construcción 🚧</h1>
             <p class="text-gray-300 mb-6">

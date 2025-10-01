@@ -21,54 +21,64 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// DASHBOARD LAYOUT PRINCIPAL
+Route::get('/main-dashboard', function () {
+    return view('dashboard'); // Vista normal con layout app
+})->middleware(['auth', 'verified'])
+  ->name('main.dashboard');
+
 // LAYOUT CLIENTES
 Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->group(function () {
     //DASHBOARD
-    Route::get('/client-dashboard', function () {
+    Route::get('/dashboard', function () {
         return view('client.dashboard');
     })->name('dashboard');
 
     //EVENTOS
-    Route::get('/eventos/nuevo/cliente', [\App\Http\Controllers\EventoClientController::class, 'create'])
+    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos')
         ->name('eventos.create');
 
-    Route::get('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'index'])
+    Route::get('/eventos', [\App\Http\Controllers\EventoClientController::class, 'index'])
         ->middleware('can:ver.eventos')
         ->name('eventos.index');
 
-    Route::post('/eventos/cliente', [\App\Http\Controllers\EventoClientController::class, 'store'])
+    Route::post('/eventos/store', [\App\Http\Controllers\EventoClientController::class, 'store'])
         ->middleware('can:crear.eventos')
         ->name('eventos.store');
 
-    Route::get('/eventos/{evento}/edit/cliente', [\App\Http\Controllers\EventoClientController::class, 'edit'])
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoClientController::class, 'edit'])
         ->middleware('can:editar.eventos')
         ->name('eventos.edit');
 
-    Route::put('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'update'])
+    Route::put('/eventos/{evento}/update', [\App\Http\Controllers\EventoClientController::class, 'update'])
         ->middleware('can:editar.eventos')
         ->name('eventos.update');
 
-    Route::delete('/eventos/{evento}/cliente', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
+    Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
         
     //SEGUIMIENTOS
-    Route::get('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
+    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
         ->middleware('can:ver.seguimientos')
         ->name('seguimientos.index');
 
-    Route::get('/seguimientos/nuevo/cliente', [\App\Http\Controllers\SeguimientoController::class,'createClientLayout'])
+    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'createClientLayout'])
         ->middleware('can:crear.seguimientos')
         ->name('seguimientos.create');
 
-    Route::post('/seguimientos/cliente', [\App\Http\Controllers\SeguimientoController::class, 'storeClientLayout'])
+    Route::post('/seguimientos/store', [\App\Http\Controllers\SeguimientoController::class, 'storeClientLayout'])
         ->middleware('can:crear.seguimientos')
         ->name('seguimientos.store');
 
     // PATRULLAS 
     Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
         ->name('patrullas.index');
+    
+    Route::get('/livewire/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'createClient'])
+        ->middleware('can:crear.patrullas')
+        ->name('patrullas.create');
 
     Route::get('/patrullas/mapa/cliente', [\App\Http\Controllers\PatrullaController::class, 'locationClient'])
         ->name('patrullas.location');

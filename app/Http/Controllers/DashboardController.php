@@ -13,7 +13,7 @@ class DashboardController extends Controller
 
         if (!$user) {
             \Log::warning('No hay usuario autenticado');
-            return redirect()->intended(config('fortify.home'));
+            return redirect()->route('login');
         }
 
         \Log::info('Usuario logueado:', [
@@ -32,6 +32,6 @@ class DashboardController extends Controller
         
         // Para admin, operador, otros
          \Log::info('Redirigiendo a DASHBOARD NORMAL');
-        return redirect()->intended(config('fortify.home'));
+        return redirect()->route('main.dashboard');
     }
 }

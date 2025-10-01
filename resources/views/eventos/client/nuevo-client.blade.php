@@ -83,7 +83,7 @@
                         </a>
                     </div>
 
-                    <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                    <form action="{{ route('client.eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         <!-- 1. Categoria -->
                         <div class="bg-gray-700 p-4 rounded-lg">
@@ -161,7 +161,8 @@
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" @if(old('cliente_id') == $cliente->id) selected @endif
+                                    <option value="{{ $cliente->id }}"
+                                        @if(old('cliente_id') == $cliente->id) selected @endif
                                         data-empresas="{{ $cliente->empresasAsociadas->pluck('nombre', 'id') }}">
                                         {{ $cliente->nombre }}
                                     </option>
@@ -174,8 +175,8 @@
 
                         <!-- Sección 5.1: Empresa Asociada -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada <span class="text-red-500">*</span></h3>
-                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada</h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id"
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
@@ -640,13 +641,23 @@
                     // Obtener empresas del data-attribute
                     const empresas = JSON.parse(selectedOption.getAttribute('data-empresas') || '{}');
                     
-                    // Agregar nuevas opciones
-                    Object.entries(empresas).forEach(([id, nombre]) => {
+                    // Verificar si el cliente tiene empresas asociadas
+                    if (Object.keys(empresas).length === 0) {
+                        // Si no tiene empresas, agregar opción indicando que no hay empresas
                         const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = nombre;
+                        option.value = "";
+                        option.textContent = "Este cliente no tiene empresas asociadas";
+                        option.disabled = true;
                         empresaSelect.appendChild(option);
-                    });
+                    } else {
+                    // Agregar nuevas opciones
+                        Object.entries(empresas).forEach(([id, nombre]) => {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = nombre;
+                            empresaSelect.appendChild(option);
+                        });
+                    }
                 }
             });
 

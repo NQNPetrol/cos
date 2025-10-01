@@ -72,7 +72,7 @@ class EventoController extends Controller
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
             'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
             'elementos' => 'nullable|array',
             'elementos.*' => 'nullable|string|max:255',
             'cantidades' => 'nullable|array',
@@ -153,7 +153,7 @@ class EventoController extends Controller
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
         'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
-        'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+        'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
         'elementos' => 'nullable|array',
         'elementos.*' => 'nullable|string|max:255',
         'cantidades' => 'nullable|array',

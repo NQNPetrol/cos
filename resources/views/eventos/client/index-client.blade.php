@@ -94,7 +94,7 @@
 
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Listado de Eventos</h2>
-                        <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        <a href="{{ route('client.eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                             <i class="bi bi-plus-circle mr-2"></i>Nuevo Evento
                         </a>
                     </div>
@@ -102,19 +102,6 @@
                     <!-- Filtros -->
                     <form method="GET" action="{{ route('eventos.index') }}" class="mb-6">
                         <div class="flex flex-wrap items-end gap-4">
-                            <!-- Filtro por cliente -->
-                            <div class="flex-1 min-w-[300px]">
-                                <label class="block text-sm font-medium text-gray-300 mb-1">Cliente</label>
-                                <select name="cliente_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
-                                    <option value="">Todos los clientes</option>
-                                     @foreach($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}" 
-                                                {{ request('cliente_id') == $cliente->id ? 'selected' : '' }}>
-                                            {{ $cliente->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
                             
                             <!-- Filtro por fecha desde -->
                             <div class="flex-1 min-w-[220px]">
@@ -215,12 +202,12 @@
                                                 title="Generar Reporte">
                                                 <i class="bi bi-file-earmark-pdf"></i>
                                             </a>
-                                            <a href="{{ route('eventos.edit', $evento) }}"
+                                            <a href="{{ route('client.eventos.edit', $evento) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
                                                 title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <form action="{{ route('eventos.destroy', $evento) }}" method="POST" class="inline">
+                                            <form action="{{ route('client.eventos.destroy', $evento) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 

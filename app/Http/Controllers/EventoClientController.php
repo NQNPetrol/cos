@@ -29,6 +29,8 @@ class EventoClientController extends Controller
         if (!$user) {
             return collect();
         }
+
+        //obetener el id de los clientes asignados a user
         return $user->clientes()->pluck('clientes.id');
     }
 
@@ -85,17 +87,27 @@ class EventoClientController extends Controller
 
     public function create()
     {
+        $user = Auth::user();
+        \Log::info('Usuario actual:', ['user_id' => $user->id, 'user_name' => $user->name]);
+
         $redirect = $this->redirectIfNoClientes();
         if ($redirect) {
             return $redirect;
         }
 
         $clienteIds = $this->getClienteIds();
+        \Log::info('Clientes asignados al usuario:', $clienteIds->toArray());
 
-        $clientes = Cliente::whereIn('id', $clienteIds)->get();
+        $clientes = Cliente::whereIn('id', $clienteIds)->with(['empresasAsociadas'])->get();
+        \Log::info('Clientes encontrados:', $clientes->pluck('id', 'nombre')->toArray());
+
         $supervisores = Personal::where('cargo', 'supervisor')->get();
+
         $categorias = Categoria::all();
-        $empresas = collect();
+
+        $empresas = EmpresaAsociada::whereHas('cliente', function($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })->get();
 
         return view('eventos.client.nuevo-client', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
@@ -125,7 +137,7 @@ class EventoClientController extends Controller
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
             'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
             'elementos' => 'nullable|array',
             'elementos.*' => 'nullable|string|max:255',
             'cantidades' => 'nullable|array',
@@ -221,7 +233,7 @@ class EventoClientController extends Controller
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
         'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
-        'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+        'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
         'elementos' => 'nullable|array',
         'elementos.*' => 'nullable|string|max:255',
         'cantidades' => 'nullable|array',
