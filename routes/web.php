@@ -85,13 +85,14 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     // PATRULLAS (USA MISMO CONTROLADOR)
     Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
         ->name('patrullas.index');
-    
-    Route::get('/livewire/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'createClient'])
-        ->middleware('can:crear.patrullas')
-        ->name('patrullas.create');
 
     Route::get('/patrullas/mapa/cliente', [\App\Http\Controllers\PatrullaController::class, 'locationClient'])
         ->name('patrullas.location');
+
+    // DISPOSITIVOS
+    Route::get('/patrullas/{patrulla}/dispositivos', [\App\Http\Controllers\DispositivoPatrullaController::class, 'indexClient'])
+        ->middleware('can:asignar.dispositivos')
+        ->name('patrullas.dispositivos');
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -50,6 +50,11 @@ class Cliente extends Model
         return $this->belongsToMany(User::class, 'users_has_cliente_id', 'cliente_id', 'user_id');
     }
 
+    public function patrullas()
+    {
+        return $this->hasMany(Patrulla::class);
+    }
+
     /**
      * Verifica si este es el cliente COS 
      */

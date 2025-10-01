@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Patrulla;
 use Illuminate\Validation\Rule;
+use App\Models\Cliente;
 
 class Listado extends Component
 {
@@ -23,27 +24,40 @@ class Listado extends Component
     public $color;
     public $estado = 'operativa';
     public $observaciones;
+    public $cliente_id;
+
+    public $clientes = [];
+
+    public function mount()
+    {
+        // Cargar lista de clientes para el dropdown
+        $this->clientes = Cliente::orderBy('nombre')->get();
+    }
 
     protected function rules()
     {
-    return [
-        'patente' => [
-            'required',
-            'string',
-            'max:10',
-            Rule::unique('patrullas', 'patente')->ignore($this->editingId)
-        ],
-        
-    ];
+        return [
+            'patente' => [
+                'required',
+                'string',
+                'max:10',
+                Rule::unique('patrullas', 'patente')->ignore($this->editingId)
+            ],
+            'cliente_id' => 'required|exists:clientes,id',
+            
+        ];
     }
 
     public function render()
     {
-        $patrullas = Patrulla::query()
+        $patrullas = Patrulla::with(['cliente'])
             ->when($this->search, function($query){
                 $query->where('patente', 'like', '%'.$this->search.'%')
                       ->orwhere('marca', 'like', '%'.$this->search.'%')
-                      ->orwhere('modelo', 'like', '%'.$this->search.'%');
+                      ->orwhere('modelo', 'like', '%'.$this->search.'%')
+                      ->orWhereHas('cliente', function($q) {
+                          $q->where('nombre', 'like', '%'.$this->search.'%');
+                      });
             })
             ->when($this->estadoFilter, function($query){
                 $query->where('estado', $this->estadoFilter);
@@ -77,6 +91,7 @@ class Listado extends Component
         $this->color = '';
         $this->estado = 'operativa';
         $this->observaciones = '';
+        $this->cliente_id = '';
 
     }
 
@@ -93,6 +108,7 @@ class Listado extends Component
                 'color' => $this->color,
                 'estado' => $this->estado,
                 'observaciones' => $this->observaciones,
+                'cliente_id' => $this->cliente_id,
             ]);
 
             session()->flash('sucess', 'Patrulla actualizada exitosamente');
@@ -104,6 +120,7 @@ class Listado extends Component
                 'color' => $this->color,
                 'estado' => $this->estado,
                 'observaciones' => $this->observaciones,
+                'cliente_id' => $this->cliente_id,
             ]);
 
             session()->flash('success', 'Patrulla creada exitosamente');
@@ -122,6 +139,7 @@ class Listado extends Component
         $this->color = $patrulla->color;
         $this->estado = $patrulla->estado;
         $this->observaciones = $patrulla->observaciones;
+        $this->cliente_id = $patrulla->cliente_id;
         
         $this->showModal = true;
     }

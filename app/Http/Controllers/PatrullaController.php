@@ -18,12 +18,7 @@ class PatrullaController extends Controller
 
     public function indexClient()
     {
-        return view('client.patrullas.index');
-    }
-
-    public function createClient()
-    {
-        return view('client.patrullas.create');
+        return view('patrullas.client.index-client');
     }
 
     public function locationClient() 
