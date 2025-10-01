@@ -441,7 +441,7 @@
                             </a>
                             <a href="{{ route('client.seguimientos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-search text-lg"></i>
-                                <span>Administrar Seguimientos</span>
+                                <span>Seguimientos</span>
                             </a>
                         </div>
                     </div>

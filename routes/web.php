@@ -82,14 +82,6 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->middleware('can:ver.seguimientos')
         ->name('seguimientos.index');
 
-    Route::get('/seguimientos/nuevo', [\App\Http\Controllers\SeguimientoController::class,'createClientLayout'])
-        ->middleware('can:crear.seguimientos')
-        ->name('seguimientos.create');
-
-    Route::post('/seguimientos/store', [\App\Http\Controllers\SeguimientoController::class, 'storeClientLayout'])
-        ->middleware('can:crear.seguimientos')
-        ->name('seguimientos.store');
-
     // PATRULLAS (USA MISMO CONTROLADOR)
     Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
         ->name('patrullas.index');

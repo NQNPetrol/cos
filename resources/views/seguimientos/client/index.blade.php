@@ -1,4 +1,4 @@
 @extends('layouts.cliente')
 @section('content')
-    @livewire('seguimientos.ver-seguimientos')
+    @livewire('seguimientos.ver-seguimientos-cliente')
 @endsection

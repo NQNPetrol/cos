@@ -114,25 +114,6 @@ class SeguimientoController extends Controller
         return null;
     }
 
-    public function createClientLayout()
-    {
-        $redirect = $this->redirectIfNoClientes();
-        if ($redirect) {
-            return $redirect;
-        }
-
-        $clienteIds = $this->getClienteIds();
-
-        $eventos = Evento::whereIn('cliente_id', $clienteIds)
-            ->whereDoesntHave('seguimientos', function($query){
-                $query->where('estado', 'CERRADO');
-            })->get();
-
-        return view('seguimientos.nuevo-client', [
-            'eventos' => $eventos,
-            'header' => 'Nuevo Seguimiento'
-        ]);
-    }
 
     public function indexClientLayout(Request $request)
     {
@@ -176,29 +157,6 @@ class SeguimientoController extends Controller
             'eventos' => $eventos,
             'filtros' => $request->only(['estado', 'evento_id', 'busqueda'])
         ]);
-    }
-    public function storeClientLayout(Request $request)
-    {
-        $redirect = $this->redirectIfNoClientes();
-        if ($redirect) {
-            return $redirect;
-        }
-
-        // Verificar que el usuario tenga acceso al evento seleccionado
-        if (!$this->userHasAccessToEvento($request->evento_id)) {
-            return redirect()->back()->with('error', 'No tienes acceso a este evento.');
-        }
-
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'fecha' => 'required|date',
-            'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
-            'evento_id' => 'required|exists:eventos,id'
-        ]);
-
-
-        return redirect()->route('seguimientos.index-client');
     }
 
 }
