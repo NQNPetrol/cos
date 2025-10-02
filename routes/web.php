@@ -91,10 +91,10 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/patrullas/mapa', [\App\Http\Controllers\MobileVehicleClientController::class, 'locationClient'])
         ->name('patrullas.location');
 
-    // DISPOSITIVOS PATRULLAS
-    Route::get('/patrullas/{patrulla}/dispositivos', [\App\Http\Controllers\DispositivoPatrullaController::class, 'indexClient'])
-        ->middleware('can:asignar.dispositivos')
-        ->name('patrullas.dispositivos');
+    //TICKETS Y NOTIFICACIONES
+    Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'indexClient'])
+        ->middleware('can:ver.tickets')
+        ->name('tickets.nuevo');
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -476,7 +476,7 @@
 
                     <!-- Tickets - Sin submenu, va directo -->
                     <div>
-                        <a href="" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                        <a href="{{ route('client.tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
                             <div class="flex items-center space-x-3">
                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                                     <i class="bi bi-bookmarks-fill text-white text-sm"></i>
