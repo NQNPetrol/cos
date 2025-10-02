@@ -24,7 +24,6 @@
                         <div>
                             <span class="font-semibold">Ultimos datos del</span>
                             <span class="ml-2">{{ $lastUpdate ?? 'No hay datos disponibles' }}</span>
-                            </span>
                         </div>
                     </div>
                     <div id="refresh-counter" class="bg-blue-800 text-blue-200 px-3 py-1 rounded text-sm">
@@ -38,17 +37,17 @@
                 <div class="p-6 text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
-                        <a href="{{ route('patrullas.index') }}" 
+                        <a href="{{ route('client.patrullas.index') }}" 
                         class="flex items-center text-blue-400 hover:text-blue-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
-                            Ver Patrullas
+                            Volver a Patrullas
                         </a>
                         <div class="flex justify-between items-center">
                             <div>
-                                <h2 class="text-3xl font-bold text-white mb-2">Mapa de vehiculos Moviles</h2>
-                                <p class="text-sm text-gray-300">Localización de on-board devices y patrullas</p>
+                                <h2 class="text-3xl font-bold text-white mb-2">Mapa de Vehículos Móviles</h2>
+                                <p class="text-sm text-gray-300">Localización de tus patrullas conectadas</p>
                             </div>
                             <div class="flex space-x-2">
                                 <button onclick="refreshData()" 
@@ -62,9 +61,26 @@
                         </div>
                     </div>
 
+                    <!-- Mensaje cuando no hay ubicaciones -->
+                    @if(isset($locationsConCoordenadas) && empty($locationsConCoordenadas))
+                    <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-6 mb-6 text-center">
+                        <div class="flex items-center justify-center mb-4">
+                            <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Sin información de ubicación</h3>
+                        <p class="text-yellow-200">
+                            No hay información de ubicación disponible para ninguno de tus vehículos en este momento.
+                        </p>
+                        <p class="text-yellow-100 text-sm mt-2">
+                            Los dispositivos GPS pueden estar desconectados o sin señal.
+                        </p>
+                    </div>
+                    @endif
+
                     <!-- Contenedor del Mapa -->
                     <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                        
                         <div class="h-96 bg-gray-700 rounded-lg" id="map-container">
                             <div id="map" style="height: 100%; width: 100%;"></div>
                         </div>
@@ -85,7 +101,6 @@
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Región
                                         </th>
-                                        
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Última ubicación
                                         </th>
@@ -115,10 +130,8 @@
                                                         @default
                                                             <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
                                                     @endswitch
-                                                    
                                                 </div>
                                             </td>
-                                            
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-green-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
                                                     @if(isset($locations[$vehicle->mobile_vehicle_index_code]) && $locations[$vehicle->mobile_vehicle_index_code]['latitude'])
@@ -150,12 +163,13 @@
                         </div>
                     </div>
 
-                    <!-- Paginación -->
-                    @if($mobileVehicles->hasPages())
-                        <div class="mt-6">
-                            {{ $mobileVehicles->links() }}
+                    <!-- Información del filtrado -->
+                    <div class="bg-gray-800 rounded-lg p-4 mt-4">
+                        <div class="text-sm text-gray-400">
+                            <p><strong>Vehículos mostrados:</strong> {{ $mobileVehicles->count() }} de {{ $mobileVehicles->total() }}</p>
+                            <p><strong>Con ubicación disponible:</strong> {{ isset($locationsConCoordenadas) ? count($locationsConCoordenadas) : 0 }}</p>
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,6 +177,10 @@
 
     <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap" async defer></script>
+
+    <script>
+        const userPatentes = @json($patentesUsuario);
+    </script>
     
     <script>
         let map;
@@ -181,7 +199,7 @@
                 zoom: 12,
                 center: initialCenter,
                 mapTypeId: google.maps.MapTypeId.SATELLITE,
-                mapTypeControl: true, // Permitir cambiar entre tipos de mapa
+                mapTypeControl: true,
                 mapTypeControlOptions: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
                     position: google.maps.ControlPosition.TOP_RIGHT
@@ -189,7 +207,6 @@
                 zoomControl: true,
                 streetViewControl: true,
                 fullscreenControl: true
-                
             });
             
             isMapInitialized = true;
@@ -204,17 +221,33 @@
         // Cargar datos del mapa desde la API
         async function loadMapData() {
             try {
-                console.log('Cargando datos del mapa...');
-                const response = await fetch('/api/mobile-vehicles/locations/current');
+                console.log('INICIANDO loadMapData() - Cliente');
+                console.log('Cargando datos del mapa para cliente...');
+
+                console.log('Patentes del usuario:', userPatentes);
+                const url = `/api/client/mobile-vehicles/locations/current?patentes=${JSON.stringify(userPatentes)}`;
+                console.log('URL de API locations:', url);
+                
+                
+                const response = await fetch(`/api/client/mobile-vehicles/locations/current?patentes=${JSON.stringify(userPatentes)}`);
                 const data = await response.json();
 
-                console.log('Respuesta de locations/current API:', data);
-                
+                console.log('Response status:', response.status);
+
+                console.log('Respuesta de API cliente:', data);
+                console.log('Datos recibidos de API:', data);
                 
                 if (data.success && data.locations) {
-                    console.log('Datos recibidos:', Object.keys(data.locations).length, 'vehículos');
-                    const mapData = await convertLocationsToMapData(data.locations);
-                    console.log('Datos convertidos para mapa:', mapData);
+                    console.log('Datos recibidos para cliente:', Object.keys(data.locations).length, 'vehículos');
+                    
+                  
+                    const vehiclesResponse = await fetch(`/api/client/mobile-vehicles/map/data?patentes=${JSON.stringify(userPatentes)}`);
+                    const vehiclesData = await vehiclesResponse.json();
+                    console.log('Datos de vehículos recibidos:', vehiclesData);
+
+                    const mapData = await convertLocationsToMapData(data.locations, vehiclesData.data || vehiclesData);
+                    console.log('Datos convertidos para mapa cliente:', mapData);
+                    
                     updateMap(mapData);
                     updateTable(mapData);
                     updateLastUpdateTime(data.latest_timestamp || data.timestamp);
@@ -226,24 +259,20 @@
             }
         }
 
-        async function convertLocationsToMapData(locations) {
+        async function convertLocationsToMapData(locations, vehiclesData) {
             try {
-                console.log('Convirtiendo formato de datos...');
+                console.log('Convirtiendo formato de datos para cliente...');
                 console.log('Estructura de locations recibida:', locations);
-                
-                // Primero obtener información de todos los vehículos
-                const vehiclesResponse = await fetch('/api/mobile-vehicles/');
-                const vehiclesData = await vehiclesResponse.json();
                 
                 // Crear mapa de vehículos por código
                 const vehiclesMap = {};
                 vehiclesData.forEach(vehicle => {
-                    vehiclesMap[vehicle.mobile_vehicle_index_code] = vehicle;
+                    vehiclesMap[vehicle.mobile_vehicle_index_code || vehicle.vehicle_code] = vehicle;
                 });
                 
                 const mapData = [];
                 
-                // Procesar cada ubicación - locations ahora es un objeto plano
+                // Procesar cada ubicación
                 for (const [vehicleCode, location] of Object.entries(locations)) {
                     const vehicle = vehiclesMap[vehicleCode];
                     
@@ -251,7 +280,7 @@
                     if (location && location.latitude && location.longitude) {
                         mapData.push({
                             'vehicle_code': vehicleCode,
-                            'vehicle_name': vehicle ? vehicle.mobile_vehicle_name : 'Desconocido',
+                            'vehicle_name': vehicle ? (vehicle.mobile_vehicle_name || vehicle.vehicle_name) : 'Desconocido',
                             'plate_no': location.plateNo || '',
                             'latitude': parseFloat(location.latitude),
                             'longitude': parseFloat(location.longitude),
@@ -261,30 +290,37 @@
                             'status': vehicle ? vehicle.status : 0
                         });
                         
-                        console.log('Vehículo procesado:', vehicleCode, location.latitude, location.longitude);
+                        console.log('Vehículo procesado para cliente:', vehicleCode, location.latitude, location.longitude);
                     } else {
-                        console.warn('Vehículo sin coordenadas válidas:', vehicleCode, location);
+                        console.warn('Vehículo sin coordenadas válidas para cliente:', vehicleCode, location);
                     }
                 }
                 
-                console.log('Conversión completada:', mapData.length, 'vehículos válidos');
+                console.log('Conversión completada para cliente:', mapData.length, 'vehículos válidos');
                 return mapData;
                 
             } catch (error) {
-                console.error('Error convirtiendo datos:', error);
+                console.error('Error convirtiendo datos para cliente:', error);
                 return [];
             }
         }
         
         // Actualizar el mapa con nuevos marcadores
         function updateMap(vehiclesData) {
-            if (!isMapInitialized) return;
+            if (!isMapInitialized) {
+                console.error('❌ Mapa no inicializado');
+                return;
+            }
             
-            console.log('Actualizando mapa con', vehiclesData.length, 'vehículos');
+            console.log('Actualizando mapa con datos:', vehiclesData);
+            console.log('Número de vehículos:', vehiclesData.length);
+            console.log('Actualizando mapa cliente con', vehiclesData.length, 'vehículos');
             
             // Limpiar marcadores antiguos
             Object.values(markers).forEach(marker => marker.setMap(null));
             markers = {};
+
+            console.log('Creando nuevos marcadores...');
             
             // Crear nuevos marcadores
             vehiclesData.forEach(vehicle => {
@@ -345,7 +381,7 @@
         
         // Actualizar la tabla con la información de ubicación
         function updateTable(vehiclesData) {
-            console.log('📝 Actualizando tabla con:', vehiclesData.length, 'vehículos');
+            console.log('📝 Actualizando tabla cliente con:', vehiclesData.length, 'vehículos');
             vehiclesData.forEach(vehicle => {
                 const locationElement = document.querySelector(`.location-data[data-vehicle-id="${vehicle.vehicle_code}"]`);
                 if (locationElement) {
@@ -384,12 +420,12 @@
             } else {
                 timeString = 'No hay datos disponibles';
             }
-            console.log('Última actualización:', timeString);
+            console.log('Última actualización cliente:', timeString);
         }
         
         // Iniciar actualización automática
         function startAutoRefresh() {
-            console.log('Iniciando auto-refresh cada 10 segundos');
+            console.log('Iniciando auto-refresh cliente cada 10 segundos');
             
             // Configurar intervalo de actualización (10 segundos)
             refreshInterval = setInterval(() => {
@@ -427,7 +463,7 @@
         
         // Función para actualizar manualmente
         function refreshData() {
-            console.log('Actualización manual solicitada');
+            console.log('Actualización manual solicitada para cliente');
             loadMapData();
             resetCountdown();
         }
@@ -444,7 +480,7 @@
         
         // Iniciar cuando el documento esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado, inicializando mapa...');
+            console.log('DOM cargado, inicializando mapa cliente...');
             checkGoogleMaps();
         });
         

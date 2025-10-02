@@ -8,6 +8,7 @@ use App\Http\Controllers\MobileVehicleController;
 use App\Http\Controllers\Api\PersonalImportController;
 use App\Http\Controllers\Api\PersonalCompareController;
 use App\Http\Controllers\EncodingDeviceController;
+use App\Http\Controllers\MobileVehicleClientController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -48,6 +49,13 @@ Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function 
     Route::post('/relink', [MobileVehicleController::class, 'relinkAll'])->name('relink');
     Route::get('/map/data', [MobileVehicleController::class, 'apiMapData'])->name('map-data');
     Route::get('/locations/current', [MobileVehicleController::class, 'apiLocations'])->name('locations');
+});
+
+// API PARA OBTENER GPS INFO FILTRADA POR CLIENTE
+Route::prefix('/client/mobile-vehicles')->name('api.client.mobile-vehicles.')->group(function () {
+    Route::get('/locations/current', [MobileVehicleClientController::class, 'apiLocationsClient'])->name('locations');
+    Route::get('/map/data', [MobileVehicleClientController::class, 'apiMapDataClient'])->name('map-data');
+    Route::get('/stats', [MobileVehicleClientController::class, 'statsClient'])->name('stats');
 });
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);

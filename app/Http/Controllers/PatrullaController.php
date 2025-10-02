@@ -21,9 +21,4 @@ class PatrullaController extends Controller
         return view('patrullas.client.index-client');
     }
 
-    public function locationClient() 
-    {
-        return view('client.patrullas.location');
-    }
-
 }

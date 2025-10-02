@@ -83,13 +83,15 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('seguimientos.index');
 
     // PATRULLAS (USA MISMO CONTROLADOR)
-    Route::get('/patrullas/cliente', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
+    Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
         ->name('patrullas.index');
 
-    Route::get('/patrullas/mapa/cliente', [\App\Http\Controllers\PatrullaController::class, 'locationClient'])
+    //MOBILE VEHICLE USA NUEVO CONTROLADOR
+
+    Route::get('/patrullas/mapa', [\App\Http\Controllers\MobileVehicleClientController::class, 'locationClient'])
         ->name('patrullas.location');
 
-    // DISPOSITIVOS
+    // DISPOSITIVOS PATRULLAS
     Route::get('/patrullas/{patrulla}/dispositivos', [\App\Http\Controllers\DispositivoPatrullaController::class, 'indexClient'])
         ->middleware('can:asignar.dispositivos')
         ->name('patrullas.dispositivos');
