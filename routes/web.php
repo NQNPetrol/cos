@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'indexClient'])
         ->middleware('can:ver.tickets')
         ->name('tickets.nuevo');
+
 });
 
 Route::middleware(['auth'])->group(function () {

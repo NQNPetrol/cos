@@ -71,7 +71,7 @@
                 @endif
 
                 <button wire:click="openModal" 
-                        class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium flex items-center">
+                        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white font-medium flex items-center">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -216,7 +216,7 @@
                                     Cancelar
                                 </button>
                                 <button type="submit" 
-                                        class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md text-white">
+                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white">
                                     {{ $editMode ? 'Actualizar' : 'Crear' }}
                                 </button>
                             </div>

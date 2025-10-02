@@ -100,7 +100,7 @@
             </div>
             
             <div class="info-box">
-                <p>En los próximos días te van a estar contactando del <strong>Centro de Operaciones de Seguridad (COS)</strong> para dar seguimiento a tu solicitud.</p>
+                <p>Te estarán contactando del <strong>Centro de Operaciones de Seguridad (COS)</strong> para dar seguimiento a tu solicitud.</p>
                 <p>Mantén este número de ticket (#{{ $ticket->id }}) para cualquier consulta.</p>
             </div>
             
