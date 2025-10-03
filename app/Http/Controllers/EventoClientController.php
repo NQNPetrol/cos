@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Evento;
 use App\Models\Cliente;
+use App\Models\UserCliente;
 use App\Models\Personal;
 use App\Models\Categoria;
 use App\Models\Media;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class EventoController extends Controller
+class EventoClientController extends Controller
 {
     const TIPOS_CON_ELEMENTOS = [
         'Robo o intento de robo',
@@ -22,12 +23,51 @@ class EventoController extends Controller
         'Hallazgo de objetos sospechosos'
     ];
 
+    private function getClienteIds()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return collect();
+        }
+
+        //obetener el id de los clientes asignados a user
+        return $user->clientes()->pluck('clientes.id');
+    }
+
+    private function userHasAccessToCliente($clienteId)
+    {
+        $clienteIds = $this->getClienteIds();
+        return $clienteIds->contains($clienteId);
+    }
+
+    private function redirectIfNoClientes()
+    {
+        $clienteIds = $this->getClienteIds();
+        
+        if ($clienteIds->isEmpty()) {
+            return redirect()->back()->with('error', 'No tienes clientes asignados. Contacta al administrador.');
+        }
+        
+        return null;
+    }
+
     public function index(Request $request)
     {
-        $query = Evento::with(['creador', 'cliente', 'categoria'])->latest('fecha_hora');
+        $redirect = $this->redirectIfNoClientes();
+        if ($redirect) {
+            return $redirect;
+        }
 
-        if ($request->filled('cliente_id')){
-            $query->where('cliente_id', $request->cliente_id);
+        $clienteIds = $this->getClienteIds();
+
+        $query = Evento::with(['creador', 'cliente', 'categoria'])->whereIn('cliente_id', $clienteIds)->latest('fecha_hora');
+
+        if ($request->filled('cliente_id')) {
+            if ($this->userHasAccessToCliente($request->cliente_id)) {
+                $query->where('cliente_id', $request->cliente_id);
+            } else {
+                return redirect()->back()->with('error', 'No tienes acceso a este cliente.');
+            }
         }
         if ($request->filled('fecha_desde')){
             $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
@@ -38,26 +78,51 @@ class EventoController extends Controller
         
         $eventos = $query->paginate(10)->appends($request->query());
 
-        $clientes = Cliente::orderBy('nombre')->get();
+        $clientes = Cliente::whereIn('id', $clienteIds)->orderBy('nombre')->get();
 
         $empresas = collect();
 
-        return view('eventos.index', compact(['eventos', 'clientes', 'empresas']));
+        return view('eventos.client.index-client', compact(['eventos', 'clientes', 'empresas']));
     }
 
     public function create()
     {
-        $clientes = \App\Models\Cliente::all();
-        $supervisores = Personal::where('cargo', 'supervisor')->get();
-        $categorias = Categoria::all();
-        $empresas = collect();
+        $user = Auth::user();
+        \Log::info('Usuario actual:', ['user_id' => $user->id, 'user_name' => $user->name]);
 
-        return view('eventos.nuevo', compact(['clientes', 'supervisores','categorias', 'empresas']));
+        $redirect = $this->redirectIfNoClientes();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        $clienteIds = $this->getClienteIds();
+        \Log::info('Clientes asignados al usuario:', $clienteIds->toArray());
+
+        $clientes = Cliente::whereIn('id', $clienteIds)->with(['empresasAsociadas'])->get();
+        \Log::info('Clientes encontrados:', $clientes->pluck('id', 'nombre')->toArray());
+
+        $supervisores = Personal::where('cargo', 'supervisor')->get();
+
+        $categorias = Categoria::all();
+
+        $empresas = EmpresaAsociada::whereHas('cliente', function($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })->get();
+
+        return view('eventos.client.nuevo-client', compact(['clientes', 'supervisores','categorias', 'empresas']));
     }
 
     public function store(Request $request)
     {
-        
+        $redirect = $this->redirectIfNoClientes();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        if (!$this->userHasAccessToCliente($request->cliente_id)) {
+            return redirect()->back()->with('error', 'No tienes acceso a este cliente.');
+        }
+
         $validated = $request->validate([
             'fecha_hora'    => 'required|date',
             'cliente_id'    => 'required|exists:clientes,id',
@@ -118,17 +183,23 @@ class EventoController extends Controller
         }
 
 
-        return redirect()->route('eventos.index')->with('success', 'Evento creado correctamente.');
+        return redirect()->route('client.eventos.index')->with('success', 'Evento creado correctamente.');
     }
 
     public function edit(Evento $evento)
     {
-        $clientes = Cliente::all();
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
+        $clienteIds = $this->getClienteIds();
+
+        $clientes = Cliente::whereIn('id', $clienteIds)->get();
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
         $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
-        return view('eventos.edit', [
+        return view('eventos.client.edit-client', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
@@ -139,6 +210,15 @@ class EventoController extends Controller
 
     public function update(Request $request, Evento $evento)
     {
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
+        // Verificar que el usuario tenga acceso al nuevo cliente si se cambió
+        if (!$this->userHasAccessToCliente($request->cliente_id)) {
+            return redirect()->back()->with('error', 'No tienes acceso a este cliente.');
+        }
+
         $validated = $request->validate([
         'fecha_hora' => 'required|date',
         'cliente_id' => 'required|exists:clientes,id',
@@ -196,13 +276,17 @@ class EventoController extends Controller
         }
     }
 
-    return redirect()->route('eventos.index')->with('success', 'Evento actualizado correctamente.');
+    return redirect()->route('client.eventos.index')->with('success', 'Evento actualizado correctamente.');
     
     }
 
 
     public function destroy(Evento $evento)
     {
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
         // Eliminar reportes generados asociados al evento primero
         foreach($evento->reportesGenerados as $reporte) {
             $reporte->delete();
@@ -216,11 +300,16 @@ class EventoController extends Controller
 
         $evento->delete();
 
-        return redirect()->route('eventos.index')->with('success', 'Evento eliminado correctamente');
+        return redirect()->route('client.eventos.index')->with('success', 'Evento eliminado correctamente');
     }
 
     public function destroyMedia(Media $media)
     {
+        $evento = $media->model;
+        if (!$evento instanceof Evento || !$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->back()->with('error', 'No tienes acceso a este recurso.');
+        }
+
         Storage::disk('public')->delete($media->file_path);
         $media->delete();
 
@@ -229,8 +318,14 @@ class EventoController extends Controller
 
     public function eventosBarras(Request $request)
     {
+        $redirect = $this->redirectIfNoClientes();
+        if ($redirect) {
+            return response()->json([]);
+        }
 
-         $query = Evento::query();
+        $clienteIds = $this->getClienteIds();
+
+        $query = Evento::query();
 
         // Filtrar por fecha, ?start_date=2025-08-01&end_date=2025-08-05
         if ($request->filled('start_date') && $request->filled('end_date')) {

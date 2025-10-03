@@ -1,4 +1,5 @@
-<x-app-layout>
+@extends('layouts.cliente')
+@section('content')
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
@@ -77,12 +78,12 @@
 
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Registrar Nuevo Evento</h2>
-                        <a href="{{ route('eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        <a href="{{ route('client.eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
                             <i class="bi bi-arrow-left mr-2"></i> Volver al listado
                         </a>
                     </div>
 
-                    <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                    <form action="{{ route('client.eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         <!-- 1. Categoria -->
                         <div class="bg-gray-700 p-4 rounded-lg">
@@ -160,7 +161,8 @@
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" @if(old('cliente_id') == $cliente->id) selected @endif
+                                    <option value="{{ $cliente->id }}"
+                                        @if(old('cliente_id') == $cliente->id) selected @endif
                                         data-empresas="{{ $cliente->empresasAsociadas->pluck('nombre', 'id') }}">
                                         {{ $cliente->nombre }}
                                     </option>
@@ -675,4 +677,4 @@
     });
 </script>
 @endpush
-</x-app-layout>
+@endsection

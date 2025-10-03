@@ -12,17 +12,94 @@ use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
 
+
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// DASHBOARD LAYOUT PRINCIPAL
+Route::get('/main-dashboard', function () {
+    return view('dashboard'); // Vista normal con layout app
+})->middleware(['auth', 'verified'])
+  ->name('main.dashboard');
+
+// LAYOUT CLIENTES
+Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->group(function () {
+    //DASHBOARD
+    Route::get('/dashboard', function () {
+        return view('client.dashboard');
+    })->name('dashboard');
+
+    //EVENTOS (USA CONTROLADOR DIFERENTE)
+    Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.create');
+
+    Route::get('/eventos', [\App\Http\Controllers\EventoClientController::class, 'index'])
+        ->middleware('can:ver.eventos')
+        ->name('eventos.index');
+
+    Route::post('/eventos/store', [\App\Http\Controllers\EventoClientController::class, 'store'])
+        ->middleware('can:crear.eventos')
+        ->name('eventos.store');
+
+    Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoClientController::class, 'edit'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.edit');
+
+    Route::put('/eventos/{evento}/update', [\App\Http\Controllers\EventoClientController::class, 'update'])
+        ->middleware('can:editar.eventos')
+        ->name('eventos.update');
+
+    Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
+        ->middleware('can:eliminar.eventos')
+        ->name('eventos.destroy');
+
+    //REPORTES (USA CONTROLADOR DIFERENTE)
+    Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteClientController::class, 'preview'])
+        ->middleware('can:ver.reportes')
+        ->name('eventos.reporte.preview');
+    Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteClientController::class, 'generate'])
+        ->middleware('can:generar.reportes')
+        ->name('eventos.reporte.generate');
+    Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteClientController::class, 'download'])
+        ->middleware('can:generar.reportes')
+        ->name('reportes.download');
+    Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteClientController::class, 'view'])
+        ->middleware('can:ver.reportes')
+        ->name('reportes.view');
+    Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteClientController::class, 'previewIframe'])
+        ->middleware('can:ver.reportes')
+        ->name('eventos.reporte.preview-iframe');
+    
+        
+    //SEGUIMIENTOS (USA MISMO CONTROLADOR)
+    Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
+        ->middleware('can:ver.seguimientos')
+        ->name('seguimientos.index');
+
+    // PATRULLAS (USA MISMO CONTROLADOR)
+    Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
+        ->name('patrullas.index');
+
+    //MOBILE VEHICLE USA NUEVO CONTROLADOR
+
+    Route::get('/patrullas/mapa', [\App\Http\Controllers\MobileVehicleClientController::class, 'locationClient'])
+        ->name('patrullas.location');
+
+    //TICKETS Y NOTIFICACIONES
+    Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'indexClient'])
+        ->middleware('can:ver.tickets')
+        ->name('tickets.nuevo');
+
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
-
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
@@ -378,8 +455,6 @@ Route::middleware([
             ], 500);
         }
     });
-
-
 });
 
 

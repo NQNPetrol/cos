@@ -54,6 +54,7 @@
                     <th class="px-4 py-2 text-left">Modelo</th>
                     <th class="px-4 py-2 text-left">Color</th>
                     <th class="px-4 py-2 text-left">Estado</th>
+                    <th class="px-4 py-2 text-left">Cliente</th>
                     <th class="px-4 py-2 text-left">Observaciones</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
@@ -73,6 +74,7 @@
                                 {{ ucfirst($patrulla->estado) }}
                             </span>
                         </td>
+                        <td class="px-4 py-2">{{ $patrulla->cliente->nombre ?? 'Sin asignar' }}</td>
                         <td class="px-4 py-2">{{ $patrulla->observaciones }}</td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-3">
@@ -176,8 +178,6 @@
                             @error('color') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
-    
-                        
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Estado</label>
                             <select wire:model="estado" 
@@ -187,6 +187,18 @@
                                 <option value="baja">Dada de baja</option>
                             </select>
                             @error('estado') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm mb-1 text-gray-300">Cliente Asignado <span class="text-red-500">*</span></label>
+                            <select wire:model="cliente_id" 
+                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <option value="">Seleccione un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('cliente_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
