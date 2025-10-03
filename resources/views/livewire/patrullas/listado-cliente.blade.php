@@ -56,7 +56,6 @@
                         <td class="px-4 py-2">{{ $patrulla->observaciones }}</td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-3">
-                                
                                 <a href="{{ route('client.patrullas.location') }}" 
                                    class="text-orange-400 hover:text-orange-300"
                                    title="Ubicacion">
