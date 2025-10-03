@@ -5,19 +5,34 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Models\AlertLog;
+use App\Models\User;
 
 class AlertasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('alertas.flytbase.index');
+        $logs = AlertLog::with('user')
+            ->tipo($request->tipo)
+            ->usuario($request->usuario)
+            ->exitoso($request->exitoso)
+            ->fechaDesde($request->fecha_desde)
+            ->fechaHasta($request->fecha_hasta)
+            ->latest()
+            ->paginate(10)
+            ->appends($request->query());
+
+        // Obtener usuarios para el filtro
+        $usuarios = User::whereHas('alertLogs')->get();
+
+        return view('alertas.flytbase.index', compact('logs', 'usuarios'));
     }
 
     public function triggerAlarm(Request $request)
     {
         try {
             $webhookUrl = env('FLYTBASE_WEBHOOK_URL');
-            $token = 'Bearer ' . env('FLYTBASE_API_TOKEN');
+            $token = 'Bearer ' . $request->token; //token dinamico desde formulario
 
             $payload = [
                 'timestamp' => round(microtime(true) * 1000), // Timestamp en milisegundos
@@ -48,16 +63,29 @@ class AlertasController extends Controller
                 ])
                 ->post($webhookUrl, $payload);
 
-            
+            $statusCode = $response->status();
+            $responseBody = $response->body();
+            $esExitoso = $statusCode >= 200 && $statusCode < 300;
 
-
-            Log::info('Respuesta HTTP recibida de Flytbase', [
-                'status_code' => $response->status(),
-                'response_body' => $response->body(),
-                'response_headers' => $response->headers()
+            //crear registro en tabla de logs            
+            $alertLog = AlertLog::create([
+                'tipo_alerta' => 'trigger_mision',
+                'descripcion' => 'Desplegar mision Perimetro Rodial',
+                'user_id' => auth()->id(),
+                'exito' => $esExitoso,
+                'codigo_respuesta' => $statusCode,
+                'mensaje_error' => $esExitoso ? null : $responseBody, 
+                'payload' => $payload,
+                'respuesta' => json_decode($responseBody, true) ?: ['raw' => $responseBody]
             ]);
 
-            if ($response->successful()) {
+            Log::info('Respuesta HTTP recibida de Flytbase', [
+                'status_code' => $statusCode,
+                'response_body' => $responseBody,
+                'es_exitoso' => $esExitoso // ⬅️ Para debug
+            ]);
+
+            if ($esExitoso) {
                 Log::info('Alarma enviada exitosamente a Flytbase');
                 return response()->json([
                     'success' => true,
@@ -75,6 +103,15 @@ class AlertasController extends Controller
             }
 
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            AlertLog::create([
+                'tipo_alerta' => 'trigger_mision',
+                'descripcion' => 'Desplegar mision Perimetro Rodial',
+                'user_id' => auth()->id(),
+                'exito' => false,
+                'codigo_respuesta' => 0,
+                'mensaje_error' => $e->getMessage(),
+                'payload' => $payload ?? [],
+            ]);
            
             Log::error('Error de conexión con Flytbase', [
                 'exception_message' => $e->getMessage(),
@@ -87,6 +124,15 @@ class AlertasController extends Controller
             ], 500);
 
         } catch (\Exception $e) {
+            AlertLog::create([
+                'tipo_alerta' => 'trigger_mision',
+                'descripcion' => 'Desplegar mision Perimetro Rodial',
+                'user_id' => auth()->id(),
+                'exito' => false,
+                'codigo_respuesta' => 0,
+                'mensaje_error' => $e->getMessage(),
+                'payload' => $payload ?? [],
+            ]);
             // Error general
             Log::error('Error general en triggerAlarm', [
                 'exception_message' => $e->getMessage(),

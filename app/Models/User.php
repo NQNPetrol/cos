@@ -73,6 +73,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function alertLogs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class);
+    }
+
      /**
      * Tickets creados por este usuario
      */
