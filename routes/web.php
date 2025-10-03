@@ -58,6 +58,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
+    
+    Route::post('/eventos/{evento}/anular', [\App\Http\Controllers\EventoClientController::class, 'anular'])
+        ->name('eventos.anular');
 
     //REPORTES (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteClientController::class, 'preview'])

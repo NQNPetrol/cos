@@ -51,6 +51,27 @@ class EventoClientController extends Controller
         return null;
     }
 
+    public function anular(Request $request, Evento $evento)
+    {
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
+        // Verificar que el evento no esté ya anulado
+        if ($evento->es_anulado) {
+            return redirect()->route('client.eventos.index')->with('error', 'Este evento ya ha sido anulado.');
+        }
+
+        // Actualizar los campos de anulación
+        $evento->update([
+            'es_anulado' => true,
+            'anulado_por' => Auth::user()->name,
+            'fecha_anulado' => now()
+        ]);
+
+        return redirect()->route('client.eventos.index')->with('success', 'Evento anulado correctamente.');
+    }
+
     public function index(Request $request)
     {
         $redirect = $this->redirectIfNoClientes();
@@ -60,7 +81,10 @@ class EventoClientController extends Controller
 
         $clienteIds = $this->getClienteIds();
 
-        $query = Evento::with(['creador', 'cliente', 'categoria'])->whereIn('cliente_id', $clienteIds)->latest('fecha_hora');
+        $query = Evento::with(['creador', 'cliente', 'categoria'])
+            ->whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->latest('fecha_hora');
 
         if ($request->filled('cliente_id')) {
             if ($this->userHasAccessToCliente($request->cliente_id)) {

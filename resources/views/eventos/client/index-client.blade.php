@@ -203,6 +203,17 @@
                                                 title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
+                                            <!-- Botón para anular evento -->
+                                            <form action="{{ route('client.eventos.anular', $evento) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('POST')
+                                                <button type="submit" 
+                                                        class="text-red-600 hover:text-red-900 dark:text-red-400"
+                                                        title="Anular Evento"
+                                                        onclick="return confirm('¿Estás seguro de que deseas anular este evento? Esta acción no se puede deshacer.')">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
