@@ -458,6 +458,13 @@ Route::middleware([
             ], 500);
         }
     });
+
+    // ALERTAS
+    Route::get('/alertas', [App\Http\Controllers\AlertasController::class, 'index'])
+        // ->middleware('can:ver.alertas')
+        ->name('alertas.index');
+    Route::post('/alertas/trigger-alarm', [App\Http\Controllers\AlertasController::class, 'triggerAlarm'])
+        ->name('alertas.trigger-alarm');
 });
 
 

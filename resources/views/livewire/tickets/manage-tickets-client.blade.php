@@ -239,7 +239,6 @@
                                         <th class="px-4 py-3 text-left">Categoría</th>
                                         <th class="px-4 py-3 text-left">Prioridad</th>
                                         <th class="px-4 py-3 text-left">Estado</th>
-                                        <th class="px-4 py-3 text-left">Cliente</th>
                                         <th class="px-4 py-3 text-left">Creado por</th>
                                         @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                             <th class="px-4 py-3 text-left">Asignado a</th>
@@ -281,17 +280,7 @@
                                                     {{ $estados[$ticket->estado] ?? ucfirst(str_replace('_', ' ', $ticket->estado)) }}
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-3">
-                                                @if($ticket->cliente_id)
-                                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-600 text-indigo-100">
-                                                        {{ $ticket->cliente->nombre }}
-                                                    </span>
-                                                @else
-                                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-600 text-gray-100">
-                                                        Interno
-                                                    </span>
-                                                @endif
-                                            </td>
+                                            
                                             <td class="px-4 py-3 text-white">{{ $ticket->user->name }}</td>
                                             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                                 <td class="px-4 py-3 text-gray-300">

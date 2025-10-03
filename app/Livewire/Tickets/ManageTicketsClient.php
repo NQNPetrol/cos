@@ -98,7 +98,7 @@ class ManageTicketsClient extends Component
 
         $usuariosParaAsignar = $this->getUsuariosParaAsignar();
 
-        return view('livewire.tickets.manage-tickets', [
+        return view('livewire.tickets.manage-tickets-client', [
             'tickets' => $tickets,
             'clientes' => $clientes,
             'usuarios' => $usuariosParaAsignar,
