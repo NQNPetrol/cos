@@ -59,6 +59,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-3">Tipo de Alerta</label>
                                         <select id="tipoAlerta" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                            <option value="" selected disabled>Seleccione un tipo de alerta...</option>
                                             <option value="trigger_mision">🚀 Trigger Misión</option>
                                             <option value="alerta_tecnica">⚠️ Alerta Técnica</option>
                                             <option value="alerta_hardware">🔧 Alerta Hardware</option>
