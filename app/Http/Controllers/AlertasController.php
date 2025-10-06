@@ -7,17 +7,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\AlertLog;
 use App\Models\User;
+use App\Models\MisionFlytbase;
 
 class AlertasController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
+
         $logs = AlertLog::with('user')
             ->tipo($request->tipo)
             ->usuario($request->usuario)
             ->exitoso($request->exitoso)
             ->fechaDesde($request->fecha_desde)
             ->fechaHasta($request->fecha_hasta)
+            ->porMisionesUsuario($user)
             ->latest()
             ->paginate(10)
             ->appends($request->query());
@@ -25,19 +29,58 @@ class AlertasController extends Controller
         // Obtener usuarios para el filtro
         $usuarios = User::whereHas('alertLogs')->get();
 
-        return view('alertas.flytbase.index', compact('logs', 'usuarios'));
+        $misiones = $this->getMisionesDisponibles($user);
+
+        return view('alertas.flytbase.index', compact('logs', 'usuarios', 'misiones'));
     }
 
     public function triggerAlarm(Request $request)
     {
         try {
-            $webhookUrl = env('FLYTBASE_WEBHOOK_URL');
-            $token = 'Bearer ' . $request->token; //token dinamico desde formulario
+            $user = auth()->user();
+            $tipoAlerta = $request->tipo_alerta;
+            $misionId = $request->mision_id;
+
+            // Validar que si es trigger_mision, tenga una misión seleccionada
+            if ($tipoAlerta === 'trigger_mision' && !$misionId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Debe seleccionar una misión para enviar el trigger.'
+                ], 400);
+            }
+
+            // Obtener la misión si es trigger_mision
+            if ($tipoAlerta === 'trigger_mision') {
+                $mision = MisionFlytbase::activas()->find($misionId);
+                
+                if (!$mision) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'La misión seleccionada no existe o no está activa.'
+                    ], 400);
+                }
+
+                // Verificar permisos del usuario para esta misión
+                if (!$this->usuarioPuedeAccederMision($user, $mision)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No tiene permisos para acceder a esta misión.'
+                    ], 403);
+                }
+
+                $webhookUrl = $mision->url;
+                $descripcion = "Desplegar misión: {$mision->nombre}";
+            } else {
+                $webhookUrl = env('FLYTBASE_WEBHOOK_URL');
+                $descripcion = 'Alerta técnica/hardware';
+            }
+
+            $token = 'Bearer ' . env('FLYTBASE_WEBHOOK_TOKEN');
 
             $payload = [
-                'timestamp' => round(microtime(true) * 1000), // Timestamp en milisegundos
+                'timestamp' => round(microtime(true) * 1000),
                 'severity' => 2,
-                'description' => 'Desplegar mision Perimetro Rodial',
+                'description' => 'Iniciando mision drone',
                 'latitude' => 37.7749,
                 'longitude' => -122.4194,
                 'altitude_msl' => 100,
@@ -50,11 +93,13 @@ class AlertasController extends Controller
 
             Log::info('Iniciando envío de alarma a Flytbase', [
                 'webhook_url' => $webhookUrl,
+                'tipo_alerta' => $tipoAlerta,
+                'mision_id' => $misionId,
                 'payload' => $payload,
-                'user' => auth()->user()->name ?? 'Unknown'
+                'user' => $user->name
             ]);
 
-            $response = Http::withOptions(['verify' => false]) // ⬅️ misma configuración SSL
+            $response = Http::withOptions(['verify' => false])
                 ->timeout(30)
                 ->withHeaders([
                     'Authorization' => $token,
@@ -67,29 +112,38 @@ class AlertasController extends Controller
             $responseBody = $response->body();
             $esExitoso = $statusCode >= 200 && $statusCode < 300;
 
-            //crear registro en tabla de logs            
-            $alertLog = AlertLog::create([
-                'tipo_alerta' => 'trigger_mision',
-                'descripcion' => 'Desplegar mision Perimetro Rodial',
-                'user_id' => auth()->id(),
+            // Crear registro en tabla de logs
+            $alertLogData = [
+                'tipo_alerta' => $tipoAlerta,
+                'descripcion' => $descripcion,
+                'user_id' => $user->id,
                 'exito' => $esExitoso,
                 'codigo_respuesta' => $statusCode,
-                'mensaje_error' => $esExitoso ? null : $responseBody, 
+                'mensaje_error' => $esExitoso ? null : $responseBody,
                 'payload' => $payload,
                 'respuesta' => json_decode($responseBody, true) ?: ['raw' => $responseBody]
-            ]);
+            ];
+
+            // Solo agregar mision_id si es trigger_mision
+            if ($tipoAlerta === 'trigger_mision') {
+                $alertLogData['mision_id'] = $misionId;
+            }
+
+            $alertLog = AlertLog::create($alertLogData);
 
             Log::info('Respuesta HTTP recibida de Flytbase', [
                 'status_code' => $statusCode,
                 'response_body' => $responseBody,
-                'es_exitoso' => $esExitoso // ⬅️ Para debug
+                'es_exitoso' => $esExitoso
             ]);
 
             if ($esExitoso) {
                 Log::info('Alarma enviada exitosamente a Flytbase');
                 return response()->json([
                     'success' => true,
-                    'message' => 'Alarma enviada correctamente. Misión "Perímetro Rodial" desplegada.'
+                    'message' => $tipoAlerta === 'trigger_mision' 
+                        ? "Alarma enviada correctamente. Misión '{$mision->nombre}' desplegada."
+                        : 'Alarma enviada correctamente.'
                 ]);
             } else {
                 Log::warning('Flytbase respondió con código de error', [
@@ -102,43 +156,27 @@ class AlertasController extends Controller
                 ], 500);
             }
 
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            AlertLog::create([
-                'tipo_alerta' => 'trigger_mision',
-                'descripcion' => 'Desplegar mision Perimetro Rodial',
-                'user_id' => auth()->id(),
-                'exito' => false,
-                'codigo_respuesta' => 0,
-                'mensaje_error' => $e->getMessage(),
-                'payload' => $payload ?? [],
-            ]);
-           
-            Log::error('Error de conexión con Flytbase', [
-                'exception_message' => $e->getMessage(),
-                'exception_trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de conexión: ' . $e->getMessage()
-            ], 500);
-
         } catch (\Exception $e) {
-            AlertLog::create([
-                'tipo_alerta' => 'trigger_mision',
-                'descripcion' => 'Desplegar mision Perimetro Rodial',
+            $alertLogData = [
+                'tipo_alerta' => $tipoAlerta ?? 'trigger_mision',
+                'descripcion' => $descripcion ?? 'Error desconocido',
                 'user_id' => auth()->id(),
                 'exito' => false,
                 'codigo_respuesta' => 0,
                 'mensaje_error' => $e->getMessage(),
                 'payload' => $payload ?? [],
-            ]);
-            // Error general
-            Log::error('Error general en triggerAlarm', [
+            ];
+
+            if (isset($misionId) && $tipoAlerta === 'trigger_mision') {
+                $alertLogData['mision_id'] = $misionId;
+            }
+
+            AlertLog::create($alertLogData);
+
+            Log::error('Error en triggerAlarm', [
                 'exception_message' => $e->getMessage(),
                 'exception_file' => $e->getFile(),
-                'exception_line' => $e->getLine(),
-                'exception_trace' => $e->getTraceAsString()
+                'exception_line' => $e->getLine()
             ]);
 
             return response()->json([
@@ -146,5 +184,35 @@ class AlertasController extends Controller
                 'message' => 'Error interno: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    private function getMisionesDisponibles($user)
+    {
+        $query = MisionFlytbase::activas()->with('cliente');
+
+        if ($user->hasRole('admin') || $user->hasRole('operador')) {
+            return $query->get();
+        }
+
+        if ($user->hasRole('cliente')) {
+            $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+            return $query->porClientes($userClientes)->get();
+        }
+
+        return collect();
+    }
+
+    private function usuarioPuedeAccederMision($user, $mision)
+    {
+        if ($user->hasRole('admin') || $user->hasRole('operador')) {
+            return true;
+        }
+
+        if ($user->hasRole('cliente')) {
+            $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+            return in_array($mision->cliente_id, $userClientes->toArray());
+        }
+
+        return false;
     }
 }

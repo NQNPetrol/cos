@@ -465,6 +465,32 @@ Route::middleware([
         ->name('alertas.index');
     Route::post('/alertas/trigger-alarm', [App\Http\Controllers\AlertasController::class, 'triggerAlarm'])
         ->name('alertas.trigger-alarm');
+
+    // MISIONES FLYTBASE
+    Route::get('/misiones-flytbase', [\App\Http\Controllers\MisionFlytbaseController::class, 'index'])
+        ->name('misiones-flytbase.index')
+        ->middleware('can:ver.misiones');
+
+    Route::post('/misiones-flytbase/{misionesFlytbase}/toggle-status', [\App\Http\Controllers\MisionFlytbaseController::class, 'toggleStatus'])
+        ->name('misiones-flytbase.toggle-status')
+        ->middleware('can:crear.misiones');
+    
+    Route::post('/misiones-flytbase', [App\Http\Controllers\MisionFlytbaseController::class, 'store'])
+        ->name('misiones-flytbase.store')
+        ->middleware('can:crear.misiones');
+    
+    Route::put('/misiones-flytbase/{misionesFlytbase}', [App\Http\Controllers\MisionFlytbaseController::class, 'update'])
+        ->name('misiones-flytbase.update')
+        ->middleware('can:crear.misiones');
+
+    Route::delete('/misiones-flytbase/{misionesFlytbase}', [App\Http\Controllers\MisionFlytbaseController::class, 'destroy'])
+        ->name('misiones-flytbase.destroy')
+        ->middleware('can:crear.misiones');
+
+    
+
+    
+
 });
 
 

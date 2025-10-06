@@ -611,6 +611,10 @@
                                 <i class="bi bi-rocket-takeoff"></i>
                                 <span>Flytbase</span>
                             </a>
+                            <a href="{{ route('misiones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                <i class="bi bi-rocket-takeoff"></i>
+                                <span>Misiones</span>
+                            </a>
                         </div>
                     </div>
 
