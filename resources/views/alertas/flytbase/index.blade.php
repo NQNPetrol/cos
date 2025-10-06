@@ -36,7 +36,7 @@
                         </div>
                     @endif
 
-                    <div class="space-y-6">
+                    <div class="space-y-8"> <!-- Aumenté el espacio entre secciones -->
                         <!-- Header -->
                         <div class="flex justify-between items-center">
                             <h2 class="text-2xl font-semibold text-gray-100">Administrar Alertas Flytbase</h2>
@@ -52,66 +52,95 @@
                         <!-- Panel de Configuración de Alertas -->
                         <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
                             <div class="p-6">
-                                <h3 class="text-lg font-medium text-gray-100 mb-4">Configurar y Enviar Alerta</h3>
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                
+                                <div class="space-y-6"> <!-- Espacio interno mejorado -->
                                     <!-- Tipo de Alerta -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Alerta</label>
-                                        <select id="tipoAlerta" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                        <label class="block text-sm font-medium text-gray-300 mb-3">Tipo de Alerta</label>
+                                        <select id="tipoAlerta" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                            <option value="" selected disabled>Seleccione un tipo de alerta...</option>
                                             <option value="trigger_mision">🚀 Trigger Misión</option>
                                             <option value="alerta_tecnica">⚠️ Alerta Técnica</option>
                                             <option value="alerta_hardware">🔧 Alerta Hardware</option>
                                         </select>
+                                        <p class="text-xs text-gray-400 mt-2">Selecciona el tipo de alerta a enviar</p>
                                     </div>
 
-                                    <!-- Token -->
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Flytbase Token (sin Bearer)</label>
-                                        <input type="text" id="flytbaseToken" 
-                                            placeholder="Ingresa el token actual"
-                                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 placeholder-gray-400">
-                                        <p class="text-xs text-gray-400 mt-1">El token expira cada 15 minutos</p>
+                                    <div id="misionContainer" class="hidden transition-all duration-300">
+                                        <label class="block text-sm font-medium text-gray-300 mb-3">Misión a realizar</label>
+                                        <select id="misionSelect" name="mision_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                            <option value="">Seleccione una misión</option>
+                                            @foreach($misiones as $mision)
+                                                <option value="{{ $mision->id }}">
+                                                    {{ $mision->nombre }} - {{ $mision->cliente->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <p class="text-xs text-gray-400 mt-2">Seleccione la misión que desea desplegar</p>
+                                    </div>
+
+                                    <!-- Información de configuración -->
+                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
+                                        <div class="flex items-start">
+                                            <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-200">Tener en cuenta</h4>
+                                                <p class="text-xs text-gray-400 mt-1">Una vez mandada un alerta de tipo "Trigger Mision", esta debe ser revisada por un operador quien se encargará de aprobar el despliegue del drone a la mision seleccionada.</p>
+                                                <p class="text-xs text-gray-400 mt-1">En caso de que salte un error, comunicarse con el soporte del COS (cos.support@cyhsur.com)</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Botón Enviar -->
-                                <div class="flex justify-end">
+                                <div class="flex justify-end mt-8 pt-6 border-t border-gray-700">
                                     <button id="triggerAlarmBtn"
-                                            class="inline-flex items-center px-6 py-3 bg-green-600 border border-transparent rounded-md font-medium text-sm text-white uppercase tracking-widest hover:bg-green-700 focus:outline-none focus:border-cyan-800 focus:ring ring-cyan-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-exclamation mr-2" viewBox="0 0 16 16">
+                                            class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 border border-transparent rounded-lg font-medium text-sm text-white uppercase tracking-widest hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-send-exclamation mr-3" viewBox="0 0 16 16">
                                             <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.75.75 0 0 0-.124 1.329l4.995 3.178 1.531 2.406a.5.5 0 0 0 .844-.536L6.637 10.07l7.494-7.494-1.895 4.738a.5.5 0 1 0 .928.372zm-2.54 1.183L5.93 9.363 1.591 6.602z"/>
                                             <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1.5a.5.5 0 0 1-1 0V11a.5.5 0 0 1 1 0m0 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
                                         </svg>
-                                        Enviar
+                                        Enviar Alerta
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Historial de Logs -->
-                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 mt-8"> <!-- Margen superior adicional -->
                             <div class="p-6">
                                 <!-- Header con título y botones de filtro -->
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                                    <h3 class="text-lg font-medium text-gray-100">Historial de Alertas</h3>
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-100">Historial de Alertas</h3>
+                                        <p class="text-sm text-gray-400 mt-1">Registro de todas las alertas enviadas al sistema</p>
+                                    </div>
                                     <div class="flex space-x-2">
-                                        <button type="submit" form="filterForm" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                                        <button type="submit" form="filterForm" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm transition-colors">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
+                                            </svg>
                                             Filtrar
                                         </button>
-                                        <a href="{{ route('alertas.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm">
+                                        <a href="{{ route('alertas.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm transition-colors">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                            </svg>
                                             Limpiar
                                         </a>
                                     </div>
                                 </div>
 
                                 <!-- Filtros -->
-                                <form method="GET" action="{{ route('alertas.index') }}" id="filterForm" class="mb-6">
+                                <form method="GET" action="{{ route('alertas.index') }}" id="filterForm" class="mb-8">
                                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                                         <!-- Tipo -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
-                                            <select name="tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
+                                            <select name="tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos los tipos</option>
                                                 <option value="trigger_mision" {{ request('tipo') == 'trigger_mision' ? 'selected' : '' }}>Trigger Misión</option>
                                                 <option value="alerta_tecnica" {{ request('tipo') == 'alerta_tecnica' ? 'selected' : '' }}>Alerta Técnica</option>
@@ -121,8 +150,8 @@
 
                                         <!-- Usuario -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Usuario</label>
-                                            <select name="usuario" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Usuario</label>
+                                            <select name="usuario" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos los usuarios</option>
                                                 @foreach($usuarios as $usuario)
                                                     <option value="{{ $usuario->id }}" {{ request('usuario') == $usuario->id ? 'selected' : '' }}>
@@ -134,8 +163,8 @@
 
                                         <!-- Estado -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
-                                            <select name="exitoso" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm">
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
+                                            <select name="exitoso" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos</option>
                                                 <option value="1" {{ request('exitoso') === '1' ? 'selected' : '' }}>Exitosas</option>
                                                 <option value="0" {{ request('exitoso') === '0' ? 'selected' : '' }}>Con Error</option>
@@ -144,75 +173,89 @@
 
                                         <!-- Fecha Desde -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Desde</label>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Desde</label>
                                             <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm">
+                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                         </div>
 
                                         <!-- Fecha Hasta -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Hasta</label>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Hasta</label>
                                             <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm">
+                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                         </div>
                                     </div>
                                 </form>
 
-
                                 <!-- Tabla de Logs -->
-                                <div class="overflow-x-auto">
+                                <div class="overflow-x-auto rounded-lg border border-gray-700">
                                     <table class="min-w-full divide-y divide-gray-700">
-                                        <thead class="bg-gray-700">
+                                        <thead class="bg-gray-750">
                                             <tr>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Usuario</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Fecha/Hora</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Código</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Usuario</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Fecha/Hora</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Código</th>
                                             </tr>
                                         </thead>
                                         <tbody class="bg-gray-800 divide-y divide-gray-700">
                                             @forelse($logs as $log)
-                                            <tr class="hover:bg-gray-750 transition-colors">
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">#{{ $log->id }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                                            <tr class="hover:bg-gray-750 transition-colors duration-150">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#{{ $log->id }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                     @switch($log->tipo_alerta)
                                                         @case('trigger_mision')
-                                                            🚀 Trigger Misión
+                                                            <span class="inline-flex items-center">
+                                                                🚀 Trigger Misión
+                                                            </span>
                                                             @break
                                                         @case('alerta_tecnica')
-                                                            ⚠️ Alerta Técnica
+                                                            <span class="inline-flex items-center">
+                                                                ⚠️ Alerta Técnica
+                                                            </span>
                                                             @break
                                                         @case('alerta_hardware')
-                                                            🔧 Alerta Hardware
+                                                            <span class="inline-flex items-center">
+                                                                🔧 Alerta Hardware
+                                                            </span>
                                                             @break
                                                         @default
                                                             {{ $log->tipo_alerta }}
                                                     @endswitch
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{{ $log->user->name }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ $log->user->name }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                     {{ $log->created_at->format('d/m/Y H:i:s') }}
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                <td class="px-6 py-4 whitespace-nowrap">
                                                     @if($log->exito)
-                                                        <span class="px-2 py-1 text-xs font-medium text-green-400 ">
+                                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400 border border-green-800">
+                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                            </svg>
                                                             Exitosa
                                                         </span>
                                                     @else
-                                                        <span class="px-2 py-1 text-xs font-medium text-red-400">
-                                                            ¡Error!
+                                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">
+                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                            </svg>
+                                                            Error
                                                         </span>
                                                     @endif
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-300">
                                                     {{ $log->codigo_respuesta ?: 'N/A' }}
                                                 </td>
                                             </tr>
                                             @empty
                                             <tr>
-                                                <td colspan="6" class="px-4 py-4 text-center text-sm text-gray-400">
+                                                <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">
+                                                    <svg class="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
                                                     No se encontraron registros de alertas
                                                 </td>
                                             </tr>
@@ -223,7 +266,7 @@
 
                                 <!-- Paginación -->
                                 @if($logs->hasPages())
-                                    <div class="mt-4">
+                                    <div class="mt-6">
                                         {{ $logs->links() }}
                                     </div>
                                 @endif
@@ -235,15 +278,17 @@
         </div>
     </div>
 
-    <!-- Script para manejar el trigger -->
+    <!-- Script para manejar el trigger (sin cambios) -->
     <script>
         document.getElementById('triggerAlarmBtn').addEventListener('click', function() {
             const button = this;
             const originalText = button.innerHTML;
-            const token = document.getElementById('flytbaseToken').value;
+            const tipoAlerta = document.getElementById('tipoAlerta').value;
+            const misionId = document.getElementById('misionSelect').value;
             
-            if (!token) {
-                showAlert('error', 'Por favor ingresa el token de Flytbase');
+            // Validar que si es trigger_mision, tenga misión seleccionada
+            if (tipoAlerta === 'trigger_mision' && !misionId) {
+                showAlert('error', 'Debe seleccionar una misión para continuar.');
                 return;
             }
             
@@ -257,6 +302,15 @@
             `;
             button.disabled = true;
 
+            // Preparar datos para enviar
+            const requestData = {
+                tipo_alerta: tipoAlerta
+            };
+
+            if (tipoAlerta === 'trigger_mision') {
+                requestData.mision_id = misionId;
+            }
+
             // Hacer la petición AJAX
             fetch('{{ route("alertas.trigger-alarm") }}', {
                 method: 'POST',
@@ -264,9 +318,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({
-                    token: token
-                })
+                body: JSON.stringify(requestData)
             })
             .then(response => response.json())
             .then(data => {
@@ -330,5 +382,22 @@
                 }
             }, 5000);
         }
+
+        // Manejar cambio en el tipo de alerta
+        document.getElementById('tipoAlerta').addEventListener('change', function() {
+            const misionContainer = document.getElementById('misionContainer');
+            const misionSelect = document.getElementById('misionSelect');
+            
+            if (this.value === 'trigger_mision') {
+                misionContainer.classList.remove('hidden');
+                misionContainer.classList.add('block');
+                misionSelect.required = true;
+            } else {
+                misionContainer.classList.remove('block');
+                misionContainer.classList.add('hidden');
+                misionSelect.required = false;
+                misionSelect.value = '';
+            }
+        });
     </script>
 </x-app-layout>

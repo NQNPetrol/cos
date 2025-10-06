@@ -18,7 +18,8 @@ class AlertLog extends Model
         'codigo_respuesta',
         'mensaje_error',
         'payload',
-        'respuesta'
+        'respuesta',
+        'mision_id'
     ];
 
     protected $casts = [
@@ -31,6 +32,11 @@ class AlertLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mision(): BelongsTo
+    {
+        return $this->belongsTo(MisionFlytbase::class, 'mision_id');
     }
 
     // Scopes para filtros
@@ -60,5 +66,21 @@ class AlertLog extends Model
     public function scopeFechaHasta($query, $fecha)
     {
         return $fecha ? $query->where('created_at', '<=', $fecha . ' 23:59:59') : $query;
+    }
+
+    public function scopePorMisionesUsuario($query, $user)
+    {
+        if ($user->hasRole('admin') || $user->hasRole('operador')) {
+            return $query;
+        }
+
+        if ($user->hasRole('cliente')) {
+            $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+            return $query->whereHas('mision', function($q) use ($userClientes) {
+                $q->whereIn('cliente_id', $userClientes);
+            });
+        }
+
+        return $query;
     }
 }
