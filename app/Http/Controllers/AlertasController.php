@@ -23,7 +23,7 @@ class AlertasController extends Controller
             ->fechaHasta($request->fecha_hasta)
             ->porMisionesUsuario($user)
             ->latest()
-            ->paginate(10)
+            ->paginate(5)
             ->appends($request->query());
 
         // Obtener usuarios para el filtro
@@ -51,7 +51,7 @@ class AlertasController extends Controller
 
             // Obtener la misión si es trigger_mision
             if ($tipoAlerta === 'trigger_mision') {
-                $mision = MisionFlytbase::activas()->find($misionId);
+                $mision = MisionFlytbase::with('drone')->activas()->find($misionId);
                 
                 if (!$mision) {
                     return response()->json([
@@ -139,12 +139,21 @@ class AlertasController extends Controller
 
             if ($esExitoso) {
                 Log::info('Alarma enviada exitosamente a Flytbase');
-                return response()->json([
+                $responseData = [
                     'success' => true,
                     'message' => $tipoAlerta === 'trigger_mision' 
                         ? "Alarma enviada correctamente. Misión '{$mision->nombre}' desplegada."
                         : 'Alarma enviada correctamente.'
-                ]);
+                ];
+                if ($tipoAlerta === 'trigger_mision' && $mision->hasLiveview()) {
+                    $responseData['mision_id'] = $misionId;
+                    $responseData['mision_nombre'] = $mision->nombre;
+                    $responseData['has_liveview'] = true;
+                    $responseData['drone_name'] = $mision->drone->drone;
+                    $responseData['liveview_route'] = $mision->getLiveviewRoute();
+                }
+                
+                return response()->json($responseData);
             } else {
                 Log::warning('Flytbase respondió con código de error', [
                     'status_code' => $response->status(),

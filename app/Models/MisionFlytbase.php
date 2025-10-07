@@ -17,6 +17,7 @@ class MisionFlytbase extends Model
         'nombre',
         'descripcion',
         'cliente_id',
+        'drone_id',
         'url',
         'activo'
     ];
@@ -28,6 +29,11 @@ class MisionFlytbase extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function drone(): BelongsTo
+    {
+        return $this->belongsTo(FlytbaseDrone::class, 'drone_id');
     }
 
     public function alertLogs(): HasMany
@@ -51,5 +57,25 @@ class MisionFlytbase extends Model
     public function scopePorClientes($query, array $clienteIds)
     {
         return $query->whereIn('cliente_id', $clienteIds);
+    }
+
+    public function scopeConDrone($query)
+    {
+        return $query->whereNotNull('drone_id');
+    }
+
+    public function hasLiveview(): bool
+    {
+        return $this->drone && $this->drone->hasLiveviewView();
+    }
+
+    public function getLiveviewRoute(): string
+    {
+        return $this->drone ? $this->drone->liveview_route : '';
+    }
+
+    public function getLiveviewViewPath(): string
+    {
+        return $this->drone ? $this->drone->liveview_view_path : '';
     }
 }

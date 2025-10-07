@@ -486,10 +486,30 @@ Route::middleware([
     Route::delete('/misiones-flytbase/{misionesFlytbase}', [App\Http\Controllers\MisionFlytbaseController::class, 'destroy'])
         ->name('misiones-flytbase.destroy')
         ->middleware('can:crear.misiones');
-
     
+    // LIVESTREAM 
+    Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
+        ->name('streaming.drone.liveview');
 
-    
+
+    Route::get('/alertas/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
+        ->name('alertas.liveview');
+
+    // API para obtener información del drone
+    Route::get('/api/drones/info', [App\Http\Controllers\FlytbaseDroneController::class, 'getDroneInfo'])
+        ->name('api.drones.info');
+
+    Route::get('/debug-routes', function() {
+        $routes = [
+            'alertas.liveview' => route('alertas.liveview'),
+            'alertas.index' => route('alertas.index'),
+        ];
+        
+        \Log::debug('Rutas disponibles:', $routes);
+        
+        return response()->json($routes);
+    })->name('debug.routes');
+
 
 });
 

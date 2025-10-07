@@ -3,41 +3,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
-                    <!-- Mensajes de sesión -->
-                    @if(session('success'))
-                        <div class="mb-6 p-4 bg-green-800 border border-green-600 text-green-100 rounded-lg flex items-center justify-between shadow-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('success') }}</span>
-                            </div>
-                            <button type="button" class="text-green-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('error') }}</span>
-                            </div>
-                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    @endif
-
-                    <div class="space-y-8"> <!-- Aumenté el espacio entre secciones -->
-                        <!-- Header -->
+                    <!-- Header -->
+                    <div class="bm-6">
                         <div class="flex justify-between items-center">
                             <h2 class="text-2xl font-semibold text-gray-100">Administrar Alertas Flytbase</h2>
                             <a href="https://console.flytbase.com" target="_blank" 
@@ -48,12 +15,59 @@
                                 </svg>
                             </a>
                         </div>
+                    
+                        @if(session('success'))
+                            <div class="w-full mb-6 p-4 bg-green-800 border border-green-600 text-green-100 rounded-lg flex items-center justify-between shadow-lg transition-all duration-300">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        @if(session('has_liveview'))
+                                            <a href="{{ route('alertas.liveview', ['mision_id' => session('mision_id')]) }}" 
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                                Ver Liveview
+                                            </a>
+                                        @endif
+                                        <button type="button" class="text-green-300 hover:text-white transition-colors duration-200" onclick="this.parentElement.parentElement.parentElement.style.display='none'">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
 
+                        @if(session('error'))
+                            <div class="w-full mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg transition-all duration-300">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium">{{ session('error') }}</span>
+                                    </div>
+                                    <button type="button" class="text-red-300 hover:text-white transition-colors duration-200" onclick="this.parentElement.parentElement.style.display='none'">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="space-y-8 mt-4">
                         <!-- Panel de Configuración de Alertas -->
                         <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
                             <div class="p-6">
-                                
-                                
                                 <div class="space-y-6"> <!-- Espacio interno mejorado -->
                                     <!-- Tipo de Alerta -->
                                     <div>
@@ -278,7 +292,7 @@
         </div>
     </div>
 
-    <!-- Script para manejar el trigger (sin cambios) -->
+    <!-- Script para manejar el trigger -->
     <script>
         document.getElementById('triggerAlarmBtn').addEventListener('click', function() {
             const button = this;
@@ -323,11 +337,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showAlert('success', data.message);
-                    // Recargar la página después de 2 segundos para mostrar el nuevo log
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                    // Mostrar alerta con botón de liveview si está disponible
+                    showAlert('success', data.message, data.has_liveview, data.mision_id);
+                    
+                    // Solo recargar si NO tiene liveview
+                    if (!data.has_liveview) {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
                 } else {
                     throw new Error(data.message);
                 }
@@ -344,7 +362,31 @@
             });
         });
 
-        function showAlert(type, message) {
+        // Manejar parámetros de URL para mostrar mensajes
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMessage = urlParams.get('success');
+            const hasLiveview = urlParams.get('has_liveview');
+            const misionId = urlParams.get('mision_id');
+
+            if (successMessage) {
+                // Limpiar parámetros de URL
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+
+                // Mostrar mensaje de éxito
+                showAlert('success', successMessage, hasLiveview, misionId);
+            }
+        });
+
+        function showAlert(type, message, hasLiveview = false, misionId = null) {
+            console.log('Mostrando alerta:', {
+                type: type,
+                message: message,
+                hasLiveview: hasLiveview,
+                misionId: misionId
+            });
+
             // Crear elemento de alerta
             const alertDiv = document.createElement('div');
             alertDiv.className = `mb-6 p-4 ${
@@ -353,35 +395,64 @@
                     : 'bg-red-800 border-red-600 text-red-100'
             } border rounded-lg flex items-center justify-between shadow-lg`;
             
-            alertDiv.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
-                            type === 'success' 
-                                ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                                : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                        }"/>
-                    </svg>
-                    <span>${message}</span>
-                </div>
-                <button type="button" class="text-${type === 'success' ? 'green' : 'red'}-300 hover:text-white" onclick="this.parentElement.remove()">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+            let alertContent = `
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
+                                type === 'success' 
+                                    ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                                    : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                            }"/>
+                        </svg>
+                        <span>${message}</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
             `;
+
+            if (hasLiveview && misionId) {
+                const liveviewUrl = "{{ route('alertas.liveview') }}?mision_id=" + misionId;
+                console.log('URL de liveview generada:', liveviewUrl);
+                
+                alertContent += `
+                    <a href="${liveviewUrl}" 
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150"
+                    onclick="console.log('Navegando a liveview:', '${liveviewUrl}')">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Ver Liveview
+                    </a>
+                `;
+            }
+
+            alertContent += `
+                        <button type="button" class="text-${type === 'success' ? 'green' : 'red'}-300 hover:text-white" onclick="this.parentElement.parentElement.parentElement.remove()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            alertDiv.innerHTML = alertContent;
             
             // Insertar después del header
             const header = document.querySelector('h2');
             header.parentNode.insertBefore(alertDiv, header.nextSibling);
             
-            // Auto-remover después de 5 segundos
+            console.log('Alerta insertada en el DOM');
+            
+            // Auto-remover después de 10 segundos (más tiempo para que el usuario pueda hacer clic en el botón)
             setTimeout(() => {
                 if (alertDiv.parentNode) {
                     alertDiv.parentNode.removeChild(alertDiv);
+                    console.log('Alerta auto-eliminada');
                 }
-            }, 5000);
+            }, 10000);
         }
+
 
         // Manejar cambio en el tipo de alerta
         document.getElementById('tipoAlerta').addEventListener('change', function() {
