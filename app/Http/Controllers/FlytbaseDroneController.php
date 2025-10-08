@@ -167,4 +167,55 @@ class FlytbaseDroneController extends Controller
             ]
         ]);
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'drone' => 'required|string|max:255|unique:drones_flytbase,drone',
+            'share_url' => 'required|url|max:500',
+            'activo' => 'boolean'
+        ]);
+
+        try {
+            FlytbaseDrone::create([
+                'drone' => $request->drone,
+                'share_url' => $request->share_url,
+                'activo' => $request->activo ?? true
+            ]);
+
+            return redirect()->route('drones-flytbase.index')
+                ->with('success', 'Drone creado exitosamente.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al crear el drone: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualizar un drone existente
+     */
+    public function update(Request $request, FlytbaseDrone $drones_flytbase)
+    {
+        $request->validate([
+            'drone' => 'required|string|max:255|unique:drones_flytbase,drone,' . $drones_flytbase->id,
+            'share_url' => 'required|url|max:500',
+            'activo' => 'boolean'
+        ]);
+
+        try {
+            $drones_flytbase->update([
+                'drone' => $request->drone,
+                'share_url' => $request->share_url,
+                'activo' => $request->activo ?? false
+            ]);
+
+            return redirect()->route('drones-flytbase.index')
+                ->with('success', 'Drone actualizado exitosamente.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al actualizar el drone: ' . $e->getMessage());
+        }
+    }
 }
