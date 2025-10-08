@@ -644,9 +644,9 @@
                             <button id="toggleAlertas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-exclamation-circle text-white text-sm"></i>
+                                        <i class="bi bi-rocket-takeoff text-white text-sm"></i>
                                     </div>
-                                    <span>Alertas</span>
+                                    <span>Flytbase</span>
                                 </div>
                                 <svg class="w-5 h-5 transition-transform duration-300" id="iconAlertas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -654,13 +654,17 @@
                             </button>
 
                             <div id="submenuAlertas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-radar"></i>
-                                    <span>Hikvision</span>
+                                <a href="{{ route('misiones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                    <i class="bi bi-calendar-check"></i>
+                                    <span>Misiones</span>
                                 </a>
                                 <a href="{{ route('alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-rocket-takeoff"></i>
-                                    <span>Flytbase</span>
+                                    <i class="bi bi-bell"></i>
+                                    <span>Alertas</span>
+                                </a>
+                                <a href="{{ route('drones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                    <i class="bi bi-bezier"></i>
+                                    <span>Drones</span>
                                 </a>
                             </div>
                         </div>
@@ -696,17 +700,6 @@
                                         <i class="bi bi-person-fill text-white text-sm"></i>
                                     </div>
                                     <span>Usuarios</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="submenu-misiones">
-                            <a href="{{ route('misiones-flytbase.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-calendar-check text-white text-sm"></i>
-                                    </div>
-                                    <span>Misiones</span>
                                 </div>
                             </a>
                         </div>

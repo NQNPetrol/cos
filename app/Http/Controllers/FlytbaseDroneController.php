@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Log;
 
 class FlytbaseDroneController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        $drones = FlytbaseDrone::withCount(['misiones' => function($query) {
+            $query->where('activo', true);
+        }])
+        ->latest()
+        ->get();
+
+        return view('drones-flytbase.index', compact('drones'));
+    }
+
     /**
      * Mostrar el liveview de un drone específico
      */

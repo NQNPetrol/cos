@@ -499,6 +499,9 @@ Route::middleware([
     Route::get('/api/drones/info', [App\Http\Controllers\FlytbaseDroneController::class, 'getDroneInfo'])
         ->name('api.drones.info');
 
+    Route::get('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'index'])->name('drones-flytbase.index');
+
+
     Route::get('/debug-routes', function() {
         $routes = [
             'alertas.liveview' => route('alertas.liveview'),
