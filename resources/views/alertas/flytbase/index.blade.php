@@ -3,41 +3,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
-                    <!-- Mensajes de sesión -->
-                    @if(session('success'))
-                        <div class="mb-6 p-4 bg-green-800 border border-green-600 text-green-100 rounded-lg flex items-center justify-between shadow-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('success') }}</span>
-                            </div>
-                            <button type="button" class="text-green-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('error') }}</span>
-                            </div>
-                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    @endif
-
-                    <div class="space-y-8"> <!-- Aumenté el espacio entre secciones -->
-                        <!-- Header -->
+                    <!-- Header -->
+                    <div class="mb-6">
                         <div class="flex justify-between items-center">
                             <h2 class="text-2xl font-semibold text-gray-100">Administrar Alertas Flytbase</h2>
                             <a href="https://console.flytbase.com" target="_blank" 
@@ -48,13 +15,13 @@
                                 </svg>
                             </a>
                         </div>
+                    </div>
 
+                    <div class="space-y-8 mt-4">
                         <!-- Panel de Configuración de Alertas -->
                         <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
                             <div class="p-6">
-                                
-                                
-                                <div class="space-y-6"> <!-- Espacio interno mejorado -->
+                                <div class="space-y-6">
                                     <!-- Tipo de Alerta -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-3">Tipo de Alerta</label>
@@ -86,10 +53,36 @@
                                             <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
-                                            <div>
+                                            <div class="flex-1">
                                                 <h4 class="text-sm font-medium text-gray-200">Tener en cuenta</h4>
                                                 <p class="text-xs text-gray-400 mt-1">Una vez mandada un alerta de tipo "Trigger Mision", esta debe ser revisada por un operador quien se encargará de aprobar el despliegue del drone a la mision seleccionada.</p>
                                                 <p class="text-xs text-gray-400 mt-1">En caso de que salte un error, comunicarse con el soporte del COS (cos.support@cyhsur.com)</p>
+                                                
+                                                <!-- Mensaje dinámico para trigger misión exitoso -->
+                                                <div id="triggerSuccessMessage" class="hidden mt-4 p-3 bg-green-900/30 border border-green-700 rounded-lg">
+                                                    <div class="flex items-center justify-between">
+                                                        <div class="flex-1">
+                                                            <p class="text-xs text-green-300 font-medium mb-2">
+                                                                Misión desplegada exitosamente. El dron está en camino.
+                                                            </p>
+                                                            <div class="flex items-center space-x-3">
+                                                                <a id="liveviewButton" href="#" 
+                                                                    class="inline-flex items-center px-3 py-1 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150">
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                                    </svg>
+                                                                    Ver Streaming del Drone
+                                                                </a>
+                                                                <button type="button" onclick="hideTriggerSuccessMessage()" 
+                                                                        class="text-green-300 hover:text-white transition-colors duration-200">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -109,8 +102,9 @@
                             </div>
                         </div>
 
+                        <!-- El resto del código de Historial de Logs se mantiene igual -->
                         <!-- Historial de Logs -->
-                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 mt-8"> <!-- Margen superior adicional -->
+                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 mt-8">
                             <div class="p-6">
                                 <!-- Header con título y botones de filtro -->
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -278,7 +272,7 @@
         </div>
     </div>
 
-    <!-- Script para manejar el trigger (sin cambios) -->
+    <!-- Script para manejar el trigger -->
     <script>
         document.getElementById('triggerAlarmBtn').addEventListener('click', function() {
             const button = this;
@@ -322,18 +316,27 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Respuesta recibida del servidor:', data); // ← AGREGAR ESTO
+                
                 if (data.success) {
-                    showAlert('success', data.message);
-                    // Recargar la página después de 2 segundos para mostrar el nuevo log
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                    console.log('Tipo de alerta:', tipoAlerta); // ← AGREGAR ESTO
+                    console.log('Has liveview:', data.has_liveview); // ← AGREGAR ESTO
+                    
+                    // Si es trigger_mision exitoso, mostrar el mensaje en la tarjeta
+                    if (tipoAlerta === 'trigger_mision' && data.has_liveview) {
+                        console.log('Condición cumplida - mostrando mensaje'); // ← AGREGAR ESTO
+                        showTriggerSuccessMessage(data.mision_id, data.mision_nombre);
+                    } else {
+                        console.log('Condición NO cumplida - mostrando alerta temporal'); // ← AGREGAR ESTO
+                        // Para otros tipos de alerta, mostrar alerta temporal
+                        showTemporaryAlert('success', data.message);
+                    }
                 } else {
                     throw new Error(data.message);
                 }
             })
             .catch(error => {
-                showAlert('error', 'Error al enviar la alarma: ' + error.message);
+                showTemporaryAlert('error', 'Error al enviar la alarma: ' + error.message);
             })
             .finally(() => {
                 // Restaurar botón después de 3 segundos
@@ -344,8 +347,34 @@
             });
         });
 
-        function showAlert(type, message) {
-            // Crear elemento de alerta
+        function showTriggerSuccessMessage(misionId, misionNombre) {
+            const successMessage = document.getElementById('triggerSuccessMessage');
+            const liveviewButton = document.getElementById('liveviewButton');
+            
+            console.log('Elemento successMessage:', successMessage); 
+            console.log('Elemento liveviewButton:', liveviewButton); 
+            
+            // Actualizar el enlace del botón
+            liveviewButton.href = "{{ route('alertas.liveview') }}?mision_id=" + misionId;
+            
+            // Mostrar el mensaje
+            console.log('Clases antes:', successMessage.className); 
+            successMessage.classList.remove('hidden');
+            successMessage.classList.add('block');
+            console.log('Clases después:', successMessage.className);
+            
+            console.log('Mensaje de éxito mostrado para misión:', misionNombre);
+        }
+
+
+        function hideTriggerSuccessMessage() {
+            const successMessage = document.getElementById('triggerSuccessMessage');
+            successMessage.classList.remove('block');
+            successMessage.classList.add('hidden');
+        }
+
+        function showTemporaryAlert(type, message) {
+            // Crear elemento de alerta temporal
             const alertDiv = document.createElement('div');
             alertDiv.className = `mb-6 p-4 ${
                 type === 'success' 
@@ -354,21 +383,23 @@
             } border rounded-lg flex items-center justify-between shadow-lg`;
             
             alertDiv.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
-                            type === 'success' 
-                                ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                                : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                        }"/>
-                    </svg>
-                    <span>${message}</span>
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
+                                type === 'success' 
+                                    ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                                    : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                            }"/>
+                        </svg>
+                        <span class="text-sm font-medium">${message}</span>
+                    </div>
+                    <button type="button" class="text-${type === 'success' ? 'green' : 'red'}-300 hover:text-white" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
-                <button type="button" class="text-${type === 'success' ? 'green' : 'red'}-300 hover:text-white" onclick="this.parentElement.remove()">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
             `;
             
             // Insertar después del header
@@ -398,6 +429,11 @@
                 misionSelect.required = false;
                 misionSelect.value = '';
             }
+        });
+
+        // Ocultar mensaje de éxito al cargar la página (para asegurar estado inicial)
+        document.addEventListener('DOMContentLoaded', function() {
+            hideTriggerSuccessMessage();
         });
     </script>
 </x-app-layout>
