@@ -495,10 +495,21 @@ Route::middleware([
     Route::get('/alertas/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
         ->name('alertas.liveview');
 
+    //DRONES
     // API para obtener información del drone
     Route::get('/api/drones/info', [App\Http\Controllers\FlytbaseDroneController::class, 'getDroneInfo'])
         ->name('api.drones.info');
 
+    Route::get('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'index'])
+        ->name('drones-flytbase.index');
+
+    Route::post('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'store'])
+        ->name('drones-flytbase.store');
+    Route::put('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'update'])
+        ->name('drones-flytbase.update');
+
+
+    //DEBUG
     Route::get('/debug-routes', function() {
         $routes = [
             'alertas.liveview' => route('alertas.liveview'),

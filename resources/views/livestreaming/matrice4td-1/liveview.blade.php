@@ -6,16 +6,25 @@
                     <div class="space-y-8">
                         <!-- Header -->
                         <div class="flex justify-between items-center">
+                            
                             <div>
+                                <a href="{{ route('alertas.index') }}" 
+                                class="flex items-center text-blue-400 hover:text-blue-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                    </svg>
+                                    Alertas
+                                </a>
                                 <h2 class="text-2xl font-semibold text-gray-100">Drone Streaming</h2>
                                 <p class="text-sm text-gray-400 mt-1">Transmisión en vivo de la misión desplegada</p>
                             </div>
-                            <a href="{{ route('alertas.index') }}" 
+                            <a href="{{ route('drones-flytbase.index') }}" 
                                class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            
+                                todos los drones
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8m-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5"/>
                                 </svg>
-                                Volver a Alertas
                             </a>
                         </div>
 
