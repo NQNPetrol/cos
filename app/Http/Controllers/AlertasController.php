@@ -146,14 +146,46 @@ class AlertasController extends Controller
                         : 'Alarma enviada correctamente.'
                 ];
                 if ($tipoAlerta === 'trigger_mision' && $mision->hasLiveview()) {
+                    Log::info('Misión tiene liveview', [
+                        'mision_id' => $misionId,
+                        'mision_nombre' => $mision->nombre,
+                        'has_liveview' => $mision->hasLiveview()
+                    ]);
                     $responseData['mision_id'] = $misionId;
                     $responseData['mision_nombre'] = $mision->nombre;
                     $responseData['has_liveview'] = true;
                     $responseData['drone_name'] = $mision->drone->drone;
                     $responseData['liveview_route'] = $mision->getLiveviewRoute();
                 }
+
+                if ($tipoAlerta === 'trigger_mision') {
+                    Log::info('DEBUG - Estado de liveview', [
+                        'mision_id' => $misionId,
+                        'mision_nombre' => $mision->nombre,
+                        'tiene_drone' => isset($mision->drone),
+                        'drone_id' => $mision->drone->id ?? 'No tiene drone',
+                        'metodo_hasLiveview_existe' => method_exists($mision, 'hasLiveview'),
+                        'hasLiveview_result' => method_exists($mision, 'hasLiveview') ? $mision->hasLiveview() : 'Método no existe',
+                        'drone_data' => $mision->drone ?? 'No hay datos de drone'
+                    ]);
+                    
+                    // Si el método existe y retorna true, o si forzamos para testing
+                    $shouldShowLiveview = (method_exists($mision, 'hasLiveview') && $mision->hasLiveview()) || true;
+                    
+                    if ($shouldShowLiveview) {
+                        Log::info('Misión tiene liveview - agregando a respuesta');
+                        $responseData['mision_id'] = $misionId;
+                        $responseData['mision_nombre'] = $mision->nombre;
+                        $responseData['has_liveview'] = true;
+                        $responseData['drone_name'] = $mision->drone->drone ?? 'Drone no disponible';
+                        $responseData['liveview_route'] = method_exists($mision, 'getLiveviewRoute') 
+                            ? $mision->getLiveviewRoute() 
+                            : route('alertas.liveview');
+                    }
+                }
                 
                 return response()->json($responseData);
+                
             } else {
                 Log::warning('Flytbase respondió con código de error', [
                     'status_code' => $response->status(),
