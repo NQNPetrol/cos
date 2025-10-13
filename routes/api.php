@@ -58,5 +58,12 @@ Route::prefix('/client/mobile-vehicles')->name('api.client.mobile-vehicles.')->g
     Route::get('/stats', [MobileVehicleClientController::class, 'statsClient'])->name('stats');
 });
 
+
+// API para webhook de S3
+Route::prefix('s3-webhook')->group(function () {
+    Route::post('/', [S3WebhookController::class, 'handleWebhook']);
+    Route::get('/files', [S3WebhookController::class, 'listDownloadedFiles']);
+});
+
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);
 Route::get('eventos/barras', [EventoController::class, 'eventosBarras']);
