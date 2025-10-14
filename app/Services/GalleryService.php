@@ -184,7 +184,7 @@ class GalleryService
      * Extraer cliente del nombre de misión
      * Ejemplo: "pozo-1-cliente-a" → "cliente-a"
      */
-    private function extractClientFromMission(string $mission): string
+    public function extractClientFromMission(string $mission): string
     {
         // Asumimos que el cliente es la última parte después del último guión
         $parts = explode('-', $mission);

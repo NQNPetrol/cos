@@ -10,13 +10,6 @@
                                 <h2 class="text-2xl font-semibold text-gray-100">Galería de Misiones</h2>
                                 <p class="text-sm text-gray-400 mt-1">Imágenes y videos capturados por drones</p>
                             </div>
-                            <a href="{{ route('alertas.index') }}" 
-                               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
-                                Volver a Alertas
-                            </a>
                         </div>
 
                         <!-- Filtros -->
@@ -178,7 +171,11 @@
                                                         </div>
                                                         <div class="text-gray-300 text-xs mt-1">
                                                             {{ $media['patterns']['prefix'] }} • 
-                                                            {{ \Carbon\Carbon::createFromFormat('YmdHis', $media['patterns']['timestamp'])->format('d/m/Y H:i') }}
+                                                            @if($media['patterns']['timestamp'] !== 'unknown' && strlen($media['patterns']['timestamp']) === 14)
+                                                                {{ \Carbon\Carbon::createFromFormat('YmdHis', $media['patterns']['timestamp'])->format('d/m/Y H:i') }}
+                                                            @else
+                                                                Fecha desconocida
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
@@ -208,8 +205,14 @@
                                                             {{ $media['patterns']['mission'] }}
                                                         </div>
                                                         <div class="text-gray-300 text-xs mt-1">
+                                                            {{ $media['patterns']['prefix'] }} •
+                                                            <div class="text-gray-300 text-xs mt-1">
                                                             {{ $media['patterns']['prefix'] }} • 
-                                                            {{ \Carbon\Carbon::createFromFormat('YmdHis', $media['patterns']['timestamp'])->format('d/m/Y H:i') }}
+                                                            @if($media['patterns']['timestamp'] !== 'unknown' && strlen($media['patterns']['timestamp']) === 14)
+                                                                {{ \Carbon\Carbon::createFromFormat('YmdHis', $media['patterns']['timestamp'])->format('d/m/Y H:i') }}
+                                                            @else
+                                                                Fecha desconocida
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
