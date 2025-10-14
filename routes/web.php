@@ -521,6 +521,13 @@ Route::middleware([
         return response()->json($routes);
     })->name('debug.routes');
 
+    Route::prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', [App\Http\Controllers\GalleryController::class, 'index'])->name('index');
+        Route::get('/api', [App\Http\Controllers\GalleryController::class, 'apiIndex'])->name('api.index');
+        Route::get('/mission/{drone}/{client}/{mission}', [App\Http\Controllers\GalleryController::class, 'missionShow'])->name('mission.show');
+        Route::get('/thumbnails', [App\Http\Controllers\GalleryController::class, 'getThumbnails'])->name('thumbnails');
+    });
+
 
 });
 
