@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PersonalImportController;
 use App\Http\Controllers\Api\PersonalCompareController;
 use App\Http\Controllers\EncodingDeviceController;
 use App\Http\Controllers\MobileVehicleClientController;
+use App\Http\Controllers\S3WebhookController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();

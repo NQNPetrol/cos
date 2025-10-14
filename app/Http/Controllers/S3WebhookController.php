@@ -13,6 +13,7 @@ class S3WebhookController extends Controller
 {
     public function handleWebhook(Request $request)
     {
+        
         // Validar el request
         $validated = $request->validate([
             'bucket' => 'required|string',
@@ -55,6 +56,9 @@ class S3WebhookController extends Controller
                 'key' => env('AWS_ACCESS_KEY_ID'),
                 'secret' => env('AWS_SECRET_ACCESS_KEY'),
             ],
+            'http' => [
+                'verify' => false
+            ]
         ]);
 
         $bucket = $fileData['bucket'];
@@ -68,21 +72,26 @@ class S3WebhookController extends Controller
 
         // Crear directorio si no existe
         if (!Storage::disk('local')->exists($localDirectory)) {
-            Storage::disk('local')->makeDirectory($localDirectory);
+            Storage::disk('local')->makeDirectory($localDirectory, 0755, true);
         }
+
+        $fullLocalPath = Storage::disk('local')->path($localPath);
+
 
         // Descargar archivo desde S3
         try {
             $result = $s3Client->getObject([
                 'Bucket' => $bucket,
                 'Key' => $key,
-                'SaveAs' => storage_path('app/' . $localPath)
+                'SaveAs' => $fullLocalPath
             ]);
 
             Log::info("Archivo descargado exitosamente: {$localPath}");
+            Log::info("Ruta física: {$fullLocalPath}");
 
             return [
                 'local_path' => $localPath,
+                'full_path' => $fullLocalPath,
                 'size' => $result->get('ContentLength'),
                 'mime_type' => $result->get('ContentType')
             ];
@@ -99,11 +108,11 @@ class S3WebhookController extends Controller
         $videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm'];
 
         if (in_array($fileExtension, $imageExtensions)) {
-            return 'public/s3-images';
+            return 's3-images';
         } elseif (in_array($fileExtension, $videoExtensions)) {
-            return 'public/s3-videos';
+            return 's3-videos';
         } else {
-            return 'public/s3-files';
+            return 's3-files';
         }
     }
 
