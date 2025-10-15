@@ -23,6 +23,9 @@ class Evento extends Model
         'empresa_asociada_id',
         'elementos_sustraidos',
         'cantidad',
+        'es_anulado',
+        'anulado_por',
+        'fecha_anulado',
     ];
 
         protected $casts = [
@@ -31,6 +34,8 @@ class Evento extends Model
         'updated_at' => 'datetime',
         'elementos_sustraidos' => 'array',
         'cantidad' => 'array',
+        'fecha_anulado' => 'datetime',
+        'es_anulado' => 'boolean',
     ];
 
 

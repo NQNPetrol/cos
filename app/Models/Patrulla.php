@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patrulla extends Model
 {
-    protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones'];
+    protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones', 'cliente_id'];
     
     public function dispositivos()
     {
@@ -14,6 +14,11 @@ class Patrulla extends Model
                     ->using(DispositivoPatrulla::class)
                     ->withPivot('fecha_asignacion')
                     ->withTimestamps();
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 
     public function mobileVehicle()

@@ -8,6 +8,8 @@ use App\Http\Controllers\MobileVehicleController;
 use App\Http\Controllers\Api\PersonalImportController;
 use App\Http\Controllers\Api\PersonalCompareController;
 use App\Http\Controllers\EncodingDeviceController;
+use App\Http\Controllers\MobileVehicleClientController;
+use App\Http\Controllers\S3WebhookController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -49,6 +51,24 @@ Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function 
     Route::get('/map/data', [MobileVehicleController::class, 'apiMapData'])->name('map-data');
     Route::get('/locations/current', [MobileVehicleController::class, 'apiLocations'])->name('locations');
 });
+
+// API PARA OBTENER GPS INFO FILTRADA POR CLIENTE
+Route::prefix('/client/mobile-vehicles')->name('api.client.mobile-vehicles.')->group(function () {
+    Route::get('/locations/current', [MobileVehicleClientController::class, 'apiLocationsClient'])->name('locations');
+    Route::get('/map/data', [MobileVehicleClientController::class, 'apiMapDataClient'])->name('map-data');
+    Route::get('/stats', [MobileVehicleClientController::class, 'statsClient'])->name('stats');
+});
+
+
+// API para webhook de S3
+Route::prefix('s3-webhook')->group(function () {
+    Route::post('/', [S3WebhookController::class, 'handleWebhook']);
+    Route::get('/files', [S3WebhookController::class, 'listDownloadedFiles']);
+    Route::post('/rebuild-cache', [S3WebhookController::class, 'rebuildCache']);
+    Route::get('/cache-status', [S3WebhookController::class, 'cacheStatus']);
+});
+
+
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);
 Route::get('eventos/barras', [EventoController::class, 'eventosBarras']);

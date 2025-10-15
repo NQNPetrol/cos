@@ -51,7 +51,7 @@
                     @endforeach
                 </select>
 
-                @if(auth()->user()->hasRole('admin'))
+                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                     <div class="flex items-center space-x-2">
                         <select wire:model.live="clientTypeFilter" class="form-select bg-gray-800 border-gray-700 text-gray-100 text-sm">
                             <option value="">Todos los tickets</option>
@@ -147,7 +147,7 @@
                                                        class="form-radio text-green-600 bg-gray-700 border-gray-600" 
                                                        name="emitido_por" 
                                                        value="COS"
-                                                       {{ $emitido_por === 'COS' ? 'checked' : '' }}>
+                                                       wire:model="emitido_por">
                                                 <span class="ml-2 text-gray-300">COS</span>
                                             </label>
                                             <label class="flex items-center">
@@ -155,7 +155,7 @@
                                                        class="form-radio text-green-600 bg-gray-700 border-gray-600" 
                                                        name="emitido_por" 
                                                        value="CLIENTE"
-                                                       {{ $emitido_por === 'CLIENTE' ? 'checked' : '' }}>
+                                                       wire:model="emitido_por">
                                                 <span class="ml-2 text-gray-300">CLIENTE</span>
                                             </label>
                                         </div>
@@ -193,7 +193,7 @@
                                   
                                 @endif
 
-                                @if($editMode && auth()->user()->hasRole('admin'))
+                                @if($editMode && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador')))
                                     <!-- Estado (solo en edición y para admin) -->
                                     <div>
                                         <label for="estado" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
@@ -241,7 +241,7 @@
                                         <th class="px-4 py-3 text-left">Estado</th>
                                         <th class="px-4 py-3 text-left">Cliente</th>
                                         <th class="px-4 py-3 text-left">Creado por</th>
-                                        @if(auth()->user()->hasRole('admin'))
+                                        @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                             <th class="px-4 py-3 text-left">Asignado a</th>
                                         @endif
                                         <th class="px-4 py-3 text-left">Fecha creación</th>
@@ -293,7 +293,7 @@
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-white">{{ $ticket->user->name }}</td>
-                                            @if(auth()->user()->hasRole('admin'))
+                                            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                                 <td class="px-4 py-3 text-gray-300">
                                                     {{ $ticket->assignedTo->name ?? 'Sin asignar' }}
                                                 </td>
@@ -304,7 +304,7 @@
                                             </td>
                                             <td class="px-4 py-3">
                                                 <div class="flex space-x-2">
-                                                    @if(auth()->user()->hasRole('admin') && $ticket->estado !== 'cerrado')
+                                                    @if((auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador')) && $ticket->estado !== 'cerrado')
                                                         <button wire:click="edit({{ $ticket->id }})" 
                                                                 class="p-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white" 
                                                                 title="Editar">
@@ -314,7 +314,7 @@
                                                         </button>
                                                     @endif
                                                     
-                                                    @if(auth()->user()->hasRole('admin'))
+                                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                                         <div class="relative group">
                                                             <button class="p-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white" title="Opciones">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@
                                                             </button>
                                                             <div class="absolute right-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg opacity-0 invisible transition-all duration-300 group-hover:opacity-100 group-hover:visible z-10">
                                                                 <div class="py-1">
-                                                                    @if($ticket->estado !== 'cerrado')
+                                                                    @if($ticket->estado !== 'cerrado' && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador')))
                                                                         <button wire:click="updateStatus({{ $ticket->id }}, 'abierto')" 
                                                                                 class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">
                                                                             Marcar como Abierto
@@ -386,39 +386,40 @@
             </div>
         </div>
     </div>
-</div>
-<script>
-document.addEventListener('livewire:init', function() {
-    // Función para mostrar/ocultar campos según selección
-    function toggleTicketFields() {
-        const clienteField = document.getElementById('cliente-field');
-        const asignadoField = document.getElementById('asignado-field');
-        const emitidoPorCliente = document.querySelector('input[name="emitido_por"][value="CLIENTE"]');
-        
-        if (clienteField && asignadoField && emitidoPorCliente) {
-            if (emitidoPorCliente.checked) {
-                clienteField.style.display = 'block';
-                asignadoField.style.display = 'none';
-            } else {
-                clienteField.style.display = 'none';
-                asignadoField.style.display = 'block';
+    <script>
+    document.addEventListener('livewire:init', function() {
+        // Función para mostrar/ocultar campos según selección
+        function toggleTicketFields() {
+            const clienteField = document.getElementById('cliente-field');
+            const asignadoField = document.getElementById('asignado-field');
+            const emitidoPorCliente = document.querySelector('input[name="emitido_por"][value="CLIENTE"]');
+            const emitidoPorCOS = document.querySelector('input[name="emitido_por"][value="COS"]');
+            
+            if (clienteField && asignadoField) {
+                if (emitidoPorCliente && emitidoPorCliente.checked) {
+                    clienteField.style.display = 'block';
+                    asignadoField.style.display = 'none';
+                } else if (emitidoPorCOS && emitidoPorCOS.checked) {
+                    clienteField.style.display = 'none';
+                    asignadoField.style.display = 'block';
+                }
             }
         }
-    }
 
-    // Escuchar cambios en los radio buttons
-    document.addEventListener('change', function(e) {
-        if (e.target.name === 'emitido_por') {
-            toggleTicketFields();
-        }
+        // Escuchar cambios en los radio buttons
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'emitido_por') {
+                toggleTicketFields();
+            }
+        });
+
+        // Ejecutar al cargar y cuando Livewire actualice el DOM
+        Livewire.on('modal-opened', function() {
+            setTimeout(toggleTicketFields, 10);
+        });
+
+        // Ejecutar inicialmente
+        toggleTicketFields();
     });
-
-    // Ejecutar al cargar y cuando Livewire actualice el DOM
-    Livewire.on('update', function() {
-        setTimeout(toggleTicketFields, 10);
-    });
-
-    // Ejecutar inicialmente
-    toggleTicketFields();
-});
-</script>
+    </script>
+</div>

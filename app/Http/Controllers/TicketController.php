@@ -11,6 +11,12 @@ class TicketController extends Controller
         return view('tickets.nuevo');
     }
 
+    public function indexClient()
+    {
+        return view('tickets.client.nuevo');
+    }
+
+
     /**
      * Obtener tickets asignados al usuario actual
      */

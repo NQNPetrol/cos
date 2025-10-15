@@ -36,6 +36,15 @@ class EventoController extends Controller
             $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
         }
         
+        //Filtro por evento anulado o vigente
+        if ($request->filled('estado')) {
+            if ($request->estado === 'ANULADO') {
+                $query->where('es_anulado', true);
+            } elseif ($request->estado === 'VIGENTE') {
+                $query->where('es_anulado', false);
+            }
+        }
+
         $eventos = $query->paginate(10)->appends($request->query());
 
         $clientes = Cliente::orderBy('nombre')->get();
@@ -72,7 +81,7 @@ class EventoController extends Controller
             'observaciones' => 'nullable|string',
             'url_reporte'   => 'nullable|url',
             'media.*'       => 'nullable|image|mimes:jpeg,png|max:2048', //2MB max
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
             'elementos' => 'nullable|array',
             'elementos.*' => 'nullable|string|max:255',
             'cantidades' => 'nullable|array',
@@ -153,7 +162,7 @@ class EventoController extends Controller
         'observaciones' => 'nullable|string',
         'url_reporte' => 'nullable|url',
         'media.*' => 'nullable|image|mimes:jpeg,png|max:2048',
-        'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+        'empresa_asociada_id'=> 'nullable|exists:empresas_asociadas,id',
         'elementos' => 'nullable|array',
         'elementos.*' => 'nullable|string|max:255',
         'cantidades' => 'nullable|array',

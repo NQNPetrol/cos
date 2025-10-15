@@ -177,16 +177,16 @@
                                                 <div class="flex space-x-2">
                                                     <!-- Formulario para activar/desactivar -->
                                                     <form action="{{ route('notifications.toggle', $notification->id) }}" method="POST" 
-                                                          onsubmit="return confirm('¿{{ $notification->is_active ? 'Desactivar' : 'Activar' }} esta notificación?')">
+                                                        onsubmit="return confirm('¿{{ $notification->is_active ? 'Desactivar' : 'Activar' }} esta notificación?')">
                                                         @csrf
-                                                        @method('POST')
+                                                        @method('POST') <!-- Cambiar a POST ya que el método toggle usa POST -->
                                                         <input type="hidden" name="activate" value="{{ $notification->is_active ? '0' : '1' }}">
                                                         <button type="submit"
                                                                 class="p-1.5 rounded-lg {{ $notification->is_active ? 'text-yellow-100 hover:text-yellow-200 hover:bg-yellow-200/30' : 'text-green-400 hover:text-green-200 hover:bg-green-200/30' }} transition-colors"
                                                                 title="{{ $notification->is_active ? 'Desactivar' : 'Activar' }}">
                                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                      d="{{ $notification->is_active ? 'M6 18L18 6M6 6l12 12' : 'M5 13l4 4L19 7' }}"/>
+                                                                    d="{{ $notification->is_active ? 'M6 18L18 6M6 6l12 12' : 'M5 13l4 4L19 7' }}"/>
                                                             </svg>
                                                         </button>
                                                     </form>
@@ -317,11 +317,13 @@
 
                         <!-- Estado -->
                         <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="is_active" id="editIsActive" value="1"
-                                       class="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-300">Notificación activa</span>
-                            </label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Estado Actual</label>
+                            <div id="editStatusDisplay" class="px-3 py-2 bg-gray-700 rounded-lg border border-gray-600">
+                                <span id="statusText" class="text-sm font-medium"></span>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-400">
+                                Use el botón de activar/desactivar en la tabla para cambiar el estado
+                            </p>
                         </div>
                     </div>
 
@@ -331,7 +333,7 @@
                             Cancelar
                         </button>
                         <button type="submit" 
-                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
+                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg transition-colors">
                             Guardar Cambios
                         </button>
                     </div>
@@ -412,8 +414,20 @@
                 document.getElementById('editMessage').value = data.notification.message;
                 document.getElementById('editType').value = data.notification.type;
                 document.getElementById('editPriority').value = data.notification.priority;
-                document.getElementById('editIsActive').checked = data.notification.is_active;
                 
+                const statusText = document.getElementById('statusText');
+                const statusDisplay = document.getElementById('editStatusDisplay');
+                
+                if (data.notification.is_active) {
+                    statusText.textContent = 'ACTIVA';
+                    statusText.className = 'text-sm font-medium text-green-400';
+                    statusDisplay.className = 'px-3 py-2 bg-green-900/20 rounded-lg border border-green-600/50';
+                } else {
+                    statusText.textContent = 'INACTIVA';
+                    statusText.className = 'text-sm font-medium text-red-400';
+                    statusDisplay.className = 'px-3 py-2 bg-red-900/20 rounded-lg border border-red-600/50';
+                }
+
                 // Llenar select de usuario si existe
                 if (data.notification.user_id) {
                     document.getElementById('editUserId').value = data.notification.user_id;

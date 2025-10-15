@@ -73,6 +73,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function alertLogs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class);
+    }
+
      /**
      * Tickets creados por este usuario
      */
@@ -95,6 +100,11 @@ class User extends Authenticatable
     public function clientes(): BelongsToMany
     {
         return $this->belongsToMany(Cliente::class, 'users_has_cliente_id', 'user_id', 'cliente_id');
+    }
+
+    public function userClientes()
+    {
+        return $this->hasMany(UserCliente::class);
     }
 
      /**

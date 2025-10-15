@@ -3,6 +3,78 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
+
+                    <!-- Mensajes de sesión -->
+                    @if(session('success'))
+                        <div class="mb-6 p-4 bg-green-800 border border-green-600 text-green-100 rounded-lg flex items-center justify-between shadow-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>{{ session('success') }}</span>
+                            </div>
+                            <button type="button" class="text-green-300 hover:text-white" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>{{ session('error') }}</span>
+                            </div>
+                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('info'))
+                        <div class="mb-6 p-4 bg-blue-800 border border-blue-600 text-blue-100 rounded-lg flex items-center justify-between shadow-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>{{ session('info') }}</span>
+                            </div>
+                            <button type="button" class="text-blue-300 hover:text-white" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <ul class="list-disc list-inside">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Registrar Nuevo Evento</h2>
                         <a href="{{ route('eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
@@ -101,8 +173,8 @@
 
                         <!-- Sección 5.1: Empresa Asociada -->
                         <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada <span class="text-red-500">*</span></h3>
-                            <select name="empresa_asociada_id" id="empresa_asociada_id" required
+                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada</h3>
+                            <select name="empresa_asociada_id" id="empresa_asociada_id"
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
@@ -567,13 +639,23 @@
                     // Obtener empresas del data-attribute
                     const empresas = JSON.parse(selectedOption.getAttribute('data-empresas') || '{}');
                     
-                    // Agregar nuevas opciones
-                    Object.entries(empresas).forEach(([id, nombre]) => {
+                    // Verificar si el cliente tiene empresas asociadas
+                    if (Object.keys(empresas).length === 0) {
+                        // Si no tiene empresas, agregar opción indicando que no hay empresas
                         const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = nombre;
+                        option.value = "";
+                        option.textContent = "Este cliente no tiene empresas asociadas";
+                        option.disabled = true;
                         empresaSelect.appendChild(option);
-                    });
+                    } else {
+                    // Agregar nuevas opciones
+                        Object.entries(empresas).forEach(([id, nombre]) => {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = nombre;
+                            empresaSelect.appendChild(option);
+                        });
+                    }
                 }
             });
 

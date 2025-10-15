@@ -15,4 +15,10 @@ class PatrullaController extends Controller
     {
         return view('patrullas.create');
     }
+
+    public function indexClient()
+    {
+        return view('patrullas.client.index-client');
+    }
+
 }
