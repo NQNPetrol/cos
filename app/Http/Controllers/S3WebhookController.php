@@ -285,11 +285,11 @@ class S3WebhookController extends Controller
         $localPath = $localDirectory . '/' . $fileName;
 
         // Crear directorio si no existe
-        if (!Storage::disk('local')->exists($localDirectory)) {
-            Storage::disk('local')->makeDirectory($localDirectory, 0755, true);
+        if (!Storage::disk('public')->exists($localDirectory)) {
+            Storage::disk('public')->makeDirectory($localDirectory, 0755, true);
         }
 
-        $fullLocalPath = Storage::disk('local')->path($localPath);
+        $fullLocalPath = Storage::disk('public')->path($localPath);
 
         // Descargar archivo
         $result = $s3Client->getObject([

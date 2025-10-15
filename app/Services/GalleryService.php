@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class GalleryService
 {
@@ -15,6 +16,7 @@ class GalleryService
      */
     public function getOrganizedGallery(array $filters = [])
     {
+        Log::info('GALLERY SERVICE: Iniciando getOrganizedGallery');
         return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function() use ($filters) {
             $images = $this->getAllImages();
             $videos = $this->getAllVideos();
@@ -29,27 +31,46 @@ class GalleryService
     private function getAllImages()
     {
         $images = [];
+        $directory = 's3-images';
+
+        Log::info("GALLERY SERVICE: Buscando imágenes en directorio: s3-images");
         
-        if (Storage::disk('local')->exists('s3-images')) {
-            $files = Storage::disk('local')->files('s3-images');
+        if (Storage::disk('public')->exists('s3-images')) {
+            $files = Storage::disk('public')->files('s3-images');
+            Log::info("GALLERY SERVICE: Archivos encontrados en s3-images: " . count($files));
             
             foreach ($files as $file) {
                 $filename = basename($file);
                 $patterns = $this->extractPatterns($filename);
+
+                $physicalPath = Storage::disk('public')->path($file);
+                $fileExists = file_exists($physicalPath);
+                $fileSize = Storage::disk('public')->size($file);
+                $fileUrl = Storage::url($file);
+                $lastModified = Storage::disk('public')->lastModified($file);
+
+                Log::info("GALLERY SERVICE: Procesando imagen - Archivo: {$filename}");
+                Log::info("Ruta física: {$physicalPath}");
+                Log::info("Existe físicamente: " . ($fileExists ? 'SÍ' : 'NO'));
+                Log::info("Tamaño: {$fileSize} bytes");
+                Log::info("URL Storage: {$fileUrl}");
+                Log::info("Patrones: " . json_encode($patterns));
                 
                 $images[] = [
                     'filename' => $filename,
                     'path' => $file,
                     'url' => Storage::url($file),
-                    'size' => Storage::size($file),
-                    'last_modified' => Storage::lastModified($file),
+                    'size' => $fileSize,
+                    'last_modified' => $lastModified,
                     'patterns' => $patterns,
                     'type' => 'image',
                     'mission_key' => $this->createMissionKey($patterns)
                 ];
             }
+        } else {
+           Log::warning("GALLERY SERVICE: El directorio {$directory} NO existe en storage");
         }
-        
+        Log::info("GALLERY SERVICE: Total imágenes procesadas: " . count($images));
         return $images;
     }
 
@@ -59,27 +80,45 @@ class GalleryService
     private function getAllVideos()
     {
         $videos = [];
+        $directory = 's3-videos';
         
-        if (Storage::disk('local')->exists('s3-videos')) {
-            $files = Storage::disk('local')->files('s3-videos');
+        Log::info("GALLERY SERVICE: Buscando videos en directorio: {$directory}");
+        
+        if (Storage::disk('public')->exists('s3-videos')) {
+            $files = Storage::disk('public')->files('s3-videos');
+            Log::info("GALLERY SERVICE: Archivos encontrados en {$directory}: " . count($files));
             
             foreach ($files as $file) {
                 $filename = basename($file);
                 $patterns = $this->extractPatterns($filename);
+
+                $physicalPath = Storage::disk('public')->path($file);
+                $fileExists = file_exists($physicalPath);
+                $fileSize = Storage::disk('public')->size($file);
+                $fileUrl = Storage::url($file);
+                $lastModified = Storage::disk('public')->lastModified($file);
+
+                Log::info("GALLERY SERVICE: Procesando video - Archivo: {$filename}");
+                Log::info("Ruta física: {$physicalPath}");
+                Log::info("Existe físicamente: " . ($fileExists ? 'SÍ' : 'NO'));
+                Log::info("Tamaño: {$fileSize} bytes");
+                Log::info("URL Storage: {$fileUrl}");
                 
                 $videos[] = [
                     'filename' => $filename,
                     'path' => $file,
-                    'url' => Storage::url($file),
-                    'size' => Storage::size($file),
-                    'last_modified' => Storage::lastModified($file),
+                    'url' => $fileUrl,
+                    'size' => $fileSize,
+                    'last_modified' => $lastModified,
                     'patterns' => $patterns,
                     'type' => 'video',
                     'mission_key' => $this->createMissionKey($patterns)
                 ];
             }
+        } else {
+            Log::warning("GALLERY SERVICE: El directorio {$directory} NO existe en storage");
         }
-        
+        Log::info("GALLERY SERVICE: Total videos procesados: " . count($videos));
         return $videos;
     }
 
@@ -88,6 +127,7 @@ class GalleryService
      */
     private function organizeMedia(array $images, array $videos, array $filters)
     {
+        Log::info("GALLERY SERVICE: Organizando media - Imágenes: " . count($images) . ", Videos: " . count($videos));
         $organized = [
             'drones' => [],
             'clients' => [],
@@ -100,12 +140,15 @@ class GalleryService
         ];
 
         $allMedia = array_merge($images, $videos);
+        Log::info("GALLERY SERVICE: Total media a organizar: " . count($allMedia));
         
-        foreach ($allMedia as $media) {
+        foreach ($allMedia as $index => $media) {
             $patterns = $media['patterns'];
+            Log::info("GALLERY SERVICE: Procesando media {$index}/" . count($allMedia) . " - {$media['filename']}");
             
             // Aplicar filtros
             if ($this->shouldFilter($patterns, $filters)) {
+                Log::info("GALLERY SERVICE: Media filtrada - {$media['filename']}");
                 continue;
             }
             
@@ -113,6 +156,9 @@ class GalleryService
             $client = $this->extractClientFromMission($patterns['mission']);
             $mission = $patterns['mission'];
             $missionKey = $media['mission_key'];
+
+            Log::info("GALLERY SERVICE: Asignando - Drone: {$drone}, Cliente: {$client}, Misión: {$mission}");
+
             
             // Organizar por drone
             if (!isset($organized['drones'][$drone])) {
@@ -176,7 +222,7 @@ class GalleryService
                 });
             }
         }
-        
+        Log::info("GALLERY SERVICE: Organización completada - Misiones: {$organized['stats']['total_missions']}");
         return $organized;
     }
 
@@ -184,7 +230,7 @@ class GalleryService
      * Extraer cliente del nombre de misión
      * Ejemplo: "pozo-1-cliente-a" → "cliente-a"
      */
-    private function extractClientFromMission(string $mission): string
+    public function extractClientFromMission(string $mission): string
     {
         // Asumimos que el cliente es la última parte después del último guión
         $parts = explode('-', $mission);

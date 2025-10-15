@@ -666,6 +666,10 @@
                                     <i class="bi bi-bezier"></i>
                                     <span>Drones</span>
                                 </a>
+                                <a href="{{ route('gallery.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                    <i class="bi bi-grid-1x2"></i>
+                                    <span>Galeria</span>
+                                </a>
                             </div>
                         </div>
 
