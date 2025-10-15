@@ -7,8 +7,8 @@
                         <!-- Header -->
                         <div class="flex justify-between items-center">
                             <div>
-                                <h2 class="text-2xl font-semibold text-gray-100">Galería de Misiones</h2>
-                                <p class="text-sm text-gray-400 mt-1">Imágenes y videos capturados por drones</p>
+                                <h2 class="text-2xl font-semibold text-gray-100">Galería</h2>
+                                <p class="text-sm text-gray-400 mt-1">Imágenes y videos capturados por nuestros drones durante misiones</p>
                             </div>
                         </div>
 
@@ -133,6 +133,7 @@
                             <!-- Grid de Media -->
                             <div id="mediaGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 @php
+                                    Log::info('VISTA GALLERY: Iniciando renderizado de vista');
                                     $allMedia = [];
                                     foreach($galleryData['drones'] as $drone) {
                                         foreach($drone['clients'] as $client) {
@@ -141,13 +142,22 @@
                                             }
                                         }
                                     }
+                                    Log::info("VISTA GALLERY: Total media a renderizar: " . count($allMedia));
                                     // Ordenar por timestamp más reciente
                                     usort($allMedia, function($a, $b) {
                                         return $b['patterns']['timestamp'] <=> $a['patterns']['timestamp'];
                                     });
+                                    Log::info("VISTA GALLERY: Media ordenada por timestamp");
                                 @endphp
 
-                                @foreach($allMedia as $media)
+                                @foreach($allMedia as $index => $media)
+                                    @php
+                                        Log::info("VISTA GALLERY: Renderizando media {$index}/" . count($allMedia) . " - {$media['filename']}");
+                                        Log::info("VISTA GALLERY: URL: {$media['url']}");
+                                       
+                                        
+                                        Log::info("VISTA GALLERY: Tipo: {$media['type']}");
+                                    @endphp
                                     <div class="media-item bg-gray-700 rounded-lg overflow-hidden border border-gray-600 hover:border-blue-500 transition-all duration-300" 
                                          data-drone="{{ $media['patterns']['prefix'] }}"
                                          data-client="{{ $galleryService->extractClientFromMission($media['patterns']['mission']) }}"
@@ -157,11 +167,11 @@
                                         @if($media['type'] === 'image')
                                             <!-- Tarjeta de Imagen -->
                                             <div class="relative group">
+                                                
                                                 <img src="{{ $media['url'] }}" 
                                                      alt="{{ $media['filename'] }}"
                                                      class="w-full h-48 object-cover cursor-pointer"
-                                                     loading="lazy"
-                                                     onclick="openModal('{{ $media['url'] }}', '{{ $media['filename'] }}')">
+                                                     loading="lazy">
                                                 
                                                 <!-- Overlay de información -->
                                                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-end">
@@ -245,48 +255,191 @@
     </div>
 
     <!-- Modal para visualización -->
-    <div id="mediaModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
-        <div class="relative max-w-4xl max-h-full w-full mx-4">
-            <!-- Botón cerrar -->
-            <button onclick="closeModal()" 
-                    class="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-            
-            <!-- Contenido del modal -->
-            <div id="modalContent" class="bg-gray-900 rounded-lg overflow-hidden">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Información del archivo -->
-            <div id="modalInfo" class="mt-4 text-white text-center">
-                <!-- Se llenará dinámicamente -->
+    <div id="galleryModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="relative max-w-6xl max-h-full w-full mx-4">
+            <div class="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+                <!-- Header con título y botón cerrar -->
+                <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                    <h3 id="modalTitle" class="text-lg font-semibold text-white truncate max-w-2xl">
+                        <!-- Título dinámico se insertará aquí -->
+                    </h3>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Contenido de la imagen -->
+                <div class="p-4 flex justify-center items-center max-h-[70vh] overflow-auto">
+                    <img id="modalImage" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg">
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-        // Filtros
-        document.getElementById('applyFilters').addEventListener('click', function() {
-            const drone = document.getElementById('droneFilter').value;
-            const client = document.getElementById('clientFilter').value;
-            const mission = document.getElementById('missionFilter').value;
+
+        // Modal functions
+        function openModal(url, filename, type = 'image') {
+            console.log('OPEN MODAL CALLED:', { url, filename, type });
             
-            const params = new URLSearchParams();
-            if (drone) params.append('drone', drone);
-            if (client) params.append('client', client);
-            if (mission) params.append('mission', mission);
+            const modal = document.getElementById('galleryModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
             
-            window.location.href = '{{ route("gallery.index") }}?' + params.toString();
+            if (!modal || !modalImage || !modalTitle) {
+                console.error('Elementos del modal no encontrados');
+                return;
+            }
+
+            modalImage.src = url;
+            modalImage.alt = filename;
+            modalTitle.textContent = filename;
+            
+            // Mostrar modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            console.log('Modal abierto correctamente');
+        }
+
+        function closeModal() {
+            console.log('CLOSE MODAL CALLED');
+            const modal = document.getElementById('galleryModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // ✅ APPROACH COMPLETAMENTE NUEVO - DEBUG DETALLADO
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 DOM Cargado - Iniciando configuración de galería');
+            
+            // 1. Configurar cierre del modal
+            const closeBtn = document.getElementById('closeModalBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+
+            // 2. DEBUG DETALLADO DE LAS IMÁGENES
+            function debugImages() {
+                console.log('🔍 INICIANDO DEBUG DE IMÁGENES...');
+                
+                // Todas las imágenes en media-items
+                const allImages = document.querySelectorAll('.media-item img');
+                console.log(`📸 Total imágenes encontradas: ${allImages.length}`);
+                
+                allImages.forEach((img, index) => {
+                    console.log(`Imagen ${index + 1}:`, {
+                        src: img.src,
+                        alt: img.alt,
+                        classList: img.classList,
+                        style: img.style.cssText,
+                        parent: img.parentElement?.tagName,
+                        computedStyle: window.getComputedStyle(img).cursor
+                    });
+                    
+                    // Verificar si hay overlays que bloqueen
+                    const parent = img.parentElement;
+                    if (parent) {
+                        console.log(`Parent:`, {
+                            tag: parent.tagName,
+                            classList: parent.classList,
+                            hasOverlay: parent.querySelector('.absolute') !== null
+                        });
+                    }
+                });
+            }
+
+            // 3. CONFIGURACIÓN DE CLICKS - VERSIÓN ROBUSTA
+            function setupGalleryClicks() {
+                console.log('🎯 Configurando clicks de galería...');
+                
+                // Opción A: Click en el CONTENEDOR de la imagen (más confiable)
+                const mediaItems = document.querySelectorAll('.media-item');
+                console.log(`Encontrados ${mediaItems.length} media-items`);
+                
+                mediaItems.forEach((item, index) => {
+                    const img = item.querySelector('img');
+                    const mediaType = item.dataset.type;
+                    
+                    if (img && mediaType === 'image') {
+                        console.log(`Configurando media-item ${index + 1}:`, img.alt);
+                        
+                        // Hacer TODO el item clickeable
+                        item.style.cursor = 'pointer';
+                        item.title = 'Click para ampliar';
+                        
+                        // Agregar event listener al ITEM completo
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            console.log(`CLICK EN MEDIA-ITEM ${index + 1}:`, {
+                                target: e.target.tagName,
+                                alt: img.alt,
+                                src: img.src
+                            });
+                            
+                            openModal(img.src, img.alt, 'image');
+                        });
+                        
+                        // También agregar listener a la imagen por si acaso
+                        img.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log(`CLICK DIRECTO EN IMAGEN ${index + 1}`);
+                            openModal(img.src, img.alt, 'image');
+                        });
+                    }
+                });
+                
+                // Opción B: También configurar clicks directos en imágenes
+                const directImages = document.querySelectorAll('.media-item img');
+                directImages.forEach((img, index) => {
+                    img.style.cursor = 'pointer';
+                    
+                    img.addEventListener('click', function(e) {
+                        e.stopPropagation(); // Prevenir que llegue al media-item
+                        console.log(`📸 CLICK DIRECTO EN IMAGEN ${index + 1}`);
+                    });
+                });
+            }
+
+            // 4. EJECUTAR CONFIGURACIÓN
+            setTimeout(() => {
+                debugImages(); // Primero debuggear
+                setupGalleryClicks(); // Luego configurar clicks
+                
+                console.log('Configuración de galería completada');
+                
+                // Verificación final
+                const clickableItems = document.querySelectorAll('.media-item[style*="cursor: pointer"]');
+                console.log(`${clickableItems.length} elementos configurados como clickeables`);
+            }, 1000);
+
+            // 5. Cerrar modal con ESC y click fuera
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            const modal = document.getElementById('galleryModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // 6. Inicializar filtros
+            filterMedia();
         });
 
-        document.getElementById('clearFilters').addEventListener('click', function() {
-            window.location.href = '{{ route("gallery.index") }}';
-        });
-
-        // Filtrado en cliente
+        // Funciones de filtros (mantener igual)
         function filterMedia() {
             const droneFilter = document.getElementById('droneFilter').value.toLowerCase();
             const clientFilter = document.getElementById('clientFilter').value.toLowerCase();
@@ -309,81 +462,42 @@
                 if (showItem) visibleCount++;
             });
             
-            // Mostrar/ocultar mensaje de no resultados
             const noResults = document.getElementById('noResults');
             const mediaCount = document.getElementById('mediaCount');
             
             if (visibleCount === 0) {
                 noResults.classList.remove('hidden');
-                mediaGrid.classList.add('hidden');
+                document.getElementById('mediaGrid').classList.add('hidden');
             } else {
                 noResults.classList.add('hidden');
-                mediaGrid.classList.remove('hidden');
+                document.getElementById('mediaGrid').classList.remove('hidden');
             }
             
             mediaCount.textContent = visibleCount + ' elementos';
         }
 
-        // Aplicar filtros cuando cambien los selects
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const drone = document.getElementById('droneFilter').value;
+            const client = document.getElementById('clientFilter').value;
+            const mission = document.getElementById('missionFilter').value;
+            
+            const params = new URLSearchParams();
+            if (drone) params.append('drone', drone);
+            if (client) params.append('client', client);
+            if (mission) params.append('mission', mission);
+            
+            window.location.href = '{{ route("gallery.index") }}?' + params.toString();
+        });
+
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            window.location.href = '{{ route("gallery.index") }}';
+        });
+
         document.getElementById('droneFilter').addEventListener('change', filterMedia);
         document.getElementById('clientFilter').addEventListener('change', filterMedia);
         document.getElementById('missionFilter').addEventListener('change', filterMedia);
 
-        // Modal functions
-        function openModal(url, filename, type = 'image') {
-            const modal = document.getElementById('mediaModal');
-            const modalContent = document.getElementById('modalContent');
-            const modalInfo = document.getElementById('modalInfo');
-            
-            if (type === 'image') {
-                modalContent.innerHTML = `
-                    <img src="${url}" alt="${filename}" class="w-full h-auto max-h-[70vh] object-contain">
-                `;
-            } else {
-                modalContent.innerHTML = `
-                    <video controls class="w-full h-auto max-h-[70vh]">
-                        <source src="${url}" type="video/mp4">
-                        Tu navegador no soporta el elemento video.
-                    </video>
-                `;
-            }
-            
-            modalInfo.innerHTML = `
-                <h3 class="text-lg font-medium">${filename}</h3>
-                <p class="text-gray-400 text-sm mt-1">${type === 'image' ? 'Imagen' : 'Video'}</p>
-            `;
-            
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('mediaModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            
-            // Pausar video si está reproduciendo
-            const video = modal.querySelector('video');
-            if (video) {
-                video.pause();
-            }
-        }
-
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-
-        // Cerrar modal haciendo click fuera
-        document.getElementById('mediaModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Vista de grid/list (opcional)
+        // Vista de grid/list
         document.getElementById('gridView').addEventListener('click', function() {
             document.getElementById('mediaGrid').classList.remove('grid-cols-1');
             document.getElementById('mediaGrid').classList.add('grid-cols-1', 'sm:grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-4', 'xl:grid-cols-5');
@@ -397,25 +511,6 @@
             this.classList.add('bg-gray-700', 'text-gray-300');
             document.getElementById('gridView').classList.remove('bg-gray-700', 'text-gray-300');
         });
-
-        // Inicializar filtros al cargar
-        document.addEventListener('DOMContentLoaded', function() {
-            filterMedia();
-        });
     </script>
 
-    <style>
-        .media-item {
-            transition: all 0.3s ease;
-        }
-        
-        .media-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        
-        #mediaModal {
-            backdrop-filter: blur(5px);
-        }
-    </style>
 </x-app-layout>
