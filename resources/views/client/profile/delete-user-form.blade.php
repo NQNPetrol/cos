@@ -36,6 +36,15 @@
                                 wire:keydown.enter="deleteUser" />
 
                     <x-input-error for="password" class="mt-2" />
+                    
+                    <!-- Mostrar cualquier otro error -->
+                    @if ($errors->any())
+                        <div class="mt-2 text-sm text-red-600">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </x-slot>
 

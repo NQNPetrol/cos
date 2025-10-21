@@ -12,7 +12,7 @@
             {{ __('Si es necesario, puedes cerrar sesión en todas tus demás sesiones del navegador en todos tus dispositivos. Algunas de tus sesiones recientes se enumeran a continuación; sin embargo, esta lista puede no ser exhaustiva. Si crees que tu cuenta ha sido comprometida, también deberías actualizar tu contraseña.') }}
         </div>
 
-        @if (isset($sessions) && count($sessions) > 0)
+        @if (count($sessions) > 0)
             <div class="mt-5 space-y-6">
                 <!-- Other Browser Sessions -->
                 @foreach ($sessions as $session)

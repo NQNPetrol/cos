@@ -28,7 +28,7 @@
 
                 <!-- Current Profile Photo -->
                 <div class="mt-2" x-show="! photoPreview">
-                    <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full size-20 object-cover">
+                    <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="rounded-full size-20 object-cover">
                 </div>
 
                 <!-- New Profile Photo Preview -->
@@ -42,7 +42,7 @@
                     {{ __('Seleccionar Nueva Foto') }}
                 </x-secondary-button>
 
-                @if ($this->user->profile_photo_path)
+                @if (auth()->user()->profile_photo_path)
                     <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
                         {{ __('Eliminar Foto') }}
                     </x-secondary-button>
@@ -56,16 +56,16 @@
         <div class="col-span-6 sm:col-span-4">
             <x-label for="name" value="{{ __('Nombre') }}" class="text-gray-300" />
             <x-input id="name" type="text" class="mt-1 block w-full" wire:model="state.name" required autocomplete="name" />
-            <x-input-error for="name" class="mt-2" />
+            <x-input-error for="state.name" class="mt-2" />
         </div>
 
         <!-- Email -->
         <div class="col-span-6 sm:col-span-4">
             <x-label for="email" value="{{ __('Correo Electrónico') }}" class="text-gray-300" />
             <x-input id="email" type="email" class="mt-1 block w-full" wire:model="state.email" required autocomplete="username" />
-            <x-input-error for="email" class="mt-2" />
+            <x-input-error for="state.email" class="mt-2" />
 
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
+            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! auth()->user()->hasVerifiedEmail())
                 <p class="text-sm mt-2 text-gray-400">
                     {{ __('Tu dirección de correo electrónico no está verificada.') }}
 

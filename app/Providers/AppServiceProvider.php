@@ -7,6 +7,11 @@ use Spatie\Permission\Models\Permission;
 use App\Observers\PermissionObserver;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middleware\RoleMiddleware;
+use Livewire\Livewire;
+use App\Livewire\Client\UpdateProfileInformationForm;
+use App\Livewire\Client\UpdatePasswordForm;
+use App\Livewire\Client\LogoutOtherBrowserSessionsForm;
+use App\Livewire\Client\DeleteUserForm;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
     {
          Permission::observe(PermissionObserver::class);
          Route::aliasMiddleware('role', RoleMiddleware::class);
+         Livewire::component('client.update-profile-information-form', UpdateProfileInformationForm::class);
+         Livewire::component('client.update-password-form', UpdatePasswordForm::class);
+         Livewire::component('client.logout-other-browser-sessions-form', LogoutOtherBrowserSessionsForm::class);
+         Livewire::component('client.delete-user-form', DeleteUserForm::class);
 
     }
 }
