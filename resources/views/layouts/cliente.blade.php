@@ -133,6 +133,7 @@
             color: #dc2626 !important;
         }
     </style>
+
 </head>
 <body class="bg-gray-700">
 
@@ -482,6 +483,20 @@
                                     <i class="bi bi-bookmarks-fill text-white text-sm"></i>
                                 </div>
                                 <span>Tickets</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Misiones drones -->
+                     <div>
+                        <a href="{{ route('client.alertas.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                </div>
+                                <span>Misiones Drone</span>
                             </div>
                         </a>
                     </div>

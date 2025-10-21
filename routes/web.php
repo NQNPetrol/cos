@@ -104,6 +104,14 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->middleware('can:ver.tickets')
         ->name('tickets.nuevo');
 
+    //TRIGGER ALERTAS FLYTBASE
+    Route::get('/misiones', [App\Http\Controllers\AlertasClientController::class, 'index'])
+        // ->middleware('can:ver.alertas')
+        ->name('alertas.index');
+
+    Route::post('/misiones/trigger', [App\Http\Controllers\AlertasClientController::class, 'triggerAlarm'])
+        ->name('alertas.trigger-alarm');
+
 });
 
 Route::middleware(['auth'])->group(function () {

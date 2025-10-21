@@ -59,6 +59,21 @@ class MisionFlytbase extends Model
         return $query->whereIn('cliente_id', $clienteIds);
     }
 
+    public function scopePorClienteUsuario($query, $user)
+    {
+        if ($user->hasRole('admin') || $user->hasRole('operador')) {
+            return $query;
+        }
+
+        if ($user->hasRole('cliente')) {
+            $clienteIds = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+            return $query->whereIn('cliente_id', $clienteIds->toArray());
+        }
+
+        // Si no tiene rol válido, no retorna ninguna misión
+        return $query->where('cliente_id', 0);
+    }
+
     public function scopeConDrone($query)
     {
         return $query->whereNotNull('drone_id');
