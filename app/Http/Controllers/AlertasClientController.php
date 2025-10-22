@@ -9,6 +9,8 @@ use App\Models\AlertLog;
 use App\Models\User;
 use App\Models\MisionFlytbase;
 use App\Models\UserCliente;
+use App\Models\PilotoFlytbaseCliente;
+use App\Models\PilotoFlytbase;
 
 class AlertasClientController extends Controller
 {
@@ -69,11 +71,18 @@ class AlertasClientController extends Controller
                 ], 400);
             }
 
+            $tokenPiloto = $this->obtenerTokenPiloto($user);
+            if (!$tokenPiloto) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo obtener el token de autenticación del piloto asignado.'
+                ], 500);
+            }
 
             $webhookUrl = $mision->url;
             $descripcion = "Desplegar misión: {$mision->nombre}";
 
-            $token = 'Bearer ' . env('FLYTBASE_WEBHOOK_TOKEN');
+            $token = 'Bearer ' . $tokenPiloto;
 
             $payload = [
                 'timestamp' => round(microtime(true) * 1000),
@@ -221,6 +230,54 @@ class AlertasClientController extends Controller
                 'success' => false,
                 'message' => 'Error interno: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function obtenerTokenPiloto($user)
+    {
+        try {
+            // Obtener el cliente del usuario
+            $userCliente = UserCliente::where('user_id', $user->id)->first();
+            
+            if (!$userCliente) {
+                Log::error('Usuario no tiene cliente asignado', ['user_id' => $user->id]);
+                return null;
+            }
+
+            // Obtener el piloto asignado al cliente
+            $pilotoCliente = PilotoFlytbaseCliente::where('cliente_id', $userCliente->cliente_id)->first();
+            
+            if (!$pilotoCliente) {
+                Log::error('Cliente no tiene piloto asignado', ['cliente_id' => $userCliente->cliente_id]);
+                return null;
+            }
+
+            // Obtener el token del piloto
+            $piloto = PilotoFlytbase::find($pilotoCliente->piloto_flytbase_id);
+            
+            if (!$piloto || empty($piloto->token)) {
+                Log::error('Piloto no encontrado o sin token', [
+                    'piloto_id' => $pilotoCliente->piloto_flytbase_id,
+                    'piloto_encontrado' => !is_null($piloto),
+                    'tiene_token' => $piloto && !empty($piloto->token)
+                ]);
+                return null;
+            }
+
+            Log::info('Token de piloto obtenido exitosamente', [
+                'user_id' => $user->id,
+                'cliente_id' => $userCliente->cliente_id,
+                'piloto_id' => $piloto->id
+            ]);
+
+            return $piloto->token;
+
+        } catch (\Exception $e) {
+            Log::error('Error al obtener token del piloto', [
+                'user_id' => $user->id,
+                'exception' => $e->getMessage()
+            ]);
+            return null;
         }
     }
 
