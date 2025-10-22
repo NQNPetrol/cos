@@ -7,7 +7,7 @@
                     <!-- Header -->
                     <div class="mb-6">
                         <div class="flex justify-between items-center">
-                            <h2 class="text-2xl font-semibold text-gray-100">Administrar Alertas Flytbase</h2>
+                            <h2 class="text-2xl font-semibold text-gray-100">Despliegue de Misiones</h2>
                             <a href="https://console.flytbase.com" target="_blank" 
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150">
                                 Flytbase Console
@@ -45,7 +45,7 @@
                                                 No hay misiones disponibles para su cliente. Contacte al administrador.
                                             </p>
                                         @else
-                                            <p class="text-xs text-gray-400 mt-2">Seleccione la misión que desea desplegar</p>
+                                            <p class="text-xs text-gray-400 mt-2">Seleccione la misión junto con drone que desea volar.</p>
                                         @endif
                                     </div>
 
@@ -140,7 +140,7 @@
             };
 
             // Hacer la petición AJAX
-            fetch('{{ route("alertas.trigger-alarm") }}', {
+            fetch('{{ route("client.alertas.trigger-alarm") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -158,7 +158,7 @@
                     // Si tiene liveview, mostrar el mensaje especial
                     if (data.has_liveview) {
                         console.log('Condición cumplida - mostrando mensaje');
-                        showTriggerSuccessMessage(data.mision_id, data.mision_nombre);
+                        showTriggerSuccessMessage(data);
                     } else {
                         console.log('Condición NO cumplida - mostrando alerta temporal');
                         // Para misiones sin liveview, mostrar alerta temporal
@@ -180,15 +180,26 @@
             });
         });
 
-        function showTriggerSuccessMessage(misionId, misionNombre) {
+        function showTriggerSuccessMessage(data) {
             const successMessage = document.getElementById('triggerSuccessMessage');
             const liveviewButton = document.getElementById('liveviewButton');
             
             console.log('Elemento successMessage:', successMessage); 
-            console.log('Elemento liveviewButton:', liveviewButton); 
+            console.log('Elemento liveviewButton:', liveviewButton);
+            console.log('Datos para liveview:', data); 
             
-            // Actualizar el enlace del botón
-            liveviewButton.href = "{{ route('alertas.liveview') }}?mision_id=" + misionId;
+            if (data.drone_name) {
+                
+                const droneName = data.drone_name.toLowerCase();
+                
+                // Construir la ruta para clientes: /client/drones/{droneName}/liveview?mision_id={misionId}
+                const liveviewUrl = "{{ route('client.streaming.drone.liveview', ['droneName' => 'DRONE_PLACEHOLDER']) }}".replace('DRONE_PLACEHOLDER', droneName);
+                liveviewButton.href = liveviewUrl + '?mision_id=' + data.mision_id;
+                
+                console.log('URL de liveview construida:', liveviewButton.href);
+            } else {
+                console.log('Usando URL de liveview genérica:', liveviewButton.href);
+            }
             
             // Mostrar el mensaje
             console.log('Clases antes:', successMessage.className); 
@@ -196,7 +207,7 @@
             successMessage.classList.add('block');
             console.log('Clases después:', successMessage.className);
             
-            console.log('Mensaje de éxito mostrado para misión:', misionNombre);
+            console.log('Mensaje de éxito mostrado para misión:', data.mision_nombre);
         }
 
         function hideTriggerSuccessMessage() {

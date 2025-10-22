@@ -99,18 +99,22 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/patrullas/mapa', [\App\Http\Controllers\MobileVehicleClientController::class, 'locationClient'])
         ->name('patrullas.location');
 
-    //TICKETS Y NOTIFICACIONES
+    //TICKETS Y NOTIFICACIONES (mismo controlador)
     Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'indexClient'])
         ->middleware('can:ver.tickets')
         ->name('tickets.nuevo');
 
-    //TRIGGER ALERTAS FLYTBASE
+    //TRIGGER ALERTAS FLYTBASE (nuevo controllador)
     Route::get('/misiones', [App\Http\Controllers\AlertasClientController::class, 'index'])
         // ->middleware('can:ver.alertas')
         ->name('alertas.index');
 
     Route::post('/misiones/trigger', [App\Http\Controllers\AlertasClientController::class, 'triggerAlarm'])
         ->name('alertas.trigger-alarm');
+
+    // LIVESTREAM 
+    Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveviewClient'])
+        ->name('streaming.drone.liveview');
 
 });
 
