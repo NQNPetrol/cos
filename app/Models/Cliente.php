@@ -55,6 +55,12 @@ class Cliente extends Model
         return $this->hasMany(Patrulla::class);
     }
 
+    public function pilotosFlytbase(): BelongsToMany
+    {
+        return $this->belongsToMany(PilotoFlytbase::class, 'piloto_flytbase_cliente', 'cliente_id', 'piloto_flytbase_id')
+                    ->withTimestamps();
+    }
+
     /**
      * Verifica si este es el cliente COS 
      */

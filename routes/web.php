@@ -545,6 +545,10 @@ Route::middleware([
         Route::get('/thumbnails', [App\Http\Controllers\GalleryController::class, 'getThumbnails'])->name('thumbnails');
     });
 
+    Route::get('/pilotos/asignar-clientes', function () {
+        return view('pilotos.index');
+    })->name('pilotos.index');
+
 
 });
 

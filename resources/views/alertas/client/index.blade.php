@@ -29,8 +29,11 @@
                                         <select id="misionSelect" name="mision_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                                             <option value="">Seleccione una misión disponible</option>
                                             @foreach($misiones as $mision)
-                                                <option value="{{ $mision->id }}">
-                                                    {{ $mision->nombre }} 
+                                                <option value="{{ $mision->id }}"
+                                                    data-nombre="{{ $mision->nombre }}"
+                                                    data-drone="{{ $mision->drone->drone ?? 'No asignado'}}"
+                                                    data-descripcion="{{ $mision->descripcion ?? 'Sin descripcion disponible' }}">
+                                                    {{ $mision->nombre}}
                                                     @if($mision->cliente)
                                                         - {{ $mision->cliente->nombre }}
                                                     @endif
@@ -104,6 +107,75 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Resumen de Misión Seleccionada -->
+                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                            <div class="p-6">
+                                
+
+                                <!-- Estado vacío -->
+                                <div id="emptyMissionState" class="text-center py-12">
+                                    <div class="w-20 h-20 mx-auto mb-4 bg-gray-700 rounded-full flex items-center justify-center">
+                                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-lg font-medium text-gray-300 mb-2">Selecciona una misión</h4>
+                                    <p class="text-gray-400">Primero debes seleccionar una misión del listado superior para ver los detalles.</p>
+                                </div>
+
+                                <!-- Contenido del resumen (oculto inicialmente) -->
+                                <div id="missionSummary" class="hidden">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                        <!-- Información Básica -->
+                                        <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
+                                            <div class="flex items-center mb-3">
+                                                <svg class="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                <h4 class="text-sm font-medium text-gray-200">Información Básica</h4>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <p class="text-xs text-gray-400">Nombre de la Misión</p>
+                                                    <p id="summaryNombre" class="text-sm font-medium text-gray-100">-</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-400">Drone Asignado</p>
+                                                    <p id="summaryDrone" class="text-sm font-medium text-gray-100">-</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Descripción -->
+                                        <div class="bg-gray-750 rounded-lg p-4 border border-gray-600 md:col-span-2">
+                                            <div class="flex items-center mb-3">
+                                                <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <h4 class="text-sm font-medium text-gray-200">Descripción</h4>
+                                            </div>
+                                            <p id="summaryDescripcion" class="text-sm text-gray-300 leading-relaxed">-</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Estado de la Misión -->
+                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <svg class="w-5 h-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                <h4 class="text-sm font-medium text-gray-200">Estado Actual</h4>
+                                            </div>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                                                <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
+                                                Lista para Desplegar
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,6 +184,39 @@
 
     <!-- Script para manejar el trigger -->
     <script>
+        // Manejar cambio en la selección de misión
+        document.getElementById('misionSelect').addEventListener('change', function() {
+            updateMissionSummary(this);
+        });
+
+        function updateMissionSummary(selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const emptyState = document.getElementById('emptyMissionState');
+            const missionSummary = document.getElementById('missionSummary');
+
+            if (selectedOption.value === '') {
+                // Mostrar estado vacío
+                emptyState.classList.remove('hidden');
+                missionSummary.classList.add('hidden');
+            } else {
+                // Ocultar estado vacío y mostrar resumen
+                emptyState.classList.add('hidden');
+                missionSummary.classList.remove('hidden');
+
+                // Actualizar información del resumen
+                document.getElementById('summaryNombre').textContent = selectedOption.getAttribute('data-nombre') || '-';
+                document.getElementById('summaryDrone').textContent = selectedOption.getAttribute('data-drone') || '-';
+                document.getElementById('summaryDescripcion').textContent = selectedOption.getAttribute('data-descripcion') || 'Sin descripción disponible';
+            }
+        }
+
+        // Inicializar el resumen al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectElement = document.getElementById('misionSelect');
+            updateMissionSummary(selectElement);
+        });
+
+
         document.getElementById('triggerAlarmBtn').addEventListener('click', function() {
             const button = this;
             const originalText = button.innerHTML;

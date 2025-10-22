@@ -475,6 +475,57 @@
                         </div>
                     </div>
 
+                    <!-- Drones -->
+                    <div>
+                        <button id="toggleDrones" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#ffffff"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M10 10h4v4h-4z" />
+                                        <path d="M10 10l-3.5 -3.5" />
+                                        <path d="M9.96 6a3.5 3.5 0 1 0 -3.96 3.96" />
+                                        <path d="M14 10l3.5 -3.5" />
+                                        <path d="M18 9.96a3.5 3.5 0 1 0 -3.96 -3.96" />
+                                        <path d="M14 14l3.5 3.5" />
+                                        <path d="M14.04 18a3.5 3.5 0 1 0 3.96 -3.96" />
+                                        <path d="M10 14l-3.5 3.5" />
+                                        <path d="M6 14.04a3.5 3.5 0 1 0 3.96 3.96" />
+                                    </svg>
+                                </div>
+                                <span>Drones</span>
+                            </div>
+                            <svg class="w-5 h-5 transition-transform duration-300" id="iconDrones" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div id="submenuDrones" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                            <a href="{{ route('client.alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                <i class="bi bi-send-plus-fill text-lg"></i>
+                                <span>Desplegar Misión</span>
+                            </a>
+                            <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                <i class="bi bi-calendar2-day-fill text-lg"></i>
+                                <span>Programar Misión</span>
+                            </a>
+                            <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                <i class="bi bi-clock"></i>
+                                <span>Logs</span>
+                            </a>
+                        </div>
+                    </div>
+
+
                     <!-- Tickets - Sin submenu, va directo -->
                     <div>
                         <a href="{{ route('client.tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
@@ -483,20 +534,6 @@
                                     <i class="bi bi-bookmarks-fill text-white text-sm"></i>
                                 </div>
                                 <span>Tickets</span>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Misiones drones -->
-                     <div>
-                        <a href="{{ route('client.alertas.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                    </svg>
-                                </div>
-                                <span>Misiones Drone</span>
                             </div>
                         </a>
                     </div>
@@ -891,17 +928,7 @@
         const toggleBtn = document.getElementById('toggleSidebar');
         const sidebar = document.getElementById('sidebar');
 
-        // Menú desplegable Clientes
-        const toggleClientes = document.getElementById('toggleClientes');
-        const submenuClientes = document.getElementById('submenuClientes');
-        const iconClientes = document.getElementById('iconClientes');
-
-        if (toggleClientes && submenuClientes && iconClientes) {
-            toggleClientes.addEventListener('click', () => {
-                submenuClientes.classList.toggle('hidden');
-                iconClientes.classList.toggle('rotate-180');
-            });
-        }
+   
 
         // Menú desplegable Eventos
         const toggleEventos = document.getElementById('toggleEventos');
@@ -927,29 +954,19 @@
             });
         }
 
-        //config
-        const toggleConfiguracion = document.getElementById('toggleConfiguracion');
-        const submenuConfiguracion = document.getElementById('submenuConfiguracion');
-        const iconConfiguracion = document.getElementById('iconConfiguracion');
+        //patrullas
+        const toggleDrones = document.getElementById('toggleDrones');
+        const submenuDrones = document.getElementById('submenuDrones');
+        const iconDrones = document.getElementById('iconDrones');
 
-        if (toggleConfiguracion && submenuConfiguracion && iconConfiguracion) {
-            toggleConfiguracion.addEventListener('click', () => {
-                submenuConfiguracion.classList.toggle('hidden');
-                iconConfiguracion.classList.toggle('rotate-180');
+        if (toggleDrones && submenuDrones && iconDrones) {
+            toggleDrones.addEventListener('click', () => {
+                submenuDrones.classList.toggle('hidden');
+                iconDrones.classList.toggle('rotate-180');
             });
         }
 
-        //personal
-        const togglePersonal = document.getElementById('togglePersonal');
-        const submenuPersonal = document.getElementById('submenuPersonal');
-        const iconPersonal = document.getElementById('iconPersonal');
-
-        if (togglePersonal && submenuPersonal && iconPersonal) {
-            togglePersonal.addEventListener('click', () => {
-                submenuPersonal.classList.toggle('hidden');
-                iconPersonal.classList.toggle('rotate-180');
-            });
-        }
+ 
 
         //Inventario
         const toggleInventario = document.getElementById('toggleInventario');
