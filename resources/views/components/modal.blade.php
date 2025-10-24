@@ -1,3 +1,4 @@
+<!-- Version adaptada a livewire v3.6.4 -->
 @props(['id', 'maxWidth'])
 
 @php
@@ -13,7 +14,9 @@ $maxWidth = [
 @endphp
 
 <div
-    x-data="{ show: @entangle($attributes->wire('model')) }"
+    x-data="{
+        show: @if($attributes->has('wire:model')) $wire.{{ $attributes->wire('model')->value() }} @else false @endif
+    }"
     x-on:close.stop="show = false"
     x-on:keydown.escape.window="show = false"
     x-show="show"

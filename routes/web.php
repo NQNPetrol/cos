@@ -34,6 +34,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         return view('client.dashboard');
     })->name('dashboard');
 
+    // PROFILE
+    Route::get('/profile', function () {
+        return view('client.profile.show');
+    })->name('profile.show');
+
     //EVENTOS (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos')
