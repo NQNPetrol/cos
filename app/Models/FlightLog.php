@@ -20,14 +20,27 @@ class FlightLog extends Model
         'flight_endtime',
         'flight_time',
         'total_distance',
-        'estado'
+        'estado',
+        'event_id',
+        'message',
+        'severity',
+        'drone_name',
+        'dock_name',
+        'organization',
+        'event_timestamp',
+        'site',
+        'event_coordinates',
+        'automation',
+        'drone_battery',
+        'flight_details'
     ];
 
     protected $casts = [
         'flight_starttime' => 'datetime',
         'flight_endtime' => 'datetime',
         'flight_time' => 'integer',
-        'total_distance' => 'float'
+        'total_distance' => 'float',
+        'event_coordinates' => 'array'
     ];
 
     const ESTADO_EN_PROCESO = 'en_proceso';
@@ -84,6 +97,18 @@ class FlightLog extends Model
     public function scopePorEstado($query, $estado)
     {
         return $query->where('estado', $estado);
+    }
+
+    /**
+     * Scope para buscar flight logs cercanos a un timestamp
+     */
+    public function scopeCercanosATimestamp($query, $timestamp, $minutosTolerancia = 30)
+    {
+        $fechaInicio = \Carbon\Carbon::parse($timestamp)->subMinutes($minutosTolerancia);
+        $fechaFin = \Carbon\Carbon::parse($timestamp);
+        
+        return $query->whereBetween('flight_starttime', [$fechaInicio, $fechaFin])
+                    ->where('flight_starttime', '<=', $fechaFin);
     }
 
     /**
@@ -167,14 +192,19 @@ class FlightLog extends Model
             return 'No disponible';
         }
 
-        $horas = floor($this->flight_time / 60);
-        $minutos = $this->flight_time % 60;
+        $horas = floor($this->flight_time / 3600);
+        $minutos = floor(($this->flight_time % 3600) / 60);
+        $segundos = $this->flight_time % 60;
 
         if ($horas > 0) {
-            return "{$horas}h {$minutos}m";
+            return sprintf("%dh %dm %ds", $horas, $minutos, $segundos);
         }
 
-        return "{$minutos}m";
+        if ($minutos > 0) {
+            return sprintf("%dm %ds", $minutos, $segundos);
+        }
+
+        return sprintf("%ds", $segundos);
     }
 
     /**

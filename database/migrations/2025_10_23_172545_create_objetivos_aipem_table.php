@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('objetivos_aipem', function (Blueprint $table) {
             $table->id();
-            $table->string('codobj', 8)->primary();
+            $table->string('codobj');
             $table->string('nombre', 255);
             $table->date('fecha_alta')->nullable();
             $table->date('fecha_baja')->nullable();

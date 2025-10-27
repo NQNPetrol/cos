@@ -56,26 +56,8 @@
 
                                 <!-- Información y controles -->
                                 <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                                        <h4 class="text-sm font-medium text-gray-200 mb-2">Estado de la Transmisión</h4>
-                                        <div class="flex items-center">
-                                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                                            <span class="text-xs text-gray-300">Transmisión Activa</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                                        <h4 class="text-sm font-medium text-gray-200 mb-2">Duración de Sesión</h4>
-                                        <p class="text-xs text-gray-300" id="sessionTimerCard">00:00:00</p>
-                                    </div>
-                                    
-                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                                        <h4 class="text-sm font-medium text-gray-200 mb-2">Acciones</h4>
-                                        <button onclick="refreshStream()" 
-                                                class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors">
-                                            Refrescar Stream
-                                        </button>
-                                    </div>
+                                
+                                   
                                 </div>
 
                                 <!-- Mensaje de información -->
