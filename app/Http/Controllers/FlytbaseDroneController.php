@@ -218,4 +218,119 @@ class FlytbaseDroneController extends Controller
                 ->with('error', 'Error al actualizar el drone: ' . $e->getMessage());
         }
     }
+
+    public function liveviewClient(Request $request, $droneName = null)
+    {
+        Log::debug('=== INICIANDO LIVEWVIEW CLIENT ===');
+        $user = auth()->user();
+        
+        Log::debug('Usuario cliente autenticado:', [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'roles' => $user->getRoleNames()->toArray()
+        ]);
+        
+        Log::debug('Parámetros recibidos:', [
+            'mision_id' => $request->get('mision_id'),
+            'droneName' => $droneName,
+            'all_params' => $request->all()
+        ]);
+
+        // Si se proporciona mision_id, obtener el drone desde la misión con filtro de cliente
+        $misionId = $request->get('mision_id');
+        $mision = null;
+        $drone = null;
+
+        if ($misionId) {
+            Log::debug('Buscando misión por ID con filtro de cliente:', ['mision_id' => $misionId]);
+            
+            // Usar el scope porClienteUsuario para filtrar por cliente del usuario
+            $mision = MisionFlytbase::activas()
+                ->porClienteUsuario($user)
+                ->with('drone')
+                ->find($misionId);
+            
+            Log::debug('Resultado de búsqueda de misión para cliente:', [
+                'mision_encontrada' => !!$mision,
+                'mision_nombre' => $mision ? $mision->nombre : 'No encontrada o sin acceso',
+                'tiene_drone' => $mision && $mision->drone ? 'Sí' : 'No'
+            ]);
+
+            if ($mision && $mision->drone) {
+                $drone = $mision->drone;
+                Log::debug('Drone encontrado desde misión:', [
+                    'drone_id' => $drone->id,
+                    'drone_nombre' => $drone->drone,
+                    'share_url' => $drone->share_url ? 'Configurado' : 'No configurado'
+                ]);
+            }
+        }
+
+        if (!$drone && $droneName) {
+            Log::debug('Buscando drone por nombre:', ['droneName' => $droneName]);
+            $drone = FlytbaseDrone::where('drone', $droneName)->first();
+            Log::debug('Resultado de búsqueda por nombre:', [
+                'drone_encontrado' => !!$drone,
+                'drone_nombre' => $drone ? $drone->drone : 'No encontrado'
+            ]);
+        }
+
+        // Si no se encuentra el drone, redirigir con error
+        if (!$drone) {
+            Log::warning('DRONE NO ENCONTRADO O SIN ACCESO - Redirigiendo a client.alertas.index');
+            return redirect()->route('client.alertas.index')
+                ->with('error', 'Drone no encontrado o no tiene permisos para acceder.');
+        }
+
+        Log::debug('Drone seleccionado para cliente:', [
+            'id' => $drone->id,
+            'nombre' => $drone->drone,
+            'share_url' => $drone->share_url,
+            'activo' => $drone->activo
+        ]);
+
+        // Verificar si existe la vista específica para clientes
+        $viewPath = 'livestreaming.client.' . $drone->drone . '.liveview';
+        Log::debug('Verificando vista para cliente:', [
+            'view_path' => $viewPath,
+            'view_exists' => view()->exists($viewPath) ? 'Sí' : 'No'
+        ]);
+
+        if (!view()->exists($viewPath)) {
+            // Intentar con el nombre en minúsculas
+            $viewPath = 'livestreaming.client.' . strtolower($drone->drone) . '.liveview';
+            Log::debug('Verificando vista en minúsculas:', [
+                'view_path' => $viewPath,
+                'view_exists' => view()->exists($viewPath) ? 'Sí' : 'No'
+            ]);
+        }
+
+        if (!view()->exists($viewPath)) {
+            // Intentar reemplazar espacios y caracteres especiales
+            $cleanDroneName = str_replace([' ', '-'], '', $drone->drone);
+            $viewPath = 'livestreaming.client.' . strtolower($cleanDroneName) . '.liveview';
+            Log::debug('Verificando vista limpia:', [
+                'view_path' => $viewPath,
+                'view_exists' => view()->exists($viewPath) ? 'Sí' : 'No'
+            ]);
+        }
+
+        // Preparar datos para la vista
+        $viewData = [
+            'drone' => $drone,
+            'mision' => $mision,
+            'flytbaseGuestUrl' => $drone->share_url,
+        ];
+
+        Log::debug('Datos enviados a la vista cliente:', [
+            'drone_presente' => isset($viewData['drone']),
+            'mision_presente' => isset($viewData['mision']),
+            'url_presente' => isset($viewData['flytbaseGuestUrl'])
+        ]);
+
+        Log::debug('=== RENDERIZANDO VISTA CLIENTE ===', ['view' => $viewPath]);
+
+        // Renderizar la vista específica para clientes
+        return view($viewPath, $viewData);
+    }
 }

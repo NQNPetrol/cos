@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PersonalCompareController;
 use App\Http\Controllers\EncodingDeviceController;
 use App\Http\Controllers\MobileVehicleClientController;
 use App\Http\Controllers\S3WebhookController;
+use App\Http\Controllers\FlytbaseFlightLogsController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -68,6 +69,10 @@ Route::prefix('s3-webhook')->group(function () {
     Route::get('/cache-status', [S3WebhookController::class, 'cacheStatus']);
 });
 
+// API PARA IMPORTAR FLIGHT LOGS DESDE MAIL DE FLYTBASE
+Route::prefix('flytbase')->group(function () {
+    Route::post('/flight-logs/email', [FlytbaseFlightLogsController::class, 'storeFromEmail']);
+});
 
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);

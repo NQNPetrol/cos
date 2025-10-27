@@ -654,6 +654,10 @@
                             </button>
 
                             <div id="submenuAlertas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                <a href="{{ route('pilotos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                    <span>Pilotos</span>
+                                </a>
                                 <a href="{{ route('misiones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                     <i class="bi bi-calendar-check"></i>
                                     <span>Misiones</span>
