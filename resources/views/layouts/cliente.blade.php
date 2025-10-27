@@ -518,7 +518,7 @@
                                 <i class="bi bi-calendar2-day-fill text-lg"></i>
                                 <span>Programar Misión</span>
                             </a>
-                            <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            <a href="{{ route('client.flight-logs') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                 <i class="bi bi-clock"></i>
                                 <span>Logs</span>
                             </a>

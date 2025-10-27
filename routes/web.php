@@ -116,6 +116,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveviewClient'])
         ->name('streaming.drone.liveview');
 
+    //FLIGHT LOGS
+    Route::get('/flight-logs', function () {
+        return view('flightlogs.client.index');
+    })->name('flight-logs');
+
 });
 
 Route::middleware(['auth'])->group(function () {
