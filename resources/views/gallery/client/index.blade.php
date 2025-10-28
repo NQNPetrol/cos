@@ -9,72 +9,7 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <h2 class="text-2xl font-semibold text-gray-100">Galería</h2>
-                                <p class="text-sm text-gray-400 mt-1">Imágenes y videos capturados por nuestros drones durante misiones</p>
-                            </div>
-                        </div>
-
-                        <!-- Filtros -->
-                        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                            <h3 class="text-lg font-medium text-gray-100 mb-4">Filtros</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- Filtro por Drone -->
-                                <div>
-                                    <label for="droneFilter" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Drone
-                                    </label>
-                                    <select id="droneFilter" name="drone" 
-                                            class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Todos los drones</option>
-                                        @foreach($galleryData['drones'] as $drone)
-                                            <option value="{{ $drone['name'] }}" 
-                                                    {{ request('drone') == $drone['name'] ? 'selected' : '' }}>
-                                                {{ $drone['name'] }} ({{ $drone['stats']['images'] + $drone['stats']['videos'] }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Filtro por Misión -->
-                                <div>
-                                    <label for="missionFilter" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Misión
-                                    </label>
-                                    <select id="missionFilter" name="mission" 
-                                            class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Todas las misiones</option>
-                                        @php
-                                            $allMissions = [];
-                                            foreach($galleryData['drones'] as $drone) {
-                                                foreach($drone['clients'] as $client) {
-                                                    foreach($client['missions'] as $mission) {
-                                                        $allMissions[$mission['name']] = $mission['name'];
-                                                    }
-                                                }
-                                            }
-                                        @endphp
-                                        @foreach($allMissions as $mission)
-                                            <option value="{{ $mission }}" 
-                                                    {{ request('mission') == $mission ? 'selected' : '' }}>
-                                                {{ $mission }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Botones de acción -->
-                            <div class="flex justify-between items-center mt-6">
-                                <div class="text-sm text-gray-400">
-                                    <span class="font-semibold text-gray-200">{{ $galleryData['stats']['total_images'] }}</span> imágenes y 
-                                    <span class="font-semibold text-gray-200">{{ $galleryData['stats']['total_videos'] }}</span> videos en 
-                                    <span class="font-semibold text-gray-200">{{ $galleryData['stats']['total_missions'] }}</span> misiones
-                                </div>
-                                <div class="flex space-x-3">
-                                    <button type="button" id="clearFilters" 
-                                            class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
-                                        Limpiar Filtros
-                                    </button>
-                                </div>
+                                <p class="text-sm text-gray-400 mt-1">Imágenes y videos capturados por drones y/o cámaras</p>
                             </div>
                         </div>
 
@@ -168,7 +103,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <h3 class="text-lg font-medium text-gray-300 mb-2">No se encontraron resultados</h3>
-                            <p class="text-gray-400">Intenta ajustar los filtros para ver más contenido.</p>
+                            <p class="text-gray-400">No hay imágenes o videos disponibles en este momento.</p>
                         </div>
                     </div>
                 </div>
@@ -263,6 +198,7 @@
             
             // Actualizar contadores
             updateCounters();
+            checkEmptyState();
         }
 
         function setupEventListeners() {
@@ -277,11 +213,6 @@
             document.getElementById('closeVideoModalBtn').addEventListener('click', closeVideoModal);
             document.getElementById('downloadImageBtn').addEventListener('click', downloadCurrentImage);
             document.getElementById('downloadVideoBtn').addEventListener('click', downloadCurrentVideo);
-
-            // Filtros
-            document.getElementById('droneFilter').addEventListener('change', applyFilters);
-            document.getElementById('missionFilter').addEventListener('change', applyFilters);
-            document.getElementById('clearFilters').addEventListener('click', clearFilters);
 
             // Cerrar modales con ESC
             document.addEventListener('keydown', (e) => {
@@ -336,6 +267,13 @@
                 loadingElement.classList.add('hidden');
                 carousel.classList.remove('hidden');
             }
+
+            // Actualizar contadores de carga
+            if (type === 'images') {
+                galleryState.loadedImages = endIndex;
+            } else {
+                galleryState.loadedVideos = endIndex;
+            }
         }
 
         function createMediaElement(media, index, type) {
@@ -343,14 +281,13 @@
             div.className = 'flex-shrink-0 w-64 bg-gray-700 rounded-lg overflow-hidden border border-gray-600 hover:border-blue-500 transition-all duration-300 snap-start';
             div.style.scrollSnapAlign = 'start';
 
-            if (type === 'image') {
+            if (type === 'images') {
                 div.innerHTML = `
-                    <div class="relative group cursor-pointer" onclick="openImageModal(${index})">
+                    <div class="relative group cursor-pointer" data-index="${index}" onclick="openImageModal(${index})">
                         <img src="${media.url}" 
                              alt="${media.filename}"
                              class="w-full h-48 object-cover"
                              loading="lazy"
-                             onload="handleImageLoad('images')"
                              onerror="handleMediaError(this, 'image')">
                         
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-end">
@@ -373,7 +310,7 @@
                 `;
             } else {
                 div.innerHTML = `
-                    <div class="relative group cursor-pointer" onclick="openVideoModal(${index})">
+                    <div class="relative group cursor-pointer" data-index="${index}" onclick="openVideoModal(${index})">
                         <div class="w-full h-48 bg-gray-600 flex items-center justify-center">
                             <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
@@ -415,18 +352,12 @@
             
             if (scrollLeft + clientWidth >= scrollWidth - 100 && loadedCount < items.length) {
                 loadCarouselItems(type, loadedCount, galleryState.itemsPerPage);
-                
-                if (type === 'images') {
-                    galleryState.loadedImages += galleryState.itemsPerPage;
-                } else {
-                    galleryState.loadedVideos += galleryState.itemsPerPage;
-                }
             }
         }
 
         function scrollCarousel(type, direction) {
             const carousel = document.getElementById(`${type}Carousel`);
-            const scrollAmount = 300; // Ajusta según el ancho de tus items
+            const scrollAmount = 300;
             
             carousel.scrollBy({
                 left: direction * scrollAmount,
@@ -437,6 +368,9 @@
         // Funciones de modales
         function openImageModal(index) {
             const media = galleryState.visibleImages[index];
+            
+            if (!media) return;
+
             galleryState.currentImageIndex = index;
             
             document.getElementById('modalImage').src = media.url;
@@ -447,6 +381,9 @@
 
         function openVideoModal(index) {
             const media = galleryState.visibleVideos[index];
+            
+            if (!media) return;
+
             galleryState.currentVideoIndex = index;
             
             const video = document.getElementById('modalVideo');
@@ -501,59 +438,14 @@
             return 'Fecha desconocida';
         }
 
-        function handleImageLoad(type) {
-            // Puedes usar esto para tracking de carga si es necesario
-        }
-
         function handleMediaError(element, type) {
             console.error(`Error loading ${type}:`, element.src);
-            element.src = '/placeholder-image.jpg'; // Imagen de placeholder en caso de error
+            element.src = '/placeholder-image.jpg';
         }
 
         function updateCounters() {
             document.getElementById('imagesCount').textContent = `${galleryState.visibleImages.length} imágenes`;
             document.getElementById('videosCount').textContent = `${galleryState.visibleVideos.length} videos`;
-        }
-
-        function applyFilters() {
-            const droneFilter = document.getElementById('droneFilter').value.toLowerCase();
-            const missionFilter = document.getElementById('missionFilter').value.toLowerCase();
-
-            galleryState.visibleImages = galleryState.allMedia.filter(media => 
-                media.type === 'image' &&
-                (!droneFilter || media.patterns.prefix.toLowerCase().includes(droneFilter)) &&
-                (!missionFilter || media.patterns.mission.toLowerCase().includes(missionFilter))
-            );
-
-            galleryState.visibleVideos = galleryState.allMedia.filter(media => 
-                media.type === 'video' &&
-                (!droneFilter || media.patterns.prefix.toLowerCase().includes(droneFilter)) &&
-                (!missionFilter || media.patterns.mission.toLowerCase().includes(missionFilter))
-            );
-
-            // Resetear carruseles
-            resetCarousels();
-            updateCounters();
-            checkEmptyState();
-        }
-
-        function resetCarousels() {
-            // Limpiar y recargar carruseles
-            document.getElementById('imagesCarousel').innerHTML = '';
-            document.getElementById('videosCarousel').innerHTML = '';
-            document.getElementById('imagesLoading').classList.remove('hidden');
-            document.getElementById('videosLoading').classList.remove('hidden');
-            
-            galleryState.loadedImages = 0;
-            galleryState.loadedVideos = 0;
-            
-            loadInitialItems();
-        }
-
-        function clearFilters() {
-            document.getElementById('droneFilter').value = '';
-            document.getElementById('missionFilter').value = '';
-            applyFilters();
         }
 
         function checkEmptyState() {
@@ -564,6 +456,11 @@
                 noResults.classList.add('hidden');
             }
         }
+
+        // Hacer funciones globales para los onclick
+        window.openImageModal = openImageModal;
+        window.openVideoModal = openVideoModal;
+        window.handleMediaError = handleMediaError;
     </script>
 
     <style>
