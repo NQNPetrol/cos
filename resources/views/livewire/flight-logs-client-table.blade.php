@@ -25,18 +25,24 @@
 
         <div>
             <label class="block text-sm mb-1">Nombre del Drone</label>
-            <input type="text" 
-                   wire:model.live="droneName"
-                   placeholder="Buscar por drone..."
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            <select wire:model.live="droneName"
+                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Todos los drones</option>
+                @foreach($drones as $drone)
+                    <option value="{{ $drone }}">{{ $drone }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div>
             <label class="block text-sm mb-1">Nombre de Misión</label>
-            <input type="text" 
-                   wire:model.live="misionNombre"
-                   placeholder="Buscar por misión..."
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            <select wire:model.live="misionNombre"
+                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Todas las misiones</option>
+                @foreach($misiones as $mision)
+                    <option value="{{ $mision->nombre }}">{{ $mision->nombre }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
 
@@ -47,7 +53,8 @@
                 <tr>
                     <th class="px-4 py-3 text-left">Misión</th>
                     <th class="px-4 py-3 text-left">Drone</th>
-                    <th class="px-4 py-3 text-left">Fecha y Hora</th>
+                    <th class="px-4 py-3 text-left">Take Off</th>
+                    <th class="px-4 py-3 text-left">Landing</th>
                     <th class="px-4 py-3 text-left">Duración</th>
                     <th class="px-4 py-3 text-left">Piloto</th>
                     <th class="px-4 py-3 text-left">Estado</th>
@@ -72,14 +79,32 @@
                             <div class="text-gray-200">{{ $log->drone_name }}</div>
                         </td>
                         
-                        <!-- Fecha y Hora -->
+                        <!-- Takeoff -->
                         <td class="px-4 py-3">
-                            <div class="text-gray-200">
-                                {{ $log->flight_starttime?->format('d/m/Y') ?? 'N/A' }}
-                            </div>
-                            <div class="text-xs text-gray-400">
-                                {{ $log->flight_starttime?->format('H:i') ?? 'N/A' }}
-                            </div>
+                            @if($log->flight_starttime)
+                                <div class="text-gray-200">
+                                    {{ $log->flight_starttime->format('d/m/Y') }}
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    {{ $log->flight_starttime->format('H:i:s') }}
+                                </div>
+                            @else
+                                <span class="text-gray-400 text-xs">N/A</span>
+                            @endif
+                        </td>
+                        
+                        <!-- Landing -->
+                        <td class="px-4 py-3">
+                            @if($log->flight_endtime)
+                                <div class="text-gray-200">
+                                    {{ $log->flight_endtime->format('d/m/Y') }}
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    {{ $log->flight_endtime->format('H:i:s') }}
+                                </div>
+                            @else
+                                <span class="text-gray-400 text-xs">En vuelo</span>
+                            @endif
                         </td>
                         
                         <!-- Duración -->

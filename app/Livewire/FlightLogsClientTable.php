@@ -56,6 +56,7 @@ class FlightLogsClientTable extends Component
             return view('livewire.flight-logs-client-table', [
                 'flightLogs' => collect([]),
                 'misiones' => collect([]),
+                'drones' => collect([]),
             ]);
         }
 
@@ -88,10 +89,20 @@ class FlightLogsClientTable extends Component
         $misionesDisponibles = MisionFlytbase::whereIn('cliente_id', $clienteIds)
             ->with('cliente')
             ->get();
+        
+        $dronesDisponibles = FlightLog::whereIn('mision_flytbase_id', $misionIds)
+            ->select('drone_name')
+            ->distinct()
+            ->orderBy('drone_name')
+            ->get()
+            ->pluck('drone_name')
+            ->filter()
+            ->values();
 
         return view('livewire.flight-logs-client-table', [
             'flightLogs' => $flightLogs,
             'misiones' => $misionesDisponibles,
+            'drones' => $dronesDisponibles,
         ]);
     }
 }
