@@ -10,6 +10,7 @@ use App\Models\FlytbaseDrone;
 use App\Models\FlytbaseDock;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PeticionesMisionesClient extends Component
 {
@@ -30,6 +31,9 @@ class PeticionesMisionesClient extends Component
     public $observaciones;
     public $waypoints = [];
 
+    public $currentWaypointIndex = 0;
+    public $showActionModal = false;
+
     // Filtros
     public $filtroEstado = '';
 
@@ -39,18 +43,160 @@ class PeticionesMisionesClient extends Component
 
     public function mount()
     {
-        $this->waypoints = [
-            [
-                'latitud' => '',
-                'longitud' => '',
-                'altitud' => '',
-                'acciones' => []
-            ]
+        Log::info('Componente PeticionesMisionesClient montado');
+        $this->waypoints = [];
+    }
+
+    public function agregarWaypoint()
+    {
+        Log::info('Agregando waypoint');
+        $this->waypoints[] = [
+            'latitud' => '',
+            'longitud' => '',
+            'altitud' => $this->route_altitude,
+            'acciones' => []
         ];
+        
+        // Si es el primer waypoint, establecer como current
+        if (count($this->waypoints) === 1) {
+            $this->currentWaypointIndex = 0;
+        }
+        Log::info('Waypoints después de agregar:', ['count' => count($this->waypoints), 'currentIndex' => $this->currentWaypointIndex]);
+    }
+
+    public function eliminarWaypoint($index)
+    {
+        Log::info('Eliminando waypoint', ['index' => $index, 'totalWaypoints' => count($this->waypoints)]);
+        if (count($this->waypoints) > 0) {
+            unset($this->waypoints[$index]);
+            $this->waypoints = array_values($this->waypoints);
+            
+            // Ajustar el índice actual si es necesario
+            if ($this->currentWaypointIndex >= count($this->waypoints)) {
+                $this->currentWaypointIndex = max(0, count($this->waypoints) - 1);
+            }
+            
+            // Si no hay waypoints, resetear el índice
+            if (count($this->waypoints) === 0) {
+                $this->currentWaypointIndex = 0;
+            }
+            Log::info('Waypoints después de eliminar:', ['count' => count($this->waypoints), 'currentIndex' => $this->currentWaypointIndex]);
+        }
+    }
+
+    public function nextWaypoint()
+    {
+        Log::info('Navegando al siguiente waypoint', ['currentIndex' => $this->currentWaypointIndex, 'totalWaypoints' => count($this->waypoints)]);
+        if ($this->currentWaypointIndex < count($this->waypoints) - 1) {
+            $this->currentWaypointIndex++;
+            Log::info('Nuevo índice de waypoint:', ['currentIndex' => $this->currentWaypointIndex]);
+        } else {
+            Log::info('No se puede navegar al siguiente - ya está en el último waypoint');
+        }
+    }
+
+    public function previousWaypoint()
+    {
+        Log::info('Navegando al waypoint anterior', ['currentIndex' => $this->currentWaypointIndex]);
+        if ($this->currentWaypointIndex > 0) {
+            $this->currentWaypointIndex--;
+            Log::info('Nuevo índice de waypoint:', ['currentIndex' => $this->currentWaypointIndex]);
+        } else {
+            Log::info('No se puede navegar al anterior - ya está en el primer waypoint');
+        }
+    }
+
+    public function abrirModalAcciones()
+    {
+        Log::info('Abriendo modal de acciones', [
+            'currentWaypointIndex' => $this->currentWaypointIndex,
+            'totalWaypoints' => count($this->waypoints),
+            'showActionModal' => $this->showActionModal
+        ]);
+        
+        $this->showActionModal = true;
+        
+        Log::info('Modal de acciones abierto', ['showActionModal' => $this->showActionModal]);
+    }
+
+    public function cerrarModalAcciones()
+    {
+        Log::info('Cerrando modal de acciones');
+        $this->showActionModal = false;
+    }
+
+    public function agregarAccion($accion)
+    {
+        Log::info('Agregando acción', [
+            'accion' => $accion,
+            'currentIndex' => $this->currentWaypointIndex,
+            'waypointsCount' => count($this->waypoints)
+        ]);
+
+        if (!isset($this->waypoints[$this->currentWaypointIndex])) {
+            Log::error('Waypoint actual no existe', ['currentIndex' => $this->currentWaypointIndex]);
+            return;
+        }
+
+        $currentIndex = $this->currentWaypointIndex;
+        
+        if (!in_array($accion, $this->waypoints[$currentIndex]['acciones'])) {
+            $this->waypoints[$currentIndex]['acciones'][] = $accion;
+            Log::info('Acción agregada exitosamente', [
+                'accion' => $accion,
+                'accionesActuales' => $this->waypoints[$currentIndex]['acciones']
+            ]);
+        } else {
+            Log::info('La acción ya existe en el waypoint', ['accion' => $accion]);
+        }
+        
+        $this->showActionModal = false;
+        Log::info('Modal cerrado después de agregar acción');
+    }
+
+    public function eliminarAccion($waypointIndex, $accion)
+    {
+        Log::info('Eliminando acción', [
+            'waypointIndex' => $waypointIndex,
+            'accion' => $accion,
+            'accionesAntes' => $this->waypoints[$waypointIndex]['acciones'] ?? []
+        ]);
+
+        if (isset($this->waypoints[$waypointIndex]['acciones'])) {
+            $acciones = $this->waypoints[$waypointIndex]['acciones'];
+            $this->waypoints[$waypointIndex]['acciones'] = array_values(array_diff($acciones, [$accion]));
+            Log::info('Acción eliminada exitosamente', [
+                'accionesDespues' => $this->waypoints[$waypointIndex]['acciones']
+            ]);
+        } else {
+            Log::warning('No se encontraron acciones para eliminar en el waypoint', ['waypointIndex' => $waypointIndex]);
+        }
+    }
+
+    public function getActionLabel($action)
+    {
+        $acciones = [
+            'take_thermal_image' => 'Capturar Imagen Térmica',
+            'take_wide_image' => 'Capturar Imagen Angular',
+            'take_panorama_image' => 'Capturar Imagen Panoramica',
+            'start_recording' => 'Iniciar Grabación',
+            'stop_recording' => 'Detener Grabación',
+            'zoom_in' => 'Activar Zoom',
+            'set_gimbal_90' => 'Rotar Camara a 90°',
+            'set_gimbal_45' => 'Rotar Camara 45°',
+        ];
+        
+        return $acciones[$action] ?? $action;
     }
 
     public function render()
     {
+        Log::info('Renderizando componente', [
+            'showActionModal' => $this->showActionModal,
+            'currentWaypointIndex' => $this->currentWaypointIndex,
+            'waypointsCount' => count($this->waypoints)
+        ]);
+
         $user = Auth::user();
         
         // Obtener peticiones del usuario cliente
@@ -137,23 +283,6 @@ class PeticionesMisionesClient extends Component
         session()->flash('success', 'Petición anulada correctamente.');
     }
 
-    public function agregarWaypoint()
-    {
-        $this->waypoints[] = [
-            'latitud' => '',
-            'longitud' => '',
-            'altitud' => $this->route_altitude,
-            'acciones' => []
-        ];
-    }
-
-    public function eliminarWaypoint($index)
-    {
-        if (count($this->waypoints) > 1) {
-            unset($this->waypoints[$index]);
-            $this->waypoints = array_values($this->waypoints);
-        }
-    }
 
     public function toggleAccion($waypointIndex, $accion)
     {
