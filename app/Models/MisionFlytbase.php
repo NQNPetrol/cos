@@ -18,13 +18,28 @@ class MisionFlytbase extends Model
         'descripcion',
         'cliente_id',
         'drone_id',
+        'dock_id',
+        'site_id',
+        'route_altitude',
+        'route_speed',
+        'route_waypoint_type',
+        'waypoints',
         'url',
-        'activo'
+        'activo',
+        'observaciones',
     ];
 
     protected $casts = [
-        'activo' => 'boolean'
+        'activo' => 'boolean',
+        'route_altitude' => 'decimal:2',
+        'route_speed' => 'decimal:2',
+        'waypoints' => 'array',
     ];
+
+    const TIPO_RUTA_LINEAL = 'linear_route';
+    const TIPO_RUTA_TRANSITO = 'transits_waypoint';
+    const TIPO_RUTA_CURVA_PARADA = 'curved_route_drone_stops';
+    const TIPO_RUTA_CURVA_CONTINUA = 'curved_route_drone_continues';
 
     public function cliente(): BelongsTo
     {
@@ -36,9 +51,24 @@ class MisionFlytbase extends Model
         return $this->belongsTo(FlytbaseDrone::class, 'drone_id');
     }
 
+    public function dock(): BelongsTo
+    {
+        return $this->belongsTo(FlytbaseDock::class, 'dock_id');
+    }
+
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(FlytbaseSite::class, 'site_id');
+    }
+
     public function alertLogs(): HasMany
     {
         return $this->hasMany(AlertLog::class, 'mision_id');
+    }
+
+    public function peticionOrigen(): HasOne
+    {
+        return $this->hasOne(PeticionMisionFlytbase::class, 'mision_aprobada_id');
     }
 
     // Scope para misiones activas

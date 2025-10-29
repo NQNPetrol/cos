@@ -129,6 +129,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         Route::get('/thumbnails', [App\Http\Controllers\GalleryClientController::class, 'getThumbnails'])->name('thumbnails');
     });
 
+    //MISIONES
+    Route::get('/planificar-misiones', function () {
+        return view('misiones-flytbase.client.index');
+    })->name('misiones');
+
 });
 
 Route::middleware(['auth'])->group(function () {
