@@ -279,9 +279,7 @@
                     <td class="px-4 py-3 text-gray-300">{{ $peticion->site->nombre ?? 'N/A' }}</td>
                     <td class="px-4 py-3 text-gray-300">{{ $peticion->drone->drone ?? 'N/A' }}</td>
                     <td class="px-4 py-3">
-                        <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                            {{ $peticion->obtenerCantidadWaypoints() }} puntos
-                        </span>
+                        
                     </td>
                     <td class="px-4 py-3">
                         @php
@@ -333,68 +331,52 @@
     <div class="mt-4">
         {{ $peticiones->links() }}
     </div>
-</div>
 
-<!-- Modal de Agregar Acción -->
+    <!-- Modal de Agregar Acción -->
+    @if($showActionModal)
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.75);">
+        <div class="bg-gray-800 rounded-lg max-w-md w-full mx-auto shadow-2xl">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-100">Agregar Acción</h3>
+                    <button wire:click="cerrarModalAcciones" 
+                            type="button"
+                            class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
 
-<!-- Modal de Agregar Acción -->
-@if($showActionModal)
-<div wire:key="action-modal" class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black bg-opacity-75" style="display: flex !important; opacity: 1 !important; visibility: visible !important;">
-    <div class="bg-gray-800 rounded-lg max-w-md w-full mx-auto relative z-[99999]">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-100">Agregar Acción</h3>
-                <button wire:click="cerrarModalAcciones" 
-                        class="text-gray-400 hover:text-white transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
+                <div class="space-y-3">
+                    @php
+                        $accionesDisponibles = [
+                            'take_thermal_image' => 'Capturar Imagen Térmica',
+                            'take_wide_image' => 'Capturar Imagen Angular',
+                            'take_panorama_image' => 'Capturar Imagen Panoramica',
+                            'start_recording' => 'Iniciar Grabación',
+                            'stop_recording' => 'Detener Grabación',
+                            'zoom_in' => 'Activar Zoom',
+                            'set_gimbal_90' => 'Rotar Camara a 90°',
+                            'set_gimbal_45' => 'Rotar Camara 45°',
+                        ];
+                    @endphp
 
-            <div class="space-y-3">
-                @php
-                    $accionesDisponibles = [
-                        'take_thermal_image' => 'Capturar Imagen Térmica',
-                        'take_wide_image' => 'Capturar Imagen Angular',
-                        'take_panorama_image' => 'Capturar Imagen Panoramica',
-                        'start_recording' => 'Iniciar Grabación',
-                        'stop_recording' => 'Detener Grabación',
-                        'zoom_in' => 'Activar Zoom',
-                        'set_gimbal_90' => 'Rotar Camara a 90°',
-                        'set_gimbal_45' => 'Rotar Camara 45°',
-                    ];
-                @endphp
-
-                @foreach($accionesDisponibles as $valor => $texto)
-                <button type="button"
-                        wire:click="agregarAccion('{{ $valor }}')"
-                        class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors border border-gray-600 hover:border-gray-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-200 font-medium">{{ $texto }}</span>
-                        <i class="fas fa-plus text-blue-400"></i>
-                    </div>
-                </button>
-                @endforeach
+                    @foreach($accionesDisponibles as $valor => $texto)
+                    <button type="button"
+                            wire:click="agregarAccion('{{ $valor }}')"
+                            class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors border border-gray-600 hover:border-gray-500">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-200 font-medium">{{ $texto }}</span>
+                            <i class="fas fa-plus text-blue-400"></i>
+                        </div>
+                    </button>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
+    @endif
 </div>
-<script>
-document.addEventListener('livewire:init', () => {
-    Livewire.hook('element.updated', (el, component) => {
-        if (component.showActionModal) {
-            // Forzar que el modal sea visible
-            const modal = document.querySelector('[wire\\:key="action-modal"]');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.style.visibility = 'visible';
-                modal.style.opacity = '1';
-                console.log('Modal forzado a ser visible');
-            }
-        }
-    });
-});
-</script>
-@endif
+
 
 <!-- Modal de Ver Petición -->
 @if($showViewModal && $selectedPeticion)

@@ -9,6 +9,7 @@ use App\Models\FlytbaseSite;
 use App\Models\FlytbaseDrone;
 use App\Models\FlytbaseDock;
 use App\Models\Cliente;
+use App\Models\UserCliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -30,16 +31,14 @@ class PeticionesMisionesClient extends Component
     public $route_waypoint_type = 'linear_route';
     public $observaciones;
     public $waypoints = [];
-
+            
     public $currentWaypointIndex = 0;
     public $showActionModal = false;
 
     // Filtros
     public $filtroEstado = '';
 
-    protected $queryString = [
-        'filtroEstado' => ['except' => '']
-    ];
+  
 
     public function mount()
     {
@@ -117,12 +116,14 @@ class PeticionesMisionesClient extends Component
         $this->showActionModal = true;
         
         Log::info('Modal de acciones abierto', ['showActionModal' => $this->showActionModal]);
+        $this->dispatch('modal-opened');
     }
 
     public function cerrarModalAcciones()
     {
         Log::info('Cerrando modal de acciones');
         $this->showActionModal = false;
+        $this->dispatch('modal-closed');
     }
 
     public function agregarAccion($accion)
@@ -146,8 +147,10 @@ class PeticionesMisionesClient extends Component
                 'accion' => $accion,
                 'accionesActuales' => $this->waypoints[$currentIndex]['acciones']
             ]);
+            session()->flash('action-added', 'Acción agregada correctamente');
         } else {
             Log::info('La acción ya existe en el waypoint', ['accion' => $accion]);
+            session()->flash('info', 'La acción ya está agregada en este waypoint');
         }
         
         $this->showActionModal = false;
@@ -211,8 +214,8 @@ class PeticionesMisionesClient extends Component
         $peticiones = $query->paginate(10);
 
         // Datos para el formulario
-        $sites = FlytbaseSite::where('activo', true)->get();
-        $drones = FlytbaseDrone::where('activo', true)->get();
+        $sites = FlytbaseSite::activos()->get();
+        $drones = FlytbaseDrone::activos()->get();
         $cliente = $user->cliente;
 
         return view('livewire.peticiones-misiones-client', compact('peticiones', 'sites', 'drones', 'cliente'));
@@ -235,18 +238,34 @@ class PeticionesMisionesClient extends Component
         ]);
 
         $user = Auth::user();
-        $cliente = $user->cliente;
+        $userCliente = UserCliente::where('user_id', $user->id)->first();
 
         // Obtener dock basado en el drone seleccionado
-        $drone = FlytbaseDrone::find($this->drone_id);
-        $dock = $drone ? FlytbaseDock::where('activo', true)->first() : null;
+        $drone = FlytbaseDrone::activos()->find($this->drone_id);
+        $site = FlytbaseSite::activos()->find($this->site_id);
+
+        if (!$drone) {
+            session()->flash('error', 'El drone seleccionado no está disponible o no está activo.');
+            return;
+        }
+
+        if (!$site) {
+            session()->flash('error', 'El site seleccionado no está disponible o no está activo.');
+            return;
+        }
+
+        $dock = FlytbaseDock::activos()->where('flytbase_site_id', $this->site_id)->first();
+
+        if (!$dock) {
+            session()->flash('error', 'No hay un dock activo disponible para el site seleccionado.');
+            return;
+        }
 
         $peticion = PeticionMisionFlytbase::create([
             'nombre' => $this->nombre,
             'descripcion' => $this->descripcion,
-            'cliente_id' => $cliente->id,
+            'cliente_id' => $userCliente->cliente_id,
             'drone_id' => $this->drone_id,
-            'dock_id' => $dock?->id,
             'site_id' => $this->site_id,
             'route_altitude' => $this->route_altitude,
             'route_speed' => $this->route_speed,

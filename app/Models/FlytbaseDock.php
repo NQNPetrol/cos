@@ -20,14 +20,14 @@ class FlytbaseDock extends Model
         'latitud',
         'longitud',
         'altitude',
-        'activo'
+        'active'
     ];
 
     protected $casts = [
         'latitud' => 'decimal:8',
         'longitud' => 'decimal:8',
         'altitude' => 'decimal:2',
-        'activo' => 'boolean'
+        'active' => 'boolean'
     ];
 
     public function site(): BelongsTo
@@ -47,7 +47,7 @@ class FlytbaseDock extends Model
 
     public function scopeActivos($query)
     {
-        return $query->where('activo', true);
+        return $query->where('active', true);
     }
 
     public function getCoordenadasAttribute(): array
