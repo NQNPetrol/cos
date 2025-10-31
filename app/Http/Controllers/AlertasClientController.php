@@ -11,6 +11,7 @@ use App\Models\MisionFlytbase;
 use App\Models\UserCliente;
 use App\Models\PilotoFlytbaseCliente;
 use App\Models\PilotoFlytbase;
+use App\Models\FlightLog;
 
 class AlertasClientController extends Controller
 {
@@ -71,6 +72,14 @@ class AlertasClientController extends Controller
                 ], 400);
             }
 
+            $pilotoId = $this->obtenerPilotoId($user);
+            if (!$pilotoId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo obtener el piloto asignado para este cliente.'
+                ], 500);
+            }
+
             $tokenPiloto = $this->obtenerTokenPiloto($user);
             if (!$tokenPiloto) {
                 return response()->json([
@@ -103,7 +112,8 @@ class AlertasClientController extends Controller
                 'tipo_alerta' => $tipoAlerta,
                 'mision_id' => $misionId,
                 'payload' => $payload,
-                'user' => $user->name
+                'user' => $user->name,
+                'piloto_id' => $pilotoId
             ]);
 
             $response = Http::withOptions(['verify' => false])
@@ -138,6 +148,31 @@ class AlertasClientController extends Controller
 
             $alertLog = AlertLog::create($alertLogData);
 
+            if ($esExitoso) {
+                $flightLogData = [
+                    'piloto_flytbase_id' => $pilotoId, // Asignar piloto inmediatamente
+                    'mision_flytbase_id' => $misionId,
+                    'alert_log_id' => $alertLog->id,
+                    'flight_starttime' => now(),
+                    'drone_name' => $mision->drone->drone ?? 'matrice4td-1', // Usar drone de la misión o default
+                    'estado' => FlightLog::ESTADO_EN_PROCESO,
+                    'flight_details' => "Alarm Response Mission ({$mision->nombre}) - " . $user->name,
+                    'organization' => 'CYHsur', // Valor por defecto
+                    'site' => 'Site 1 - Rodial', // Valor por defecto
+                    'dock_name' => 'DockCYH01', // Valor por defecto
+                ];
+
+                $flightLog = FlightLog::create($flightLogData);
+
+                Log::info('Flight log creado exitosamente para usuario cliente', [
+                    'flight_log_id' => $flightLog->id,
+                    'mision_id' => $misionId,
+                    'drone_name' => $flightLog->drone_name,
+                    'piloto_id' => $pilotoId,
+                    'user_id' => $user->id
+                ]);
+            }
+
             Log::info('Respuesta HTTP recibida de Flytbase', [
                 'status_code' => $statusCode,
                 'response_body' => $responseBody,
@@ -150,12 +185,14 @@ class AlertasClientController extends Controller
                     'success' => true,
                     'message' => "Misión '{$mision->nombre}' desplegada exitosamente."
                 ];
+
                 if ($mision->hasLiveview()) {
                     Log::info('Misión tiene liveview', [
                         'mision_id' => $misionId,
                         'mision_nombre' => $mision->nombre,
                         'has_liveview' => $mision->hasLiveview()
                     ]);
+
                     $responseData['mision_id'] = $misionId;
                     $responseData['mision_nombre'] = $mision->nombre;
                     $responseData['has_liveview'] = true;
@@ -230,6 +267,42 @@ class AlertasClientController extends Controller
                 'success' => false,
                 'message' => 'Error interno: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function obtenerPilotoId($user)
+    {
+        try {
+            // Obtener el cliente del usuario
+            $userCliente = UserCliente::where('user_id', $user->id)->first();
+            
+            if (!$userCliente) {
+                Log::error('Usuario no tiene cliente asignado', ['user_id' => $user->id]);
+                return null;
+            }
+
+            // Obtener el piloto asignado al cliente
+            $pilotoCliente = PilotoFlytbaseCliente::where('cliente_id', $userCliente->cliente_id)->first();
+            
+            if (!$pilotoCliente) {
+                Log::error('Cliente no tiene piloto asignado', ['cliente_id' => $userCliente->cliente_id]);
+                return null;
+            }
+
+            Log::info('Piloto ID obtenido exitosamente', [
+                'user_id' => $user->id,
+                'cliente_id' => $userCliente->cliente_id,
+                'piloto_id' => $pilotoCliente->piloto_flytbase_id
+            ]);
+
+            return $pilotoCliente->piloto_flytbase_id;
+
+        } catch (\Exception $e) {
+            Log::error('Error al obtener ID del piloto', [
+                'user_id' => $user->id,
+                'exception' => $e->getMessage()
+            ]);
+            return null;
         }
     }
 
