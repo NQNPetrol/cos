@@ -11,6 +11,7 @@ use App\Http\Controllers\EncodingDeviceController;
 use App\Http\Controllers\MobileVehicleClientController;
 use App\Http\Controllers\S3WebhookController;
 use App\Http\Controllers\FlytbaseFlightLogsController;
+use App\Http\Controllers\Api\ObjetivosCompareController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,6 +28,15 @@ Route::post('/personal', [PersonalImportController::class, 'store'])
 
 Route::post('/personal/verificar/importar', [PersonalCompareController::class, 'store']);
 
+//API PARA IMPORTAR OBJETIVOS
+Route::get('/objetivos-aipem', [ObjetivosCompareController::class, 'index']);
+
+Route::post('/objetivos-aipem/verificar', [ObjetivosCompareController::class, 'verificarExistencia']);
+
+Route::post('/objetivos-aipem', [ObjetivosCompareController::class, 'store'])
+    ->name('api.objetivos-aipem.import');
+
+Route::post('/objetivos-aipem/verificar/importar', [ObjetivosCompareController::class, 'store']);
 
 //API PARA IMPORTAR ENCODING DEVICES
 Route::get('/encoding-devices', [EncodingDeviceController::class, 'index']);
