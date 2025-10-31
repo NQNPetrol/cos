@@ -34,13 +34,23 @@ class FlytbaseFlightLogsController extends Controller
                 ], 422);
             }
 
+            $droneNameToSearch = $request->drone_name_custom ?? $request->drone_name;
+
+            Log::info('Drone name for search', [
+                'drone_name_flytbase' => $request->drone_name,
+                'drone_name_custom' => $request->drone_name_custom,
+                'drone_name_used_for_search' => $droneNameToSearch
+            ]);
+
             // Buscar flight log más cercano al timestamp del evento
-            $flightLog = $this->findClosestFlightLog($request->event_timestamp, $request->drone_name);
+            $flightLog = $this->findClosestFlightLog($request->event_timestamp, $droneNameToSearch);
             
             if (!$flightLog) {
                 Log::warning('No flight log found close to event timestamp', [
                     'event_timestamp' => $request->event_timestamp,
                     'drone_name' => $request->drone_name,
+                    'drone_name_custom' => $request->drone_name_custom,
+                    'drone_name_used_for_search' => $droneNameToSearch,
                     'search_range' => '30 minutes before event'
                 ]);
                 return response()->json([
@@ -66,7 +76,7 @@ class FlytbaseFlightLogsController extends Controller
             // Calcular flight_time
             $flightTime = null;
             if ($flightLog->flight_starttime) {
-                $flightTime = $flightEndTime->diffInSeconds($flightLog->flight_starttime);
+                $flightTime = $flightLog->flight_starttime->diffInSeconds($flightEndTime);
                 Log::info('Flight time calculated', [
                     'start' => $flightLog->flight_starttime,
                     'end' => $flightEndTime,
@@ -104,6 +114,7 @@ class FlytbaseFlightLogsController extends Controller
             Log::info('Flytbase flight log updated successfully from email', [
                 'flight_log_id' => $flightLog->id,
                 'drone_name' => $request->drone_name,
+                'drone_name_custom' => $request->drone_name_custom,
                 'flight_time_seconds' => $flightTime,
                 'flight_starttime' => $flightLog->flight_starttime,
                 'flight_endtime' => $flightEndTime,
@@ -120,6 +131,11 @@ class FlytbaseFlightLogsController extends Controller
                     'flight_time_readable' => $flightLog->duracion_legible,
                     'status' => 'completed',
                     'piloto_assigned' => !is_null($pilotoId),
+                    'drone_match' => [
+                        'requested' => $request->drone_name,
+                        'custom' => $request->drone_name_custom,
+                        'found_in_db' => $flightLog->drone_name
+                    ]
                 ]
             ], 200);
 
@@ -146,20 +162,55 @@ class FlytbaseFlightLogsController extends Controller
         $startSearch = $eventTime->copy()->subMinutes(30); // tiempo maximo que puede durar un vuelo
         
         $query = FlightLog::where('flight_starttime', '>=', $startSearch)
-                         ->where('flight_starttime', '<=', $eventTime)
-                         ->where('estado', FlightLog::ESTADO_EN_PROCESO)
-                         ->whereNull('flight_endtime');
+                        ->where('flight_starttime', '<=', $eventTime)
+                        ->where('estado', FlightLog::ESTADO_EN_PROCESO)
+                        ->whereNull('flight_endtime');
+        
+        $allLogs = FlightLog::where('estado', FlightLog::ESTADO_EN_PROCESO)
+                            ->whereNull('flight_endtime')
+                            ->get(['id', 'drone_name', 'flight_starttime']);
+        
+        Log::info('Available flight logs for matching', [
+            'available_logs' => $allLogs->toArray(),
+            'requested_drone' => $droneName,
+            'event_time' => $eventTime
+        ]);
 
-        // Si tenemos drone_name, filtrar por él
+        // Si tenemos drone_name, hacer búsqueda flexible
         if ($droneName) {
-            $query->where('drone_name', $droneName);
+            // Normalizar el nombre del drone para búsqueda flexible
+            $cleanedDroneName = preg_replace('/<[^>]*>/', '', $droneName);
+            $cleanedDroneName = trim($cleanedDroneName);
+            
+            $query->where(function($q) use ($cleanedDroneName) {
+                // Búsqueda exacta
+                $q->where('drone_name', $cleanedDroneName)
+                // O buscar drones que contengan partes del nombre
+                ->orWhereRaw('LOWER(drone_name) = LOWER(?)', [$cleanedDroneName]);
+            });
+        
         }
 
         // Ordenar por proximidad al evento
         $flightLogs = $query->get();
 
         if ($flightLogs->isEmpty()) {
-            return null;
+            Log::warning('No flight logs found with flexible search', [
+                'event_timestamp' => $eventTime,
+                'drone_name' => $droneName,
+                'search_range' => '30 minutes before event',
+            ]);
+
+            $queryWithoutDrone = FlightLog::where('flight_starttime', '>=', $startSearch)
+                                        ->where('flight_starttime', '<=', $eventTime)
+                                        ->where('estado', FlightLog::ESTADO_EN_PROCESO)
+                                        ->whereNull('flight_endtime');
+            
+            $flightLogs = $queryWithoutDrone->get();
+
+            if ($flightLogs->isEmpty()) {
+                return null;
+            }
         }
 
         // Encontrar el más cercano al timestamp del evento
@@ -170,12 +221,25 @@ class FlytbaseFlightLogsController extends Controller
         Log::info('Closest flight log found', [
             'flight_log_id' => $closestLog->id,
             'flight_starttime' => $closestLog->flight_starttime,
+            'drone_name_in_db' => $closestLog->drone_name,
+            'drone_name_requested' => $droneName,
             'event_timestamp' => $eventTime,
             'time_difference_seconds' => $closestLog->flight_starttime->diffInSeconds($eventTime),
-            'drone_name' => $closestLog->drone_name
+            'match_type' => $closestLog->drone_name === $droneName ? 'exact' : 'time_based'
         ]);
 
         return $closestLog;
+    }
+
+
+    private function normalizeDroneName($droneName)
+    {
+        // Convertir a minúsculas y remover números al final
+        $normalized = strtolower($droneName);
+        $normalized = preg_replace('/\d+$/', '', $normalized); // Remover números al final
+        $normalized = preg_replace('/[^a-z]/', '', $normalized); // Remover caracteres no alfabéticos
+        
+        return $normalized;
     }
 
     private function extractPilotoFromFlightDetails($flightDetails)

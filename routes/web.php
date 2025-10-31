@@ -116,6 +116,24 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveviewClient'])
         ->name('streaming.drone.liveview');
 
+    //FLIGHT LOGS
+    Route::get('/flight-logs', function () {
+        return view('flightlogs.client.index');
+    })->name('flight-logs');
+
+    //GALLERY
+    Route::prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', [App\Http\Controllers\GalleryClientController::class, 'index'])->name('index');
+        Route::get('/api', [App\Http\Controllers\GalleryClientController::class, 'apiIndex'])->name('api.index');
+        Route::get('/mission/{drone}/{client}/{mission}', [App\Http\Controllers\GalleryClientController::class, 'missionShow'])->name('mission.show');
+        Route::get('/thumbnails', [App\Http\Controllers\GalleryClientController::class, 'getThumbnails'])->name('thumbnails');
+    });
+
+    //MISIONES
+    Route::get('/planificar-misiones', function () {
+        return view('misiones-flytbase.client.index');
+    })->name('misiones');
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -538,6 +556,7 @@ Route::middleware([
         return response()->json($routes);
     })->name('debug.routes');
 
+    //GALERIA
     Route::prefix('gallery')->name('gallery.')->group(function () {
         Route::get('/', [App\Http\Controllers\GalleryController::class, 'index'])->name('index');
         Route::get('/api', [App\Http\Controllers\GalleryController::class, 'apiIndex'])->name('api.index');
@@ -545,10 +564,14 @@ Route::middleware([
         Route::get('/thumbnails', [App\Http\Controllers\GalleryController::class, 'getThumbnails'])->name('thumbnails');
     });
 
+    // PILOTOS 
     Route::get('/pilotos/asignar-clientes', function () {
         return view('pilotos.index');
     })->name('pilotos.index');
 
+    //PETICIONES MISIONES 
+    Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
+        ->name('peticiones.index');
 
 });
 
