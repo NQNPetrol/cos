@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FlytbaseDrone extends Model
 {
@@ -15,6 +16,7 @@ class FlytbaseDrone extends Model
     protected $fillable = [
         'drone',
         'share_url',
+        'dock_id',
         'activo'
     ];
 
@@ -28,6 +30,11 @@ class FlytbaseDrone extends Model
     public function misiones(): HasMany
     {
         return $this->hasMany(MisionFlytbase::class, 'drone_id');
+    }
+
+    public function dock(): BelongsTo
+    {
+        return $this->belongsTo(FlytbaseDock::class, 'dock_id');
     }
 
     /**
