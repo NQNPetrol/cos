@@ -1,10 +1,4 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
-
-    <div class="fixed top-0 left-0 z-[10000] bg-red-500 text-white p-2 text-xs font-mono">
-        showActionModal: {{ $showActionModal ? 'true' : 'false' }} | 
-        Waypoints: {{ count($waypoints) }} | 
-        Current: {{ $currentWaypointIndex }}
-    </div>
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -278,8 +272,10 @@
                     </td>
                     <td class="px-4 py-3 text-gray-300">{{ $peticion->site->nombre ?? 'N/A' }}</td>
                     <td class="px-4 py-3 text-gray-300">{{ $peticion->drone->drone ?? 'N/A' }}</td>
-                    <td class="px-4 py-3">
-                        
+                    <td class="px-4 py-3 text-gray-300">
+                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-blue-100 bg-blue-600 rounded-full">
+                            {{ $this->getWaypointsCount($peticion) }}
+                        </span>
                     </td>
                     <td class="px-4 py-3">
                         @php
@@ -297,6 +293,12 @@
                     <td class="px-4 py-3 text-gray-300 text-sm">
                         {{ $peticion->created_at->format('d/m/Y') }}
                     </td>
+                    <td class="px-4 py-3 text-gray-300 text-sm">
+                        <span class="max-w-xs truncate inline-block" title="{{ $this->getAccionesUnicas($peticion) }}">
+                            {{ $this->getAccionesUnicas($peticion) }}
+                        </span>
+                    </td>
+            
                     <td class="px-4 py-3">
                         <div class="flex space-x-2">
                             <button wire:click="verPeticion({{ $peticion->id }})" 

@@ -46,6 +46,21 @@ class PeticionesMisionesClient extends Component
         $this->waypoints = [];
     }
 
+    public function getWaypointsCount($peticion)
+    {
+        if (empty($peticion->waypoints)) {
+            return 'sin waypoints';
+        }
+        
+        $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
+        
+        if (empty($waypoints) || !is_array($waypoints)) {
+            return 'sin waypoints';
+        }
+        
+        return count($waypoints);
+    }
+
     public function agregarWaypoint()
     {
         Log::info('Agregando waypoint');
@@ -174,6 +189,42 @@ class PeticionesMisionesClient extends Component
         } else {
             Log::warning('No se encontraron acciones para eliminar en el waypoint', ['waypointIndex' => $waypointIndex]);
         }
+    }
+
+     public function getAccionesUnicas($peticion)
+    {
+        if (empty($peticion->waypoints)) {
+            return 'sin acciones';
+        }
+        
+        $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
+        
+        if (empty($waypoints) || !is_array($waypoints)) {
+            return 'sin acciones';
+        }
+        
+        $accionesUnicas = [];
+        
+        foreach ($waypoints as $waypoint) {
+            if (isset($waypoint['acciones']) && is_array($waypoint['acciones'])) {
+                foreach ($waypoint['acciones'] as $accion) {
+                    if (!in_array($accion, $accionesUnicas)) {
+                        $accionesUnicas[] = $accion;
+                    }
+                }
+            }
+        }
+        
+        if (empty($accionesUnicas)) {
+            return 'sin acciones';
+        }
+        
+        // Convertir códigos de acciones a texto legible
+        $accionesLegibles = array_map(function($accion) {
+            return $this->getActionLabel($accion);
+        }, $accionesUnicas);
+        
+        return implode(', ', $accionesLegibles);
     }
 
     public function getActionLabel($action)

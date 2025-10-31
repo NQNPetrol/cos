@@ -569,6 +569,9 @@ Route::middleware([
         return view('pilotos.index');
     })->name('pilotos.index');
 
+    //PETICIONES MISIONES 
+    Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
+        ->name('peticiones.index');
 
 });
 

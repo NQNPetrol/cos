@@ -136,15 +136,6 @@ class PeticionMisionFlytbase extends Model
             'activo' => true
         ]);
 
-        // Actualizar la petición
-        $this->update([
-            'estado' => self::ESTADO_APROBADA,
-            'revisado_por' => $revisor->id,
-            'comentarios_revisor' => $comentarios,
-            'revisado_en' => now(),
-            'mision_aprobada_id' => $mision->id
-        ]);
-
         return $mision;
     }
 
