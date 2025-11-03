@@ -185,8 +185,8 @@
                                             <span class="text-gray-400">Sin ubicación</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
-                                        {{ \Carbon\Carbon::parse($evento->fecha)->format('d/m/Y H:i') }}
+                                    <td class="px-5 py-3 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
+                                        {{ \Carbon\Carbon::parse($evento->fecha_hora)->format('d/m/Y H:i') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
                                         {{ $evento->creador->name ?? 'N/A' }}
