@@ -538,6 +538,9 @@ Route::middleware([
     Route::get('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'index'])
         ->name('drones-flytbase.index');
 
+    Route::delete('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'destroy'])
+        ->name('drones-flytbase.destroy');
+
     Route::post('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'store'])
         ->name('drones-flytbase.store');
     Route::put('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'update'])

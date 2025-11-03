@@ -11,7 +11,7 @@
                             <!-- Boton de peticiones -->
                             <a href="{{ route('peticiones.index') }}" 
                                 class="flex items-center text-blue-400 hover:text-blue-300">
-                                Peticiones Clientes 
+                                Peticiones Clientes
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
                                     <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
                                     <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
@@ -83,7 +83,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <button onclick="openEditModal({{ $mision->id }}, '{{ $mision->nombre }}', '{{ $mision->descripcion }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }})"
+                                            <button onclick="openEditModal({{ $mision->id }}, '{{ addslashes($mision->nombre) }}', '{{ addslashes($mision->descripcion) }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }}, {{ $mision->drone_id ?? 'null' }}, {{ $mision->dock_id ?? 'null' }}, {{ $mision->site_id ?? 'null' }}, '{{ $mision->route_altitude }}', '{{ $mision->route_speed }}', '{{ $mision->route_waypoint_type }}', '{{ addslashes($mision->observaciones) }}', `{{ addslashes(json_encode($mision->waypoints, JSON_PRETTY_PRINT)) }}`)"
                                                     class="text-blue-400 hover:text-blue-300 transition-colors p-1 rounded hover:bg-blue-900/30"
                                                     title="Editar misión">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -128,7 +128,7 @@
     </div>
     <!-- Modal de Crear Misión -->
     <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Crear Nueva Misión</h3>
                 <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-300">
@@ -141,41 +141,137 @@
             <form id="createForm" method="POST" action="{{ route('misiones-flytbase.store') }}">
                 @csrf
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
-                        <input type="text" name="nombre" required 
-                               class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Columna 1: Información Básica -->
+                    <div class="space-y-4">
+                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Información Básica</h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
+                            <input type="text" name="nombre" required 
+                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
+                            <textarea name="descripcion" rows="3"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
+                            <select name="cliente_id" required 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
+                            <input type="url" name="url" required 
+                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                   placeholder="https://api.flytbase.com/rest/alarms/trigger">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Observaciones</label>
+                            <textarea name="observaciones" rows="2"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                      placeholder="Observaciones adicionales sobre la misión..."></textarea>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
-                        <textarea name="descripcion" rows="3"
-                                  class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
-                    </div>
+                    <!-- Columna 2: Configuración de Vuelo -->
+                    <div class="space-y-4">
+                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Configuración de Vuelo</h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Drone</label>
+                            <select name="drone_id" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un drone</option>
+                                @foreach($drones as $drone)
+                                    <option value="{{ $drone->id }}">{{ $drone->drone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
-                        <select name="cliente_id" required 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-                            <option value="">Seleccione un cliente</option>
-                            @foreach($clientes as $cliente)
-                                <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Dock</label>
+                            <select name="dock_id" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un dock</option>
+                                @foreach($docks as $dock)
+                                    <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
-                        <input type="url" name="url" required 
-                               class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                               placeholder="https://api.flytbase.com/rest/alarms/trigger">
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Site</label>
+                            <select name="site_id" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un site</option>
+                                @foreach($sites as $site)
+                                    <option value="{{ $site->id }}">{{ $site->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="flex items-center">
-                        <input type="checkbox" name="activo" id="createActivo" value="1" checked
-                               class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
-                        <label for="createActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Altitud (m) *</label>
+                                <input type="number" name="route_altitude" step="0.01" value="35.00" required 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Velocidad (m/s) *</label>
+                                <input type="number" name="route_speed" step="0.01" value="5.33" required 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Ruta *</label>
+                            <select name="route_waypoint_type" required 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="linear_route">Ruta Lineal</option>
+                                <option value="transits_waypoint">Vuela sobre waypoints</option>
+                                <option value="curved_route_drone_stops">Ruta Curva con Paradas</option>
+                                <option value="curved_route_drone_continues">Ruta Curva Contínua</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">JSON Waypoints</label>
+                            <textarea name="waypoints" rows="8"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
+                                      placeholder='[
+                                                        {
+                                                            "altitud": 35,
+                                                            "latitud": "-38.85047",
+                                                            "acciones": ["take_panorama_image"],
+                                                            "longitud": "-68.12660"
+                                                        },
+                                                        {
+                                                            "altitud": 35,
+                                                            "latitud": "-38.84919",
+                                                            "acciones": [],
+                                                            "longitud": "-68.12503"
+                                                        }
+                                                    ]'></textarea>
+                            <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" name="activo" id="createActivo" value="1" checked
+                                   class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                            <label for="createActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
+                        </div>
                     </div>
                 </div>
 
@@ -195,7 +291,7 @@
 
     <!-- Modal de Editar Misión -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Editar Misión</h3>
                 <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-300">
@@ -208,42 +304,135 @@
             <form id="editForm" method="POST">
                 @csrf
                 @method('PUT')
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
-                        <input type="text" name="nombre" id="editNombre" required 
-                               class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Información Básica</h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
+                            <input type="text" name="nombre" id="editNombre" required 
+                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
+                            <textarea name="descripcion" id="editDescripcion" rows="3"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
+                            <select name="cliente_id" id="editClienteId" required 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
+                            <input type="url" name="url" id="editUrl" required 
+                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                   placeholder="https://api.flytbase.com/rest/alarms/trigger">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Observaciones</label>
+                            <textarea name="observaciones" id="editObservaciones" rows="2"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                      placeholder="Observaciones adicionales sobre la misión..."></textarea>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
-                        <textarea name="descripcion" id="editDescripcion" rows="3"
-                                  class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
-                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Configuración de Vuelo</h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Drone</label>
+                            <select name="drone_id" id="editDroneId" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un drone</option>
+                                @foreach($drones as $drone)
+                                    <option value="{{ $drone->id }}">{{ $drone->drone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
-                        <select name="cliente_id" id="editClienteId" required 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-                            <option value="">Seleccione un cliente</option>
-                            @foreach($clientes as $cliente)
-                                <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Dock</label>
+                            <select name="dock_id" id="editDockId" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un dock</option>
+                                @foreach($docks as $dock)
+                                    <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
-                        <input type="url" name="url" id="editUrl" required 
-                               class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                               placeholder="https://api.flytbase.com/rest/alarms/trigger">
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Site</label>
+                            <select name="site_id" id="editSiteId" 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="">Seleccione un site</option>
+                                @foreach($sites as $site)
+                                    <option value="{{ $site->id }}">{{ $site->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="flex items-center">
-                        <input type="checkbox" name="activo" id="editActivo" value="1"
-                               class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
-                        <label for="editActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Altitud (m) *</label>
+                                <input type="number" name="route_altitude" id="editRouteAltitude" step="0.01" required 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Velocidad (m/s) *</label>
+                                <input type="number" name="route_speed" id="editRouteSpeed" step="0.01" required 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Ruta *</label>
+                            <select name="route_waypoint_type" id="editRouteWaypointType" required 
+                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                <option value="linear_route">Ruta Lineal</option>
+                                <option value="transits_waypoint">Vuela sobre waypoints</option>
+                                <option value="curved_route_drone_stops">Ruta Curva con Paradas</option>
+                                <option value="curved_route_drone_continues">Ruta Curva Contínua</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">JSON Waypoints</label>
+                            <textarea name="waypoints" id="editWaypoints" rows="8"
+                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
+                                      placeholder='[
+                                                    {
+                                                        "altitud": 35,
+                                                        "latitud": "-38.85047",
+                                                        "acciones": ["take_panorama_image"],
+                                                        "longitud": "-68.12660"
+                                                    },
+                                                    {
+                                                        "altitud": 35,
+                                                        "latitud": "-38.84919",
+                                                        "acciones": [],
+                                                        "longitud": "-68.12503"
+                                                    }
+                                                    ]'></textarea>
+                            <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" name="activo" id="editActivo" value="1"
+                                   class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                            <label for="editActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
+                        </div>
                     </div>
                 </div>
 
@@ -273,16 +462,50 @@
         }
 
         // Funciones para el modal de editar
-        function openEditModal(id, nombre, descripcion, clienteId, url, activo) {
+        function openEditModal(id, nombre, descripcion, clienteId, url, activo, droneId = null, dockId = null, siteId = null, routeAltitude = '35.00', routeSpeed = '5.33', routeWaypointType = 'linear_route', observaciones = '', waypoints = '') {
+            console.log('Abriendo modal de edición con datos:', { 
+                id, nombre, descripcion, clienteId, url, activo, 
+                droneId, dockId, siteId, routeAltitude, routeSpeed, 
+                routeWaypointType, observaciones, waypoints 
+            });
+            
             document.getElementById('editModal').classList.remove('hidden');
             
             // Actualizar el formulario
             document.getElementById('editForm').action = `/misiones-flytbase/${id}`;
-            document.getElementById('editNombre').value = nombre;
+            document.getElementById('editNombre').value = nombre || '';
             document.getElementById('editDescripcion').value = descripcion || '';
-            document.getElementById('editClienteId').value = clienteId;
-            document.getElementById('editUrl').value = url;
-            document.getElementById('editActivo').checked = activo;
+            document.getElementById('editClienteId').value = clienteId || '';
+            document.getElementById('editUrl').value = url || '';
+            document.getElementById('editActivo').checked = activo === true || activo === 'true';
+            document.getElementById('editDroneId').value = droneId && droneId !== 'null' ? droneId : '';
+            document.getElementById('editDockId').value = dockId && dockId !== 'null' ? dockId : '';
+            document.getElementById('editSiteId').value = siteId && siteId !== 'null' ? siteId : '';
+            document.getElementById('editRouteAltitude').value = routeAltitude || '35.00';
+            document.getElementById('editRouteSpeed').value = routeSpeed || '5.33';
+            document.getElementById('editRouteWaypointType').value = routeWaypointType || 'linear_route';
+            document.getElementById('editObservaciones').value = observaciones || '';
+
+            // Manejar waypoints
+            if (waypoints && waypoints !== 'null' && waypoints !== '""') {
+                try {
+                    // Si waypoints ya es un string JSON, intentar formatearlo
+                    if (typeof waypoints === 'string') {
+                        const parsedWaypoints = JSON.parse(waypoints);
+                        document.getElementById('editWaypoints').value = JSON.stringify(parsedWaypoints, null, 2);
+                    } else {
+                        document.getElementById('editWaypoints').value = JSON.stringify(waypoints, null, 2);
+                    }
+                } catch (e) {
+                    console.error('Error al parsear waypoints:', e);
+                    // Si hay error al parsear, usar el valor original
+                    document.getElementById('editWaypoints').value = waypoints;
+                }
+            } else {
+                document.getElementById('editWaypoints').value = '';
+            }
+            
+            console.log('Modal configurado correctamente');
         }
 
         function closeEditModal() {
