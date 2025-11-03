@@ -573,6 +573,10 @@ Route::middleware([
     Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
         ->name('peticiones.index');
 
+    //OBJETIVOS AIPEM
+    Route::get('/objetivos-a', function () {
+        return view('objetivos.aipem.index');
+    })->name('objetivos-aipem.index');
 });
 
 
