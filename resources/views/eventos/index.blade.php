@@ -218,7 +218,7 @@
                                         @endif
                                     </td>
                                     <td class="px-5 py-3 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
-                                        {{ \Carbon\Carbon::parse($evento->fecha)->format('d/m/Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($evento->fecha_hora)->format('d/m/Y H:i') }}
                                     </td>
                                     <td class="px-5 py-3 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
                                         {{ $evento->creador->name ?? 'N/A' }}

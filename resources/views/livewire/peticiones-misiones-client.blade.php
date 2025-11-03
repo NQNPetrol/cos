@@ -1,4 +1,56 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+    @if (session()->has('success'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 5000)"
+         class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+    @endif
+
+    @if (session()->has('error'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 5000)"
+         class="fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+    @endif
+
+    @if (session()->has('info'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 3000)"
+         class="fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ session('info') }}</span>
+        </div>
+    </div>
+    @endif
+
+    <!-- Mensajes de acción en waypoints -->
+    @if (session()->has('action-added'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 3000)"
+         class="mb-4 bg-green-600 text-white px-4 py-2 rounded-lg">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <span class="text-sm">{{ session('action-added') }}</span>
+        </div>
+    </div>
+    @endif
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>

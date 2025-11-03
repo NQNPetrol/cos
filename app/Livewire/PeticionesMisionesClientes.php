@@ -125,10 +125,12 @@ class PeticionesMisionesClientes extends Component
         try {
             $drone = FlytbaseDrone::with('dock')->find($this->selectedPeticion->drone_id);
             if (!$drone) {
+                Log::error('No hay drone asociado');
                 session()->flash('error', 'No se pudo encontrar el drone asociado a esta petición.');
                 return;
             }
             if (!$drone->dock_id) {
+                Log::error('No hay dock asociado al dorne seleccionado');
                 session()->flash('error', 'El drone seleccionado no tiene un dock asignado.');
                 return;
             }
@@ -159,6 +161,7 @@ class PeticionesMisionesClientes extends Component
             ]);
 
             session()->flash('success', 'Misión aprobada correctamente. Se ha creado la misión #' . $mision->id);
+            Log::info('Mision aceptada.');
             $this->showViewModal = false;
 
         } catch (\Exception $e) {
@@ -171,6 +174,7 @@ class PeticionesMisionesClientes extends Component
     {
         if (!$this->selectedPeticion || $this->selectedPeticion->estado !== 'pendiente') {
             session()->flash('error', 'La petición no está disponible o ya fue procesada.');
+            Log::info('Mision rechazada.');
             return;
         }
 
@@ -190,5 +194,11 @@ class PeticionesMisionesClientes extends Component
         $peticion->delete();
 
         session()->flash('success', 'Petición eliminada correctamente.');
+    }
+
+    public function closeModal()
+    {
+        $this->showViewModal = false;
+        $this->selectedPeticion = null;
     }
 }
