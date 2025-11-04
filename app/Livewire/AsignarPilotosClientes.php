@@ -15,6 +15,8 @@ class AsignarPilotosClientes extends Component
     public $asignaciones = [];
     public $pilotoSeleccionado = null;
     public $clienteSeleccionado = null;
+    public $paginaActual = 1;
+    public $porPagina = 2; // Mostrar 2 cartas por página
 
     protected $rules = [
         'pilotoSeleccionado' => 'required|exists:pilotos_flytbase,id',
@@ -85,5 +87,44 @@ class AsignarPilotosClientes extends Component
     public function render()
     {
         return view('livewire.asignar-pilotos-clientes');
+    }
+
+    public function getPilotosConAsignacionesProperty()
+    {
+        $pilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
+            return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
+        });
+        
+        $inicio = ($this->paginaActual - 1) * $this->porPagina;
+        return $pilotosConAsignaciones->slice($inicio, $this->porPagina);
+    }
+
+    public function getTotalPaginasProperty()
+    {
+        $totalPilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
+            return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
+        })->count();
+        
+        return ceil($totalPilotosConAsignaciones / $this->porPagina);
+    }
+
+    public function paginaSiguiente()
+    {
+        if ($this->paginaActual < $this->totalPaginas) {
+            $this->paginaActual++;
+        }
+    }
+
+    public function paginaAnterior()
+    {
+        if ($this->paginaActual > 1) {
+            $this->paginaActual--;
+        }
+    }
+
+    public function updated()
+    {
+        // Resetear a página 1 cuando se hacen cambios
+        $this->paginaActual = 1;
     }
 }
