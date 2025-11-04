@@ -662,17 +662,74 @@
                                     <i class="bi bi-calendar-check"></i>
                                     <span>Misiones</span>
                                 </a>
-                                <a href="{{ route('alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-bell"></i>
-                                    <span>Alertas</span>
-                                </a>
-                                <a href="{{ route('drones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-bezier"></i>
-                                    <span>Drones</span>
-                                </a>
+                                
                                 <a href="{{ route('gallery.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                     <i class="bi bi-grid-1x2"></i>
                                     <span>Galeria</span>
+                                </a>
+
+                                <div class="submenu-container">
+                                    <button id="toggleDispositivos" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                        <div class="flex items-center space-x-3">
+                    
+                                            <span>Dispositivos</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconDispositivos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuDispositivos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('drones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            
+                                            <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            >
+                                                <path d="M10 10h4v4h-4z" />
+                                                <path d="M10 10l-3.5 -3.5" />
+                                                <path d="M9.96 6a3.5 3.5 0 1 0 -3.96 3.96" />
+                                                <path d="M14 10l3.5 -3.5" />
+                                                <path d="M18 9.96a3.5 3.5 0 1 0 -3.96 -3.96" />
+                                                <path d="M14 14l3.5 3.5" />
+                                                <path d="M14.04 18a3.5 3.5 0 1 0 3.96 -3.96" />
+                                                <path d="M10 14l-3.5 3.5" />
+                                                <path d="M6 14.04a3.5 3.5 0 1 0 3.96 3.96" />
+                                            </svg>
+
+                                            <span class="transition-colors duration-200">Drones</span>
+                                        </a>
+                                        <a href="{{ route('docks-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+
+                                            <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            >
+                                                <path d="M6 12h12v-2a2 2 0 0 1 2 -2a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2a2 2 0 0 1 2 2v2z" />
+                                                <path d="M6 15h12" />
+                                                <path d="M6 18h12" />
+                                                <path d="M21 11v7" />
+                                                <path d="M3 11v7" />
+                                            </svg>
+
+                                            <span class="transition-colors duration-200">Docks</span>
+                                        </a>
+                                    </div>
+                                </div>
                                 </a>
                             </div>
                         </div>
@@ -1197,6 +1254,19 @@
             toggleMisiones.addEventListener('click', () => {
                 submenuMisiones.classList.toggle('hidden');
                 iconMisiones.classList.toggle('rotate-180');
+            });
+        }
+
+        //Dispositivos
+        //Misiones
+        const toggleDispositivos = document.getElementById('toggleDispositivos');
+        const submenuDispositivos = document.getElementById('submenuDispositivos');
+        const iconDispositivos = document.getElementById('iconDispositivos');
+
+        if (toggleDispositivos && submenuDispositivos && iconDispositivos) {
+            toggleDispositivos.addEventListener('click', () => {
+                submenuDispositivos.classList.toggle('hidden');
+                iconDispositivos.classList.toggle('rotate-180');
             });
         }
     </script>
