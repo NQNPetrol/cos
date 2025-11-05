@@ -589,6 +589,11 @@ Route::middleware([
     Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
         ->name('peticiones.index');
 
+    //SITES
+    Route::get('/sites', function () {
+        return view('sites-flytbase.index');
+    })->name('sites.index');
+
     //OBJETIVOS AIPEM
     Route::get('/objetivos-a', function () {
         return view('objetivos.aipem.index');

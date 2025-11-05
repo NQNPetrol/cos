@@ -662,6 +662,13 @@
                                     <i class="bi bi-calendar-check"></i>
                                     <span>Misiones</span>
                                 </a>
+
+                                <a href="{{ route('alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+
+                                    <i class="bi bi-bell"></i>
+
+                                    <span>Alertas</span>
+                                </a>
                                 
                                 <a href="{{ route('gallery.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                     <i class="bi bi-grid-1x2"></i>
@@ -730,6 +737,29 @@
                                         </a>
                                     </div>
                                 </div>
+                                </a>
+                                <a href="{{ route('sites.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="22"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    >
+                                    <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+                                    <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+                                    <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+                                    <path d="M12 11l0 .01" />
+                                    <path d="M12 18l-3.5 -5a4 4 0 1 1 7 0l-3.5 5" />
+                                </svg>
+
+                                    <span>Sites</span>
                                 </a>
                             </div>
                         </div>

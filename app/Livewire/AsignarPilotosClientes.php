@@ -84,12 +84,7 @@ class AsignarPilotosClientes extends Component
         session()->flash('success', 'Asignacion eliminada correctamente.');
     }
 
-    public function render()
-    {
-        return view('livewire.asignar-pilotos-clientes');
-    }
-
-    public function getPilotosConAsignacionesProperty()
+    public function getPilotosPaginados()
     {
         $pilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
             return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
@@ -99,7 +94,7 @@ class AsignarPilotosClientes extends Component
         return $pilotosConAsignaciones->slice($inicio, $this->porPagina);
     }
 
-    public function getTotalPaginasProperty()
+    public function getTotalPaginas()
     {
         $totalPilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
             return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
@@ -110,7 +105,7 @@ class AsignarPilotosClientes extends Component
 
     public function paginaSiguiente()
     {
-        if ($this->paginaActual < $this->totalPaginas) {
+        if ($this->paginaActual < $this->getTotalPaginas()) {
             $this->paginaActual++;
         }
     }
@@ -124,7 +119,14 @@ class AsignarPilotosClientes extends Component
 
     public function updated()
     {
-        // Resetear a página 1 cuando se hacen cambios
         $this->paginaActual = 1;
+    }
+
+    public function render()
+    {
+        return view('livewire.asignar-pilotos-clientes', [
+            'pilotosPaginados' => $this->getPilotosPaginados(),
+            'totalPaginas' => $this->getTotalPaginas(),
+        ]);
     }
 }
