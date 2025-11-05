@@ -18,15 +18,27 @@ class FlytbaseSite extends Model
         'descripcion',
         'cliente_id',
         'activo',
+        'location',
+        'devices',
+        'organization_id',
+        'members',
     ];
 
     protected $casts = [
-        'activo' => 'boolean'
+        'activo' => 'boolean',
+        'location' => 'array',
+        'devices' => 'array',
+        'members' => 'array',
     ];
 
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(FlytbaseOrg::class, 'organization_id');
     }
 
     public function docks(): HasMany

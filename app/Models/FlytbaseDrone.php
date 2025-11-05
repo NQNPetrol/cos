@@ -37,6 +37,8 @@ class FlytbaseDrone extends Model
         return $this->belongsTo(FlytbaseDock::class, 'dock_id');
     }
 
+  
+
     /**
      * Scope para drones activos
      */
