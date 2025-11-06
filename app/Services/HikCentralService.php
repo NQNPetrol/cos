@@ -8,6 +8,7 @@ use App\Models\StreamUrl;
 use App\Models\Camera;
 use App\Models\MobileVehicle;
 use App\Models\Patrulla;
+use App\Models\AnprPassingRecord;
 
 class HikCentralService
 {
@@ -351,7 +352,7 @@ class HikCentralService
 
         $timestamp = round(microtime(true) * 1000);
         $contentType = 'application/json';
-        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp); 
 
         // Convertir array de códigos a string separado por comas
         $indexCodesString = implode(',', $mobileVehicleIndexCodes);
@@ -479,5 +480,181 @@ class HikCentralService
                 'latest_timestamp' => null
             ];
         }
+    }
+
+    public function getCrossRecords(
+        string $cameraIndexCode = '101',
+        string $plateNo = '',
+        string $ownerName = '',
+        string $contact = '',
+        string $startTime = null,
+        string $endTime = null,
+        int $pageNo = 1,
+        int $pageSize = 10,
+        string $sortField = 'PassTime',
+        int $orderType = 1
+    ): array {
+        $path = '/artemis/api/pms/v1/crossRecords/page';
+        $url = $this->baseUrl . $path;
+        $accept = 'application/json';
+
+        $timestamp = round(microtime(true) * 1000);
+        $contentType = 'application/json';
+        $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+
+        // Si no se proporcionan fechas, usar últimas 24 horas
+        if ($startTime === null) {
+            $startTime = now()->subDay()->setTimezone('+08:00')->format('Y-m-d\TH:i:sP');
+        }
+        
+        if ($endTime === null) {
+            $endTime = now()->setTimezone('+08:00')->format('Y-m-d\TH:i:sP');
+        }
+
+        $requestBody = [
+            'cameraIndexCode' => $cameraIndexCode,
+            'plateNo' => $plateNo,
+            'ownerName' => $ownerName,
+            'contact' => $contact,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'pageNo' => $pageNo,
+            'pageSize' => $pageSize,
+            'sortField' => $sortField,
+            'orderType' => $orderType,
+        ];
+
+        Log::info('Solicitando registros de cruce', [
+            'camera' => $cameraIndexCode,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'page' => $pageNo
+        ]);
+
+        $response = Http::withOptions(['verify' => false])
+            ->timeout(60)
+            ->withHeaders([
+                'Accept' => $accept,
+                'Content-Type' => $contentType,
+                'x-ca-key' => $this->apiKey,
+                'x-ca-signature' => $signature,
+                'x-ca-timestamp' => $timestamp,
+            ])->post($url, $requestBody);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            
+            if (isset($data['code']) && $data['code'] === '0') {
+                Log::info('Registros de cruce obtenidos exitosamente', [
+                    'total' => $data['data']['total'] ?? 0,
+                    'current_page' => $data['data']['pageNo'] ?? 1,
+                    'records_count' => count($data['data']['list'] ?? [])
+                ]);
+                return $data['data'] ?? [];
+            }
+            
+            Log::error('Error en respuesta de registros de cruce', ['response' => $data]);
+            throw new \Exception('API devolvió código de error: ' . ($data['code'] ?? 'unknown'));
+        }
+
+        Log::error('Error en solicitud de registros de cruce', ['response' => $response->body()]);
+        throw new \Exception('Error obteniendo registros de cruce: ' . $response->body());
+    }
+
+    /**
+     * Importa todos los registros de cruce paginando
+     */
+    public function importCrossRecords(string $startTime = null, string $endTime = null): array
+    {
+        $results = [
+            'total_imported' => 0,
+            'total_updated' => 0,
+            'total_pages' => 0,
+            'total_records' => 0,
+            'errors' => []
+        ];
+
+        try {
+            $pageNo = 1;
+            $pageSize = 100; // Máximo por página
+
+            do {
+                Log::info("Obteniendo página {$pageNo} de registros de cruce");
+                
+                $crossRecordsData = $this->getCrossRecords(
+                    cameraIndexCode: '101',
+                    startTime: $startTime,
+                    endTime: $endTime,
+                    pageNo: $pageNo,
+                    pageSize: $pageSize
+                );
+
+                if (empty($crossRecordsData['list'])) {
+                    break;
+                }
+
+                // Guardar el total en la primera página
+                if ($pageNo === 1) {
+                    $results['total_records'] = $crossRecordsData['total'] ?? 0;
+                }
+
+                // Procesar cada registro
+                foreach ($crossRecordsData['list'] as $record) {
+                    try {
+                        // Convertir el tiempo de cruce a formato correcto
+                        $crossTime = $record['crossTime'] ?? $record['cross_time'] ?? null;
+
+                        $recordData = [
+                            'cross_record_syscode' => $record['crossRecordSyscode'],
+                            'camera_index_code' => $record['cameraIndexCode'],
+                            'plate_no' => $record['plateNo'],
+                            'owner_name' => $record['ownerName'] ?? '',
+                            'contact' => $record['contact'] ?? '',
+                            'vehicle_pic_uri' => $record['vehiclePicUri'] ?? '',
+                            'cross_time' => $crossTime,
+                            'vehicle_color' => $record['vehicleColor'] ?? null,
+                            'vehicle_type' => $record['vehicleType'] ?? null,
+                            'country' => $record['country'] ?? null,
+                            'vehicle_direction_type' => $record['vehicleDirectionType'] ?? null,
+                            'vehicle_brand' => $record['vehicleBrand'] ?? null,
+                            'vehicle_speed' => $record['vehicleSpeed'] ?? null,
+                        ];
+
+                        // Usar updateOrCreate para evitar duplicados
+                        AnprPassingRecord::updateOrCreate(
+                            ['cross_record_syscode' => $recordData['cross_record_syscode']],
+                            $recordData
+                        );
+
+                        $results['total_imported']++;
+
+                    } catch (\Exception $e) {
+                        $results['errors'][] = [
+                            'record' => $record['crossRecordSyscode'] ?? 'Unknown',
+                            'error' => $e->getMessage()
+                        ];
+                        Log::error("Error procesando registro: " . $e->getMessage(), [
+                            'record_data' => $record
+                        ]);
+                    }
+                }
+
+                $pageNo++;
+                $results['total_pages']++;
+
+                // Verificar si hay más páginas
+                $currentCount = $pageNo * $pageSize;
+                $totalRecords = $crossRecordsData['total'] ?? 0;
+
+            } while ($currentCount < $totalRecords);
+
+            Log::info('Importación de registros de cruce completada', $results);
+
+        } catch (\Exception $e) {
+            Log::error('Error en importación de registros de cruce: ' . $e->getMessage());
+            throw $e;
+        }
+
+        return $results;
     }
 }
