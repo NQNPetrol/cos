@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\MisionFlytbase;
+use App\Models\FlytbaseDrone;
+use App\Models\FlytbaseDock;
+use App\Models\FlytbaseSite;
 use App\Models\Cliente;
 use App\Models\UserCliente;
 
@@ -33,8 +36,11 @@ class MisionFlytbaseController extends Controller
         }
 
         $clientes = Cliente::orderBy('nombre')->get();
+        $drones = FlytbaseDrone::activos()->get();
+        $docks = FlytbaseDock::activos()->get();
+        $sites = FlytbaseSite::activos()->get();
 
-        return view('misiones-flytbase.index', compact('misiones', 'clientes'));
+        return view('misiones-flytbase.index', compact('misiones', 'clientes', 'drones', 'docks', 'sites'));
     }
 
 
@@ -49,7 +55,15 @@ class MisionFlytbaseController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'cliente_id' => 'required|exists:clientes,id',
+            'drone_id' => 'nullable|exists:drones_flytbase,id',
+            'dock_id' => 'nullable|exists:flytbase_docks,id',
+            'site_id' => 'nullable|exists:flytbase_sites,id',
+            'route_altitude' => 'required|numeric|min:0|max:500',
+            'route_speed' => 'required|numeric|min:0|max:50',
+            'route_waypoint_type' => 'required|in:linear_route,transits_waypoint,curved_route_drone_stops,curved_route_drone_continues',
+            'waypoints' => 'nullable|json',
             'url' => 'required|url',
+            'observaciones' => 'nullable|string',
             'activo' => 'boolean'
         ]);
 
@@ -62,6 +76,21 @@ class MisionFlytbaseController extends Controller
         }
 
         try {
+            if (!empty($validated['waypoints'])) {
+                try {
+                    // Validar que el JSON sea válido
+                    $waypointsArray = json_decode($validated['waypoints'], true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        return redirect()->back()->with('error', 'El formato de JSON en waypoints no es válido.');
+                    }
+                    $validated['waypoints'] = $waypointsArray;
+                } catch (\Exception $e) {
+                    return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
+                }
+            } else {
+                $validated['waypoints'] = null;
+            }
+
             MisionFlytbase::create($validated);
             
             return redirect()->route('misiones-flytbase.index')
@@ -96,11 +125,34 @@ class MisionFlytbaseController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'cliente_id' => 'required|exists:clientes,id',
+            'drone_id' => 'nullable|exists:drones_flytbase,id',
+            'dock_id' => 'nullable|exists:flytbase_docks,id',
+            'site_id' => 'nullable|exists:flytbase_sites,id',
+            'route_altitude' => 'required|numeric|min:0|max:500',
+            'route_speed' => 'required|numeric|min:0|max:50',
+            'route_waypoint_type' => 'required|in:linear_route,transits_waypoint,curved_route_drone_stops,curved_route_drone_continues',
+            'waypoints' => 'nullable|json',
             'url' => 'required|url',
+            'observaciones' => 'nullable|string',
             'activo' => 'boolean'
         ]);
 
         try {
+            if (!empty($validated['waypoints'])) {
+                try {
+                    // Validar que el JSON sea válido
+                    $waypointsArray = json_decode($validated['waypoints'], true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        return redirect()->back()->with('error', 'El formato de JSON en waypoints no es válido.');
+                    }
+                    $validated['waypoints'] = $waypointsArray;
+                } catch (\Exception $e) {
+                    return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
+                }
+            } else {
+                $validated['waypoints'] = null;
+            }
+
             $misionesFlytbase->update($validated);
             
             if ($request->ajax()) {

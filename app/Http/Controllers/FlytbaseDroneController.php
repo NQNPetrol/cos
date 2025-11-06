@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\FlytbaseDrone;
 use App\Models\MisionFlytbase;
 use Illuminate\Support\Facades\Log;
+use App\Models\FlytbaseDock;
 
 class FlytbaseDroneController extends Controller
 {
@@ -18,7 +19,9 @@ class FlytbaseDroneController extends Controller
         ->latest()
         ->get();
 
-        return view('drones-flytbase.index', compact('drones'));
+        $docks = FlytbaseDock::activos()->get();
+
+        return view('drones-flytbase.index', compact('drones', 'docks'));
     }
 
     /**
@@ -172,6 +175,7 @@ class FlytbaseDroneController extends Controller
     {
         $request->validate([
             'drone' => 'required|string|max:255|unique:drones_flytbase,drone',
+            'dock_id' => 'nullable|exists:flytbase_docks,id',
             'share_url' => 'required|url|max:500',
             'activo' => 'boolean'
         ]);
@@ -179,6 +183,7 @@ class FlytbaseDroneController extends Controller
         try {
             FlytbaseDrone::create([
                 'drone' => $request->drone,
+                'dock_id' => $request->dock_id,
                 'share_url' => $request->share_url,
                 'activo' => $request->activo ?? true
             ]);
@@ -199,6 +204,7 @@ class FlytbaseDroneController extends Controller
     {
         $request->validate([
             'drone' => 'required|string|max:255|unique:drones_flytbase,drone,' . $drones_flytbase->id,
+            'dock_id' => 'nullable|exists:flytbase_docks,id',
             'share_url' => 'required|url|max:500',
             'activo' => 'boolean'
         ]);
@@ -206,6 +212,7 @@ class FlytbaseDroneController extends Controller
         try {
             $drones_flytbase->update([
                 'drone' => $request->drone,
+                'dock_id' => $request->dock_id,
                 'share_url' => $request->share_url,
                 'activo' => $request->activo ?? false
             ]);
@@ -332,5 +339,23 @@ class FlytbaseDroneController extends Controller
 
         // Renderizar la vista específica para clientes
         return view($viewPath, $viewData);
+    }
+
+    public function destroy(FlytbaseDrone $drones_flytbase)
+    {
+        try {
+            // Verificar si el drone tiene misiones asociadas
+            if ($drones_flytbase->misiones()->exists()) {
+                return redirect()->back()->with('error', 'No se puede eliminar el drone porque tiene misiones asociadas.');
+            }
+
+            $drones_flytbase->delete();
+            
+            return redirect()->route('drones-flytbase.index')
+                ->with('success', 'Drone eliminado exitosamente.');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al eliminar el drone: ' . $e->getMessage());
+        }
     }
 }

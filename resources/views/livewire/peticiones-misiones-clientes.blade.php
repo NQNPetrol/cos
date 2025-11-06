@@ -1,4 +1,55 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+    @if (session()->has('approval-error'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 6000)"
+         class="fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-md">
+        <div class="flex items-start space-x-2">
+            <i class="fas fa-exclamation-triangle mt-1"></i>
+            <div>
+                <p class="font-medium">Error al Aprobar Misión</p>
+                <p class="text-sm mt-1">{{ session('approval-error') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if (session()->has('approval-success'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 5000)"
+         class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <div>
+                <p class="font-medium">Misión Aprobada</p>
+                <p class="text-sm mt-1">{{ session('approval-success') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if (session()->has('rejection-success'))
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition
+         x-init="setTimeout(() => show = false, 5000)"
+         class="fixed top-4 right-4 bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <p class="font-medium">Misión Rechazada</p>
+                <p class="text-sm mt-1">{{ session('rejection-success') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Mensajes Flash Generales -->
+    
+    
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -128,13 +179,74 @@
 
     <!-- Modal de Ver Petición -->
     @if($showViewModal && $selectedPeticion)
-    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+         wire:click="closeModal">
+        @if (session()->has('success') && !session()->has('approval-success') && !session()->has('rejection-success'))
+            <div x-data="{ show: true }" 
+                x-show="show" 
+                x-transition
+                x-init="setTimeout(() => show = false, 5000)"
+                class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if (session()->has('error') && !session()->has('approval-error'))
+            <div x-data="{ show: true }" 
+                x-show="show" 
+                x-transition
+                x-init="setTimeout(() => show = false, 5000)"
+                class="fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
+        <style>
+            .modal-scroll::-webkit-scrollbar {
+                width: 10px;
+            }
+            .modal-scroll::-webkit-scrollbar-track {
+                background: #374151; /* gray-700 */
+                border-radius: 6px;
+                margin: 4px;
+            }
+            .modal-scroll::-webkit-scrollbar-thumb {
+                background: #4B5563; /* gray-600 */
+                border-radius: 6px;
+                border: 2px solid #374151; /* mismo color que el track */
+            }
+            .modal-scroll::-webkit-scrollbar-thumb:hover {
+                background: #6B7280; /* gray-500 */
+            }
+
+            /* Estilos para el scroll de waypoints */
+            .waypoints-scroll::-webkit-scrollbar {
+                width: 8px;
+            }
+            .waypoints-scroll::-webkit-scrollbar-track {
+                background: #4B5563; /* gray-600 */
+                border-radius: 4px;
+            }
+            .waypoints-scroll::-webkit-scrollbar-thumb {
+                background: #6B7280; /* gray-500 */
+                border-radius: 4px;
+            }
+            .waypoints-scroll::-webkit-scrollbar-thumb:hover {
+                background: #9CA3AF; /* gray-400 */
+            }
+        </style>
+        <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-scroll"
+             wire:click.stop>
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-semibold text-gray-100">Detalles de la Petición</h3>
-                    <button wire:click="$set('showViewModal', false)" 
-                            class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700">
+                    <button wire:click="closeModal" 
+                            class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 transition-colors lg:hidden">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
@@ -271,17 +383,6 @@
                 <div class="border-t border-gray-700 pt-4">
                     <h4 class="text-lg font-medium text-gray-200 mb-4">Información de Revisión</h4>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-sm text-gray-400">Revisado por:</label>
-                            <p class="text-gray-100">{{ $selectedPeticion->revisor->name ?? 'N/A' }}</p>
-                        </div>
-                        {{-- Eliminar o comentar esta sección ya que revisado_en no existe --}}
-                        {{--
-                        <div>
-                            <label class="text-sm text-gray-400">Fecha de revisión:</label>
-                            <p class="text-gray-100">{{ $selectedPeticion->revisado_en?->format('d/m/Y H:i') ?? 'N/A' }}</p>
-                        </div>
-                        --}}
                         <div>
                             <label class="text-sm text-gray-400">Comentarios:</label>
                             <p class="text-gray-100">{{ $selectedPeticion->comentarios_revisor ?: 'Sin comentarios' }}</p>

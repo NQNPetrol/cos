@@ -538,10 +538,26 @@ Route::middleware([
     Route::get('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'index'])
         ->name('drones-flytbase.index');
 
+    Route::delete('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'destroy'])
+        ->name('drones-flytbase.destroy');
+
     Route::post('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'store'])
         ->name('drones-flytbase.store');
     Route::put('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'update'])
         ->name('drones-flytbase.update');
+
+    //DOCKS
+    Route::get('/docks-flytbase', [App\Http\Controllers\FlytbaseDockController::class, 'index'])
+    ->name('docks-flytbase.index');
+
+    Route::post('/docks-flytbase', [App\Http\Controllers\FlytbaseDockController::class, 'store'])
+        ->name('docks-flytbase.store');
+
+    Route::put('/docks-flytbase/{flytbase_dock}', [App\Http\Controllers\FlytbaseDockController::class, 'update'])
+        ->name('docks-flytbase.update');
+
+    Route::delete('/docks-flytbase/{flytbase_dock}', [App\Http\Controllers\FlytbaseDockController::class, 'destroy'])
+        ->name('docks-flytbase.destroy');
 
 
     //DEBUG
@@ -572,6 +588,11 @@ Route::middleware([
     //PETICIONES MISIONES 
     Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
         ->name('peticiones.index');
+
+    //SITES
+    Route::get('/sites', function () {
+        return view('sites-flytbase.index');
+    })->name('sites.index');
 
     //OBJETIVOS AIPEM
     Route::get('/objetivos-a', function () {
