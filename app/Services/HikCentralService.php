@@ -571,6 +571,7 @@ class HikCentralService
             'total_updated' => 0,
             'total_pages' => 0,
             'total_records' => 0,
+            'imported_records' => [],
             'errors' => []
         ];
 
@@ -620,11 +621,28 @@ class HikCentralService
                             'vehicle_speed' => $record['vehicleSpeed'] ?? null,
                         ];
 
+                        
+
                         // Usar updateOrCreate para evitar duplicados
-                        AnprPassingRecord::updateOrCreate(
+                        $savedRecord = AnprPassingRecord::updateOrCreate(
                             ['cross_record_syscode' => $recordData['cross_record_syscode']],
                             $recordData
                         );
+
+                        $results['imported_records'][] = [
+                            'id' => $savedRecord->id,
+                            'cross_record_syscode' => $savedRecord->cross_record_syscode,
+                            'plate_no' => $savedRecord->plate_no,
+                            'vehicle_pic_uri' => $savedRecord->vehicle_pic_uri, 
+                            'cross_time' => $savedRecord->cross_time,
+                            'camera_index_code' => $savedRecord->camera_index_code
+                        ];
+                        Log::info('🔍 [SERVICE_DEBUG] Registro guardado', [
+                            'saved_record_id' => $savedRecord->id,
+                            'has_id' => !empty($savedRecord->id),
+                            'cross_record_syscode' => $savedRecord->cross_record_syscode
+                        ]);
+
 
                         $results['total_imported']++;
 
@@ -648,7 +666,11 @@ class HikCentralService
 
             } while ($currentCount < $totalRecords);
 
-            Log::info('Importación de registros de cruce completada', $results);
+            Log::info('Importación de registros de cruce completada', [
+                'total_imported' => $results['total_imported'],
+                'imported_records_count' => count($results['imported_records']),
+                'total_pages' => $results['total_pages']
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error en importación de registros de cruce: ' . $e->getMessage());

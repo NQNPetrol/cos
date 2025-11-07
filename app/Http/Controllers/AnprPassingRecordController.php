@@ -2,18 +2,99 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\HikCentralService;
-use App\Models\AnprPassingRecord;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Models\AnprPassingRecord;
+use App\Models\AnprEventImage;
+use App\Services\HikCentralService;
+use App\Services\HikCentralImageService;
 use Illuminate\Support\Facades\Log;
 
 class AnprPassingRecordController extends Controller
 {
-    protected $hikCentralService;
+    protected $hikImageService;
 
-    public function __construct(HikCentralService $hikCentralService)
+    public function __construct(HikCentralImageService $hikImageService, HikCentralService $hikCentralService)
     {
+        $this->hikImageService = $hikImageService;
         $this->hikCentralService = $hikCentralService;
+    }
+
+    public function processImageAfterImport($anprRecord): void
+    {
+        if (is_array($anprRecord)) {
+            $recordId = $anprRecord['id'];
+            $picUri = $anprRecord['vehicle_pic_uri'] ?? null;
+            $plateNo = $anprRecord['plate_no'] ?? 'unknown';
+            
+            Log::info('[PROCESS_IMAGE] Procesando desde array', [
+                'record_id' => $recordId,
+                'pic_uri' => $picUri,
+                'plate_no' => $plateNo
+            ]);
+            
+        } else {
+            // Si es modelo Eloquent
+            $recordId = $anprRecord->id;
+            $picUri = $anprRecord->vehicle_pic_uri ?? null;
+            $plateNo = $anprRecord->plate_no ?? 'unknown';
+            Log::info('[PROCESS_IMAGE] Procesando desde modelo', [
+                'record_id' => $recordId,
+                'pic_uri' => $picUri,
+                'plate_no' => $plateNo
+            ]);
+        }
+
+        if (empty($picUri)) {
+            Log::warning('[IMAGE_PROCESSING_SKIP] No pic_uri/vehicle_pic_uri disponible', [
+                'anpr_record_id' => $recordId,
+                'plate_no' => $plateNo
+            ]);
+            return;
+        }
+
+        try {
+            Log::info('[IMAGE_PROCESSING_START] Iniciando procesamiento de imagen', [
+                'anpr_record_id' => $recordId,
+                'pic_uri' => $picUri,
+                'plate_no' => $plateNo
+            ]);
+            // Obtener el path de la imagen de la API HikCentral
+            $imagePath = $this->hikImageService->fetchImagePathFromHikCentral($picUri);
+            
+            if ($imagePath) {
+                // Crear registro en anpr_event_images con el path obtenido
+                AnprEventImage::create([
+                    'anpr_record_id' => $recordId,
+                    'veh_pic_uri' => $picUri,
+                    'image_path' => $imagePath, 
+                    'status' => 'path_obtained', // Estado: path obtenido
+                    'file_size' => strlen($imagePath)
+                ]);
+
+                Log::info('[IMAGE_PROCESSING_SUCCESS] Path de imagen obtenido exitosamente y registro creado', [
+                    'anpr_record_id' => $recordId,
+                    'event_image_id' => $eventImage->id,
+                    'image_path_length' => strlen($imagePath),
+                    'plate_no' => $plateNo
+                ]);
+            } else {
+                Log::error('[IMAGE_PROCESSING_ERROR] Error crítico al procesar imagen después de importar', [
+                'anpr_record_id' => $recordId,
+                'pic_uri' => $picUri,
+                'plate_no' => $plateNo
+            ]);
+
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al procesar imagen después de importar', [
+                'anpr_record_id' => $recordId,
+                'pic_uri' => $picUri,
+                'plate_no' => $plateNo,
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     public function importLast24Hours()
@@ -31,6 +112,56 @@ class AnprPassingRecordController extends Controller
             ]);
 
             $results = $this->hikCentralService->importCrossRecords($startTime, $endTime);
+
+            Log::info('🔍 [DEBUG] Estructura completa de $results', [
+                'results_keys' => array_keys($results),
+                'results_full' => $results
+            ]);
+
+        
+
+            if (isset($results['imported_records']) && count($results['imported_records']) > 0) {
+                Log::info('🎯 [IMAGE_PROCESSING] Condición cumplida, procesando imágenes', [
+                    'total_records' => count($results['imported_records'])
+                ]);
+                
+                $processedCount = 0;
+                $skippedCount = 0;
+                
+                foreach ($results['imported_records'] as $index => $importedRecord) {
+                    Log::info("[IMAGE_PROCESSING] Procesando registro {$index}", [
+                        'record_id' => $importedRecord['id'] ?? 'unknown',
+                        'vehicle_pic_uri' => $importedRecord['vehicle_pic_uri'] ?? 'null',
+                        'plate_no' => $importedRecord['plate_no'] ?? 'unknown'
+                    ]);
+                    
+                    if (!empty($importedRecord['vehicle_pic_uri'])) {
+                        Log::info('📸 [IMAGE_PROCESSING] Llamando a processImageAfterImport');
+                        $this->processImageAfterImport($importedRecord);
+                        $processedCount++;
+                    } else {
+                        Log::warning('🚫 [IMAGE_PROCESSING] pic_uri vacío, saltando registro', [
+                            'record_id' => $importedRecord['id'] ?? 'unknown',
+                            'plate_no' => $importedRecord['plate_no'] ?? 'unknown'
+                        ]);
+                        $skippedCount++;
+                    }
+                }
+                
+                Log::info('✅ [IMAGE_PROCESSING] Procesamiento completado', [
+                    'total_processed' => $processedCount,
+                    'total_skipped' => $skippedCount
+                ]);
+            } else {
+                Log::warning('❌ [IMAGE_PROCESSING] No hay registros importados para procesar imágenes', [
+                    'has_imported_records' => isset($results['imported_records']),
+                    'imported_records_count' => isset($results['imported_records']) ? count($results['imported_records']) : 0,
+                    'total_imported' => $results['total_imported'] ?? 0
+                ]);
+            }
+            
+
+            Log::info('Si despues de Resultados obtenidos ves este mensaje es porque no se ejecuta la condicion');
 
             // Obtener estadísticas actualizadas después de la importación
             $totalRecords = AnprPassingRecord::count();

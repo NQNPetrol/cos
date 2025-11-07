@@ -9,10 +9,6 @@ class AnprPassingRecord extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'cross_record_syscode';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
         'cross_record_syscode',
         'camera_index_code',
@@ -38,4 +34,16 @@ class AnprPassingRecord extends Model
         'vehicle_brand' => 'integer',
         'vehicle_speed' => 'integer',
     ];
+
+     public function eventImages()
+    {
+        return $this->hasMany(AnprEventImage::class, 'anpr_record_id');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        
+        // Opcionalmente agregar índice único en la migración
+    }
 }
