@@ -598,6 +598,15 @@ Route::middleware([
     Route::get('/objetivos-a', function () {
         return view('objetivos.aipem.index');
     })->name('objetivos-aipem.index');
+
+    //ANPR RECORDS
+    Route::get('/anpr/records', [\App\Http\Controllers\AnprPassingRecordController::class, 'index'])
+        ->name('anpr.index');
+    Route::post('/anpr/import', [\App\Http\Controllers\AnprPassingRecordController::class, 'importLast24Hours'])->name('anpr.import');
+    Route::get('/anpr/stats', [\App\Http\Controllers\AnprPassingRecordController::class, 'getStats'])->name('stats');
+
+    Route::get('/anpr/event-image/{recordId}', \App\Livewire\HikCentralImages\ViewEventImage::class)
+        ->name('anpr.view-image');
 });
 
 
