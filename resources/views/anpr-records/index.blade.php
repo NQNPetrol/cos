@@ -164,6 +164,7 @@
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Propietario</th>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Velocidad</th>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Dirección</th>
+                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -224,10 +225,18 @@
                                                     </span>
                                                 @endif
                                             </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                                <a href="{{ route('anpr.view-image', $record->id) }}" 
+                                                class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                                                title="Ver imagen capturada">
+                                                    <i class="bi bi-card-image"></i>
+                                                    
+                                                </a>
+                                            </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">
+                                            <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-400">
                                                 <svg class="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
@@ -410,4 +419,5 @@
             }
         });
     </script>
+
 </x-app-layout>

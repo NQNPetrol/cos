@@ -35,9 +35,9 @@ class AnprPassingRecord extends Model
         'vehicle_speed' => 'integer',
     ];
 
-     public function eventImages()
+    public function eventImage()
     {
-        return $this->hasMany(AnprEventImage::class, 'anpr_record_id');
+        return $this->hasOne(AnprEventImage::class, 'anpr_record_id');
     }
 
     public static function boot()

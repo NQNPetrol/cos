@@ -621,8 +621,6 @@ class HikCentralService
                             'vehicle_speed' => $record['vehicleSpeed'] ?? null,
                         ];
 
-                        
-
                         // Usar updateOrCreate para evitar duplicados
                         $savedRecord = AnprPassingRecord::updateOrCreate(
                             ['cross_record_syscode' => $recordData['cross_record_syscode']],
@@ -637,11 +635,7 @@ class HikCentralService
                             'cross_time' => $savedRecord->cross_time,
                             'camera_index_code' => $savedRecord->camera_index_code
                         ];
-                        Log::info('🔍 [SERVICE_DEBUG] Registro guardado', [
-                            'saved_record_id' => $savedRecord->id,
-                            'has_id' => !empty($savedRecord->id),
-                            'cross_record_syscode' => $savedRecord->cross_record_syscode
-                        ]);
+                        
 
 
                         $results['total_imported']++;

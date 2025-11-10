@@ -532,9 +532,26 @@
                             <button id="togglePatrullas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-taxi-front-fill text-white text-sm"></i>
+                                   
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="23"
+                                            height="23"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="white"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            >
+                                            <path d="M17.464 6.518a6 6 0 1 0 -3.023 7.965" />
+                                            <path d="M17.482 17.464a6 6 0 1 0 -7.965 -3.023" />
+                                            <path d="M6.54 17.482a6 6 0 1 0 3.024 -7.965" />
+                                            <path d="M6.518 6.54a6 6 0 1 0 7.965 3.024" />
+                                        </svg>
+
                                     </div>
-                                    <span>Patrullas</span>
+                                    <span>HikCentral</span>
                                 </div>
                                 <svg class="w-5 h-5 transition-transform duration-300" id="iconPatrullas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -543,12 +560,34 @@
 
                             <div id="submenuPatrullas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
                                 <a href="{{ route('patrullas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-gear text-lg"></i>
-                                    <span>Administrar Patrullas</span>
+                                    <i class="bi bi-taxi-front-fill text-blue text-sm"></i>
+                                    <span>On board devices</span>
                                 </a>
                                 <a href="{{ route('patrullas.location') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                     <i class="bi bi-geo-alt text-lg"></i>
-                                    <span>Ver en el Mapa</span>
+                                    <span>Real-Time Monitoring</span>
+                                </a>
+                                <a href="{{ route('anpr.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                            
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        >
+                                        <path d="M17 5h2a2 2 0 0 1 2 2v2" />
+                                        <path d="M21 15v2a2 2 0 0 1 -2 2h-2" />
+                                        <path d="M7 19h-2a2 2 0 0 1 -2 -2v-2" />
+                                        <path d="M3 9v-2a2 2 0 0 1 2 -2h2" />
+                                        <path d="M7 9m0 1a1 1 0 0 1 1 -1h8a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1z" />
+                                    </svg>
+
+                                    <span>ANPR</span>
                                 </a>
                             </div>
                         </div>
