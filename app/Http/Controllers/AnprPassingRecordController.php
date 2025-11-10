@@ -45,10 +45,11 @@ class AnprPassingRecordController extends Controller
             ]);
         }
 
-        if (empty($picUri)) {
-            Log::warning('[IMAGE_PROCESSING_SKIP] No pic_uri/vehicle_pic_uri disponible', [
+        if (empty($picUri) || !str_starts_with($picUri, 'Vsm://')) {
+            Log::warning('[IMAGE_PROCESSING_SKIP] URI no compatible', [
                 'anpr_record_id' => $recordId,
-                'plate_no' => $plateNo
+                'plate_no' => $plateNo,
+                'uri_type' => empty($picUri) ? 'empty' : 'non-vsm'
             ]);
             return;
         }
@@ -62,14 +63,17 @@ class AnprPassingRecordController extends Controller
             // Obtener el path de la imagen de la API HikCentral
             $imagePath = $this->hikImageService->fetchImagePathFromHikCentral($picUri);
             
-            if ($imagePath) {
+            if ($imagePath && str_starts_with($imagePath, 'data:image/jpeg;base64,')) {
+                Log::info('El registro cumple con las condiciones adecuadas');
                 // Crear registro en anpr_event_images con el path obtenido
-                AnprEventImage::create([
+                $imageBase64 = str_replace('data:image/jpeg;base64,', '', $imagePath);
+                $eventImage = AnprEventImage::create([
                     'anpr_record_id' => $recordId,
                     'veh_pic_uri' => $picUri,
-                    'image_path' => $imagePath, 
-                    'status' => 'path_obtained', // Estado: path obtenido
-                    'file_size' => strlen($imagePath)
+                    'image_path' => $imagePath,
+                    'image_base64' => $imageBase64,
+                    'status' => 'base64_obtained',
+                    'file_size' => strlen($imageBase64)
                 ]);
 
                 Log::info('[IMAGE_PROCESSING_SUCCESS] Path de imagen obtenido exitosamente y registro creado', [

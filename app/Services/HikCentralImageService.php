@@ -8,14 +8,20 @@ use Illuminate\Support\Facades\Log;
 class HikCentralImageService
 {
     private $baseUrl;
-    private $appKey;
-    private $appSecret;
+    private $apiKey;
+    private $apiSecret;
 
     public function __construct()
     {
-        $this->baseUrl = 'http://190.93.206.216:9016/artemis';
-        $this->appKey = env('HIKCENTRAL_APP_KEY');
-        $this->appSecret = env('HIKCENTRAL_APP_SECRET');
+        $this->baseUrl = rtrim(env('HIKCENTRAL_URL', ''), '/');
+        $this->apiKey = env('HIKCENTRAL_API_KEY');
+        $this->apiSecret = env('HIKCENTRAL_API_SECRET');
+
+        Log::info('[IMAGE_SERVICE_INIT] HikCentralImageService inicializado', [
+            'base_url' => $this->baseUrl,
+            'api_key_set' => !empty($this->apiKey)
+        ]);
+        
     }
 
     /**
@@ -24,17 +30,31 @@ class HikCentralImageService
     public function fetchImagePathFromHikCentral(string $picUri): ?string
     {
         try {
-            $headers = $this->generateAuthHeaders();
+            $path = '/artemis/api/acs/v1/event/pictures';
+            $url = $this->baseUrl . $path;
+            $accept = 'application/json';
             
-            Log::info('Solicitando imagen a HikCentral API', [
+            $timestamp = round(microtime(true) * 1000);
+            $contentType = 'application/json';
+            $signature = $this->signRequest('POST', $accept, $contentType, $path, $timestamp);
+            
+            Log::info('[IMAGE_API_REQUEST] Solicitando imagen a HikCentral API', [
                 'pic_uri' => $picUri,
-                'url' => $this->baseUrl . '/api/pms/v1/image'
+                'url' => $url,
+                'timestamp' => $timestamp
             ]);
 
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders($headers)
+                ->withHeaders([
+                    'Accept' => $accept,
+                    'Content-Type' => $contentType,
+                    'x-ca-key' => $this->apiKey,
+                    'x-ca-signature' => $signature,
+                    'x-ca-timestamp' => $timestamp,
+                    'domainId' => '0' 
+                ])
                 ->timeout(15)
-                ->post($this->baseUrl . '/api/pms/v1/image', [
+                ->post($url, [
                     'picUri' => $picUri
                 ]);
 
@@ -66,27 +86,14 @@ class HikCentralImageService
         return null;
     }
 
-    /**
-     * Generar headers de autenticación AK/SK
-     */
-    private function generateAuthHeaders(): array
+   private function signRequest(string $method, string $accept, string $contentType, string $path, int $timestamp): string
     {
-        $timestamp = round(microtime(true) * 1000);
-        $nonce = uniqid();
-        
-        $signature = base64_encode(hash_hmac('sha256', 
-            $this->appKey . $timestamp . $nonce, 
-            $this->appSecret, 
-            true
-        ));
+        $stringToSign = strtoupper($method) . "\n" .
+                    $accept . "\n" .
+                    $contentType . "\n" .
+                    $path;
 
-        return [
-            'Content-Type' => 'application/json',
-            'appKey' => $this->appKey,
-            'timestamp' => $timestamp,
-            'nonce' => $nonce,
-            'signature' => $signature,
-        ];
+        return base64_encode(hash_hmac('sha256', $stringToSign, $this->apiSecret, true));
     }
 
 
