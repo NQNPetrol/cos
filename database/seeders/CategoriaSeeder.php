@@ -20,6 +20,7 @@ class CategoriaSeeder extends Seeder
             'Tecnológicos/comunicación',
             'Entorno y contexto',
             'Administrativos/reportables al cliente',
+            'Salud/Emergencias',
         ];
 
         foreach ($categorias as $nombre) {
