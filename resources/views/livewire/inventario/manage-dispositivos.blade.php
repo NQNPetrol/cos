@@ -199,7 +199,31 @@
     <!-- Modal -->
     @if($showModal)
         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto" @click.stop>
+            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto scrollbar-custom" @click.stop>
+                <style>
+                    .scrollbar-custom {
+                        scrollbar-width: thin;
+                        scrollbar-color: #4B5563 #1F2937;
+                    }
+                    
+                    .scrollbar-custom::-webkit-scrollbar {
+                        width: 8px;
+                    }
+                    
+                    .scrollbar-custom::-webkit-scrollbar-track {
+                        background: #1F2937; /* bg-gray-800 */
+                        border-radius: 4px;
+                    }
+                    
+                    .scrollbar-custom::-webkit-scrollbar-thumb {
+                        background: #4B5563; /* bg-gray-600 */
+                        border-radius: 4px;
+                    }
+                    
+                    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+                        background: #6B7280; /* bg-gray-500 */
+                    }
+                </style>
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-100">
                         {{ $editingId ? 'Editar Dispositivo' : 'Nuevo Dispositivo' }}
@@ -227,13 +251,18 @@
                                 <select wire:model="tipo" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                                     <option value="">Seleccionar...</option>
                                     <option value="cámara_ip">Cámara IP</option>
+                                    <option value="camara_ptz">Domo PTZ</option>
+                                    <option value="camara_deeplearning">Cámara Deeplearning</option>
                                     <option value="nvr_dvr">NVR/DVR</option>
-                                    <option value="control_acceso">Control de Acceso</option>
-                                    <option value="intercomunicador">Intercomunicador</option>
+                                    <option value="control_acceso">DoorStation</option>
+                                    <option value="indoorstation">IndoorStation</option>
                                     <option value="switch_poe">Switch PoE</option>
                                     <option value="sensor_alarma">Sensor de Alarma</option>
-                                    <option value="dispositivo_reconocimiento">Reconocimiento Facial</option>
+                                    <option value="bodycam">Bodycam</option>
+                                    <option value="dockstation">DockStation</option>
                                     <option value="gps">GPS</option>
+                                    <option value="drone">Drone</option>
+                                    <option value="antena_starlink">Starlink-Mini</option>
                                     <option value="otros">Otros</option>
                                 </select>
                                 @error('tipo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
