@@ -88,7 +88,7 @@ class ManageTicketsClient extends Component
             $query->where('categoria', $this->categoryFilter);
         }
 
-        $tickets = $query->latest()->paginate(10);
+        $tickets = $query->latest()->paginate(6);
 
         $clientes = Cliente::orderBy('nombre')->get();
         $usuariosParaTabla = User::orderBy('name')->get();

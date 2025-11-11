@@ -44,7 +44,7 @@ class ManageDispositivos extends Component
     public $clientes;
 
     protected $rules = [
-        'tipo' => 'required|in:cámara_ip,nvr_dvr,control_acceso,intercomunicador,switch_poe,sensor_alarma,dispositivo_reconocimiento,gps,otros',
+        'tipo' => 'required|in:cámara_ip,nvr_dvr,control_acceso,doorstation,switch_poe,sensor_alarma,dispositivo_reconocimiento,gps,bodycam,drone,camara_ptz,camara_deeplearning,indoorstation,antena_starlink,dockstation,otros',
         'direccion_ip' => 'nullable|ip',
         'puerto' => 'nullable|string|max:10',
         'version_software' => 'nullable|string|max:255',
