@@ -231,7 +231,7 @@
             <div class="p-6">
                 @if ($tickets->count())
                     <div class="overflow-x-auto">
-                        <div class="max-h-96 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <div class="max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-700 text-gray-300">

@@ -41,27 +41,27 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
 
     //EVENTOS (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
-        ->middleware('can:crear.eventos')
+        ->middleware('can:crear.eventos-cliente')
         ->name('eventos.create');
 
     Route::get('/eventos', [\App\Http\Controllers\EventoClientController::class, 'index'])
-        ->middleware('can:ver.eventos')
+        ->middleware('can:ver.eventos-cliente')
         ->name('eventos.index');
 
     Route::post('/eventos/store', [\App\Http\Controllers\EventoClientController::class, 'store'])
-        ->middleware('can:crear.eventos')
+        ->middleware('can:crear.eventos-cliente')
         ->name('eventos.store');
 
     Route::get('/eventos/{evento}/edit', [\App\Http\Controllers\EventoClientController::class, 'edit'])
-        ->middleware('can:editar.eventos')
+        ->middleware('can:editar.eventos-cliente')
         ->name('eventos.edit');
 
     Route::put('/eventos/{evento}/update', [\App\Http\Controllers\EventoClientController::class, 'update'])
-        ->middleware('can:editar.eventos')
+        ->middleware('can:editar.eventos-cliente')
         ->name('eventos.update');
 
     Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoClientController::class, 'destroy'])
-        ->middleware('can:eliminar.eventos')
+        ->middleware('can:eliminar.eventos-cliente')
         ->name('eventos.destroy');
     
     Route::post('/eventos/{evento}/anular', [\App\Http\Controllers\EventoClientController::class, 'anular'])
@@ -69,70 +69,79 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
 
     //REPORTES (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteClientController::class, 'preview'])
-        ->middleware('can:ver.reportes')
+        ->middleware('can:ver.reportes-cliente')
         ->name('eventos.reporte.preview');
+
     Route::post('/eventos/{evento}/reporte/generar', [\App\Http\Controllers\ReporteClientController::class, 'generate'])
-        ->middleware('can:generar.reportes')
+        ->middleware('can:generar.reportes-cliente')
         ->name('eventos.reporte.generate');
+
     Route::get('/reportes/{reporte}/download', [\App\Http\Controllers\ReporteClientController::class, 'download'])
-        ->middleware('can:generar.reportes')
+        ->middleware('can:generar.reportes-cliente')
         ->name('reportes.download');
+
     Route::get('/reportes/{reporte}/view', [\App\Http\Controllers\ReporteClientController::class, 'view'])
-        ->middleware('can:ver.reportes')
+        ->middleware('can:ver.reportes-cliente')
         ->name('reportes.view');
+
     Route::get('/eventos/{evento}/preview-iframe', [\App\Http\Controllers\ReporteClientController::class, 'previewIframe'])
-        ->middleware('can:ver.reportes')
+        ->middleware('can:ver.reportes-cliente')
         ->name('eventos.reporte.preview-iframe');
     
         
     //SEGUIMIENTOS (USA MISMO CONTROLADOR)
     Route::get('/seguimientos', [\App\Http\Controllers\SeguimientoController::class,'indexClientLayout'])
-        ->middleware('can:ver.seguimientos')
+        ->middleware('can:ver.seguimientos-cliente')
         ->name('seguimientos.index');
 
     // PATRULLAS (USA MISMO CONTROLADOR)
     Route::get('/patrullas', [\App\Http\Controllers\PatrullaController::class, 'indexClient'])
-        ->name('patrullas.index');
+        ->name('patrullas.index')
+        ->middleware('can:ver.patrullas-cliente');
 
     //MOBILE VEHICLE USA NUEVO CONTROLADOR
 
     Route::get('/patrullas/mapa', [\App\Http\Controllers\MobileVehicleClientController::class, 'locationClient'])
-        ->name('patrullas.location');
+        ->name('patrullas.location')
+        ->middleware('can:ver.location-cliente');
 
     //TICKETS Y NOTIFICACIONES (mismo controlador)
     Route::get('/tickets/nuevo', [App\Http\Controllers\TicketController::class, 'indexClient'])
-        ->middleware('can:ver.tickets')
+        ->middleware('can:ver.tickets-cliente')
         ->name('tickets.nuevo');
 
     //TRIGGER ALERTAS FLYTBASE (nuevo controllador)
     Route::get('/misiones', [App\Http\Controllers\AlertasClientController::class, 'index'])
-        // ->middleware('can:ver.alertas')
+        ->middleware('can:ver.alertas-cliente')
         ->name('alertas.index');
 
     Route::post('/misiones/trigger', [App\Http\Controllers\AlertasClientController::class, 'triggerAlarm'])
-        ->name('alertas.trigger-alarm');
+        ->name('alertas.trigger-alarm')
+        ->middleware('can:trigger.alertas-cliente');
 
     // LIVESTREAM 
     Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveviewClient'])
-        ->name('streaming.drone.liveview');
+        ->name('streaming.drone.liveview')
+        ->middleware('can:ver.liveview-cliente');
+        
 
     //FLIGHT LOGS
     Route::get('/flight-logs', function () {
         return view('flightlogs.client.index');
-    })->name('flight-logs');
+    })->name('flight-logs')->middleware('can:ver.flightlogs-cliente');
 
     //GALLERY
     Route::prefix('gallery')->name('gallery.')->group(function () {
-        Route::get('/', [App\Http\Controllers\GalleryClientController::class, 'index'])->name('index');
-        Route::get('/api', [App\Http\Controllers\GalleryClientController::class, 'apiIndex'])->name('api.index');
-        Route::get('/mission/{drone}/{client}/{mission}', [App\Http\Controllers\GalleryClientController::class, 'missionShow'])->name('mission.show');
-        Route::get('/thumbnails', [App\Http\Controllers\GalleryClientController::class, 'getThumbnails'])->name('thumbnails');
+        Route::get('/', [App\Http\Controllers\GalleryClientController::class, 'index'])->name('index')->middleware('can:ver.galeria-cliente');
+        Route::get('/api', [App\Http\Controllers\GalleryClientController::class, 'apiIndex'])->name('api.index')->middleware('can:ver.galeria-cliente');
+        Route::get('/mission/{drone}/{client}/{mission}', [App\Http\Controllers\GalleryClientController::class, 'missionShow'])->name('mission.show')->middleware('can:ver.galeria-cliente');
+        Route::get('/thumbnails', [App\Http\Controllers\GalleryClientController::class, 'getThumbnails'])->name('thumbnails')->middleware('can:ver.galeria-cliente');
     });
 
     //MISIONES
     Route::get('/planificar-misiones', function () {
         return view('misiones-flytbase.client.index');
-    })->name('misiones');
+    })->name('misiones')->middleware('can:crear.peticion-misiones');
 
 });
 
@@ -194,7 +203,7 @@ Route::middleware([
         ->name('usuarios.destroy');
 
     //resetar contraseña
-    Route::put('/usuarios/{user}/reset-password', [App\Http\Controllers\UserController::class, 'resetPassword'])->name('usuarios.reset-password');
+    Route::put('/usuarios/{user}/reset-password', [App\Http\Controllers\UserController::class, 'resetPassword'])->middleware('can:resetar.contraseña')->name('usuarios.reset-password');
     
     //CLIENTE-USUARIO
     Route::get('usuarios/asignar-clientes', [App\Http\Controllers\UserClienteController::class, 'index'])->middleware('can:asignar.clientes')->name('user-cliente.index');
@@ -367,7 +376,7 @@ Route::middleware([
         ->name('patrullas.create');
 
     Route::get('/patrullas/location', [\App\Http\Controllers\MobileVehicleController::class, 'location'])
-        // ->middleware('can:ver.location')
+        ->middleware('can:ver.location')
         ->name('patrullas.location');
 
     //DISPOSiTIVO-PATRULLA
@@ -393,42 +402,47 @@ Route::middleware([
         ->middleware('can:crear.notificaciones')
         ->name('notifications.store');
 
-    Route::post('/notificaciones/{notification}/toggle', [NotificationController::class, 'toggle'])->name('notifications.toggle');
+    Route::post('/notificaciones/{notification}/toggle', [NotificationController::class, 'toggle'])->name('notifications.toggle')->middleware('can:crear.notif');
     
-    Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy')->middleware('can:crear.notif');
     
-    Route::put('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'update'])->name('notifications.update');
+    Route::put('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'update'])->name('notifications.update')->middleware('can:crear.notif');
 
     Route::get('/admin/notificaciones/{notification}/editar-datos', [App\Http\Controllers\NotificationController::class, 'editData'])
-    ->middleware('can:administrar.notificaciones')
-    ->name('notifications.edit.data');
+        ->middleware('can:administrar.notificaciones')
+        ->name('notifications.edit.data');
 
     // RUTAS API
     Route::middleware('auth')->group(function () {
         // Obtener notificaciones del usuario actual
         Route::get('/notificaciones', [App\Http\Controllers\NotificationController::class, 'index'])
-            ->name('notifications.index');
+            ->name('notifications.index')
+            ->middleware('can:crear.notif');
         
         // Contador de notificaciones sin leer
         Route::get('/notificaciones/contador', [App\Http\Controllers\NotificationController::class, 'unreadCount'])
-            ->name('notifications.unread.count');
+            ->name('notifications.unread.count')
+            ->middleware('can:crear.notif');
         
         // Marcar notificación como leída
         Route::post('/notificaciones/{notification}/leer', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
-            ->name('notifications.mark.read');
+            ->name('notifications.mark.read')
+            ->middleware('can:crear.notif');
         
         // Descartar notificación
         Route::delete('/notificaciones/{notification}/descartar', [App\Http\Controllers\NotificationController::class, 'dismiss'])
-            ->name('notifications.dismiss');
+            ->name('notifications.dismiss')
+            ->middleware('can:crear.notif');
         
         // Marcar todas las notificaciones como leídas
         Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
-            ->name('notifications.mark.all.read');
+            ->name('notifications.mark.all.read')
+            ->middleware('can:crear.notif');
     });
 
     // CAMARAS LIST Y LIVEVIEW
-    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index');
-    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('cameras.stream');
+    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index')->middleware('can:ver.camaras');
+    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('cameras.stream')->middleware('can:ver.camaras');
     
     Route::get('/test-env', function () {
         return [
@@ -496,10 +510,11 @@ Route::middleware([
 
     // ALERTAS
     Route::get('/alertas', [App\Http\Controllers\AlertasController::class, 'index'])
-        // ->middleware('can:ver.alertas')
+        ->middleware('can:ver.alertas')
         ->name('alertas.index');
     Route::post('/alertas/trigger-alarm', [App\Http\Controllers\AlertasController::class, 'triggerAlarm'])
-        ->name('alertas.trigger-alarm');
+        ->name('alertas.trigger-alarm')
+        ->middleware('can:trigger.alertas');
 
     // MISIONES FLYTBASE
     Route::get('/misiones-flytbase', [\App\Http\Controllers\MisionFlytbaseController::class, 'index'])
@@ -524,40 +539,52 @@ Route::middleware([
     
     // LIVESTREAM 
     Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
-        ->name('streaming.drone.liveview');
+        ->name('streaming.drone.liveview')
+        ->middleware('can:ver.liveview');
 
 
     Route::get('/alertas/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
-        ->name('alertas.liveview');
+        ->name('alertas.liveview')
+        ->middleware('can:ver.liveview');
 
     //DRONES
     // API para obtener información del drone
     Route::get('/api/drones/info', [App\Http\Controllers\FlytbaseDroneController::class, 'getDroneInfo'])
-        ->name('api.drones.info');
+        ->name('api.drones.info')
+        ->middleware('can:ver.droneInfo');
 
     Route::get('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'index'])
-        ->name('drones-flytbase.index');
+        ->name('drones-flytbase.index')
+        ->middleware('can:ver.drones');
 
     Route::delete('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'destroy'])
-        ->name('drones-flytbase.destroy');
+        ->name('drones-flytbase.destroy')
+        ->middleware('can:eliminar.drones');
 
     Route::post('/drones-flytbase', [App\Http\Controllers\FlytbaseDroneController::class, 'store'])
-        ->name('drones-flytbase.store');
+        ->name('drones-flytbase.store')
+        ->middleware('can:crear.drones');
+
     Route::put('/drones-flytbase/{drones_flytbase}', [App\Http\Controllers\FlytbaseDroneController::class, 'update'])
-        ->name('drones-flytbase.update');
+        ->name('drones-flytbase.update')
+        ->middleware('can:crear.drones');
 
     //DOCKS
     Route::get('/docks-flytbase', [App\Http\Controllers\FlytbaseDockController::class, 'index'])
-    ->name('docks-flytbase.index');
+    ->name('docks-flytbase.index')
+    ->middleware('can:ver.docks');
 
     Route::post('/docks-flytbase', [App\Http\Controllers\FlytbaseDockController::class, 'store'])
-        ->name('docks-flytbase.store');
+        ->name('docks-flytbase.store')
+        ->middleware('can:crear.docks');
 
     Route::put('/docks-flytbase/{flytbase_dock}', [App\Http\Controllers\FlytbaseDockController::class, 'update'])
-        ->name('docks-flytbase.update');
+        ->name('docks-flytbase.update')
+        ->middleware('can:crear.docks');
 
     Route::delete('/docks-flytbase/{flytbase_dock}', [App\Http\Controllers\FlytbaseDockController::class, 'destroy'])
-        ->name('docks-flytbase.destroy');
+        ->name('docks-flytbase.destroy')
+        ->middleware('can:eliminar.docks');
 
 
     //DEBUG
@@ -574,39 +601,40 @@ Route::middleware([
 
     //GALERIA
     Route::prefix('gallery')->name('gallery.')->group(function () {
-        Route::get('/', [App\Http\Controllers\GalleryController::class, 'index'])->name('index');
-        Route::get('/api', [App\Http\Controllers\GalleryController::class, 'apiIndex'])->name('api.index');
+        Route::get('/', [App\Http\Controllers\GalleryController::class, 'index'])->name('index')->middleware('can:ver.galeria');
+        Route::get('/api', [App\Http\Controllers\GalleryController::class, 'apiIndex'])->name('api.index')->middleware('can:importar.galeria');
         Route::get('/mission/{drone}/{client}/{mission}', [App\Http\Controllers\GalleryController::class, 'missionShow'])->name('mission.show');
-        Route::get('/thumbnails', [App\Http\Controllers\GalleryController::class, 'getThumbnails'])->name('thumbnails');
+        Route::get('/thumbnails', [App\Http\Controllers\GalleryController::class, 'getThumbnails'])->name('thumbnails')->middleware('can:ver.galeria');
     });
 
     // PILOTOS 
     Route::get('/pilotos/asignar-clientes', function () {
         return view('pilotos.index');
-    })->name('pilotos.index');
+    })->name('pilotos.index')->middleware('can:ver.pilotos');
 
     //PETICIONES MISIONES 
     Route::get('/misiones/peticiones-clientes', [\App\Http\Controllers\PeticionesMisionesClient::class, 'index'])
-        ->name('peticiones.index');
+        ->name('peticiones.index')
+        ->middleware('can:ver.peticiones');
 
     //SITES
     Route::get('/sites', function () {
         return view('sites-flytbase.index');
-    })->name('sites.index');
+    })->name('sites.index')->middleware('can:ver.sites');
 
     //OBJETIVOS AIPEM
     Route::get('/objetivos-a', function () {
         return view('objetivos.aipem.index');
-    })->name('objetivos-aipem.index');
+    })->name('objetivos-aipem.index')->middleware('can:ver.objetivos-aipem');
 
     //ANPR RECORDS
     Route::get('/anpr/records', [\App\Http\Controllers\AnprPassingRecordController::class, 'index'])
-        ->name('anpr.index');
-    Route::post('/anpr/import', [\App\Http\Controllers\AnprPassingRecordController::class, 'importLast24Hours'])->name('anpr.import');
-    Route::get('/anpr/stats', [\App\Http\Controllers\AnprPassingRecordController::class, 'getStats'])->name('stats');
+        ->name('anpr.index')->middleware('can:ver.registros-anpr');
+    Route::post('/anpr/import', [\App\Http\Controllers\AnprPassingRecordController::class, 'importLast24Hours'])->name('anpr.import')->middleware('can:importar.registros-anpr');
+    Route::get('/anpr/stats', [\App\Http\Controllers\AnprPassingRecordController::class, 'getStats'])->name('stats')->middleware('can:ver.registros-anpr');
 
     Route::get('/anpr/event-image/{recordId}', \App\Livewire\HikCentralImages\ViewEventImage::class)
-        ->name('anpr.view-image');
+        ->name('anpr.view-image')->middleware('can:ver.registros-anpr');
 });
 
 
