@@ -101,6 +101,7 @@ class AnprPassingRecordController extends Controller
         }
     }
 
+    //PARA AGREGAR A UN CRONOJOB
     public function importLast24Hours()
     {
         try {
