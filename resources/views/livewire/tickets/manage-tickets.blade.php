@@ -231,10 +231,11 @@
             <div class="p-6">
                 @if ($tickets->count())
                     <div class="overflow-x-auto">
-                        <div class="max-h-96 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <div class="max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-700 text-gray-300">
+                                        <th class="px-4 py-3 text-left">ID</th>
                                         <th class="px-4 py-3 text-left">Título</th>
                                         <th class="px-4 py-3 text-left">Categoría</th>
                                         <th class="px-4 py-3 text-left">Prioridad</th>
@@ -252,6 +253,9 @@
                                 <tbody class="divide-y divide-gray-700">
                                     @foreach ($tickets as $ticket)
                                         <tr class="hover:bg-gray-750">
+                                            <td class="px-4 py-3">
+                                                <div class="text-white font-medium">#{{ $ticket->id }}</div>
+                                            </td>
                                             <td class="px-4 py-3">
                                                 <div>
                                                     <div class="text-white font-medium">{{ $ticket->titulo }}</div>
@@ -353,7 +357,7 @@
                                                     @endif
 
                                                     <!-- Botón para ver detalles (todos los usuarios) -->
-                                                    <button onclick="alert('Detalles del ticket:\n\nTítulo: {{ $ticket->titulo }}\nDescripción: {{ $ticket->descripcion }}\nCategoría: {{ $categorias[$ticket->categoria] ?? $ticket->categoria }}\nPrioridad: {{ ucfirst($ticket->prioridad) }}\nEstado: {{ $estados[$ticket->estado] ?? $ticket->estado }}\nCreado: {{ $ticket->created_at->format('d/m/Y H:i') }}\nCreado por: {{ $ticket->user->name }}{{ $ticket->cliente ? '\nCliente: ' . $ticket->cliente->nombre : '' }}{{ $ticket->assignedTo ? '\nAsignado a: ' . $ticket->assignedTo->name : '' }}{{ $ticket->fecha_cierre ? '\nCerrado: ' . $ticket->fecha_cierre->format('d/m/Y H:i') : '' }}')"
+                                                    <button onclick="alert('Detalles del ticket #{{ $ticket->id }}:\n\nTítulo: {{ $ticket->titulo }}\nDescripción: {{ $ticket->descripcion }}\nCategoría: {{ $categorias[$ticket->categoria] ?? $ticket->categoria }}\nPrioridad: {{ ucfirst($ticket->prioridad) }}\nEstado: {{ $estados[$ticket->estado] ?? $ticket->estado }}\nCreado: {{ $ticket->created_at->format('d/m/Y H:i') }}\nCreado por: {{ $ticket->user->name }}{{ $ticket->cliente ? '\nCliente: ' . $ticket->cliente->nombre : '' }}{{ $ticket->assignedTo ? '\nAsignado a: ' . $ticket->assignedTo->name : '' }}{{ $ticket->fecha_cierre ? '\nCerrado: ' . $ticket->fecha_cierre->format('d/m/Y H:i') : '' }}')"
                                                             class="p-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white" 
                                                             title="Ver detalles">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

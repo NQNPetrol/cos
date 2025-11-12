@@ -449,11 +449,18 @@
             <div class="footer-content">
                 <table style="width: 100%;">
                     <tr>
-                        <td class="generated-by">
-                            Elaborado por {{ auth()->user()->name ?? 'Sistema' }}
+                        <td style="width: 60%; vertical-align: top;">
+                            <div style="margin-bottom: 5px;">
+                                <strong>Registrado por:</strong><br>
+                                {{ $evento->creador->name ?? 'Sistema' }}
+                            </div>
+                            <div>
+                                <strong>Firmado por:</strong><br>
+                                {{ $usuarioGenerador->name ?? 'Sistema' }}
+                            </div>
                         </td>
-                        <td class="timestamp">
-                            {{ now()->format('d/m/Y H:i:s') }}
+                        <td style="width: 40%; text-align: right; vertical-align: top;">
+                            {{ now()->format('d/m/Y') }}
                         </td>
                     </tr>
                 </table>

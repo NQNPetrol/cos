@@ -352,6 +352,12 @@
             'Problemas de cobertura',
             'Quejas del cliente',
             'Notificaciones a ART / aseguradoras'
+        ],
+        'Salud/Emergencias': [
+            'Evacuación médica o traslado de emergencia',
+            'Agresion fisica por parte de terceros',
+            'Traumatismos o lesiones graves durante servicio',
+            'Pérdidas de personal durante servicio'
         ]
     };
 
