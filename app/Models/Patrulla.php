@@ -62,4 +62,16 @@ class Patrulla extends Model
         $ultimoRegistro = $this->registrosFlota()->latest('fecha_registro')->first();
         return $ultimoRegistro->observacion ?? 'N/A';
     }
+
+    public function sistemas()
+    {
+        return $this->belongsToMany(Sistema::class, 'patrulla_sistemas')
+                    ->withPivot('fecha_registro', 'nro_interno', 'registra_user')
+                    ->withTimestamps();
+    }
+
+    public function documentacion()
+    {
+        return $this->hasMany(PatrullaDocumental::class);
+    }
 }
