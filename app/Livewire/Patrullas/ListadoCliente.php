@@ -5,6 +5,7 @@ namespace App\Livewire\Patrullas;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Patrulla;
+use App\Models\PatrullaRegistroFlota;
 use Illuminate\Support\Facades\Auth;
 
 class ListadoCliente extends Component
@@ -15,6 +16,10 @@ class ListadoCliente extends Component
     public $estadoFilter = '';
     public $editingEstadoId = null;
     public $nuevoEstado = '';
+    public $editingObjetivoId = null;
+    public $nuevoObjetivo = '';
+    public $editingObservacionId = null;
+    public $nuevaObservacion = '';
 
     /**
      * Obtener los IDs de clientes asociados al usuario autenticado
@@ -90,6 +95,82 @@ class ListadoCliente extends Component
     {
         $this->editingEstadoId = null;
         $this->nuevoEstado = '';
+    }
+
+    public function iniciarEdicionObjetivo($patrullaId, $objetivoActual)
+    {
+        $this->editingObjetivoId = $patrullaId;
+        $this->nuevoObjetivo = $objetivoActual ?? '';
+    }
+
+    public function guardarObjetivo($patrullaId)
+    {
+        $patrulla = Patrulla::find($patrullaId);
+        
+        if ($patrulla) {
+            // Obtener el último registro para mantener la observación existente
+            $ultimoRegistro = $patrulla->ultimoRegistroFlota;
+            $observacionExistente = $ultimoRegistro->observacion ?? null;
+
+            // Crear nuevo registro
+            PatrullaRegistroFlota::create([
+                'fecha_registro' => now(),
+                'patrulla_id' => $patrullaId,
+                'objetivo_servicio' => $this->nuevoObjetivo,
+                'observacion' => $observacionExistente,
+                'user_id' => Auth::id()
+            ]);
+
+            session()->flash('success', 'Objetivo/Servicio actualizado correctamente');
+        } else {
+            session()->flash('error', 'No se encontró la patrulla');
+        }
+
+        $this->cancelarEdicionObjetivo();
+    }
+
+    public function cancelarEdicionObjetivo()
+    {
+        $this->editingObjetivoId = null;
+        $this->nuevoObjetivo = '';
+    }
+
+    public function iniciarEdicionObservacion($patrullaId, $observacionActual)
+    {
+        $this->editingObservacionId = $patrullaId;
+        $this->nuevaObservacion = $observacionActual ?? '';
+    }
+
+    public function guardarObservacion($patrullaId)
+    {
+        $patrulla = Patrulla::find($patrullaId);
+        
+        if ($patrulla) {
+            // Obtener el último registro para mantener el objetivo existente
+            $ultimoRegistro = $patrulla->ultimoRegistroFlota;
+            $objetivoExistente = $ultimoRegistro->objetivo_servicio ?? null;
+
+            // Crear nuevo registro
+            PatrullaRegistroFlota::create([
+                'fecha_registro' => now(),
+                'patrulla_id' => $patrullaId,
+                'objetivo_servicio' => $objetivoExistente,
+                'observacion' => $this->nuevaObservacion,
+                'user_id' => Auth::id()
+            ]);
+
+            session()->flash('success', 'Observación actualizada correctamente');
+        } else {
+            session()->flash('error', 'No se encontró la patrulla');
+        }
+
+        $this->cancelarEdicionObservacion();
+    }
+
+    public function cancelarEdicionObservacion()
+    {
+        $this->editingObservacionId = null;
+        $this->nuevaObservacion = '';
     }
 
     public function updatingSearch()

@@ -87,10 +87,68 @@
                             @endif
                         </td>
                         <td class="px-4 py-2">
-                            {{ $patrulla->ultimo_objetivo_servicio ?? 'N/A' }}
+                            @if ($editingObjetivoId === $patrulla->id)
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" 
+                                           wire:model="nuevoObjetivo"
+                                           class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
+                                           placeholder="Objetivo/Servicio">
+                                    <button wire:click="guardarObjetivo({{ $patrulla->id }})"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
+                                        Guardar
+                                    </button>
+                                    <button wire:click="cancelarEdicionObjetivo"
+                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            @else
+                                <div class="flex items-center gap-1">
+                                    <span class="max-w-xs truncate">
+                                        {{ $patrulla->ultimoRegistroFlota->objetivo_servicio ?? 'N/A' }}
+                                    </span>
+                                    <button wire:click="iniciarEdicionObjetivo({{ $patrulla->id }}, '{{ $patrulla->ultimoRegistroFlota->objetivo_servicio ?? '' }}')"
+                                            class="text-gray-400 hover:text-gray-300 transition-colors flex-shrink-0"
+                                            title="Editar objetivo/servicio">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endif
                         </td>
                         <td class="px-4 py-2">
-                            {{ $patrulla->ultima_observacion ?? 'N/A' }}
+                            @if ($editingObservacionId === $patrulla->id)
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" 
+                                           wire:model="nuevaObservacion"
+                                           class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
+                                           placeholder="Observación">
+                                    <button wire:click="guardarObservacion({{ $patrulla->id }})"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
+                                        Guardar
+                                    </button>
+                                    <button wire:click="cancelarEdicionObservacion"
+                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            @else
+                                <div class="flex items-center gap-1">
+                                    <span class="max-w-xs truncate">
+                                        {{ $patrulla->ultimoRegistroFlota->observacion ?? 'N/A' }}
+                                    </span>
+                                    <button wire:click="iniciarEdicionObservacion({{ $patrulla->id }}, '{{ $patrulla->ultimoRegistroFlota->observacion ?? '' }}')"
+                                            class="text-gray-400 hover:text-gray-300 transition-colors flex-shrink-0"
+                                            title="Editar observación">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endif
                         </td>
 
                        
