@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patrulla extends Model
 {
-    protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones', 'cliente_id'];
+    protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones', 'cliente_id', 'año'];
     
     public function dispositivos()
     {
@@ -39,5 +39,27 @@ class Patrulla extends Model
     public function getMobileVehicleIndexCode()
     {
         return $this->mobileVehicle?->mobile_vehicle_index_code;
+    }
+
+    public function registrosFlota()
+    {
+        return $this->hasMany(PatrullaRegistroFlota::class);
+    }
+
+    public function ultimoRegistroFlota()
+    {
+        return $this->hasOne(PatrullaRegistroFlota::class)->latestOfMany();
+    }
+    
+    public function getUltimoObjetivoServicioAttribute()
+    {
+        $ultimoRegistro = $this->registrosFlota()->latest('fecha_registro')->first();
+        return $ultimoRegistro->objetivo_servicio ?? 'N/A';
+    }
+
+    public function getUltimaObservacionAttribute()
+    {
+        $ultimoRegistro = $this->registrosFlota()->latest('fecha_registro')->first();
+        return $ultimoRegistro->observacion ?? 'N/A';
     }
 }

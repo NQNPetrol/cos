@@ -1,6 +1,6 @@
 <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Listado de Patrullas</h2>
+        <h2 class="text-2xl font-bold">Flotas Vehiculares</h2>
     </div>
 
     <!-- Filtros -->
@@ -29,12 +29,13 @@
         <table class="min-w-full text-sm">
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
-                    <th class="px-4 py-2 text-left">Patente</th>
-                    <th class="px-4 py-2 text-left">Marca</th>
-                    <th class="px-4 py-2 text-left">Modelo</th>
-                    <th class="px-4 py-2 text-left">Color</th>
-                    <th class="px-4 py-2 text-left">Estado</th>
-                    <th class="px-4 py-2 text-left">Observaciones</th>
+                    <th class="px-4 py-2 text-left">DOMINIO</th>
+                    <th class="px-4 py-2 text-left">MARCA</th>
+                    <th class="px-4 py-2 text-left">MODELO</th>
+                    <th class="px-4 py-2 text-left">AÑO</th>
+                    <th class="px-4 py-2 text-left">ESTADO</th>
+                    <th class="px-4 py-2 text-left">OBJETIVO/SERVICIO</th>
+                    <th class="px-4 py-2 text-left">OBSERVACION</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
             </thead>
@@ -43,17 +44,56 @@
                     <tr class="border-b border-gray-700 hover:bg-gray-800">
                         <td class="px-4 py-2 font-medium">{{ $patrulla->patente }}</td>
                         <td class="px-4 py-2">{{ $patrulla->marca }}</td>
-                        <td class="px-4 py-2">{{ $patrulla->modelo }}</td>
-                        <td class="px-4 py-2">{{ $patrulla->color }}</td>
+                        <td class="px-4 py-2">{{ $patrulla->modelo }}</td>   
+                        <td class="px-4 py-2">{{ $patrulla->año ?? 'N/A'}}</td>
                         <td class="px-4 py-2">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ 
-                                $patrulla->estado == 'operativa' ? 'bg-green-100 text-green-800' : 
-                                ($patrulla->estado == 'mantenimiento' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') 
-                            }}">
-                                {{ ucfirst($patrulla->estado) }}
-                            </span>
+                            @if ($editingEstadoId === $patrulla->id)
+                                <!-- Modo edición -->
+                                <div class="flex items-center space-x-2">
+                                    <select wire:model="nuevoEstado" 
+                                            class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200">
+                                        <option value="operativa">Operativa</option>
+                                        <option value="disponible">Disponible</option>
+                                        <option value="en mantenimiento">En mantenimiento</option>
+                                    </select>
+                                    <button wire:click="guardarEstado({{ $patrulla->id }})"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
+                                        Guardar
+                                    </button>
+                                    <button wire:click="cancelarEdicion"
+                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            @else
+                                <!-- Modo visualización -->
+                                <div class="flex items-center gap-1">
+                                    <span class="{{ 
+                                        $patrulla->estado === 'operativa' ? 'text-green-400' : 
+                                        ($patrulla->estado === 'disponible' ? 'text-blue-400' : 
+                                        'text-yellow-400')
+                                    }}">
+                                        {{ ucfirst($patrulla->estado) }}
+                                    </span>
+                                    <button wire:click="iniciarEdicionEstado({{ $patrulla->id }}, '{{ $patrulla->estado }}')"
+                                            class="text-gray-400 hover:text-gray-300 transition-colors"
+                                            title="Editar estado">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endif
                         </td>
-                        <td class="px-4 py-2">{{ $patrulla->observaciones }}</td>
+                        <td class="px-4 py-2">
+                            {{ $patrulla->ultimo_objetivo_servicio ?? 'N/A' }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ $patrulla->ultima_observacion ?? 'N/A' }}
+                        </td>
+
+                       
                         <td class="px-4 py-2">
                             <div class="flex space-x-3">
                                 <a href="{{ route('client.patrullas.location') }}" 
@@ -62,6 +102,26 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-map" viewBox="0 0 16 16">
                                         <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8z"/>
                                         <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                                    </svg>
+                                </a>
+                                <a href="" 
+                                   class="text-gray-400 hover:text-gray-300"
+                                   title="Todos lo datos">
+                                    <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 18 18"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    >
+                                        <path d="M20 6l-11 0" />
+                                        <path d="M20 12l-7 0" />
+                                        <path d="M20 18l-11 0" />
+                                        <path d="M4 8l4 4l-4 4" />
                                     </svg>
                                 </a>
                             </div>

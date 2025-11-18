@@ -13,6 +13,8 @@ class ListadoCliente extends Component
 
     public $search = '';
     public $estadoFilter = '';
+    public $editingEstadoId = null;
+    public $nuevoEstado = '';
 
     /**
      * Obtener los IDs de clientes asociados al usuario autenticado
@@ -32,7 +34,7 @@ class ListadoCliente extends Component
     {
         $clienteIds = $this->getClienteIds();
 
-        $patrullas = Patrulla::with(['cliente']) // Cargar relación con cliente
+        $patrullas = Patrulla::with(['cliente', 'ultimoRegistroFlota']) // Cargar relación con cliente
             ->whereIn('cliente_id', $clienteIds) // Filtrar por clientes del usuario
             ->when($this->search, function($query){
                 $query->where('patente', 'like', '%'.$this->search.'%')
@@ -49,6 +51,45 @@ class ListadoCliente extends Component
         return view('livewire.patrullas.listado-cliente', [
             'patrullas' => $patrullas
         ]);
+    }
+
+    public function iniciarEdicionEstado($patrullaId, $estadoActual)
+    {
+        $this->editingEstadoId = $patrullaId;
+        $this->nuevoEstado = $estadoActual;
+    }
+
+    public function guardarEstado($patrullaId)
+    {
+        // Validar que el estado sea uno de los permitidos
+        $estadosPermitidos = ['operativa', 'disponible', 'en mantenimiento'];
+        
+        if (!in_array($this->nuevoEstado, $estadosPermitidos)) {
+            session()->flash('error', 'Estado no válido');
+            return;
+        }
+
+        // Buscar la patrulla y actualizar el estado
+        $patrulla = Patrulla::find($patrullaId);
+        
+        if ($patrulla) {
+            $patrulla->update([
+                'estado' => $this->nuevoEstado
+            ]);
+            
+            session()->flash('success', 'Estado actualizado correctamente');
+        } else {
+            session()->flash('error', 'No se encontró la patrulla');
+        }
+
+        // Limpiar el estado de edición
+        $this->cancelarEdicion();
+    }
+
+    public function cancelarEdicion()
+    {
+        $this->editingEstadoId = null;
+        $this->nuevoEstado = '';
     }
 
     public function updatingSearch()

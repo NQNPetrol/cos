@@ -48,7 +48,7 @@ class PermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'ver.flightlogs-cliente']);
         
         // Galería cliente
-        // Permission::firstOrCreate(['name' => 'ver.galeria-cliente']);
+        Permission::firstOrCreate(['name' => 'ver.galeria-cliente']);
         
         // Misiones cliente
         Permission::firstOrCreate(['name' => 'crear.peticion-misiones']);
@@ -255,7 +255,7 @@ class PermissionsSeeder extends Seeder
             'trigger.alertas-cliente',
             'ver.liveview-cliente',
             'ver.flightlogs-cliente',
-            'ver.galeria-cliente',
+            // 'ver.galeria-cliente',
             'crear.peticion-misiones',
         ];
 
