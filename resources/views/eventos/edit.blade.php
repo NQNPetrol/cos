@@ -193,7 +193,7 @@
                             </div>
                             
                             <button type="button" id="add-elemento-btn" 
-                                class="mt-2 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
+                                class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
                             <i class="bi bi-plus-circle mr-1"></i> Añadir
                         </button>
                             
@@ -203,6 +203,21 @@
                             @error('cantidades')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <!-- Personas evento  (A EDITAR) -->
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-4">7.2 Personas Involucradas en el Evento</h3>
+                            <p class="text-sm text-gray-300 mb-4">Agregue o edite las personas involucradas en el evento según su tipo.</p>
+                            
+                            <div id="personas-container">
+                                <!-- Las filas de personas se agregarán dinámicamente aquí -->
+                            </div>
+                            
+                            <button type="button" id="add-persona-btn" 
+                                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="bi bi-person-plus mr-2"></i> Agregar Persona
+                            </button>
                         </div>
                         
                         <!-- Sección 7: Observaciones -->
@@ -333,6 +348,12 @@
                 'Problemas de cobertura',
                 'Quejas del cliente',
                 'Notificaciones a ART / aseguradoras'
+            ],
+            'Salud/Emergencias': [
+                'Evacuación médica o traslado de emergencia',
+                'Agresion fisica por parte de terceros',
+                'Traumatismos o lesiones graves durante servicio',
+                'Pérdidas de personal durante servicio'
             ]
         };
 
@@ -628,6 +649,180 @@
 
         document.querySelector('form').addEventListener('submit', function(e) {
             onsole.log('Formulario enviado');
+        });
+
+        let personaCount = 0;
+
+        // Función para agregar nueva fila de persona
+        function addPersonaRow(personaData = {}) {
+            personaCount++;
+            const container = document.getElementById('personas-container');
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'persona-row bg-gray-800 p-4 rounded-lg mb-4';
+            newRow.id = `persona-row-${personaCount}`;
+            
+            // Determinar valores por defecto
+            const tipo = personaData.tipo || '';
+            const nombre = personaData.nombre || '';
+            const tipoDoc = personaData.tipo_doc || '';
+            const nroDoc = personaData.nro_doc || '';
+            const nroTelefono = personaData.nro_telefono || '';
+            const relacionEvento = personaData.relacion_evento || '';
+            const descripcionFisica = personaData.descripcion_fisica || '';
+            const comportamientoObservado = personaData.comportamiento_observado || '';
+            
+            newRow.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-md font-medium text-white">Persona #${personaCount}</h4>
+                    <button type="button" class="remove-persona-btn px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                        <i class="bi bi-trash mr-1"></i> Eliminar
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Persona <span class="text-red-500">*</span></label>
+                        <select name="personas_tipo[]" class="persona-tipo-select block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                            <option value="">Seleccione un tipo</option>
+                            <option value="afectado/victima" ${tipo === 'afectado/victima' ? 'selected' : ''}>Afectado/Víctima</option>
+                            <option value="sospechoso" ${tipo === 'sospechoso' ? 'selected' : ''}>Sospechoso</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Campos para Afectado/Víctima -->
+                <div class="campos-afectado ${tipo === 'afectado/victima' ? '' : 'hidden'}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
+                            <input type="text" name="personas_nombre[]" value="${nombre}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Nombre completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Documento</label>
+                            <select name="personas_tipo_doc[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                <option value="">Seleccione tipo</option>
+                                <option value="DNI" ${tipoDoc === 'DNI' ? 'selected' : ''}>DNI</option>
+                                <option value="Pasaporte" ${tipoDoc === 'Pasaporte' ? 'selected' : ''}>Pasaporte</option>
+                                <option value="Cédula" ${tipoDoc === 'Cédula' ? 'selected' : ''}>Cédula</option>
+                                <option value="Otro" ${tipoDoc === 'Otro' ? 'selected' : ''}>Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Número de Documento</label>
+                            <input type="number" name="personas_nro_doc[]" value="${nroDoc}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de documento">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Teléfono</label>
+                            <input type="text" name="personas_nro_telefono[]" value="${nroTelefono}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de teléfono">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Relación con el Evento</label>
+                        <textarea name="personas_relacion_evento[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa la relación de esta persona con el evento">${relacionEvento}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Campos para Sospechoso -->
+                <div class="campos-sospechoso ${tipo === 'sospechoso' ? '' : 'hidden'}">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Descripción Física</label>
+                        <textarea name="personas_descripcion_fisica[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa las características físicas del sospechoso">${descripcionFisica}</textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Comportamiento Observado</label>
+                        <textarea name="personas_comportamiento_observado[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa el comportamiento observado del sospechoso">${comportamientoObservado}</textarea>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            
+            // Añadir event listener para el cambio de tipo
+            const tipoSelect = newRow.querySelector('.persona-tipo-select');
+            tipoSelect.addEventListener('change', function() {
+                toggleCamposPersona(this);
+            });
+            
+            // Añadir listener al botón de eliminar
+            const removeBtn = newRow.querySelector('.remove-persona-btn');
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+                renumberPersonas();
+            });
+        }
+
+        // Función para mostrar/ocultar campos según el tipo de persona
+        function toggleCamposPersona(selectElement) {
+            const row = selectElement.closest('.persona-row');
+            const camposAfectado = row.querySelector('.campos-afectado');
+            const camposSospechoso = row.querySelector('.campos-sospechoso');
+            
+            // Ocultar todos los campos primero
+            camposAfectado.classList.add('hidden');
+            camposSospechoso.classList.add('hidden');
+            
+            // Mostrar campos según el tipo seleccionado
+            if (selectElement.value === 'afectado/victima') {
+                camposAfectado.classList.remove('hidden');
+            } else if (selectElement.value === 'sospechoso') {
+                camposSospechoso.classList.remove('hidden');
+            }
+        }
+
+        // Función para renumerar las personas después de eliminar
+        function renumberPersonas() {
+            const rows = document.querySelectorAll('.persona-row');
+            rows.forEach((row, index) => {
+                const title = row.querySelector('h4');
+                title.textContent = `Persona #${index + 1}`;
+            });
+            personaCount = rows.length;
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Añadir event listener al botón de agregar persona
+            document.getElementById('add-persona-btn').addEventListener('click', function() {
+                addPersonaRow();
+            });
+            
+            // Cargar personas existentes del evento
+            @if(isset($personas) && $personas->count() > 0)
+                @foreach($personas as $persona)
+                    addPersonaRow({
+                        tipo: "{{ $persona->tipo }}",
+                        nombre: "{{ $persona->nombre ?? '' }}",
+                        tipo_doc: "{{ $persona->tipo_doc ?? '' }}",
+                        nro_doc: "{{ $persona->nro_doc ?? '' }}",
+                        nro_telefono: "{{ $persona->nro_telefono ?? '' }}",
+                        relacion_evento: "{{ $persona->relacion_evento ?? '' }}",
+                        descripcion_fisica: "{{ $persona->descripcion_fisica ?? '' }}",
+                        comportamiento_observado: "{{ $persona->comportamiento_observado ?? '' }}"
+                    });
+                @endforeach
+            @endif
+            
+            // Cargar personas de old() si hay errores de validación
+            @if(old('personas_tipo'))
+                const personasTipo = @json(old('personas_tipo'));
+                personasTipo.forEach((tipo, index) => {
+                    const personaData = {
+                        tipo: tipo,
+                        nombre: "{{ old('personas_nombre.' . $index, '') }}",
+                        tipo_doc: "{{ old('personas_tipo_doc.' . $index, '') }}",
+                        nro_doc: "{{ old('personas_nro_doc.' . $index, '') }}",
+                        nro_telefono: "{{ old('personas_nro_telefono.' . $index, '') }}",
+                        relacion_evento: "{{ old('personas_relacion_evento.' . $index, '') }}",
+                        descripcion_fisica: "{{ old('personas_descripcion_fisica.' . $index, '') }}",
+                        comportamiento_observado: "{{ old('personas_comportamiento_observado.' . $index, '') }}"
+                    };
+                    
+                    addPersonaRow(personaData);
+                });
+            @endif
         });
 
     </script>

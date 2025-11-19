@@ -12,6 +12,7 @@ use App\Models\EmpresaAsociada;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PersonasEventos;
 
 class EventoController extends Controller
 {
@@ -136,13 +137,15 @@ class EventoController extends Controller
         $supervisores = Personal::where('cargo', 'supervisor')->get();
         $categorias = Categoria::all();
         $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
+        $personas = $evento->personas;
 
         return view('eventos.edit', [
             'evento' => $evento,
             'clientes' => $clientes,
             'supervisores' => $supervisores,
             'categorias' => $categorias,
-            'empresas' => $empresas
+            'empresas' => $empresas,
+            'personas' => $personas
         ]);
     }
 
@@ -169,6 +172,25 @@ class EventoController extends Controller
         'cantidades.*' => 'nullable|integer|min:1',
     ]);
 
+    $personasValidated = $request->validate([
+        'personas_tipo' => 'nullable|array',
+        'personas_tipo.*' => 'nullable|string|in:afectado/victima,sospechoso',
+        'personas_nombre' => 'nullable|array',
+        'personas_nombre.*' => 'nullable|string|max:255',
+        'personas_tipo_doc' => 'nullable|array',
+        'personas_tipo_doc.*' => 'nullable|string|max:50',
+        'personas_nro_doc' => 'nullable|array',
+        'personas_nro_doc.*' => 'nullable|integer',
+        'personas_nro_telefono' => 'nullable|array',
+        'personas_nro_telefono.*' => 'nullable|string|max:20',
+        'personas_relacion_evento' => 'nullable|array',
+        'personas_relacion_evento.*' => 'nullable|string|max:500',
+        'personas_descripcion_fisica' => 'nullable|array',
+        'personas_descripcion_fisica.*' => 'nullable|string|max:500',
+        'personas_comportamiento_observado' => 'nullable|array',
+        'personas_comportamiento_observado.*' => 'nullable|string|max:500',
+    ]);
+
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
     $validated['latitud'] = $lat;
     $validated['longitud'] = $lng;
@@ -188,6 +210,30 @@ class EventoController extends Controller
     }
 
     $evento->update($validated);
+
+    $evento->personas()->delete();
+
+    if ($request->has('personas_tipo')) {
+        foreach ($request->personas_tipo as $index => $tipo) {
+            $personaData = [
+                'tipo' => $tipo,
+                'evento_id' => $evento->id,
+            ];
+
+            if ($tipo === 'afectado/victima') {
+                $personaData['nombre'] = $request->personas_nombre[$index] ?? null;
+                $personaData['tipo_doc'] = $request->personas_tipo_doc[$index] ?? null;
+                $personaData['nro_doc'] = $request->personas_nro_doc[$index] ?? null;
+                $personaData['nro_telefono'] = $request->personas_nro_telefono[$index] ?? null;
+                $personaData['relacion_evento'] = $request->personas_relacion_evento[$index] ?? null;
+            } elseif ($tipo === 'sospechoso') {
+                $personaData['descripcion_fisica'] = $request->personas_descripcion_fisica[$index] ?? null;
+                $personaData['comportamiento_observado'] = $request->personas_comportamiento_observado[$index] ?? null;
+            }
+
+            \App\Models\PersonasEventos::create($personaData);
+        }
+    }
 
     // Manejo de archivos
     if ($request->hasFile('media')) {
