@@ -200,7 +200,8 @@
                                             </a>
                                             <button onclick="abrirModalNotas({{ $evento->id }})"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
-                                                title="Agregar notas adicionales">
+                                                title="Agregar notas adicionales"
+                                                data-notas="{{ e($evento->notas_adicionales ?? '') }}">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
                                             <!-- Botón para anular evento -->
@@ -290,10 +291,16 @@
         </div>
     </div>
     <script>
+        let notasActuales = '';
         // Funciones para el modal de notas
         function abrirModalNotas(eventoId) {
             // Construir la URL manualmente usando la estructura correcta
             document.getElementById('formNotas').action = `/client/eventos/${eventoId}/notas-adicionales`;
+            
+            const boton = event.target.closest('button');
+            const notas = boton.getAttribute('data-notas') || '';
+
+            document.getElementById('notas_adicionales').value = notas;
             document.getElementById('modalNotas').classList.remove('hidden');
             document.getElementById('notas_adicionales').focus();
         }

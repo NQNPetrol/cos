@@ -45,6 +45,11 @@ class Evento extends Model
         return $this->hasMany(Seguimiento::class);
     }
 
+    public function personas()
+    {
+        return $this->hasMany(PersonasEventos::class, 'evento_id');
+    }
+
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');

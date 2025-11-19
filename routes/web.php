@@ -65,9 +65,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('eventos.destroy');
     
     Route::post('/eventos/{evento}/anular', [\App\Http\Controllers\EventoClientController::class, 'anular'])
+        ->middleware('can:anular.eventos-cliente')
         ->name('eventos.anular');
 
     Route::post('/eventos/{evento}/notas-adicionales', [\App\Http\Controllers\EventoClientController::class, 'agregarNotasAdicionales'])
+        ->middleware('can:agregar-notas.eventos-cliente')
         ->name('eventos.notas-adicionales');
 
     //REPORTES (USA CONTROLADOR DIFERENTE)

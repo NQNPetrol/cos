@@ -236,7 +236,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> 
                             
                             <button type="button" id="add-elemento-btn" 
                                 class="mt-2 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
@@ -249,6 +249,21 @@
                             @error('cantidades')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <!-- Personas evento -->
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-white mb-4">7.2 Personas Involucradas en el Evento</h3>
+                           
+                                
+                            <div id="personas-container">
+                                    <!-- Las filas de personas se agregarán dinámicamente aquí -->
+                            </div>
+                                
+                            <button type="button" id="add-persona-btn" 
+                                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="bi bi-person-plus mr-2"></i> Agregar Persona
+                            </button>
                         </div>
 
                         <!-- Sección 7: Observaciones -->
@@ -680,6 +695,158 @@
                 }
             }
         }
+    });
+
+    let personaCount = 0;
+
+    function addPersonaRow() {
+        personaCount++;
+        const container = document.getElementById('personas-container');
+        
+        const newRow = document.createElement('div');
+        newRow.className = 'persona-row bg-gray-800 p-4 rounded-lg mb-4';
+        newRow.id = `persona-row-${personaCount}`;
+        
+        newRow.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-md font-medium text-white">Persona #${personaCount}</h4>
+                <button type="button" class="remove-persona-btn px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                    <i class="bi bi-trash mr-1"></i> Eliminar
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Persona <span class="text-red-500">*</span></label>
+                    <select name="personas_tipo[]" class="persona-tipo-select block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="afectado/victima">Afectado/Víctima</option>
+                        <option value="sospechoso">Sospechoso</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Campos para Afectado/Víctima -->
+            <div class="campos-afectado hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
+                        <input type="text" name="personas_nombre[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Nombre completo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Documento</label>
+                        <select name="personas_tipo_doc[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                            <option value="">Seleccione tipo</option>
+                            <option value="DNI">DNI</option>
+                            <option value="Pasaporte">Pasaporte</option>
+                            <option value="Cédula">Cédula</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Número de Documento</label>
+                        <input type="number" name="personas_nro_doc[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de documento">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Teléfono</label>
+                        <input type="text" name="personas_nro_telefono[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de teléfono">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Relación con el Evento</label>
+                    <textarea name="personas_relacion_evento[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa la relación de esta persona con el evento"></textarea>
+                </div>
+            </div>
+            
+            <!-- Campos para Sospechoso -->
+            <div class="campos-sospechoso hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Descripción Física</label>
+                    <textarea name="personas_descripcion_fisica[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa las características físicas del sospechoso"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Comportamiento Observado</label>
+                    <textarea name="personas_comportamiento_observado[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa el comportamiento observado del sospechoso"></textarea>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(newRow);
+
+        const tipoSelect = newRow.querySelector('.persona-tipo-select');
+        tipoSelect.addEventListener('change', function() {
+            toggleCamposPersona(this);
+        });
+
+        const removeBtn = newRow.querySelector('.remove-persona-btn');
+        removeBtn.addEventListener('click', function() {
+            newRow.remove();
+            renumberPersonas();
+        });
+    }
+
+    function toggleCamposPersona(selectElement) {
+        const row = selectElement.closest('.persona-row');
+        const camposAfectado = row.querySelector('.campos-afectado');
+        const camposSospechoso = row.querySelector('.campos-sospechoso');
+        
+        // Ocultar todos los campos primero
+        camposAfectado.classList.add('hidden');
+        camposSospechoso.classList.add('hidden');
+        
+        // Mostrar campos según el tipo seleccionado
+        if (selectElement.value === 'afectado/victima') {
+            camposAfectado.classList.remove('hidden');
+        } else if (selectElement.value === 'sospechoso') {
+            camposSospechoso.classList.remove('hidden');
+        }
+    }
+
+    function renumberPersonas() {
+        const rows = document.querySelectorAll('.persona-row');
+        rows.forEach((row, index) => {
+            const title = row.querySelector('h4');
+            title.textContent = `Persona #${index + 1}`;
+        });
+        personaCount = rows.length;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Añadir event listener al botón de agregar persona
+        document.getElementById('add-persona-btn').addEventListener('click', addPersonaRow);
+        
+        // Cargar personas existentes si hay valores antiguos
+        @if(old('personas_tipo'))
+            const personasTipo = @json(old('personas_tipo'));
+            personasTipo.forEach((tipo, index) => {
+                addPersonaRow();
+                
+                // Esperar un momento para que se cree la fila
+                setTimeout(() => {
+                    const rows = document.querySelectorAll('.persona-row');
+                    const currentRow = rows[rows.length - 1];
+                    
+                    // Establecer valores
+                    const tipoSelect = currentRow.querySelector('.persona-tipo-select');
+                    tipoSelect.value = tipo;
+                    toggleCamposPersona(tipoSelect);
+                    
+                    // Establecer otros valores según el tipo
+                    if (tipo === 'afectado/victima') {
+                        currentRow.querySelector('input[name="personas_nombre[]"]').value = "{{ old('personas_nombre.' + index, '') }}";
+                        currentRow.querySelector('select[name="personas_tipo_doc[]"]').value = "{{ old('personas_tipo_doc.' + index, '') }}";
+                        currentRow.querySelector('input[name="personas_nro_doc[]"]').value = "{{ old('personas_nro_doc.' + index, '') }}";
+                        currentRow.querySelector('input[name="personas_nro_telefono[]"]').value = "{{ old('personas_nro_telefono.' + index, '') }}";
+                        currentRow.querySelector('textarea[name="personas_relacion_evento[]"]').value = "{{ old('personas_relacion_evento.' + index, '') }}";
+                    } else if (tipo === 'sospechoso') {
+                        currentRow.querySelector('textarea[name="personas_descripcion_fisica[]"]').value = "{{ old('personas_descripcion_fisica.' + index, '') }}";
+                        currentRow.querySelector('textarea[name="personas_comportamiento_observado[]"]').value = "{{ old('personas_comportamiento_observado.' + index, '') }}";
+                    }
+                }, 100);
+            });
+        @endif
     });
 </script>
 @endpush
