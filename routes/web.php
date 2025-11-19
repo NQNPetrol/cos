@@ -67,6 +67,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::post('/eventos/{evento}/anular', [\App\Http\Controllers\EventoClientController::class, 'anular'])
         ->name('eventos.anular');
 
+    Route::post('/eventos/{evento}/notas-adicionales', [\App\Http\Controllers\EventoClientController::class, 'agregarNotasAdicionales'])
+        ->name('eventos.notas-adicionales');
+
     //REPORTES (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/{evento}/reporte', [\App\Http\Controllers\ReporteClientController::class, 'preview'])
         ->middleware('can:ver.reportes-cliente')

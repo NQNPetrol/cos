@@ -371,5 +371,22 @@ class EventoClientController extends Controller
         return response()->json($data);
 
     }
+
+    public function agregarNotasAdicionales(Request $request, Evento $evento)
+    {
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
+        $validated = $request->validate([
+            'notas_adicionales' => 'required|string|max:1000'
+        ]);
+
+        $evento->update([
+            'notas_adicionales' => $validated['notas_adicionales']
+        ]);
+
+        return redirect()->route('client.eventos.index')->with('success', 'Notas adicionales agregadas correctamente.');
+    }
     
 }

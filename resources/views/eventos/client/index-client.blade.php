@@ -198,11 +198,11 @@
                                                 title="Generar Reporte">
                                                 <i class="bi bi-file-earmark-pdf"></i>
                                             </a>
-                                            <a href="{{ route('client.eventos.edit', $evento) }}"
+                                            <button onclick="abrirModalNotas({{ $evento->id }})"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
-                                                title="Editar">
+                                                title="Agregar notas adicionales">
                                                 <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                            </button>
                                             <!-- Botón para anular evento -->
                                             <form action="{{ route('client.eventos.anular', $evento) }}" method="POST" class="inline">
                                                 @csrf
@@ -243,5 +243,86 @@
                 </div>
             </div>
         </div>
+        <!-- Modal para Notas Adicionales -->
+        <div id="modalNotas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-white">Agregar Notas Adicionales</h3>
+                    <button type="button" 
+                            class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                            onclick="cerrarModalNotas()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span class="sr-only">Cerrar modal</span>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <form id="formNotas" method="POST">
+                        @csrf
+                        <div class="space-y-4">
+                            <div>
+                                <label for="notas_adicionales" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Notas Adicionales
+                                </label>
+                                <textarea name="notas_adicionales" id="notas_adicionales" rows="6" required
+                                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        placeholder="Ingrese las notas adicionales para este evento..."></textarea>
+                                <p class="text-xs text-gray-400 mt-1">Máximo 1000 caracteres</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 mt-6">
+                            <button type="button" 
+                                    class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                    onclick="cerrarModalNotas()">
+                                Cancelar
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white transition-colors">
+                                Guardar Notas
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+    <script>
+        // Funciones para el modal de notas
+        function abrirModalNotas(eventoId) {
+            // Construir la URL manualmente usando la estructura correcta
+            document.getElementById('formNotas').action = `/client/eventos/${eventoId}/notas-adicionales`;
+            document.getElementById('modalNotas').classList.remove('hidden');
+            document.getElementById('notas_adicionales').focus();
+        }
+
+        function cerrarModalNotas() {
+            document.getElementById('modalNotas').classList.add('hidden');
+            document.getElementById('notas_adicionales').value = '';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalNotas');
+            if (event.target === modal) {
+                cerrarModalNotas();
+            }
+        }
+
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModalNotas();
+            }
+        });
+
+        // Validación de longitud de texto
+        document.getElementById('notas_adicionales').addEventListener('input', function() {
+            if (this.value.length > 1000) {
+                this.value = this.value.substring(0, 1000);
+            }
+        });
+    </script>
 @endsection

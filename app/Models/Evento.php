@@ -26,6 +26,7 @@ class Evento extends Model
         'es_anulado',
         'anulado_por',
         'fecha_anulado',
+        'notas_adicionales'
     ];
 
         protected $casts = [
