@@ -25,6 +25,11 @@ class PatrullaSistema extends Model
         return $this->belongsTo(Patrulla::class);
     }
 
+    public function sistema()
+    {
+        return $this->belongsTo(Sistema::class);
+    }
+
     public function usuarioRegistra()
     {
         return $this->belongsTo(User::class, 'registra_user');

@@ -21,6 +21,9 @@ class ListadoCliente extends Component
     public $editingObservacionId = null;
     public $nuevaObservacion = '';
 
+    public $mostrarModal = false;
+    public $patrullaSeleccionada = null;
+
     /**
      * Obtener los IDs de clientes asociados al usuario autenticado
      */
@@ -181,6 +184,18 @@ class ListadoCliente extends Component
     public function updatingEstadoFilter()
     {
         $this->resetPage();
+    }
+
+    public function abrirModal($patrullaId)
+    {
+        $this->patrullaSeleccionada = Patrulla::with(['cliente'])->find($patrullaId);
+        $this->mostrarModal = true;
+    }
+
+    public function cerrarModal()
+    {
+        $this->mostrarModal = false;
+        $this->patrullaSeleccionada = null;
     }
 
     public function clearFilters()

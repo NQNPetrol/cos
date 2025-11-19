@@ -162,9 +162,9 @@
                                         <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
                                     </svg>
                                 </a>
-                                <a href="" 
-                                   class="text-gray-400 hover:text-gray-300"
-                                   title="Todos lo datos">
+                                <button wire:click="abrirModal({{ $patrulla->id }})" 
+                                        class="text-gray-400 hover:text-gray-300 transition-colors"
+                                        title="Todos los datos">
                                     <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="18"
@@ -181,7 +181,7 @@
                                         <path d="M20 18l-11 0" />
                                         <path d="M4 8l4 4l-4 4" />
                                     </svg>
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -225,6 +225,49 @@
              x-init="setTimeout(() => show = false, 3000)"
              class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
             {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- Modal -->
+    @if($mostrarModal && $patrullaSeleccionada)
+        <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+            <div class="bg-gray-700 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+                <!-- Header del Modal -->
+                <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-100">
+                            PATRULLA {{ $patrullaSeleccionada->patente }}
+                        </h2>
+                        <button wire:click="cerrarModal" 
+                                class="text-gray-400 hover:text-gray-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-1">
+                        {{ $patrullaSeleccionada->marca }} {{ $patrullaSeleccionada->modelo }} - {{ $patrullaSeleccionada->año }}
+                    </p>
+                </div>
+
+                <!-- Contenido del Modal -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="mt-6 bg-gray-900 rounded-lg p-4">
+                        <!-- - Sistemas -->
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            @livewire('flotas-vehiculares.sistema-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
+                        </div>
+                    </div>
+
+                    <!-- Documental -->
+                    <div class="mt-6 bg-gray-900 rounded-lg p-4">
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                @livewire('flotas-vehiculares.documentacion-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
 </div>
