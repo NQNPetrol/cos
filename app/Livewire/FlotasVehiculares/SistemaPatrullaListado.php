@@ -21,6 +21,7 @@ class SistemaPatrullaListado extends Component
     public $nuevoSistemaId = '';
     public $nuevaFechaRegistro = '';
     public $nuevoNroInterno = '';
+    public $nuevaFechaVto = '';
 
     public function mount($patrullaId)
     {
@@ -34,7 +35,7 @@ class SistemaPatrullaListado extends Component
         $sistemas = PatrullaSistema::with(['sistema'])
             ->where('patrulla_id', $this->patrullaId)
             ->orderBy('created_at', 'desc')
-            ->paginate(5);
+            ->paginate(4);
 
         return view('livewire.flotas-vehiculares.sistema-patrulla-listado', [
             'sistemas' => $sistemas,
@@ -59,6 +60,7 @@ class SistemaPatrullaListado extends Component
         $this->validate([
             'nuevoSistemaId' => 'required|exists:sistemas,id',
             'nuevaFechaRegistro' => 'required|date',
+            'nuevaFechaVto' => 'required|date',
             'nuevoNroInterno' => 'nullable|integer',
         ]);
 
@@ -67,6 +69,7 @@ class SistemaPatrullaListado extends Component
                 'patrulla_id' => $this->patrullaId,
                 'sistema_id' => $this->nuevoSistemaId,
                 'fecha_registro' => $this->nuevaFechaRegistro,
+                'fecha_vto' => $this->nuevaFechaVto,
                 'nro_interno' => $this->nuevoNroInterno,
                 'registra_user' => Auth::id(),
             ]);
@@ -86,5 +89,6 @@ class SistemaPatrullaListado extends Component
         $this->nuevoSistemaId = '';
         $this->nuevaFechaRegistro = '';
         $this->nuevoNroInterno = '';
+        $this->nuevaFechaVto = '';
     }
 }

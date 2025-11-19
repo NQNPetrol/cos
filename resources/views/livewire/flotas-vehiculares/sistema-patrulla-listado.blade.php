@@ -2,8 +2,7 @@
     <div class="mb-4">
         <div class="flex justify-between items-center">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-100">Sistemas Registrados</h3>
-                    
+                <h3 class="text-lg font-semibold text-gray-100">Sistemas Registrados</h3>       
             </div>
             @if(!$mostrarFormulario)
                 <button wire:click="mostrarFormularioAgregar"
@@ -60,6 +59,16 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Fecha Vto *</label>
+                    <input type="date" 
+                        wire:model="nuevaFechaVto"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-200 text-sm">
+                    @error('nuevaFechaVto')
+                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <!-- N° Interno -->
                 <div>
                     <label class="block text-sm text-gray-300 mb-1">N° Interno</label>
@@ -101,6 +110,7 @@
                 <tr>
                     <th class="px-4 py-2 text-left">Sistema</th>
                     <th class="px-4 py-2 text-left">Fecha Registro</th>
+                    <th class="px-4 py-2 text-left">Fecha Vencimiento</th>
                     <th class="px-4 py-2 text-left">N° Interno</th>
                 </tr>
             </thead>
@@ -112,6 +122,20 @@
                         </td>
                         <td class="px-4 py-2 text-gray-300">
                             {{ $registro->fecha_registro ? \Carbon\Carbon::parse($registro->fecha_registro)->format('d/m/Y') : 'N/A' }}
+                        </td>
+                        <td class="px-4 py-2">
+                            @if($registro->fecha_vto)
+                                <div>
+                                    <span class="{{ $registro->fecha_vto->isPast() ? 'text-red-400' : 'text-green-400' }}">
+                                        {{ $registro->fecha_vto->format('d/m/Y') }}
+                                    </span>
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        {{ $registro->info_dias }}
+                                    </div>
+                                </div>
+                            @else
+                                N/A
+                            @endif
                         </td>
                         <td class="px-4 py-2 text-gray-300">
                             {{ $registro->nro_interno ?? 'N/A' }}

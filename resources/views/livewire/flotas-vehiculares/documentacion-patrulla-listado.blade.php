@@ -124,11 +124,16 @@
                         <td class="px-4 py-2 text-gray-300">
                             {{ $doc->fecha_inicio ? $doc->fecha_inicio->format('d/m/Y') : 'N/A' }}
                         </td>
-                        <td class="px-4 py-2 text-gray-300">
+                        <td class="px-4 py-2">
                             @if($doc->fecha_vto)
-                                <span class="{{ $doc->fecha_vto->isPast() ? 'text-red-400' : 'text-green-400' }}">
-                                    {{ $doc->fecha_vto->format('d/m/Y') }}
-                                </span>
+                                <div>
+                                    <span class="{{ $doc->fecha_vto->isPast() ? 'text-red-400' : 'text-green-400' }}">
+                                        {{ $doc->fecha_vto->format('d/m/Y') }}
+                                    </span>
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        {{ $doc->info_dias }}
+                                    </div>
+                                </div>
                             @else
                                 N/A
                             @endif

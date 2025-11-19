@@ -154,6 +154,11 @@
                        
                         <td class="px-4 py-2">
                             <div class="flex space-x-3">
+                                <button wire:click="abrirModal({{ $patrulla->id }})" 
+                                        class="text-blue-400 hover:text-blue-300 transition-colors"
+                                        title="Documentacion">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </button>
                                 <a href="{{ route('client.patrullas.location') }}" 
                                    class="text-orange-400 hover:text-orange-300"
                                    title="Ubicacion">
@@ -162,26 +167,7 @@
                                         <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
                                     </svg>
                                 </a>
-                                <button wire:click="abrirModal({{ $patrulla->id }})" 
-                                        class="text-gray-400 hover:text-gray-300 transition-colors"
-                                        title="Todos los datos">
-                                    <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 18 18"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    >
-                                        <path d="M20 6l-11 0" />
-                                        <path d="M20 12l-7 0" />
-                                        <path d="M20 18l-11 0" />
-                                        <path d="M4 8l4 4l-4 4" />
-                                    </svg>
-                                </button>
+                                
                             </div>
                         </td>
                     </tr>
@@ -217,7 +203,8 @@
             {{ session('success') }}
         </div>
     @endif
-        <!-- Mensajes de éxito/error -->
+
+    <!-- Mensajes de éxito/error -->
     @if (session()->has('success'))
         <div x-data="{ show: true }" 
              x-show="show" 
@@ -231,7 +218,7 @@
     <!-- Modal -->
     @if($mostrarModal && $patrullaSeleccionada)
         <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-            <div class="bg-gray-700 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 <!-- Header del Modal -->
                 <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
                     <div class="flex justify-between items-center">
@@ -251,7 +238,7 @@
                 </div>
 
                 <!-- Contenido del Modal -->
-                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)] custom-scrollbar">
                     <div class="mt-6 bg-gray-900 rounded-lg p-4">
                         <!-- - Sistemas -->
                         <div class="bg-gray-900 rounded-lg p-4">
@@ -261,13 +248,39 @@
 
                     <!-- Documental -->
                     <div class="mt-6 bg-gray-900 rounded-lg p-4">
-                            <div class="bg-gray-900 rounded-lg p-4">
-                                @livewire('flotas-vehiculares.documentacion-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
-                            </div>
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            @livewire('flotas-vehiculares.documentacion-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 10px;
+            }
+            
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1f2937; /* gray-800 - igual que el modal */
+                border-radius: 0px;
+            }
+            
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #374151; /* gray-700 */
+                border-radius: 4px;
+                border: 2px solid #1f2937; /* gray-800 */
+            }
+            
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #4b5563; /* gray-600 */
+            }
+            
+            /* Para Firefox */
+            .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #374151 #1f2937; /* gray-700 / gray-800 */
+            }
+        </style>
     @endif
 </div>

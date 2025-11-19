@@ -39,7 +39,7 @@ class DocumentacionPatrullaListado extends Component
     {
         $documentacion = PatrullaDocumental::where('patrulla_id', $this->patrullaId)
             ->orderBy('fecha_vto', 'asc')
-            ->paginate(5);
+            ->paginate(4);
 
         return view('livewire.flotas-vehiculares.documentacion-patrulla-listado', [
             'documentacion' => $documentacion,
