@@ -18,8 +18,8 @@
                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="operativa">Operativa</option>
-                <option value="mantenimiento">En mantenimiento</option>
-                <option value="baja">Dada de baja</option>
+                <option value="disponible">Disponible</option>
+                <option value="en mantenimiento">En Mantenimiento</option>
             </select>
         </div>
     </div>
