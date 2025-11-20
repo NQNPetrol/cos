@@ -152,7 +152,7 @@
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
                                     <option value="{{ $supervisor->id }}" @if($evento->supervisor_id == $supervisor->id) selected @endif>
-                                        {{ $supervisor->nombre }}
+                                        {{ $supervisor->nombre }} {{ $supervisor->apellido }} - {{ $supervisor->cliente->nombre ?? '' }}
                                     </option>
                                 @endforeach
                             </select>

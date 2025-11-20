@@ -197,8 +197,10 @@
                                     class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
-                                    <option value="{{ $supervisor->id }}" @if(old('supervisor_id') == $supervisor->id) selected @endif>
-                                        {{ $supervisor->nombre }}
+                                    <option value="{{ $supervisor->id }}"
+                                        @if(old('supervisor_id') == $supervisor->id) selected @endif
+                                        data-cliente-id="{{ $supervisor->cliente_id }}">
+                                        {{ $supervisor->nombre }} {{ $supervisor->apellido }} - {{ $supervisor->cliente->nombre ?? '' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -239,7 +241,7 @@
                             </div> 
                             
                             <button type="button" id="add-elemento-btn" 
-                                class="mt-2 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
+                                class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
                             <i class="bi bi-plus-circle mr-1"></i> Añadir
                         </button>
                             

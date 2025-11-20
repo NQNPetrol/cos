@@ -380,6 +380,75 @@
                 </div>
             </div>
             @endif
+
+            <!-- Sección de Personas Involucradas -->
+            @if($evento->personas && $evento->personas->count() > 0)
+                <div class="section">
+                    <h2 class="section-title">Personas Involucradas en el Evento</h2>
+                    
+                    <!-- Afectados/Víctimas -->
+                    @php
+                        $afectados = $evento->personas->where('tipo', 'afectado/victima');
+                    @endphp
+                    @if($afectados->count() > 0)
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 10px; background: #e2e8f0; padding: 8px; border-radius: 3px;">
+                            Afectados/Víctimas
+                        </h3>
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Tipo Doc.</th>
+                                    <th>N° Documento</th>
+                                    <th>Teléfono</th>
+                                    <th>Relación con el Evento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($afectados as $persona)
+                                <tr>
+                                    <td>{{ $persona->nombre ?? 'No especificado' }}</td>
+                                    <td>{{ $persona->tipo_doc ?? 'N/A' }}</td>
+                                    <td>{{ $persona->nro_doc ?? 'N/A' }}</td>
+                                    <td>{{ $persona->nro_telefono ?? 'N/A' }}</td>
+                                    <td>{{ $persona->relacion_evento ?? 'No especificado' }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+
+                    <!-- Sospechosos -->
+                    @php
+                        $sospechosos = $evento->personas->where('tipo', 'sospechoso');
+                    @endphp
+                    @if($sospechosos->count() > 0)
+                    <div style="margin-bottom: 10px;">
+                        <h3 style="font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 10px; background: #fee2e2; padding: 8px; border-radius: 3px;">
+                            Sospechosos
+                        </h3>
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Descripción Física</th>
+                                    <th>Comportamiento Observado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($sospechosos as $persona)
+                                <tr>
+                                    <td>{{ $persona->descripcion_fisica ?? 'No especificado' }}</td>
+                                    <td>{{ $persona->comportamiento_observado ?? 'No especificado' }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+                </div>
+            @endif
             
             <!-- Sección de Evidencia -->
             <div class="section images-section">
@@ -405,35 +474,30 @@
             
 
             <!-- Sección de Inventario de Elementos Sustraídos -->
+            @if(!empty($evento->elementos_sustraidos) && is_array($evento->elementos_sustraidos) && count(array_filter($evento->elementos_sustraidos)) > 0)
             <div class="section">
                 <h2 class="section-title">Elementos involucrados en el evento</h2>
-                
-                @if(!empty($evento->elementos_sustraidos) && !empty($evento->cantidad) && count($evento->elementos_sustraidos) > 0)
                 <!-- Tabla-->
-                    <table class="inventory-table">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for($i = 0; $i < count($evento->elementos_sustraidos); $i++)
-                                @if(isset($evento->elementos_sustraidos[$i]) && isset($evento->cantidad[$i]))
-                                    <tr>
-                                        <td>{{ $evento->elementos_sustraidos[$i] }}</td>
-                                        <td>{{ $evento->cantidad[$i] }}</td>
-                                    </tr>
-                                @endif
-                            @endfor
-                        </tbody>
-                    </table>
-                @else
-                    <div class="inventory-placeholder">
-                        [INVENTARIO] No se registraron elementos en este incidente
-                    </div>
-                @endif
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for($i = 0; $i < count($evento->elementos_sustraidos); $i++)
+                            @if(isset($evento->elementos_sustraidos[$i]) && isset($evento->cantidad[$i]))
+                                <tr>
+                                    <td>{{ $evento->elementos_sustraidos[$i] }}</td>
+                                    <td>{{ $evento->cantidad[$i] }}</td>
+                                </tr>
+                            @endif
+                        @endfor
+                    </tbody>
+                </table>
             </div>
+            @endif
 
         <!-- Sección de Observaciones Adicionales -->
         @if(isset($evento->observaciones) && $evento->observaciones)

@@ -29,7 +29,7 @@ class ReporteClientController extends Controller
             Log::info('Iniciando generación de PDF para evento: ' . $evento->id);
             
             
-            $evento->load(['media', 'categoria', 'cliente', 'supervisor', 'creador']);
+            $evento->load(['media', 'categoria', 'cliente', 'supervisor', 'creador', 'personas']);
             
             // Log de debug
             Log::info('Media cargados para evento ' . $evento->id . ':', [
@@ -166,7 +166,7 @@ class ReporteClientController extends Controller
 
     public function previewIframe(Evento $evento)
     {
-        $evento->load(['media', 'categoria', 'cliente', 'supervisor', 'creador']);
+        $evento->load(['media', 'categoria', 'cliente', 'supervisor', 'creador', 'personas']);
         $imagenesBase64 = [];
         foreach ($evento->media as $media) {
             try {
