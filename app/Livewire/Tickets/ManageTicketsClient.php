@@ -37,7 +37,7 @@ class ManageTicketsClient extends Component
         'titulo' => 'required|min:5',
         'descripcion' => 'required|min:10',
         'prioridad' => 'required|in:baja,media,alta,urgente',
-        'categoria' => 'required|in:Fallas Técnicas,Solicitud de compra,Solicitud de instalación,Solicitud de mantenimiento,Solicitud de equipamiento de vehiculos,Reclamos,Solicitud de acceso/creacion de usuarios',
+        'categoria' => 'required|in:Fallas Técnicas,Solicitud de compra,Solicitud de instalación,Solicitud de mantenimiento,Solicitud de equipamiento de vehiculos,Reclamos,Solicitud de acceso/creacion de usuarios,Solicitud de cotización,Solicitud de desarrollo/adaptación de software',
         'cliente_id' => 'nullable|exists:clientes,id',
         'asignado_a' => 'nullable|exists:users,id',
     ];
@@ -710,8 +710,11 @@ class ManageTicketsClient extends Component
         'Solicitud de mantenimiento' => 'Solicitud de mantenimiento',
         'Solicitud de equipamiento de vehiculos' => 'Solicitud de equipamiento de vehículos',
         'Reclamos' => 'Reclamos',
-        'Solicitud de acceso/creacion de usuarios' => 'Solicitud de acceso/creación de usuarios'
+        'Solicitud de acceso/creacion de usuarios' => 'Solicitud de acceso/creación de usuarios',
+        'Solicitud de cotización' => 'Solicitud de cotización',
+        'Solicitud de desarrollo/adaptación de software' => 'Solicitud de desarrollo/adaptación de software'
         ];
+
 
     }
 

@@ -126,7 +126,9 @@ class EventoClientController extends Controller
         $clientes = Cliente::whereIn('id', $clienteIds)->with(['empresasAsociadas'])->get();
         \Log::info('Clientes encontrados:', $clientes->pluck('id', 'nombre')->toArray());
 
-        $supervisores = Personal::where('cargo', 'supervisor')->get();
+        $supervisores = Personal::whereIn('cliente_id', $clienteIds)
+            ->where('cargo', 'supervisor')
+            ->get();
 
         $categorias = Categoria::all();
 
@@ -262,8 +264,13 @@ class EventoClientController extends Controller
         $clienteIds = $this->getClienteIds();
 
         $clientes = Cliente::whereIn('id', $clienteIds)->get();
-        $supervisores = Personal::where('cargo', 'supervisor')->get();
+
+        $supervisores = Personal::whereIn('cliente_id', $clienteIds)
+            ->where('cargo', 'supervisor')
+            ->get();
+
         $categorias = Categoria::all();
+
         $empresas = $evento->cliente ? $evento->cliente->empresasAsociadas : collect();
 
         return view('eventos.client.edit-client', [
