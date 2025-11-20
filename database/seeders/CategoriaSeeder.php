@@ -14,12 +14,12 @@ class CategoriaSeeder extends Seeder
     public function run(): void
     {
         $categorias = [
-            'Seguridad física',
-            'Incidentes con el personal',
-            'Seguridad vial y patrullaje',
-            'Tecnológicos/comunicación',
-            'Entorno y contexto',
-            'Administrativos/reportables al cliente',
+            // 'Seguridad física',
+            // 'Incidentes con el personal',
+            // 'Seguridad vial y patrullaje',
+            // 'Tecnológicos/comunicación',
+            // 'Entorno y contexto',
+            // 'Administrativos/reportables al cliente',
             'Salud/Emergencias',
         ];
 
