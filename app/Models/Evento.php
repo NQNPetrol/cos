@@ -26,6 +26,7 @@ class Evento extends Model
         'es_anulado',
         'anulado_por',
         'fecha_anulado',
+        'notas_adicionales'
     ];
 
         protected $casts = [
@@ -42,6 +43,11 @@ class Evento extends Model
     public function seguimientos()
     {
         return $this->hasMany(Seguimiento::class);
+    }
+
+    public function personas()
+    {
+        return $this->hasMany(PersonasEventos::class, 'evento_id');
     }
 
     public function cliente()

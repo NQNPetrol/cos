@@ -7,6 +7,7 @@ use App\Models\Evento;
 use App\Models\Cliente;
 use App\Models\UserCliente;
 use App\Models\Personal;
+use App\Models\PersonasEventos;
 use App\Models\Categoria;
 use App\Models\Media;
 use App\Models\EmpresaAsociada;
@@ -165,7 +166,26 @@ class EventoClientController extends Controller
             'elementos' => 'nullable|array',
             'elementos.*' => 'nullable|string|max:255',
             'cantidades' => 'nullable|array',
-            'cantidades.*' => 'nullable|integer|min:1',
+            'cantidades.*' => 'nullable|integer|min:1'
+        ]);
+
+        $personaValidated = $request->validate([
+            'personas_tipo' => 'nullable|array',
+            'personas_tipo.*' => 'nullable|string|in:afectado/victima,sospechoso',
+            'personas_nombre' => 'nullable|array',
+            'personas_nombre.*' => 'nullable|string|max:255',
+            'personas_tipo_doc' => 'nullable|array',
+            'personas_tipo_doc.*' => 'nullable|string|max:50',
+            'personas_nro_doc' => 'nullable|array',
+            'personas_nro_doc.*' => 'nullable|integer',
+            'personas_nro_telefono' => 'nullable|array',
+            'personas_nro_telefono.*' => 'nullable|string|max:20',
+            'personas_relacion_evento' => 'nullable|array',
+            'personas_relacion_evento.*' => 'nullable|string|max:500',
+            'personas_descripcion_fisica' => 'nullable|array',
+            'personas_descripcion_fisica.*' => 'nullable|string|max:500',
+            'personas_comportamiento_observado' => 'nullable|array',
+            'personas_comportamiento_observado.*' => 'nullable|string|max:500',
         ]);
 
         [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
@@ -188,6 +208,29 @@ class EventoClientController extends Controller
         }
         
         $evento = Evento::create($validated);
+
+        // Procesar personas involucradas
+        if ($request->has('personas_tipo')) {
+            foreach ($request->personas_tipo as $index => $tipo) {
+                $personaData = [
+                    'tipo' => $tipo,
+                    'evento_id' => $evento->id,
+                ];
+
+                if ($tipo === 'afectado/victima') {
+                    $personaData['nombre'] = $request->personas_nombre[$index] ?? null;
+                    $personaData['tipo_doc'] = $request->personas_tipo_doc[$index] ?? null;
+                    $personaData['nro_doc'] = $request->personas_nro_doc[$index] ?? null;
+                    $personaData['nro_telefono'] = $request->personas_nro_telefono[$index] ?? null;
+                    $personaData['relacion_evento'] = $request->personas_relacion_evento[$index] ?? null;
+                } elseif ($tipo === 'sospechoso') {
+                    $personaData['descripcion_fisica'] = $request->personas_descripcion_fisica[$index] ?? null;
+                    $personaData['comportamiento_observado'] = $request->personas_comportamiento_observado[$index] ?? null;
+                }
+
+                PersonasEventos::create($personaData);
+            }
+        }
 
         $empresas = EmpresaAsociada::all();
 
@@ -264,6 +307,25 @@ class EventoClientController extends Controller
         'cantidades.*' => 'nullable|integer|min:1',
     ]);
 
+    $personaValidated = $request->validate([
+        'personas_tipo' => 'nullable|array',
+        'personas_tipo.*' => 'nullable|string|in:afectado/victima,sospechoso',
+        'personas_nombre' => 'nullable|array',
+        'personas_nombre.*' => 'nullable|string|max:255',
+        'personas_tipo_doc' => 'nullable|array',
+        'personas_tipo_doc.*' => 'nullable|string|max:50',
+        'personas_nro_doc' => 'nullable|array',
+        'personas_nro_doc.*' => 'nullable|integer',
+        'personas_nro_telefono' => 'nullable|array',
+        'personas_nro_telefono.*' => 'nullable|string|max:20',
+        'personas_relacion_evento' => 'nullable|array',
+        'personas_relacion_evento.*' => 'nullable|string|max:500',
+        'personas_descripcion_fisica' => 'nullable|array',
+        'personas_descripcion_fisica.*' => 'nullable|string|max:500',
+        'personas_comportamiento_observado' => 'nullable|array',
+        'personas_comportamiento_observado.*' => 'nullable|string|max:500',
+    ]);
+
     [$lat, $lng] = array_map('trim', explode(',', $validated['coordenadas']));
     $validated['latitud'] = $lat;
     $validated['longitud'] = $lng;
@@ -283,6 +345,28 @@ class EventoClientController extends Controller
     }
 
     $evento->update($validated);
+
+    if ($request->has('personas_tipo')) {
+        foreach ($request->personas_tipo as $index => $tipo) {
+            $personaData = [
+                'tipo' => $tipo,
+                'evento_id' => $evento->id,
+            ];
+
+            if ($tipo === 'afectado/victima') {
+                $personaData['nombre'] = $request->personas_nombre[$index] ?? null;
+                $personaData['tipo_doc'] = $request->personas_tipo_doc[$index] ?? null;
+                $personaData['nro_doc'] = $request->personas_nro_doc[$index] ?? null;
+                $personaData['nro_telefono'] = $request->personas_nro_telefono[$index] ?? null;
+                $personaData['relacion_evento'] = $request->personas_relacion_evento[$index] ?? null;
+            } elseif ($tipo === 'sospechoso') {
+                $personaData['descripcion_fisica'] = $request->personas_descripcion_fisica[$index] ?? null;
+                $personaData['comportamiento_observado'] = $request->personas_comportamiento_observado[$index] ?? null;
+            }
+
+            PersonasEventos::create($personaData);
+        }
+    }
 
     // Manejo de archivos
     if ($request->hasFile('media')) {
@@ -370,6 +454,23 @@ class EventoClientController extends Controller
 
         return response()->json($data);
 
+    }
+
+    public function agregarNotasAdicionales(Request $request, Evento $evento)
+    {
+        if (!$this->userHasAccessToCliente($evento->cliente_id)) {
+            return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
+        }
+
+        $validated = $request->validate([
+            'notas_adicionales' => 'required|string|max:1000'
+        ]);
+
+        $evento->update([
+            'notas_adicionales' => $validated['notas_adicionales']
+        ]);
+
+        return redirect()->route('client.eventos.index')->with('success', 'Notas adicionales agregadas correctamente.');
     }
     
 }

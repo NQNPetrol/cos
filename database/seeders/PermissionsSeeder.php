@@ -255,6 +255,7 @@ class PermissionsSeeder extends Seeder
             'trigger.alertas-cliente',
             'ver.liveview-cliente',
             'ver.flightlogs-cliente',
+            // 'ver.galeria-cliente',
             'crear.peticion-misiones',
             'ver.reportes'
         ];
