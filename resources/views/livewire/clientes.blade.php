@@ -2,7 +2,7 @@
     <h2 class="text-2xl font-bold mb-6">Administrar Clientes</h2>
 
     @if ($successMessage)
-        <div class="bg-emerald-600 text-white p-3 rounded mb-4">
+        <div class="bg-blue-600 text-white p-3 rounded mb-4">
             {{ $successMessage }}
         </div>
     @endif
@@ -42,9 +42,19 @@
                 <label class="block text-sm mb-1">Convenio</label>
                 <input type="text" wire:model.defer="convenio" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
             </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm mb-1">Logo</label>
+                <input type="file" wire:model.defer="logo" accept=".png" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                @error('logo') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                @if ($logo)
+                    <div class="mt-2">
+                        <img src="{{ $logo->temporaryUrl() }}" class="h-20 object-contain">
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
             Guardar Cliente
         </button>
     </form>

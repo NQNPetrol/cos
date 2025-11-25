@@ -174,6 +174,9 @@ Route::middleware([
         ->middleware('can:editar.cliente')
         ->name('clientes.edit');
 
+    Route::delete('/clientes/{cliente}/delete-logo', [\App\Http\Controllers\ClienteController::class, 'deleteLogo'])
+        ->name('cliente.delete-logo');
+
     Route::put('/clientes/{cliente}', [App\Http\Controllers\ClienteController::class, 'update'])
         ->middleware('can:editar.cliente')
         ->name('clientes.update');
@@ -640,6 +643,7 @@ Route::middleware([
 
     Route::get('/anpr/event-image/{recordId}', \App\Livewire\HikCentralImages\ViewEventImage::class)
         ->name('anpr.view-image')->middleware('can:ver.registros-anpr');
+
 });
 
 
