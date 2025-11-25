@@ -18,8 +18,18 @@ class Cliente extends Model
         'ciudad',
         'provincia',
         'categoria',
-        'convenio'
+        'convenio',
+        'logo'
     ];
+
+    public function getLogoUrlAttribute()
+    {
+        if ($this->logo) {
+            return asset('storage/' . $this->logo);
+        }
+        
+        return asset('public/cyh.png');
+    }
 
     public function contratos()
     {

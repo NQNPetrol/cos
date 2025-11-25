@@ -396,15 +396,21 @@
 
     <!-- Contenedor principal --> 
     <div class="flex pt-16 min-h-screen">
-        <!-- Sidebar mejorado -->
+        <!-- Sidebar  -->
         <aside id="sidebar" class="sidebar w-72 h-full shadow-2xl fixed hidden md:block z-40 animate-slideIn">
             <div class="p-6">
-                <!-- Logo solamente (sin texto) -->
+                <!-- Logo Dinamico de cliente-->
                 <div class="mb-4 text-center">
                     <div class="flex items-center justify-center">
-                        <img src="{{ asset('cyh.png') }}" 
-                            alt="Logo Centro de Operaciones de Seguridad" 
-                            class="h-28 w-auto mb-4 transition-transform duration-300 hover:scale-105"
+                        @php
+                            $user = auth()->user();
+                            $logoUrl = $user->logo_cliente;
+                            $clienteNombre = $user->nombre_cliente;
+                            $clientePrincipal = $user->cliente_principal;
+                        @endphp
+                        <img src="{{ $logoUrl }}" 
+                            alt="Logo {{ $clienteNombre }}" 
+                            class="h-32 w-auto mb-4 transition-transform duration-300 hover:scale-105"
                             onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
                                                 
                         <div id="fallbackLogo" class="h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 hidden">

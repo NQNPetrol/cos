@@ -5,10 +5,12 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
 
 class Clientes extends Component
 {
-     use WithPagination;
+     use WithPagination, WithFileUploads;
 
     public $nombre;
     public $cuit;
@@ -17,6 +19,7 @@ class Clientes extends Component
     public $provincia;
     public $categoria;
     public $convenio;
+    public $logo;
 
     public $successMessage = null;
 
@@ -28,11 +31,17 @@ class Clientes extends Component
         'provincia' => 'nullable',
         'categoria' => 'nullable',
         'convenio'  => 'nullable',
+        'logo'      => 'nullable|image|mimes:png|max:2048',
     ];
 
     public function save()
     {
         $this->validate();
+
+        $logoPath = null;
+        if ($this->logo) {
+            $logoPath = $this->logo->store('clientes/logos', 'public');
+        }
 
         Cliente::create([
             'nombre'    => $this->nombre,
@@ -42,9 +51,10 @@ class Clientes extends Component
             'provincia' => $this->provincia,
             'categoria' => $this->categoria,
             'convenio'  => $this->convenio,
+            'logo'      => $logoPath,
         ]);
 
-        $this->reset(['nombre', 'cuit', 'domicilio', 'ciudad', 'provincia', 'categoria', 'convenio']);
+        $this->reset(['nombre', 'cuit', 'domicilio', 'ciudad', 'provincia', 'categoria', 'convenio', 'logo']);
 
         $this->successMessage = "Cliente creado exitosamente.";
     }
@@ -69,6 +79,10 @@ class Clientes extends Component
     public function delete($clienteId)
     {
         $cliente = Cliente::findOrFail($clienteId);
+
+        if ($cliente->logo && Storage::disk('public')->exists($cliente->logo)) {
+            Storage::disk('public')->delete($cliente->logo);
+        }
         
         // Verifica si el cliente tiene empresas asociadas antes de eliminar
         if ($cliente->empresasAsociadas()->count() > 0) {
