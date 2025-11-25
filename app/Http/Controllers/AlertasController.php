@@ -243,14 +243,16 @@ class AlertasController extends Controller
                 'mision_flytbase_id' => $mision->id,
                 'alert_log_id' => $alertLog->id,
                 'drone_name' => $mision->drone->drone ?? null,
-                'flight_starttime' => now(),
+                'trigger_senttime' => now(),
+                'flight_starttime' => null,
                 'estado' => FlightLog::ESTADO_EN_PROCESO,
             ]);
 
             Log::info('Flight log creado exitosamente', [
                 'flight_log_id' => $flightLog->id,
                 'mision_id' => $mision->id,
-                'drone_name' => $mision->drone->drone ?? 'N/A'
+                'drone_name' => $mision->drone->drone ?? 'N/A',
+                 'trigger_senttime' => $flightLog->trigger_senttime
             ]);
 
         } catch (\Exception $e) {
