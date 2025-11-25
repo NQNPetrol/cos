@@ -53,6 +53,7 @@
                     <th class="px-4 py-2 text-left">Marca</th>
                     <th class="px-4 py-2 text-left">Modelo</th>
                     <th class="px-4 py-2 text-left">Color</th>
+                    <th class="px-4 py-2 text-left">Año</th>
                     <th class="px-4 py-2 text-left">Estado</th>
                     <th class="px-4 py-2 text-left">Cliente</th>
                     <th class="px-4 py-2 text-left">Observaciones</th>
@@ -66,6 +67,7 @@
                         <td class="px-4 py-2">{{ $patrulla->marca }}</td>
                         <td class="px-4 py-2">{{ $patrulla->modelo }}</td>
                         <td class="px-4 py-2">{{ $patrulla->color }}</td>
+                        <td class="px-4 py-2">{{ $patrulla->año ?? 'N/A '}}</td>
                         <td class="px-4 py-2">
                             <span class="px-2 py-1 text-xs font-semibold rounded-full {{ 
                                 $patrulla->estado == 'operativa' ? 'bg-green-100 text-green-800' : 
@@ -176,6 +178,13 @@
                             <input type="text" wire:model="color" 
                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
                             @error('color') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-300">Año</label>
+                            <input type="text" wire:model="año" 
+                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            @error('año') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
