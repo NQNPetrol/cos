@@ -12,6 +12,7 @@ use App\Http\Controllers\MobileVehicleClientController;
 use App\Http\Controllers\S3WebhookController;
 use App\Http\Controllers\FlytbaseFlightLogsController;
 use App\Http\Controllers\Api\ObjetivosCompareController;
+use App\Http\Controllers\Api\DroneStatusController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -83,6 +84,9 @@ Route::prefix('s3-webhook')->group(function () {
 Route::prefix('flytbase')->group(function () {
     Route::post('/flight-logs/email', [FlytbaseFlightLogsController::class, 'storeFromEmail']);
 });
+
+//API PARA OBTENER ESTADO DE UN DRON
+Route::get('dron/get-status', [DroneStatusController::class, 'getDroneStatus']);
 
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);

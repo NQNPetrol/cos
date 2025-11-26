@@ -16,6 +16,7 @@ class FlightLog extends Model
         'piloto_flytbase_id',
         'mision_flytbase_id',
         'alert_log_id',
+        'trigger_senttime',
         'flight_starttime',
         'flight_endtime',
         'flight_time',
@@ -36,6 +37,7 @@ class FlightLog extends Model
     ];
 
     protected $casts = [
+        'trigger_senttime' => 'datetime',
         'flight_starttime' => 'datetime',
         'flight_endtime' => 'datetime',
         'flight_time' => 'integer',
@@ -77,13 +79,6 @@ class FlightLog extends Model
     {
         return $query->where('estado', self::ESTADO_INTERRUMPIDO);
     }
-
-     public function scopeActivos($query)
-    {
-        return $query->whereNotNull('flight_starttime')
-                    ->whereNull('flight_endtime');
-    }
-
     
 
     /**
@@ -221,5 +216,32 @@ class FlightLog extends Model
         }
 
         return number_format($this->total_distance, 2) . ' m';
+    }
+
+    public function scopeCercanosATriggerTime($query, $timestamp, $minutosTolerancia = 30)
+    {
+        $fechaInicio = \Carbon\Carbon::parse($timestamp)->subMinutes($minutosTolerancia);
+        $fechaFin = \Carbon\Carbon::parse($timestamp)->addMinutes($minutosTolerancia);
+        
+        return $query->whereBetween('trigger_senttime', [$fechaInicio, $fechaFin])
+                    ->whereNull('flight_starttime')
+                    ->where('estado', self::ESTADO_EN_PROCESO);
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->whereNotNull('flight_starttime')
+                    ->whereNull('flight_endtime')
+                    ->where('estado', self::ESTADO_EN_PROCESO);
+    }
+
+    public function esVueloManual(): bool
+    {
+        return is_null($this->trigger_senttime);
+    }
+
+    public function esVueloPorTrigger(): bool
+    {
+        return !is_null($this->trigger_senttime);
     }
 }

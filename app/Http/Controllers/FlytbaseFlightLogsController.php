@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\FlightLog;
 use App\Models\PilotoFlytbase;
+use App\Models\MisionFlytbase;
 use Carbon\Carbon;
 
 class FlytbaseFlightLogsController extends Controller
@@ -17,13 +18,18 @@ class FlytbaseFlightLogsController extends Controller
     public function storeFromEmail(Request $request)
     {
         try {
-            Log::info('Incoming Flytbase flight log data from email', ['request_data' => $request->all()]);
+            Log::info('Incoming Flytbase flight log data from email', [
+                'event_type' => $request->event_type,
+                'drone_name' => $request->drone_name,
+                'drone_name_custom' => $request->drone_name_custom,
+                'request_data' => $request->all()
+            ]);
 
             // Validar datos mínimos requeridos
             $validator = Validator::make($request->all(), [
                 'event_timestamp' => 'required|date',
                 'drone_name' => 'required|string',
-                'flight_details' => 'required|string',
+                'event_type' => 'required|in:takeoff,landed'
             ]);
 
             if ($validator->fails()) {
@@ -36,44 +42,231 @@ class FlytbaseFlightLogsController extends Controller
 
             $droneNameToSearch = $request->drone_name_custom ?? $request->drone_name;
 
-            Log::info('Drone name for search', [
-                'drone_name_flytbase' => $request->drone_name,
-                'drone_name_custom' => $request->drone_name_custom,
-                'drone_name_used_for_search' => $droneNameToSearch
+            if ($request->event_type === 'takeoff') {
+                return $this->handleTakeoffEvent($request, $droneNameToSearch);
+            }
+
+            if ($request->event_type === 'landed') {
+                return $this->handleLandedEvent($request, $droneNameToSearch);
+            }
+
+            
+
+        } catch (\Exception $e) {
+            Log::error('Error processing Flytbase flight log from email', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
             ]);
 
-            // Buscar flight log más cercano al timestamp del evento
-            $flightLog = $this->findClosestFlightLog($request->event_timestamp, $droneNameToSearch);
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function handleTakeoffEvent(Request $request, $droneName)
+    {
+        try {
+            Log::info('Processing takeoff event', [
+                'drone_name' => $droneName,
+                'event_timestamp' => $request->event_timestamp
+            ]);
+
+            // Buscar si existe un flight log por trigger (vuelo automático)
+            $flightLog = $this->findFlightLogByTriggerTime($request->event_timestamp, $droneName);
+            
+            if ($flightLog) {
+                // Vuelo por trigger - Actualizar con flight_starttime real
+                Log::info('Found existing flight log for trigger-based flight', [
+                    'flight_log_id' => $flightLog->id,
+                    'trigger_senttime' => $flightLog->trigger_senttime
+                ]);
+                return $this->updateExistingFlightLogWithTakeoff($flightLog, $request, $droneName);
+            } else {
+                // Vuelo manual - Crear nuevo flight log
+                Log::info('No existing flight log found, creating new one for manual flight');
+                return $this->createNewFlightLogForManualFlight($request, $droneName);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error handling takeoff event', [
+                'exception' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+            throw $e;
+        }
+    }
+
+    private function updateExistingFlightLogWithTakeoff($flightLog, $request, $droneName)
+    {
+        $pilotoId = $this->extractPilotoId($request->piloto_nombre, $request->flight_details);
+        
+        // Buscar misión basada en el drone name si no tiene misión asignada
+        $misionId = $flightLog->mision_flytbase_id;
+        if (!$misionId) {
+            $misionId = $this->findMisionByDroneName($droneName);
+        }
+
+        $eventTimestamp = Carbon::parse($request->event_timestamp);
+
+        // Preparar datos para actualizar
+        $updateData = [
+            'event_id' => $request->event_id,
+            'message' => $request->message,
+            'severity' => $request->severity,
+            'dock_name' => $request->dock_name,
+            'event_coordinates' => $request->event_coordinates,
+            'site' => $request->site,
+            'organization' => $request->organization,
+            'automation' => $request->automation,
+            'drone_battery' => $request->drone_battery,
+            'flight_details' => $request->flight_details,
+            'event_timestamp' => $eventTimestamp,
+            'flight_starttime' => $eventTimestamp, // Tiempo real de despegue
+            'estado' => FlightLog::ESTADO_EN_PROCESO,
+        ];
+
+        if ($pilotoId) {
+            $updateData['piloto_flytbase_id'] = $pilotoId;
+        }
+
+        if ($misionId && !$flightLog->mision_flytbase_id) {
+            $updateData['mision_flytbase_id'] = $misionId;
+        }
+
+        // Actualizar el flight log
+        $flightLog->update($updateData);
+
+        Log::info('Flight log existente actualizado con takeoff time', [
+            'flight_log_id' => $flightLog->id,
+            'tipo' => 'por_trigger',
+            'trigger_senttime' => $flightLog->trigger_senttime,
+            'flight_starttime' => $flightLog->flight_starttime,
+            'time_difference_minutes' => $flightLog->trigger_senttime->diffInMinutes($flightLog->flight_starttime)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Flight log existente actualizado con takeoff time',
+            'data' => [
+                'id' => $flightLog->id,
+                'tipo' => 'por_trigger',
+                'trigger_senttime' => $flightLog->trigger_senttime,
+                'flight_starttime' => $flightLog->flight_starttime,
+                'time_difference_minutes' => $flightLog->trigger_senttime->diffInMinutes($flightLog->flight_starttime)
+            ]
+        ], 200);
+    }
+
+    private function createNewFlightLogForManualFlight($request, $droneName)
+    {
+        $pilotoId = $this->extractPilotoId($request->piloto_nombre, $request->flight_details);
+        $misionId = $this->findMisionByDroneName($droneName);
+
+        $eventTimestamp = Carbon::parse($request->event_timestamp);
+
+        $flightLogData = [
+            'event_id' => $request->event_id,
+            'message' => $request->message,
+            'severity' => $request->severity,
+            'drone_name' => $droneName,
+            'dock_name' => $request->dock_name,
+            'event_coordinates' => $request->event_coordinates,
+            'site' => $request->site,
+            'organization' => $request->organization,
+            'automation' => $request->automation,
+            'drone_battery' => $request->drone_battery,
+            'flight_details' => $request->flight_details,
+            'event_timestamp' => $eventTimestamp,
+            'flight_starttime' => $eventTimestamp, // Tiempo real de despegue
+            'trigger_senttime' => null, // No hubo trigger - vuelo manual
+            'estado' => FlightLog::ESTADO_EN_PROCESO,
+            'piloto_flytbase_id' => $pilotoId,
+            'mision_flytbase_id' => $misionId,
+        ];
+
+        $flightLog = FlightLog::create($flightLogData);
+
+        Log::info('Nuevo flight log creado para vuelo manual', [
+            'flight_log_id' => $flightLog->id,
+            'tipo' => 'manual',
+            'flight_starttime' => $flightLog->flight_starttime,
+            'drone_name' => $droneName,
+            'piloto_id' => $pilotoId,
+            'mision_id' => $misionId
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nuevo flight log creado para vuelo manual',
+            'data' => [
+                'id' => $flightLog->id,
+                'tipo' => 'manual',
+                'flight_starttime' => $flightLog->flight_starttime,
+                'drone_name' => $droneName
+            ]
+        ], 201);
+    }
+
+    private function findMisionByDroneName($droneName)
+    {
+        try {
+            // Buscar misión activa que use este drone
+            $mision = MisionFlytbase::activas()
+                ->whereHas('drone', function($q) use ($droneName) {
+                    $q->where('drone', 'like', "%{$droneName}%");
+                })
+                ->first();
+
+            if ($mision) {
+                Log::info('Misión encontrada por drone name', [
+                    'drone_name' => $droneName,
+                    'mision_id' => $mision->id,
+                    'mision_nombre' => $mision->nombre
+                ]);
+            }
+
+            return $mision ? $mision->id : null;
+
+        } catch (\Exception $e) {
+            Log::error('Error finding mision by drone name', [
+                'drone_name' => $droneName,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    private function handleLandedEvent(Request $request, $droneName)
+    {
+        try {
+            Log::info('Processing landed event', [
+                'drone_name' => $droneName,
+                'event_timestamp' => $request->event_timestamp
+            ]);
+
+            // Buscar flight log activo por drone name
+            $flightLog = $this->findActiveFlightLog($request->event_timestamp, $droneName);
             
             if (!$flightLog) {
-                Log::warning('No flight log found close to event timestamp', [
+                Log::warning('No active flight log found for landed event', [
                     'event_timestamp' => $request->event_timestamp,
-                    'drone_name' => $request->drone_name,
-                    'drone_name_custom' => $request->drone_name_custom,
-                    'drone_name_used_for_search' => $droneNameToSearch,
-                    'search_range' => '30 minutes before event'
+                    'drone_name' => $droneName
                 ]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'No matching flight log found for update'
+                    'message' => 'No matching active flight log found for landed event'
                 ], 404);
             }
 
-            $pilotoId = $this->extractPilotoFromFlightDetails($request->flight_details);
+            $pilotoId = $this->extractPilotoId($request->piloto_nombre, $request->flight_details);
             
-            if (!$pilotoId) {
-                Log::warning('Piloto not found in flight details', [
-                    'flight_details' => $request->flight_details
-                ]);
-                // Podemos continuar sin piloto o decidir fallar
-                // Por ahora continuamos sin actualizar el piloto
-            }
-            
-
             // Convertir timestamp del email
             $flightEndTime = Carbon::parse($request->event_timestamp);
 
-            // Calcular flight_time
+            // Calcular flight_time usando el flight_starttime real
             $flightTime = null;
             if ($flightLog->flight_starttime) {
                 $flightTime = $flightLog->flight_starttime->diffInSeconds($flightEndTime);
@@ -89,7 +282,7 @@ class FlytbaseFlightLogsController extends Controller
                 'event_id' => $request->event_id,
                 'message' => $request->message,
                 'severity' => $request->severity,
-                'dock_name' => $request->dock_name, //actualizar cuando se cree tabla docks
+                'dock_name' => $request->dock_name,
                 'event_coordinates' => $request->event_coordinates,
                 'site' => $request->site,
                 'organization' => $request->organization,
@@ -99,59 +292,47 @@ class FlytbaseFlightLogsController extends Controller
                 'event_timestamp' => $flightEndTime,
                 'flight_endtime' => $flightEndTime,
                 'flight_time' => $flightTime,
-                'total_distance' => null, //temporalmente
+                'total_distance' => $request->total_distance ?? null,
                 'estado' => FlightLog::ESTADO_COMPLETADO,
             ];
 
-            if ($pilotoId) {
+            if ($pilotoId && !$flightLog->piloto_flytbase_id) {
                 $updateData['piloto_flytbase_id'] = $pilotoId;
-                Log::info('Piloto will be updated in flight log', ['piloto_id' => $pilotoId]);
             }
 
             // Actualizar el flight log
             $flightLog->update($updateData);
 
-            Log::info('Flytbase flight log updated successfully from email', [
+            Log::info('Flight log completado', [
                 'flight_log_id' => $flightLog->id,
-                'drone_name' => $request->drone_name,
-                'drone_name_custom' => $request->drone_name_custom,
+                'tipo' => $flightLog->trigger_senttime ? 'por_trigger' : 'manual',
                 'flight_time_seconds' => $flightTime,
                 'flight_starttime' => $flightLog->flight_starttime,
                 'flight_endtime' => $flightEndTime,
-                'piloto_updated' => !is_null($pilotoId),
-                'piloto_id' => $pilotoId
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Flight log updated successfully',
+                'message' => 'Flight log completed successfully',
                 'data' => [
                     'id' => $flightLog->id,
+                    'tipo' => $flightLog->trigger_senttime ? 'por_trigger' : 'manual',
                     'flight_time_seconds' => $flightTime,
                     'flight_time_readable' => $flightLog->duracion_legible,
-                    'status' => 'completed',
-                    'piloto_assigned' => !is_null($pilotoId),
-                    'drone_match' => [
-                        'requested' => $request->drone_name,
-                        'custom' => $request->drone_name_custom,
-                        'found_in_db' => $flightLog->drone_name
-                    ]
+                    'status' => 'completed'
                 ]
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('Error processing Flytbase flight log from email', [
+            Log::error('Error handling landed event', [
                 'exception' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all()
             ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal server error: ' . $e->getMessage()
-            ], 500);
+            throw $e;
         }
     }
+
+
 
     /**
      * Encontrar flight log más cercano al timestamp del evento
@@ -229,6 +410,72 @@ class FlytbaseFlightLogsController extends Controller
         ]);
 
         return $closestLog;
+    }
+
+    private function findFlightLogByTriggerTime($eventTimestamp, $droneName = null)
+    {
+        $eventTime = Carbon::parse($eventTimestamp);
+        
+        $query = FlightLog::cercanosATriggerTime($eventTimestamp, 30); // 30 minutos tolerancia
+        
+        if ($droneName) {
+            $query->where('drone_name', $droneName);
+        }
+
+        return $query->first();
+    }
+
+    /**
+     * Buscar flight log activo (para landed events)
+     */
+    private function findActiveFlightLog($eventTimestamp, $droneName = null)
+    {
+        $eventTime = Carbon::parse($eventTimestamp);
+        $startSearch = $eventTime->copy()->subMinutes(120); // Buscar en las últimas 2 horas
+        
+        $query = FlightLog::activos()
+                        ->where('flight_starttime', '>=', $startSearch)
+                        ->where('flight_starttime', '<=', $eventTime);
+        
+        if ($droneName) {
+            $query->where('drone_name', $droneName);
+        }
+
+        $flightLogs = $query->get();
+
+        if ($flightLogs->isEmpty()) {
+            return null;
+        }
+
+        // Encontrar el más cercano al tiempo del evento
+        return $flightLogs->sortBy(function($log) use ($eventTime) {
+            return abs($log->flight_starttime->diffInSeconds($eventTime));
+        })->first();
+    }
+
+    /**
+     * Extraer ID del piloto (usa el nombre del piloto si viene en el request)
+     */
+    private function extractPilotoId($pilotoNombre = null, $flightDetails = null)
+    {
+        // Prioridad 1: Usar el nombre del piloto que viene en el request
+        if ($pilotoNombre) {
+            $piloto = PilotoFlytbase::where('nombre', 'like', '%' . $pilotoNombre . '%')->first();
+            if ($piloto) {
+                Log::info('👤 Piloto encontrado por nombre directo', [
+                    'nombre_buscado' => $pilotoNombre,
+                    'piloto_id' => $piloto->id
+                ]);
+                return $piloto->id;
+            }
+        }
+
+        // Prioridad 2: Extraer del flight_details (método existente)
+        if ($flightDetails) {
+            return $this->extractPilotoFromFlightDetails($flightDetails);
+        }
+
+        return null;
     }
 
 
