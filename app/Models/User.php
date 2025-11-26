@@ -107,6 +107,28 @@ class User extends Authenticatable
         return $this->hasMany(UserCliente::class);
     }
 
+    public function getClientePrincipalAttribute()
+    {
+        return $this->clientes()->first();
+    }
+
+    public function getLogoClienteAttribute()
+    {
+        $cliente = $this->cliente_principal;
+        
+        if ($cliente && $cliente->logo) {
+            return $cliente->logo_url;
+        }
+
+        return asset('cyh.png');
+    }
+
+    public function getNombreClienteAttribute()
+    {
+        $cliente = $this->cliente_principal;
+        return $cliente ? $cliente->nombre : 'Centro de Operaciones';
+    }
+
      /**
      * Verifica si el usuario es del COS (staff interno)
      */

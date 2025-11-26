@@ -21,6 +21,7 @@ class Listado extends Component
     public $patente;
     public $marca;
     public $modelo;
+    public $año;
     public $color;
     public $estado = 'operativa';
     public $observaciones;
@@ -89,6 +90,7 @@ class Listado extends Component
         $this->patente = '';
         $this->modelo = '';
         $this->color = '';
+        $this->año = '';
         $this->estado = 'operativa';
         $this->observaciones = '';
         $this->cliente_id = '';
@@ -106,6 +108,7 @@ class Listado extends Component
                 'marca' => $this->marca,
                 'modelo' => $this->modelo,
                 'color' => $this->color,
+                'año' => $this->año,
                 'estado' => $this->estado,
                 'observaciones' => $this->observaciones,
                 'cliente_id' => $this->cliente_id,
@@ -118,6 +121,7 @@ class Listado extends Component
                 'marca' => $this->marca,
                 'modelo' => $this->modelo,
                 'color' => $this->color,
+                'año' => $this->año,
                 'estado' => $this->estado,
                 'observaciones' => $this->observaciones,
                 'cliente_id' => $this->cliente_id,
@@ -137,6 +141,7 @@ class Listado extends Component
         $this->marca = $patrulla->marca;
         $this->modelo = $patrulla->modelo;
         $this->color = $patrulla->color;
+        $this->año = $patrulla->año;
         $this->estado = $patrulla->estado;
         $this->observaciones = $patrulla->observaciones;
         $this->cliente_id = $patrulla->cliente_id;

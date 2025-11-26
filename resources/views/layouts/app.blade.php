@@ -628,7 +628,7 @@
                                     <i class="bi bi-camera text-lg"></i>
                                     <span>Encoding Devices</span>
                                 </a>
-                                <a href="{{ route('patrullas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
                                     <i class="bi bi-taxi-front-fill text-blue text-sm"></i>
                                     <span>On board Devices</span>
                                 </a>
@@ -818,6 +818,17 @@
                                         <i class="bi bi-bullseye text-white text-sm"></i>
                                     </div>
                                     <span>Objetivos</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="submenu-container">
+                            <a href="{{ route('patrullas.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <i class="bi bi-taxi-front-fill text-white text-sm"></i>
+                                    </div>
+                                    <span>Patrullas</span>
                                 </div>
                             </a>
                         </div>

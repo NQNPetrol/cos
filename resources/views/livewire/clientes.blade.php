@@ -2,7 +2,7 @@
     <h2 class="text-2xl font-bold mb-6">Administrar Clientes</h2>
 
     @if ($successMessage)
-        <div class="bg-emerald-600 text-white p-3 rounded mb-4">
+        <div class="bg-blue-600 text-white p-3 rounded mb-4">
             {{ $successMessage }}
         </div>
     @endif
@@ -42,9 +42,31 @@
                 <label class="block text-sm mb-1">Convenio</label>
                 <input type="text" wire:model.defer="convenio" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
             </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm mb-2 font-medium text-gray-300">Logo (PNG)</label>
+                
+                <!-- Input file con diseño consistente -->
+                <div class="relative">
+                    <input type="file" wire:model.defer="logo" accept=".png" 
+                           class="w-full bg-gray-900 border border-gray-700 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-600 cursor-pointer">
+                </div>
+                
+                @error('logo') 
+                    <span class="text-red-400 text-sm mt-2 block">{{ $message }}</span> 
+                @enderror
+                
+                @if ($logo)
+                    <div class="mt-4 p-3 bg-gray-900 rounded-lg border border-gray-700">
+                        <p class="text-sm text-gray-400 mb-2">Vista previa:</p>
+                        <img src="{{ $logo->temporaryUrl() }}" class="h-24 object-contain bg-white rounded-lg p-2">
+                    </div>
+                @endif
+                
+                <p class="text-xs text-gray-400 mt-2">Formatos aceptados: PNG. Tamaño máximo: 2MB</p>
+            </div>
         </div>
 
-        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
             Guardar Cliente
         </button>
     </form>
