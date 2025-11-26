@@ -402,6 +402,8 @@ class EventoClientController extends Controller
             return redirect()->route('client.eventos.index')->with('error', 'No tienes acceso a este evento.');
         }
 
+        $evento->personas()->delete();
+
         // Eliminar reportes generados asociados al evento primero
         foreach($evento->reportesGenerados as $reporte) {
             $reporte->delete();
