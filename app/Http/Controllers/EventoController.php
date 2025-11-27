@@ -258,6 +258,8 @@ class EventoController extends Controller
 
     public function destroy(Evento $evento)
     {
+        $evento->personas()->delete();
+           
         // Eliminar reportes generados asociados al evento primero
         foreach($evento->reportesGenerados as $reporte) {
             $reporte->delete();
