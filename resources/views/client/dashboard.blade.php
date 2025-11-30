@@ -245,6 +245,156 @@
             </div>
         </div>
     </div>
+
+    <!-- ==================== SECCIÓN DOCUMENTOS DE PATRULLAS ==================== -->
+    <div class="border-b border-gray-600 pb-2 mt-8">
+        <h2 class="text-lg font-semibold text-orange-400 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Documentación de Patrullas
+        </h2>
+    </div>
+
+    <!-- Tarjetas de resumen de documentos -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Total Documentos -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Documentos</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $totalDocumentos ?? 0 }}</p>
+                </div>
+                <div class="w-14 h-14 bg-orange-600/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentos Vencidos -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-red-900/50 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vencidos</p>
+                    <p class="text-3xl font-bold text-red-500 mt-2">{{ $documentosVencidos ?? 0 }}</p>
+                </div>
+                <div class="w-14 h-14 bg-red-600/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Por vencer en 7 días -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-amber-900/50 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vence en 7 días</p>
+                    <p class="text-3xl font-bold text-amber-500 mt-2">{{ $documentosPorVencer7Dias ?? 0 }}</p>
+                </div>
+                <div class="w-14 h-14 bg-amber-600/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentos Vigentes -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-green-900/50 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vigentes</p>
+                    <p class="text-3xl font-bold text-green-500 mt-2">{{ $documentosVigentes ?? 0 }}</p>
+                </div>
+                <div class="w-14 h-14 bg-green-600/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid: Gráfico + Tabla de documentos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Gráfico de estado de documentos -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Estado de Documentos</h2>
+                    <p class="text-gray-400 text-sm mt-1">Distribución por estado de vencimiento</p>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-600/20 text-orange-400">
+                    <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                    Vencimientos
+                </span>
+            </div>
+            
+            <div class="relative" style="height: 300px;">
+                <canvas id="chartDocumentos"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabla de documentos próximos a vencer -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Alertas de Vencimiento</h2>
+                    <p class="text-gray-400 text-sm mt-1">Documentos próximos a vencer o vencidos</p>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                @if(isset($documentosAlerta) && count($documentosAlerta) > 0)
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-400 uppercase bg-gray-800/50 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">Documento</th>
+                            <th scope="col" class="px-4 py-3">Patrulla</th>
+                            <th scope="col" class="px-4 py-3 text-center">Vencimiento</th>
+                            <th scope="col" class="px-4 py-3 text-center">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                        @foreach($documentosAlerta as $doc)
+                        <tr class="hover:bg-gray-700/50 transition-colors">
+                            <td class="px-4 py-3 font-medium text-white">{{ $doc['nombre'] }}</td>
+                            <td class="px-4 py-3 text-gray-300">{{ $doc['patrulla'] }}</td>
+                            <td class="px-4 py-3 text-center text-gray-300">{{ $doc['fecha_vto'] }}</td>
+                            <td class="px-4 py-3 text-center">
+                                @if($doc['estado'] === 'vencido')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
+                                        Vencido ({{ abs($doc['dias_restantes']) }} días)
+                                    </span>
+                                @elseif($doc['estado'] === 'critico')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-600/20 text-amber-400">
+                                        {{ $doc['dias_restantes'] }} días
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-600/20 text-yellow-400">
+                                        {{ $doc['dias_restantes'] }} días
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                @else
+                <div class="text-center py-8 text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p>No hay documentos próximos a vencer</p>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -258,6 +408,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Datos iniciales - Patrullas
     const initialDataPatrullasEstado = @json($chartDataPatrullasEstado ?? []);
     const initialDataPatrullasGPS = @json($chartDataPatrullasGPS ?? []);
+    
+    // Datos iniciales - Documentos
+    const initialDataDocumentos = @json($chartDataDocumentos ?? []);
     
     // URLs de API
     const urlClientes = "{{ route('client.dashboard.eventos-por-empresa') }}";
@@ -296,6 +449,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const colorsGPS = {
         bg: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)'],
         border: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)']
+    };
+
+    // Colores para documentos (rojo=vencido, ámbar=7días, amarillo=30días, verde=vigente)
+    const colorsDocumentos = {
+        bg: ['rgba(239, 68, 68, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(34, 197, 94, 0.8)'],
+        border: ['rgba(239, 68, 68, 1)', 'rgba(245, 158, 11, 1)', 'rgba(234, 179, 8, 1)', 'rgba(34, 197, 94, 1)']
     };
 
     // Opciones comunes para gráficos de barras
@@ -427,6 +586,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: initialDataPatrullasGPS.map(i => i.total),
                 backgroundColor: colorsGPS.bg,
                 borderColor: colorsGPS.border,
+                borderWidth: 2
+            }]
+        },
+        options: getDoughnutOptions()
+    });
+
+    // ========== GRÁFICO DE DOCUMENTOS ==========
+    
+    const ctxDocumentos = document.getElementById('chartDocumentos').getContext('2d');
+    new Chart(ctxDocumentos, {
+        type: 'doughnut',
+        data: {
+            labels: initialDataDocumentos.map(i => i.nombre),
+            datasets: [{
+                data: initialDataDocumentos.map(i => i.total),
+                backgroundColor: initialDataDocumentos.map((_, i) => colorsDocumentos.bg[i % colorsDocumentos.bg.length]),
+                borderColor: initialDataDocumentos.map((_, i) => colorsDocumentos.border[i % colorsDocumentos.border.length]),
                 borderWidth: 2
             }]
         },
