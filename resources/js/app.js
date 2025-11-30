@@ -1,16 +1,16 @@
 import { createApp } from 'vue';
-import Alpine from 'alpinejs';
 import EventosBarras from './Components/EventosBarras.vue';
 import ClientDashboard from './Components/Dashboard/ClientDashboard.vue';
 import BarChart from './Components/Dashboard/BarChart.vue';
 
-// Inicializar Alpine.js
+// Alpine.js
+import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();
 
-// Esperar a que el DOM esté listo
+// Esperar a que el DOM esté listo para Vue
 document.addEventListener('DOMContentLoaded', () => {
-    // App principal
+    // App principal Vue
     const appElement = document.getElementById('app');
     if (appElement) {
         const app = createApp({});
