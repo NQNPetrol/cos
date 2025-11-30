@@ -21,18 +21,32 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// DASHBOARD LAYOUT PRINCIPAL
-Route::get('/main-dashboard', function () {
-    return view('dashboard'); // Vista normal con layout app
-})->middleware(['auth', 'verified'])
-  ->name('main.dashboard');
+// DASHBOARD LAYOUT PRINCIPAL (ADMIN)
+Route::get('/main-dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('main.dashboard');
+
+// API para gráficos del dashboard admin
+Route::get('/main-dashboard/eventos-por-cliente', [\App\Http\Controllers\AdminDashboardController::class, 'getEventosPorCliente'])
+    ->middleware(['auth', 'verified'])
+    ->name('admin.dashboard.eventos-por-cliente');
+
+Route::get('/main-dashboard/eventos-por-categoria', [\App\Http\Controllers\AdminDashboardController::class, 'getEventosPorCategoria'])
+    ->middleware(['auth', 'verified'])
+    ->name('admin.dashboard.eventos-por-categoria');
 
 // LAYOUT CLIENTES
 Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->group(function () {
     //DASHBOARD
-    Route::get('/dashboard', function () {
-        return view('client.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\ClientDashboardController::class, 'index'])
+        ->name('dashboard');
+    
+    // API para gráficos del dashboard
+    Route::get('/dashboard/eventos-por-empresa', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorEmpresa'])
+        ->name('dashboard.eventos-por-empresa');
+    
+    Route::get('/dashboard/eventos-por-categoria', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorCategoria'])
+        ->name('dashboard.eventos-por-categoria');
 
     // PROFILE
     Route::get('/profile', function () {
