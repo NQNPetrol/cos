@@ -1,7 +1,12 @@
 import { createApp } from 'vue';
+import Alpine from 'alpinejs';
 import EventosBarras from './Components/EventosBarras.vue';
 import ClientDashboard from './Components/Dashboard/ClientDashboard.vue';
 import BarChart from './Components/Dashboard/BarChart.vue';
+
+// Inicializar Alpine.js
+window.Alpine = Alpine;
+Alpine.start();
 
 // Esperar a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
