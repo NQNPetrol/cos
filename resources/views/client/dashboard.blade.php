@@ -149,77 +149,37 @@
     </div>
 
     <!--MAPA DE CALOR -->
-    <div class="border-b border-gray-600 pb-2 mt-8">
-        <h2 class="text-lg font-semibold text-red-400 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            Mapa de Calor de Eventos
-        </h2>
-    </div>
 
     <!-- Mapa de calor en pantalla completa -->
     <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div>
                 <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
                 <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
-                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                Intensidad
-            </span>
+            <div class="flex flex-col items-end gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
+                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    Intensidad
+                </span>
+                <!-- Leyenda de colores -->
+                <div class="flex flex-col items-end gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 font-medium">Baja</span>
+                        <div class="w-48 h-4 rounded-md overflow-hidden border border-gray-600 shadow-inner" 
+                             style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">Alta</span>
+                    </div>
+                    <p class="text-xs text-gray-500 italic">Escala de intensidad de eventos</p>
+                </div>
+            </div>
         </div>
         
         <!-- Componente Vue del mapa de calor -->
         <div id="heatmap-container"
             data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
             data-height="450px">
-        </div>
-        
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-gray-800/50 p-4 rounded-lg">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-400">Zonas de Alta Frecuencia</p>
-                        <p class="text-lg font-semibold text-white">Áreas en rojo</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-gray-800/50 p-4 rounded-lg">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-yellow-600/20 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-400">Zonas de Media Frecuencia</p>
-                        <p class="text-lg font-semibold text-white">Áreas en amarillo</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-gray-800/50 p-4 rounded-lg">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-400">Zonas de Baja Frecuencia</p>
-                        <p class="text-lg font-semibold text-white">Áreas en azul</p>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 

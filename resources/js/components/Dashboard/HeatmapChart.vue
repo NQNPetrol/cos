@@ -11,10 +11,7 @@
       </div>
     </div>
     
-    <!-- Debug info -->
-    <div class="mt-2 text-xs text-gray-400">
-      Estado: {{ status }}
-    </div>
+    
   </div>
 </template>
 
@@ -114,11 +111,11 @@ const initMap = () => {
       maxZoom: 18
     }).addTo(map.value);
     
-    console.log('✅ Mapa creado');
+    console.log('Mapa creado');
     status.value = 'Mapa listo';
     
   } catch (error) {
-    console.error('❌ Error inicializando mapa:', error);
+    console.error('Error inicializando mapa:', error);
     status.value = 'Error: ' + error.message;
     loading.value = false;
   }
@@ -139,7 +136,7 @@ const loadHeatmapData = async () => {
     const response = await fetch(url);
     const data = await response.json();
     
-    console.log('📊 Datos recibidos:', data);
+    console.log('Datos recibidos:', data);
     
     if (!Array.isArray(data) || data.length === 0) {
       status.value = 'No hay datos de eventos';
