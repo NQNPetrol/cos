@@ -148,6 +148,89 @@
         </div>
     </div>
 
+    <!--MAPA DE CALOR -->
+    <div class="border-b border-gray-600 pb-2 mt-8">
+        <h2 class="text-lg font-semibold text-red-400 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Mapa de Calor de Eventos
+        </h2>
+    </div>
+
+    <!-- Mapa de calor en pantalla completa -->
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
+                <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
+                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                Intensidad
+            </span>
+        </div>
+        
+        <!-- Componente Vue del mapa de calor -->
+        <div id="heatmap-container">
+            <heatmap-chart 
+                ref="heatmapChart"
+                api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
+                :fecha-desde="filtroFechaDesde"
+                :fecha-hasta="filtroFechaHasta"
+                height="450px"
+                :radius="30"
+                :blur="20"
+                :max-intensity="1.2"
+            />
+        </div>
+        
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-800/50 p-4 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Zonas de Alta Frecuencia</p>
+                        <p class="text-lg font-semibold text-white">Áreas en rojo</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800/50 p-4 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Zonas de Media Frecuencia</p>
+                        <p class="text-lg font-semibold text-white">Áreas en amarillo</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800/50 p-4 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Zonas de Baja Frecuencia</p>
+                        <p class="text-lg font-semibold text-white">Áreas en azul</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== SECCIÓN PATRULLAS ==================== -->
     <div class="border-b border-gray-600 pb-2 mt-8">
         <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
@@ -396,6 +479,57 @@
         </div>
     </div>
 </div>
+<!-- Prueba de diagnóstico -->
+<div id="vue-test" style="display: none;">
+    <div v-if="true" style="background: red; color: white; padding: 10px;">
+        Vue está funcionando
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DIAGNÓSTICO VUE ===');
+    
+    // Verificar si Vue está disponible de diferentes formas
+    console.log('window.Vue:', typeof window.Vue !== 'undefined' ? 'Disponible globalmente' : ' No global');
+    
+    // Verificar si el componente heatmap-chart está en DOM
+    setTimeout(() => {
+        const heatmapElement = document.querySelector('heatmap-chart');
+        if (heatmapElement) {
+            console.log('Componente heatmap-chart en DOM');
+            console.log('Atributos:', {
+                apiUrl: heatmapElement.getAttribute('api-url'),
+                height: heatmapElement.getAttribute('height')
+            });
+        } else {
+            console.error('Componente heatmap-chart NO en DOM');
+        }
+    }, 1000);
+    
+    // Verificar si Leaflet está disponible globalmente
+    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? 'si ' + window.L.version : 'No global');
+    
+    // Probar API del mapa
+    const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+    console.log('URL API:', apiUrl);
+    
+    fetch(apiUrl)
+        .then(response => {
+            console.log('Estado API:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos API:', data);
+            if (data.length === 0) {
+                console.warn('API retornó array vacío - ¿Hay eventos con ubicación?');
+            }
+        })
+        .catch(error => {
+            console.error('Error API:', error);
+        });
+});
+</script>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -662,6 +796,25 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCharts();
     });
 });
+    // Diagnóstico del mapa
+    console.log('=== DIAGNÓSTICO MAPA ===');
+    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? '✅ ' + window.L.version : '❌ No disponible');
+    console.log('L.heatLayer:', typeof L !== 'undefined' && typeof L.heatLayer === 'function' ? '✅ Disponible' : '❌ No disponible');
+
+    // Probar mapa directamente
+    setTimeout(() => {
+        const testContainer = document.getElementById('test-map');
+        if (testContainer && typeof L !== 'undefined') {
+            console.log('🧪 Probando Leaflet directamente...');
+            const testMap = L.map('test-map').setView([-38.8827, -68.0447], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(testMap);
+            L.marker([-38.8827, -68.0447])
+                .addTo(testMap)
+                .bindPopup('¡Leaflet funciona!')
+                .openPopup();
+            console.log('✅ Leaflet funciona correctamente');
+        }
+    }, 1000);
 </script>
 @endpush
 @endsection
