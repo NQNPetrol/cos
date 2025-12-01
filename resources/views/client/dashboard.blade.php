@@ -172,17 +172,9 @@
         </div>
         
         <!-- Componente Vue del mapa de calor -->
-        <div id="heatmap-container">
-            <heatmap-chart 
-                ref="heatmapChart"
-                api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
-                :fecha-desde="filtroFechaDesde"
-                :fecha-hasta="filtroFechaHasta"
-                height="450px"
-                :radius="30"
-                :blur="20"
-                :max-intensity="1.2"
-            />
+        <div id="heatmap-container"
+            data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
+            data-height="450px">
         </div>
         
         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">

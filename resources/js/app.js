@@ -45,4 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardApp.mount('#client-dashboard-app');
         console.log('Dashboard montado');
     }
+    // Mapa de calor en dashboard de cliente (montaje directo del componente)
+    const heatmapContainer = document.getElementById('heatmap-container');
+    if (heatmapContainer) {
+        console.log('#heatmap-container encontrado para HeatmapChart');
+
+        const heatmapProps = {
+            apiUrl: heatmapContainer.dataset.apiUrl || '',
+            height: heatmapContainer.dataset.height || '450px',
+            fechaDesde: '',
+            fechaHasta: ''
+        };
+
+        const heatmapApp = createApp(HeatmapChart, heatmapProps);
+        heatmapApp.mount('#heatmap-container');
+    }
 });
