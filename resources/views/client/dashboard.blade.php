@@ -735,8 +735,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     zoomControl: true
                 });
                 
-                // Agregar capa de tiles (estilo oscuro)
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                // Agregar capa de tiles (estilo Voyager con colores)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                     subdomains: 'abcd',
                     maxZoom: 19
@@ -753,18 +753,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         (point.count || 1) / maxCount // Normalizar intensidad
                     ]);
                     
-                    // Crear capa de calor
+                    // Crear capa de calor con colores más intensos
                     const heat = L.heatLayer(heatData, {
-                        radius: 25,
-                        blur: 15,
+                        radius: 30,
+                        blur: 20,
                         maxZoom: 17,
                         max: 1.0,
+                        minOpacity: 0.4,
                         gradient: {
-                            0.0: '#2563eb',  // Azul
-                            0.3: '#06b6d4',  // Cyan
-                            0.5: '#84cc16',  // Verde lima
-                            0.7: '#eab308',  // Amarillo
-                            1.0: '#ef4444'   // Rojo
+                            0.0: '#3b82f6',  // Azul brillante
+                            0.25: '#06b6d4', // Cyan
+                            0.5: '#22c55e',  // Verde
+                            0.75: '#f59e0b', // Naranja
+                            1.0: '#dc2626'   // Rojo intenso
                         }
                     }).addTo(map);
                     
@@ -775,20 +776,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Agregar marcadores para cada ubicación con eventos
                     data.forEach(point => {
                         if (point.lat && point.lng) {
-                            const radius = Math.min(4 + (point.count || 1) * 2, 15); // Radio según cantidad
+                            const count = point.count || 1;
+                            const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
+                            
+                            // Color según cantidad de eventos
+                            let fillColor = '#3b82f6'; // Azul por defecto
+                            if (count >= 5) fillColor = '#dc2626'; // Rojo para muchos
+                            else if (count >= 3) fillColor = '#f59e0b'; // Naranja para varios
+                            else if (count >= 2) fillColor = '#22c55e'; // Verde para pocos
+                            
                             const marker = L.circleMarker([point.lat, point.lng], {
                                 radius: radius,
-                                fillColor: '#3b82f6',
-                                color: '#1e40af',
+                                fillColor: fillColor,
+                                color: '#ffffff',
                                 weight: 2,
-                                opacity: 0.8,
-                                fillOpacity: 0.6
+                                opacity: 1,
+                                fillOpacity: 0.85
                             }).addTo(map);
                             
                             marker.bindPopup(`
-                                <div style="padding: 8px; min-width: 120px;">
-                                    <strong style="color: #1e40af;">${point.count || 1} evento${(point.count || 1) > 1 ? 's' : ''}</strong>
-                                    <br><small style="color: #6b7280;">en esta ubicación</small>
+                                <div style="padding: 10px; min-width: 140px; text-align: center;">
+                                    <div style="font-size: 24px; font-weight: bold; color: ${fillColor};">${count}</div>
+                                    <div style="color: #374151; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
+                                    <div style="color: #9ca3af; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
                                 </div>
                             `);
                         }
