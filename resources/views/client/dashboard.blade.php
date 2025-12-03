@@ -755,11 +755,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     zoomControl: true
                 });
                 
-                // Agregar capa de tiles (CartoDB Positron - estilo claro y profesional)
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-                    subdomains: 'abcd',
+                // Capa base satelital (Esri World Imagery)
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '&copy; Esri, Maxar, Earthstar Geographics',
                     maxZoom: 19
+                }).addTo(map);
+                
+                // Capa de etiquetas con rutas y nombres (superpuesta)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                    attribution: '',
+                    subdomains: 'abcd',
+                    maxZoom: 19,
+                    pane: 'shadowPane'
                 }).addTo(map);
                 
                 if (data && data.length > 0) {
