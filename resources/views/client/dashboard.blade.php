@@ -459,45 +459,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlClientes = "{{ route('client.dashboard.eventos-por-empresa') }}";
     const urlCategorias = "{{ route('client.dashboard.eventos-por-categoria') }}";
     
-    // Paletas de colores
+    // Paleta de colores profesional para empresa de seguridad
+    // Tonos: Azules oscuros, grises, verdes, cyans - sin fucsia ni rosa
     const colorsClientes = {
-        bg: ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)',
-             'rgba(239, 68, 68, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)',
-             'rgba(6, 182, 212, 0.8)', 'rgba(249, 115, 22, 0.8)', 'rgba(34, 197, 94, 0.8)',
-             'rgba(168, 85, 247, 0.8)'],
-        border: ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)', 'rgba(245, 158, 11, 1)',
-                 'rgba(239, 68, 68, 1)', 'rgba(139, 92, 246, 1)', 'rgba(236, 72, 153, 1)',
-                 'rgba(6, 182, 212, 1)', 'rgba(249, 115, 22, 1)', 'rgba(34, 197, 94, 1)',
-                 'rgba(168, 85, 247, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy oscuro
+             'rgba(20, 83, 45, 0.85)',     // Verde oscuro
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(55, 65, 81, 0.85)',     // Gris oscuro
+             'rgba(30, 64, 175, 0.85)',    // Azul royal
+             'rgba(4, 120, 87, 0.85)',     // Verde esmeralda
+             'rgba(17, 94, 89, 0.85)',     // Teal oscuro
+             'rgba(71, 85, 105, 0.85)',    // Gris azulado
+             'rgba(37, 99, 235, 0.85)',    // Azul medio
+             'rgba(5, 150, 105, 0.85)'],   // Verde medio
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(22, 78, 99, 1)',
+                 'rgba(55, 65, 81, 1)', 'rgba(30, 64, 175, 1)', 'rgba(4, 120, 87, 1)',
+                 'rgba(17, 94, 89, 1)', 'rgba(71, 85, 105, 1)', 'rgba(37, 99, 235, 1)',
+                 'rgba(5, 150, 105, 1)']
     };
     
     const colorsCategorias = {
-        bg: ['rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)', 'rgba(168, 85, 247, 0.8)',
-             'rgba(244, 114, 182, 0.8)', 'rgba(192, 132, 252, 0.8)', 'rgba(232, 121, 249, 0.8)',
-             'rgba(167, 139, 250, 0.8)', 'rgba(251, 146, 60, 0.8)', 'rgba(74, 222, 128, 0.8)',
-             'rgba(56, 189, 248, 0.8)'],
-        border: ['rgba(139, 92, 246, 1)', 'rgba(236, 72, 153, 1)', 'rgba(168, 85, 247, 1)',
-                 'rgba(244, 114, 182, 1)', 'rgba(192, 132, 252, 1)', 'rgba(232, 121, 249, 1)',
-                 'rgba(167, 139, 250, 1)', 'rgba(251, 146, 60, 1)', 'rgba(74, 222, 128, 1)',
-                 'rgba(56, 189, 248, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy
+             'rgba(20, 83, 45, 0.85)',     // Verde bosque
+             'rgba(55, 65, 81, 0.85)',     // Gris acero
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(30, 64, 175, 0.85)',    // Azul royal
+             'rgba(4, 120, 87, 0.85)',     // Verde esmeralda
+             'rgba(71, 85, 105, 0.85)',    // Gris slate
+             'rgba(17, 94, 89, 0.85)',     // Teal
+             'rgba(37, 99, 235, 0.85)',    // Azul
+             'rgba(5, 150, 105, 0.85)'],   // Verde
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)',
+                 'rgba(22, 78, 99, 1)', 'rgba(30, 64, 175, 1)', 'rgba(4, 120, 87, 1)',
+                 'rgba(71, 85, 105, 1)', 'rgba(17, 94, 89, 1)', 'rgba(37, 99, 235, 1)',
+                 'rgba(5, 150, 105, 1)']
     };
 
     const colorsPatrullas = {
-        bg: ['rgba(6, 182, 212, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(245, 158, 11, 0.8)',
-             'rgba(239, 68, 68, 0.8)', 'rgba(99, 102, 241, 0.8)'],
-        border: ['rgba(6, 182, 212, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)',
-                 'rgba(239, 68, 68, 1)', 'rgba(99, 102, 241, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy
+             'rgba(20, 83, 45, 0.85)',     // Verde oscuro
+             'rgba(55, 65, 81, 0.85)',     // Gris
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(71, 85, 105, 0.85)'],   // Gris slate
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)',
+                 'rgba(22, 78, 99, 1)', 'rgba(71, 85, 105, 1)']
     };
 
     const colorsGPS = {
-        bg: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)'],
-        border: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)']
+        bg: ['rgba(20, 83, 45, 0.85)',    // Verde oscuro (con GPS)
+             'rgba(55, 65, 81, 0.85)'],    // Gris oscuro (sin GPS)
+        border: ['rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)']
     };
 
-    // Colores para documentos (rojo=vencido, ámbar=7días, amarillo=30días, verde=vigente)
+    // Colores para documentos (mantener semáforo pero más sobrio)
     const colorsDocumentos = {
-        bg: ['rgba(239, 68, 68, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(34, 197, 94, 0.8)'],
-        border: ['rgba(239, 68, 68, 1)', 'rgba(245, 158, 11, 1)', 'rgba(234, 179, 8, 1)', 'rgba(34, 197, 94, 1)']
+        bg: ['rgba(127, 29, 29, 0.85)',   // Rojo oscuro (vencido)
+             'rgba(146, 64, 14, 0.85)',    // Ámbar oscuro (7 días)
+             'rgba(113, 63, 18, 0.85)',    // Marrón dorado (30 días)
+             'rgba(20, 83, 45, 0.85)'],    // Verde oscuro (vigente)
+        border: ['rgba(127, 29, 29, 1)', 'rgba(146, 64, 14, 1)', 'rgba(113, 63, 18, 1)', 'rgba(20, 83, 45, 1)']
     };
 
     // Opciones comunes para gráficos de barras
@@ -735,9 +755,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     zoomControl: true
                 });
                 
-                // Agregar capa de tiles (OpenStreetMap estándar - colores claros)
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                // Agregar capa de tiles (CartoDB Dark Matter - estilo oscuro profesional)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+                    subdomains: 'abcd',
                     maxZoom: 19
                 }).addTo(map);
                 
@@ -752,19 +773,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         (point.count || 1) / maxCount // Normalizar intensidad
                     ]);
                     
-                    // Crear capa de calor con colores más intensos
+                    // Crear capa de calor con colores profesionales de seguridad
                     const heat = L.heatLayer(heatData, {
-                        radius: 30,
-                        blur: 20,
+                        radius: 35,
+                        blur: 25,
                         maxZoom: 17,
                         max: 1.0,
-                        minOpacity: 0.4,
+                        minOpacity: 0.6,
                         gradient: {
-                            0.0: '#3b82f6',  // Azul brillante
-                            0.25: '#06b6d4', // Cyan
-                            0.5: '#22c55e',  // Verde
-                            0.75: '#f59e0b', // Naranja
-                            1.0: '#dc2626'   // Rojo intenso
+                            0.0: '#1e40af',  // Azul royal
+                            0.3: '#0891b2',  // Cyan
+                            0.5: '#059669',  // Verde esmeralda
+                            0.7: '#ca8a04',  // Dorado/ámbar
+                            1.0: '#b91c1c'   // Rojo (zonas críticas)
                         }
                     }).addTo(map);
                     
@@ -778,26 +799,26 @@ document.addEventListener('DOMContentLoaded', function() {
                             const count = point.count || 1;
                             const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
                             
-                            // Color según cantidad de eventos
-                            let fillColor = '#3b82f6'; // Azul por defecto
-                            if (count >= 5) fillColor = '#dc2626'; // Rojo para muchos
-                            else if (count >= 3) fillColor = '#f59e0b'; // Naranja para varios
-                            else if (count >= 2) fillColor = '#22c55e'; // Verde para pocos
+                            // Colores profesionales según cantidad de eventos
+                            let fillColor = '#1e3a8a'; // Azul navy por defecto
+                            if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
+                            else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
+                            else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
                             
                             const marker = L.circleMarker([point.lat, point.lng], {
                                 radius: radius,
                                 fillColor: fillColor,
-                                color: '#ffffff',
+                                color: '#e5e7eb',
                                 weight: 2,
                                 opacity: 1,
-                                fillOpacity: 0.85
+                                fillOpacity: 0.9
                             }).addTo(map);
                             
                             marker.bindPopup(`
-                                <div style="padding: 10px; min-width: 140px; text-align: center;">
-                                    <div style="font-size: 24px; font-weight: bold; color: ${fillColor};">${count}</div>
-                                    <div style="color: #374151; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
-                                    <div style="color: #9ca3af; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
+                                <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
+                                    <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
+                                    <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
                                 </div>
                             `);
                         }
