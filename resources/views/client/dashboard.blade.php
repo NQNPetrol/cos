@@ -148,6 +148,41 @@
         </div>
     </div>
 
+    <!--MAPA DE CALOR -->
+
+    <!-- Mapa de calor en pantalla completa -->
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
+                <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
+                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    Intensidad
+                </span>
+                <!-- Leyenda de colores -->
+                <div class="flex flex-col items-end gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 font-medium">Baja</span>
+                        <div class="w-48 h-4 rounded-md overflow-hidden border border-gray-600 shadow-inner" 
+                             style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">Alta</span>
+                    </div>
+                    <p class="text-xs text-gray-500 italic">Escala de intensidad de eventos</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Componente Vue del mapa de calor -->
+        <div id="heatmap-container"
+            data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
+            data-height="450px">
+        </div>
+    </div>
+
     <!-- ==================== SECCIÓN PATRULLAS ==================== -->
     <div class="border-b border-gray-600 pb-2 mt-8">
         <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
@@ -396,6 +431,57 @@
         </div>
     </div>
 </div>
+<!-- Prueba de diagnóstico -->
+<div id="vue-test" style="display: none;">
+    <div v-if="true" style="background: red; color: white; padding: 10px;">
+        Vue está funcionando
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DIAGNÓSTICO VUE ===');
+    
+    // Verificar si Vue está disponible de diferentes formas
+    console.log('window.Vue:', typeof window.Vue !== 'undefined' ? 'Disponible globalmente' : ' No global');
+    
+    // Verificar si el componente heatmap-chart está en DOM
+    setTimeout(() => {
+        const heatmapElement = document.querySelector('heatmap-chart');
+        if (heatmapElement) {
+            console.log('Componente heatmap-chart en DOM');
+            console.log('Atributos:', {
+                apiUrl: heatmapElement.getAttribute('api-url'),
+                height: heatmapElement.getAttribute('height')
+            });
+        } else {
+            console.error('Componente heatmap-chart NO en DOM');
+        }
+    }, 1000);
+    
+    // Verificar si Leaflet está disponible globalmente
+    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? 'si ' + window.L.version : 'No global');
+    
+    // Probar API del mapa
+    const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+    console.log('URL API:', apiUrl);
+    
+    fetch(apiUrl)
+        .then(response => {
+            console.log('Estado API:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos API:', data);
+            if (data.length === 0) {
+                console.warn('API retornó array vacío - ¿Hay eventos con ubicación?');
+            }
+        })
+        .catch(error => {
+            console.error('Error API:', error);
+        });
+});
+</script>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -662,6 +748,25 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCharts();
     });
 });
+    // Diagnóstico del mapa
+    console.log('=== DIAGNÓSTICO MAPA ===');
+    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? '✅ ' + window.L.version : '❌ No disponible');
+    console.log('L.heatLayer:', typeof L !== 'undefined' && typeof L.heatLayer === 'function' ? '✅ Disponible' : '❌ No disponible');
+
+    // Probar mapa directamente
+    setTimeout(() => {
+        const testContainer = document.getElementById('test-map');
+        if (testContainer && typeof L !== 'undefined') {
+            console.log('🧪 Probando Leaflet directamente...');
+            const testMap = L.map('test-map').setView([-38.8827, -68.0447], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(testMap);
+            L.marker([-38.8827, -68.0447])
+                .addTo(testMap)
+                .bindPopup('¡Leaflet funciona!')
+                .openPopup();
+            console.log('✅ Leaflet funciona correctamente');
+        }
+    }, 1000);
 </script>
 @endpush
 @endsection

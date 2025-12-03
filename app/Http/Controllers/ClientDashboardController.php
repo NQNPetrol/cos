@@ -383,5 +383,68 @@ class ClientDashboardController extends Controller
 
         return response()->json($chartData);
     }
+
+    public function getEventosMapaCalor(Request $request)
+    {
+        try {
+            \Log::info('API Mapa Calor solicitada');
+            
+            $clienteIds = $this->getClienteIds();
+            
+            if ($clienteIds->isEmpty()) {
+                return response()->json([]);
+            }
+
+            $query = Evento::whereIn('cliente_id', $clienteIds)
+                ->where('es_anulado', false)
+                ->whereNotNull('latitud')  
+                ->whereNotNull('longitud') 
+                ->where('latitud', '!=', 0)  
+                ->where('longitud', '!=', 0); 
+
+            // Filtrar por rango de fechas si se proporciona
+            if ($request->filled('fecha_desde')) {
+                $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
+            }
+            if ($request->filled('fecha_hasta')) {
+                $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+            }
+
+            // Agrupar por ubicación para obtener el recuento
+            $eventosPorUbicacion = $query
+                ->select(
+                    DB::raw('ROUND(latitud, 4) as lat'),  
+                    DB::raw('ROUND(longitud, 4) as lng'), 
+                    DB::raw('COUNT(*) as count')
+                )
+                ->groupBy(DB::raw('ROUND(latitud, 4)'), DB::raw('ROUND(longitud, 4)')) // <-- Cambiado
+                ->orderBy('count', 'desc')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'lat' => (float) $item->lat,
+                        'lng' => (float) $item->lng,
+                        'count' => $item->count
+                    ];
+                });
+
+            \Log::info('Resultados encontrados:', ['total' => $eventosPorUbicacion->count()]);
+
+            return response()->json($eventosPorUbicacion);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en API Mapa Calor:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->json([
+                'error' => true,
+                'message' => 'Error interno del servidor',
+                'debug' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
 }
 

@@ -48,6 +48,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/dashboard/eventos-por-categoria', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorCategoria'])
         ->name('dashboard.eventos-por-categoria');
 
+    Route::get('/dashboard/eventos-mapa-calor', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosMapaCalor'])
+        ->name('dashboard.eventos-mapa-calor');
+
     // PROFILE
     Route::get('/profile', function () {
         return view('client.profile.show');
