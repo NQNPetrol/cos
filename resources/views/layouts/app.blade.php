@@ -7,6 +7,7 @@
     <title>@yield('title', 'Centro de Operaciones')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    @livewireStyles
     
     <style>
         /* Animaciones personalizadas */
@@ -1373,6 +1374,7 @@
             }
         });
     </script>
+    @livewireScripts
     @stack('scripts')
 </body>
 </html>
