@@ -176,10 +176,14 @@
             </div>
         </div>
         
-        <!-- Componente Vue del mapa de calor -->
-        <div id="heatmap-container"
-            data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
-            data-height="450px">
+        <!-- Mapa de calor con Leaflet -->
+        <div id="heatmap-container" style="height: 450px; border-radius: 12px; overflow: hidden; background: #1f2937;">
+            <div id="heatmap-loading" class="flex items-center justify-center h-full">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                    <span class="text-gray-300 text-sm">Cargando mapa de calor...</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -431,59 +435,12 @@
         </div>
     </div>
 </div>
-<!-- Prueba de diagnóstico -->
-<div id="vue-test" style="display: none;">
-    <div v-if="true" style="background: red; color: white; padding: 10px;">
-        Vue está funcionando
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DIAGNÓSTICO VUE ===');
-    
-    // Verificar si Vue está disponible de diferentes formas
-    console.log('window.Vue:', typeof window.Vue !== 'undefined' ? 'Disponible globalmente' : ' No global');
-    
-    // Verificar si el componente heatmap-chart está en DOM
-    setTimeout(() => {
-        const heatmapElement = document.querySelector('heatmap-chart');
-        if (heatmapElement) {
-            console.log('Componente heatmap-chart en DOM');
-            console.log('Atributos:', {
-                apiUrl: heatmapElement.getAttribute('api-url'),
-                height: heatmapElement.getAttribute('height')
-            });
-        } else {
-            console.error('Componente heatmap-chart NO en DOM');
-        }
-    }, 1000);
-    
-    // Verificar si Leaflet está disponible globalmente
-    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? 'si ' + window.L.version : 'No global');
-    
-    // Probar API del mapa
-    const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
-    console.log('URL API:', apiUrl);
-    
-    fetch(apiUrl)
-        .then(response => {
-            console.log('Estado API:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Datos API:', data);
-            if (data.length === 0) {
-                console.warn('API retornó array vacío - ¿Hay eventos con ubicación?');
-            }
-        })
-        .catch(error => {
-            console.error('Error API:', error);
-        });
-});
-</script>
-
 @push('scripts')
+<!-- Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -748,25 +705,126 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCharts();
     });
 });
-    // Diagnóstico del mapa
-    console.log('=== DIAGNÓSTICO MAPA ===');
-    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? '✅ ' + window.L.version : '❌ No disponible');
-    console.log('L.heatLayer:', typeof L !== 'undefined' && typeof L.heatLayer === 'function' ? '✅ Disponible' : '❌ No disponible');
-
-    // Probar mapa directamente
-    setTimeout(() => {
-        const testContainer = document.getElementById('test-map');
-        if (testContainer && typeof L !== 'undefined') {
-            console.log('🧪 Probando Leaflet directamente...');
-            const testMap = L.map('test-map').setView([-38.8827, -68.0447], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(testMap);
-            L.marker([-38.8827, -68.0447])
-                .addTo(testMap)
-                .bindPopup('¡Leaflet funciona!')
-                .openPopup();
-            console.log('✅ Leaflet funciona correctamente');
+    // ========== MAPA DE CALOR ==========
+    
+    function initHeatmap() {
+        const container = document.getElementById('heatmap-container');
+        const loading = document.getElementById('heatmap-loading');
+        const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+        
+        // Verificar que Leaflet esté cargado
+        if (typeof L === 'undefined') {
+            console.error('Leaflet no está disponible');
+            if (loading) {
+                loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
+            }
+            return;
         }
-    }, 1000);
+        
+        // Obtener datos de la API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Ocultar loading
+                if (loading) loading.style.display = 'none';
+                
+                // Crear el mapa
+                const map = L.map('heatmap-container', {
+                    center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
+                    zoom: 10,
+                    zoomControl: true
+                });
+                
+                // Agregar capa de tiles (estilo oscuro)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                if (data && data.length > 0) {
+                    // Calcular intensidad máxima para normalizar
+                    const maxCount = Math.max(...data.map(p => p.count || 1));
+                    
+                    // Preparar datos para el heatmap [lat, lng, intensity]
+                    const heatData = data.map(point => [
+                        point.lat,
+                        point.lng,
+                        (point.count || 1) / maxCount // Normalizar intensidad
+                    ]);
+                    
+                    // Crear capa de calor
+                    const heat = L.heatLayer(heatData, {
+                        radius: 25,
+                        blur: 15,
+                        maxZoom: 17,
+                        max: 1.0,
+                        gradient: {
+                            0.0: '#2563eb',  // Azul
+                            0.3: '#06b6d4',  // Cyan
+                            0.5: '#84cc16',  // Verde lima
+                            0.7: '#eab308',  // Amarillo
+                            1.0: '#ef4444'   // Rojo
+                        }
+                    }).addTo(map);
+                    
+                    // Ajustar vista a los puntos
+                    const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                    
+                    // Agregar marcadores para cada ubicación con eventos
+                    data.forEach(point => {
+                        if (point.lat && point.lng) {
+                            const radius = Math.min(4 + (point.count || 1) * 2, 15); // Radio según cantidad
+                            const marker = L.circleMarker([point.lat, point.lng], {
+                                radius: radius,
+                                fillColor: '#3b82f6',
+                                color: '#1e40af',
+                                weight: 2,
+                                opacity: 0.8,
+                                fillOpacity: 0.6
+                            }).addTo(map);
+                            
+                            marker.bindPopup(`
+                                <div style="padding: 8px; min-width: 120px;">
+                                    <strong style="color: #1e40af;">${point.count || 1} evento${(point.count || 1) > 1 ? 's' : ''}</strong>
+                                    <br><small style="color: #6b7280;">en esta ubicación</small>
+                                </div>
+                            `);
+                        }
+                    });
+                    
+                    console.log(`Mapa de calor cargado con ${data.length} eventos`);
+                } else {
+                    // Mostrar mensaje si no hay datos
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
+                    infoDiv.innerHTML = `
+                        <div class="text-center text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            </svg>
+                            <p>No hay eventos con ubicación geográfica</p>
+                        </div>
+                    `;
+                    container.style.position = 'relative';
+                    container.appendChild(infoDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando datos del mapa:', error);
+                if (loading) {
+                    loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
+                }
+            });
+    }
+    
+    // Inicializar mapa cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeatmap);
+    } else {
+        initHeatmap();
+    }
 </script>
 @endpush
 @endsection
