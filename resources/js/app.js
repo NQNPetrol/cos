@@ -3,21 +3,19 @@ import EventosBarras from './Components/EventosBarras.vue';
 import ClientDashboard from './Components/Dashboard/ClientDashboard.vue';
 import BarChart from './Components/Dashboard/BarChart.vue';
 
-// Alpine.js
-import Alpine from 'alpinejs';
-window.Alpine = Alpine;
-Alpine.start();
+// NOTA: Alpine.js es incluido automáticamente por Livewire 3
+// No importar manualmente para evitar conflictos con @livewireScripts
 
 // Esperar a que el DOM esté listo para Vue
 document.addEventListener('DOMContentLoaded', () => {
     // App principal Vue
     const appElement = document.getElementById('app');
     if (appElement) {
-        const app = createApp({});
-        app.component('eventos-barras', EventosBarras);
+const app = createApp({});
+app.component('eventos-barras', EventosBarras);
         app.component('client-dashboard', ClientDashboard);
         app.component('bar-chart', BarChart);
-        app.mount('#app');
+app.mount('#app');
     }
 
     // App para el dashboard del cliente

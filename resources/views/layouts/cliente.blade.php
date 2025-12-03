@@ -8,6 +8,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    @livewireStyles
     
     <style>
         /* Animaciones personalizadas */
@@ -317,7 +318,7 @@
                                     @csrf
 
                                     <x-dropdown-link href="{{ route('logout') }}"
-                                             @click.prevent="$root.submit();">
+                                            @click.prevent="$root.submit();">
                                         {{ __('Log Out') }}
                                     </x-dropdown-link>
                                 </form>
@@ -992,6 +993,7 @@
 
     </script>
     
+    @livewireScripts
     @stack('scripts')
 </body>
 </html>

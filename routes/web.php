@@ -24,7 +24,7 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
 // DASHBOARD LAYOUT PRINCIPAL (ADMIN)
 Route::get('/main-dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
-    ->name('main.dashboard');
+  ->name('main.dashboard');
 
 // API para gráficos del dashboard admin
 Route::get('/main-dashboard/eventos-por-cliente', [\App\Http\Controllers\AdminDashboardController::class, 'getEventosPorCliente'])
