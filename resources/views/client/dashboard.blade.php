@@ -150,38 +150,122 @@
 
     <!--MAPA DE CALOR -->
 
-    <!-- Mapa de calor en pantalla completa -->
+    <!-- Contenedor del mapa de calor y panel lateral -->
     <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div>
-                <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
-                <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
-            </div>
-            <div class="flex flex-col items-end gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
-                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                    Intensidad
-                </span>
-                <!-- Leyenda de colores -->
-                <div class="flex flex-col items-end gap-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 font-medium">Baja</span>
-                        <div class="w-48 h-4 rounded-md overflow-hidden border border-gray-600 shadow-inner" 
-                             style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
-                        </div>
-                        <span class="text-xs text-gray-400 font-medium">Alta</span>
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Columna principal: mapa (ancho reducido) -->
+            <div class="flex-1">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
+                        <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
                     </div>
-                    <p class="text-xs text-gray-500 italic">Escala de intensidad de eventos</p>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
+                            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                            Intensidad
+                        </span>
+                        <!-- Leyenda de colores -->
+                        <div class="flex flex-col items-end gap-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400 font-medium">Baja</span>
+                                <div class="w-40 h-4 rounded-md overflow-hidden border border-gray-600 shadow-inner" 
+                                     style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
+                                </div>
+                                <span class="text-xs text-gray-400 font-medium">Alta</span>
+                            </div>
+                            <p class="text-xs text-gray-500 italic">Escala de intensidad de eventos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mapa de calor con Leaflet (ancho reducido y fijo en altura) -->
+                <div
+                    id="heatmap-container"
+                    class="w-full"
+                    style="height: 420px; border-radius: 12px; overflow: hidden; background: #1f2937;"
+                    data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
+                    data-height="420px"
+                >
+                    <div id="heatmap-loading" class="flex items-center justify-center h-full">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                            <span class="text-gray-300 text-sm">Cargando mapa de calor...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Mapa de calor con Leaflet -->
-        <div id="heatmap-container" style="height: 450px; border-radius: 12px; overflow: hidden; background: #1f2937;">
-            <div id="heatmap-loading" class="flex items-center justify-center h-full">
-                <div class="flex flex-col items-center gap-3">
-                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
-                    <span class="text-gray-300 text-sm">Cargando mapa de calor...</span>
+
+            <!-- Panel lateral: filtros y menú desplegable -->
+            <div class="w-full lg:w-80 space-y-4">
+                <!-- Filtro por cliente -->
+                <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
+                    <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por cliente</h3>
+                    <p class="text-xs text-gray-500 mb-1">Puedes seleccionar uno o varios clientes.</p>
+                    <select
+                        id="heatmap_cliente"
+                        multiple
+                        class="w-full bg-gray-800 border border-gray-600 text-gray-200 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px]"
+                    >
+                        @foreach($empresasAsociadas as $empresa)
+                            <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Filtros por categoría y tipo de evento -->
+                <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4 space-y-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-200 mb-2">Categorías de evento</h3>
+                        <p class="text-xs text-gray-500 mb-1">Puedes seleccionar una o varias categorías.</p>
+                        <select id="heatmap_categorias" multiple
+                                class="w-full bg-gray-800 border border-gray-600 text-gray-200 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px]">
+                            @if(isset($categoriasTiposMapa))
+                                @foreach($categoriasTiposMapa as $cat)
+                                    <option value="{{ $cat['id'] }}">{{ $cat['nombre'] }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-200 mb-2">Tipos de evento</h3>
+                        <p class="text-xs text-gray-500 mb-1">Se actualizan según las categorías seleccionadas.</p>
+                        <select id="heatmap_tipos" multiple
+                                class="w-full bg-gray-800 border border-gray-600 text-gray-400 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button id="heatmap_aplicar_filtros"
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg px-3 py-2 transition-colors">
+                            Aplicar filtros del mapa
+                        </button>
+                        <button id="heatmap_limpiar_filtros"
+                                class="bg-gray-700 hover:bg-gray-600 text-gray-100 text-xs font-medium rounded-lg px-3 py-2 transition-colors">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Menú desplegable dinámico para detalle de punto -->
+                <div class="bg-gray-900/60 border border-gray-700 rounded-xl">
+                    <button type="button"
+                            id="heatmap_detalle_toggle"
+                            class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-200 hover:bg-gray-800/70 rounded-t-xl">
+                        <span>Detalle de punto seleccionado</span>
+                        <svg id="heatmap_detalle_icon" class="w-4 h-4 text-gray-400 transform transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="heatmap_detalle_panel" class="px-4 pb-4 pt-2 text-xs text-gray-400 space-y-2 hidden">
+                        <!-- Estructura del menú desplegable dinámico. El contenido se completará en una etapa posterior. -->
+                        <p class="text-gray-500">
+                            Aquí se mostrará un menú con imágenes y datos del evento asociado al punto seleccionado en el mapa.
+                        </p>
+                        <div id="heatmap_detalle_contenido" class="space-y-2">
+                            <!-- Contenido dinámico futuro -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -726,142 +810,319 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
     // ========== MAPA DE CALOR ==========
-    
-    function initHeatmap() {
-        const container = document.getElementById('heatmap-container');
-        const loading = document.getElementById('heatmap-loading');
-        const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
-        
-        // Verificar que Leaflet esté cargado
-        if (typeof L === 'undefined') {
-            console.error('Leaflet no está disponible');
-            if (loading) {
-                loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
+
+    // (function () {
+    //     const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+    //     const categoriasTiposMapa = @json($categoriasTiposMapa ?? []);
+
+    //     let mapInstance = null;
+    //     let heatLayer = null;
+    //     let markersLayer = null;
+
+    //     const container = document.getElementById('heatmap-container');
+    //     const loading = document.getElementById('heatmap-loading');
+
+    //     const selectCliente = document.getElementById('heatmap_cliente');
+    //     const selectCategorias = document.getElementById('heatmap_categorias');
+    //     const selectTipos = document.getElementById('heatmap_tipos');
+    //     const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
+    //     const btnLimpiar = document.getElementById('heatmap_limpiar_filtros');
+
+    //     const detalleToggle = document.getElementById('heatmap_detalle_toggle');
+    //     const detallePanel = document.getElementById('heatmap_detalle_panel');
+    //     const detalleIcon = document.getElementById('heatmap_detalle_icon');
+
+    //     // Verificar que Leaflet esté cargado
+    //     if (typeof L === 'undefined') {
+    //         console.error('Leaflet no está disponible');
+    //         if (loading) {
+    //             loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
+    //         }
+    //         return;
+    //     }
+
+    //     // Mapa inicial
+    //     function initMap() {
+    //         if (mapInstance) return;
+
+    //         mapInstance = L.map('heatmap-container', {
+    //             center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
+    //             zoom: 10,
+    //             zoomControl: true
+    //         });
+
+    //         // Capa base satelital (Esri World Imagery)
+    //         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    //             attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+    //             maxZoom: 19
+    //         }).addTo(mapInstance);
+
+    //         // Capa de etiquetas con rutas y nombres (superpuesta)
+    //         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+    //             attribution: '',
+    //             subdomains: 'abcd',
+    //             maxZoom: 19,
+    //             pane: 'shadowPane'
+    //         }).addTo(mapInstance);
+
+    //         markersLayer = L.layerGroup().addTo(mapInstance);
+    //     }
+
+    //     function buildQueryParams() {
+    //         const params = new URLSearchParams();
+
+    //         // Filtro por cliente
+    //         if (selectCliente && selectCliente.value) {
+    //             params.append('empresa_asociada_id', selectCliente.value);
+    //         }
+
+    //         // Filtro por categorías (múltiple)
+    //         if (selectCategorias) {
+    //             const selectedCategorias = Array.from(selectCategorias.selectedOptions).map(o => o.value);
+    //             if (selectedCategorias.length > 0) {
+    //                 params.append('categorias', selectedCategorias.join(','));
+    //             }
+    //         }
+
+    //         // Filtro por tipos (múltiple)
+    //         if (selectTipos && !selectTipos.disabled) {
+    //             const selectedTipos = Array.from(selectTipos.selectedOptions).map(o => o.value);
+    //             if (selectedTipos.length > 0) {
+    //                 params.append('tipos', selectedTipos.join(','));
+    //             }
+    //         }
+
+    //         return params.toString() ? `?${params.toString()}` : '';
+    //     }
+
+    //     async function loadHeatmap() {
+    //         initMap();
+
+    //         if (loading) {
+    //             loading.classList.remove('hidden');
+    //             loading.style.display = 'flex';
+    //         }
+
+    //         const queryString = buildQueryParams();
+
+    //         try {
+    //             const response = await fetch(apiUrl + queryString);
+    //             const data = await response.json();
+
+    //             if (loading) {
+    //                 loading.style.display = 'none';
+    //             }
+
+    //             // Limpiar capas anteriores
+    //             if (heatLayer) {
+    //                 heatLayer.remove();
+    //                 heatLayer = null;
+    //             }
+    //             if (markersLayer) {
+    //                 markersLayer.clearLayers();
+    //             }
+
+    //             if (data && data.length > 0) {
+    //                 // Calcular intensidad máxima para normalizar
+    //                 const maxCount = Math.max(...data.map(p => p.count || 1));
+
+    //                 // Preparar datos para el heatmap [lat, lng, intensity]
+    //                 const heatData = data.map(point => [
+    //                     point.lat,
+    //                     point.lng,
+    //                     (point.count || 1) / maxCount // Normalizar intensidad
+    //                 ]);
+
+    //                 // Crear capa de calor con colores profesionales de seguridad
+    //                 heatLayer = L.heatLayer(heatData, {
+    //                     radius: 35,
+    //                     blur: 25,
+    //                     maxZoom: 17,
+    //                     max: 1.0,
+    //                     minOpacity: 0.6,
+    //                     gradient: {
+    //                         0.0: '#1e40af',  // Azul royal
+    //                         0.3: '#0891b2',  // Cyan
+    //                         0.5: '#059669',  // Verde esmeralda
+    //                         0.7: '#ca8a04',  // Dorado/ámbar
+    //                         1.0: '#b91c1c'   // Rojo (zonas críticas)
+    //                     }
+    //                 }).addTo(mapInstance);
+
+    //                 // Ajustar vista a los puntos
+    //                 const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
+    //                 mapInstance.fitBounds(bounds, { padding: [40, 40] });
+
+    //                 // Agregar marcadores para cada ubicación con eventos
+    //                 data.forEach(point => {
+    //                     if (point.lat && point.lng) {
+    //                         const count = point.count || 1;
+    //                         const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
+
+    //                         // Colores profesionales según cantidad de eventos
+    //                         let fillColor = '#1e3a8a'; // Azul navy por defecto
+    //                         if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
+    //                         else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
+    //                         else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
+
+    //                         const marker = L.circleMarker([point.lat, point.lng], {
+    //                             radius: radius,
+    //                             fillColor: fillColor,
+    //                             color: '#e5e7eb',
+    //                             weight: 2,
+    //                             opacity: 1,
+    //                             fillOpacity: 0.9
+    //                         });
+
+    //                         // Popup básico
+    //                         marker.bindPopup(`
+    //                             <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
+    //                                 <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
+    //                                 <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
+    //                                 <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
+    //                             </div>
+    //                         `);
+
+    //                         // Click en marcador: preparar datos para menú desplegable (estructura sin contenido aún)
+    //                         marker.on('click', () => {
+    //                             if (detallePanel) {
+    //                                 detallePanel.classList.remove('hidden');
+    //                             }
+    //                             if (detalleIcon) {
+    //                                 detalleIcon.classList.add('rotate-180');
+    //                             }
+    //                             // Aquí en el futuro se actualizará el contenido dinámico del menú
+    //                         });
+
+    //                         marker.addTo(markersLayer);
+    //                     }
+    //                 });
+    //             } else {
+    //                 // Mostrar mensaje si no hay datos
+    //                 const infoDiv = document.createElement('div');
+    //                 infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
+    //                 infoDiv.innerHTML = `
+    //                     <div class="text-center text-gray-400">
+    //                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+    //                         </svg>
+    //                         <p>No hay eventos con ubicación geográfica</p>
+    //                     </div>
+    //                 `;
+    //                 container.style.position = 'relative';
+    //                 container.appendChild(infoDiv);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error cargando datos del mapa:', error);
+    //             if (loading) {
+    //                 loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
+    //             }
+    //         }
+    //     }
+
+    //     // Actualiza las opciones de tipos según las categorías seleccionadas
+    //     function actualizarTiposPorCategorias() {
+    //         if (!selectCategorias || !selectTipos) return;
+
+    //         const selectedCategorias = Array.from(selectCategorias.selectedOptions).map(o => parseInt(o.value, 10));
+
+    //         // Limpiamos opciones
+    //         selectTipos.innerHTML = '';
+
+    //         if (selectedCategorias.length === 0) {
+    //             selectTipos.disabled = true;
+    //             return;
+    //         }
+
+    //         const tiposSet = new Set();
+
+    //         categoriasTiposMapa.forEach(cat => {
+    //             if (selectedCategorias.includes(cat.id)) {
+    //                 (cat.tipos || []).forEach(t => tiposSet.add(t));
+    //             }
+    //         });
+
+    //         Array.from(tiposSet).sort().forEach(tipo => {
+    //             const opt = document.createElement('option');
+    //             opt.value = tipo;
+    //             opt.textContent = tipo;
+    //             selectTipos.appendChild(opt);
+    //         });
+
+    //         selectTipos.disabled = tiposSet.size === 0;
+    //     }
+
+    //     // Listeners de filtros
+    //     if (selectCategorias) {
+    //         selectCategorias.addEventListener('change', actualizarTiposPorCategorias);
+    //     }
+
+    //     if (btnAplicar) {
+    //         btnAplicar.addEventListener('click', () => {
+    //             loadHeatmap();
+    //         });
+    //     }
+
+    //     if (btnLimpiar) {
+    //         btnLimpiar.addEventListener('click', () => {
+    //             if (selectCliente) selectCliente.value = '';
+    //             if (selectCategorias) {
+    //                 Array.from(selectCategorias.options).forEach(o => (o.selected = false));
+    //             }
+    //             if (selectTipos) {
+    //                 selectTipos.innerHTML = '';
+    //                 selectTipos.disabled = true;
+    //             }
+    //             loadHeatmap();
+    //         });
+    //     }
+
+    //     // Toggle del menú desplegable de detalle
+    //     if (detalleToggle && detallePanel && detalleIcon) {
+    //         detalleToggle.addEventListener('click', () => {
+    //             const isHidden = detallePanel.classList.contains('hidden');
+    //             detallePanel.classList.toggle('hidden');
+    //             detalleIcon.classList.toggle('rotate-180', isHidden);
+    //         });
+    //     }
+
+    //     // Inicializar mapa y datos al cargar
+    //     if (document.readyState === 'loading') {
+    //         document.addEventListener('DOMContentLoaded', loadHeatmap);
+    //     } else {
+    //         loadHeatmap();
+    //     }
+    // })();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
+    const btnLimpiar = document.getElementById('heatmap_limpiar_filtros');
+    const selectCliente = document.getElementById('heatmap_cliente');
+
+    if (btnAplicar) {
+        btnAplicar.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (window.heatmapReload) {
+                window.heatmapReload();
             }
-            return;
-        }
-        
-        // Obtener datos de la API
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Ocultar loading
-                if (loading) loading.style.display = 'none';
-                
-                // Crear el mapa
-                const map = L.map('heatmap-container', {
-                    center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
-                    zoom: 10,
-                    zoomControl: true
-                });
-                
-                // Capa base satelital (Esri World Imagery)
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: '&copy; Esri, Maxar, Earthstar Geographics',
-                    maxZoom: 19
-                }).addTo(map);
-                
-                // Capa de etiquetas con rutas y nombres (superpuesta)
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-                    attribution: '',
-                    subdomains: 'abcd',
-                    maxZoom: 19,
-                    pane: 'shadowPane'
-                }).addTo(map);
-                
-                if (data && data.length > 0) {
-                    // Calcular intensidad máxima para normalizar
-                    const maxCount = Math.max(...data.map(p => p.count || 1));
-                    
-                    // Preparar datos para el heatmap [lat, lng, intensity]
-                    const heatData = data.map(point => [
-                        point.lat,
-                        point.lng,
-                        (point.count || 1) / maxCount // Normalizar intensidad
-                    ]);
-                    
-                    // Crear capa de calor con colores profesionales de seguridad
-                    const heat = L.heatLayer(heatData, {
-                        radius: 35,
-                        blur: 25,
-                        maxZoom: 17,
-                        max: 1.0,
-                        minOpacity: 0.6,
-                        gradient: {
-                            0.0: '#1e40af',  // Azul royal
-                            0.3: '#0891b2',  // Cyan
-                            0.5: '#059669',  // Verde esmeralda
-                            0.7: '#ca8a04',  // Dorado/ámbar
-                            1.0: '#b91c1c'   // Rojo (zonas críticas)
-                        }
-                    }).addTo(map);
-                    
-                    // Ajustar vista a los puntos
-                    const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
-                    map.fitBounds(bounds, { padding: [50, 50] });
-                    
-                    // Agregar marcadores para cada ubicación con eventos
-                    data.forEach(point => {
-                        if (point.lat && point.lng) {
-                            const count = point.count || 1;
-                            const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
-                            
-                            // Colores profesionales según cantidad de eventos
-                            let fillColor = '#1e3a8a'; // Azul navy por defecto
-                            if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
-                            else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
-                            else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
-                            
-                            const marker = L.circleMarker([point.lat, point.lng], {
-                                radius: radius,
-                                fillColor: fillColor,
-                                color: '#e5e7eb',
-                                weight: 2,
-                                opacity: 1,
-                                fillOpacity: 0.9
-                            }).addTo(map);
-                            
-                            marker.bindPopup(`
-                                <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
-                                    <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
-                                    <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
-                                    <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
-                                </div>
-                            `);
-                        }
-                    });
-                    
-                    console.log(`Mapa de calor cargado con ${data.length} eventos`);
-                } else {
-                    // Mostrar mensaje si no hay datos
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
-                    infoDiv.innerHTML = `
-                        <div class="text-center text-gray-400">
-                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                            </svg>
-                            <p>No hay eventos con ubicación geográfica</p>
-                        </div>
-                    `;
-                    container.style.position = 'relative';
-                    container.appendChild(infoDiv);
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando datos del mapa:', error);
-                if (loading) {
-                    loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
-                }
-            });
+        });
     }
-    
-    // Inicializar mapa cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHeatmap);
-    } else {
-        initHeatmap();
+
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', function (e) {
+            e.preventDefault();
+            // Limpiar selección de clientes
+            if (selectCliente) {
+                Array.from(selectCliente.options).forEach(o => o.selected = false);
+            }
+            // En el futuro también limpiaremos categorías/tipos aquí
+            if (window.heatmapReload) {
+                window.heatmapReload();
+            }
+        });
     }
+});
 </script>
 @endpush
 @endsection

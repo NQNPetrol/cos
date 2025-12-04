@@ -106,7 +106,7 @@ class ClientDashboardController extends Controller
 
         // Obtener estadísticas de eventos por categoría
         $categorias = Categoria::all();
-        
+
         $eventosPorCategoria = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
             ->whereNotNull('categoria_id')
@@ -130,6 +130,33 @@ class ClientDashboardController extends Controller
         usort($chartDataCategorias, function($a, $b) {
             return $b['total'] - $a['total'];
         });
+
+        // ========== MAPA DE CALOR - CATEGORÍAS Y TIPOS PARA FILTROS ==========
+
+        // Obtenemos las combinaciones únicas de categoría/tipo de los eventos válidos del cliente
+        $categoriasTiposRaw = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('categoria_id')
+            ->whereNotNull('tipo')
+            ->select('categoria_id', 'tipo')
+            ->groupBy('categoria_id', 'tipo')
+            ->get();
+
+        // Armamos un array estructurado para el front
+        $categoriasMap = Categoria::whereIn('id', $categoriasTiposRaw->pluck('categoria_id')->unique())
+            ->get()
+            ->keyBy('id');
+
+        $categoriasTipos = $categoriasTiposRaw
+            ->groupBy('categoria_id')
+            ->map(function ($group, $categoriaId) use ($categoriasMap) {
+                return [
+                    'id' => (int) $categoriaId,
+                    'nombre' => optional($categoriasMap->get($categoriaId))->nombre ?? 'Sin nombre',
+                    'tipos' => $group->pluck('tipo')->values()
+                ];
+            })
+            ->values();
 
         // ========== ESTADÍSTICAS DE PATRULLAS ==========
         
@@ -248,6 +275,7 @@ class ClientDashboardController extends Controller
             'totalEventos' => $totalEventos,
             'eventosSinEmpresa' => $eventosSinEmpresa,
             'empresasAsociadas' => $empresasAsociadas,
+            'categoriasTiposMapa' => $categoriasTipos,
             // Patrullas
             'totalPatrullas' => $totalPatrullas,
             'patrullasConGPS' => $patrullasConGPS,
@@ -408,6 +436,43 @@ class ClientDashboardController extends Controller
             }
             if ($request->filled('fecha_hasta')) {
                 $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+            }
+
+            // Filtro opcional por empresa asociada (cliente)
+            $empresas = $request->input('empresa_asociada_id');
+            if (!empty($empresas)) {
+                // Puede venir como array o CSV: "1,3,5"
+                $empresaIds = is_array($empresas)
+                    ? $empresas
+                    : array_filter(explode(',', $empresas));
+
+                if (!empty($empresaIds)) {
+                    $query->whereIn('empresa_asociada_id', $empresaIds);
+                }
+            }
+
+            // Filtro opcional por categorías (puede venir como array o CSV)
+            $categorias = $request->input('categorias');
+            if (!empty($categorias)) {
+                $categoriaIds = is_array($categorias)
+                    ? $categorias
+                    : array_filter(explode(',', $categorias));
+
+                if (!empty($categoriaIds)) {
+                    $query->whereIn('categoria_id', $categoriaIds);
+                }
+            }
+
+            // Filtro opcional por tipos de evento (puede venir como array o CSV)
+            $tipos = $request->input('tipos');
+            if (!empty($tipos)) {
+                $tiposArray = is_array($tipos)
+                    ? $tipos
+                    : array_filter(explode(',', $tipos));
+
+                if (!empty($tiposArray)) {
+                    $query->whereIn('tipo', $tiposArray);
+                }
             }
 
             // Agrupar por ubicación para obtener el recuento
