@@ -176,10 +176,14 @@
             </div>
         </div>
         
-        <!-- Componente Vue del mapa de calor -->
-        <div id="heatmap-container"
-            data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
-            data-height="450px">
+        <!-- Mapa de calor con Leaflet -->
+        <div id="heatmap-container" style="height: 450px; border-radius: 12px; overflow: hidden; background: #1f2937;">
+            <div id="heatmap-loading" class="flex items-center justify-center h-full">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                    <span class="text-gray-300 text-sm">Cargando mapa de calor...</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -431,59 +435,12 @@
         </div>
     </div>
 </div>
-<!-- Prueba de diagnóstico -->
-<div id="vue-test" style="display: none;">
-    <div v-if="true" style="background: red; color: white; padding: 10px;">
-        Vue está funcionando
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DIAGNÓSTICO VUE ===');
-    
-    // Verificar si Vue está disponible de diferentes formas
-    console.log('window.Vue:', typeof window.Vue !== 'undefined' ? 'Disponible globalmente' : ' No global');
-    
-    // Verificar si el componente heatmap-chart está en DOM
-    setTimeout(() => {
-        const heatmapElement = document.querySelector('heatmap-chart');
-        if (heatmapElement) {
-            console.log('Componente heatmap-chart en DOM');
-            console.log('Atributos:', {
-                apiUrl: heatmapElement.getAttribute('api-url'),
-                height: heatmapElement.getAttribute('height')
-            });
-        } else {
-            console.error('Componente heatmap-chart NO en DOM');
-        }
-    }, 1000);
-    
-    // Verificar si Leaflet está disponible globalmente
-    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? 'si ' + window.L.version : 'No global');
-    
-    // Probar API del mapa
-    const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
-    console.log('URL API:', apiUrl);
-    
-    fetch(apiUrl)
-        .then(response => {
-            console.log('Estado API:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Datos API:', data);
-            if (data.length === 0) {
-                console.warn('API retornó array vacío - ¿Hay eventos con ubicación?');
-            }
-        })
-        .catch(error => {
-            console.error('Error API:', error);
-        });
-});
-</script>
-
 @push('scripts')
+<!-- Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -502,45 +459,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlClientes = "{{ route('client.dashboard.eventos-por-empresa') }}";
     const urlCategorias = "{{ route('client.dashboard.eventos-por-categoria') }}";
     
-    // Paletas de colores
+    // Paleta de colores profesional para empresa de seguridad
+    // Tonos: Azules oscuros, grises, verdes, cyans - sin fucsia ni rosa
     const colorsClientes = {
-        bg: ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)',
-             'rgba(239, 68, 68, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)',
-             'rgba(6, 182, 212, 0.8)', 'rgba(249, 115, 22, 0.8)', 'rgba(34, 197, 94, 0.8)',
-             'rgba(168, 85, 247, 0.8)'],
-        border: ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)', 'rgba(245, 158, 11, 1)',
-                 'rgba(239, 68, 68, 1)', 'rgba(139, 92, 246, 1)', 'rgba(236, 72, 153, 1)',
-                 'rgba(6, 182, 212, 1)', 'rgba(249, 115, 22, 1)', 'rgba(34, 197, 94, 1)',
-                 'rgba(168, 85, 247, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy oscuro
+             'rgba(20, 83, 45, 0.85)',     // Verde oscuro
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(55, 65, 81, 0.85)',     // Gris oscuro
+             'rgba(30, 64, 175, 0.85)',    // Azul royal
+             'rgba(4, 120, 87, 0.85)',     // Verde esmeralda
+             'rgba(17, 94, 89, 0.85)',     // Teal oscuro
+             'rgba(71, 85, 105, 0.85)',    // Gris azulado
+             'rgba(37, 99, 235, 0.85)',    // Azul medio
+             'rgba(5, 150, 105, 0.85)'],   // Verde medio
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(22, 78, 99, 1)',
+                 'rgba(55, 65, 81, 1)', 'rgba(30, 64, 175, 1)', 'rgba(4, 120, 87, 1)',
+                 'rgba(17, 94, 89, 1)', 'rgba(71, 85, 105, 1)', 'rgba(37, 99, 235, 1)',
+                 'rgba(5, 150, 105, 1)']
     };
     
     const colorsCategorias = {
-        bg: ['rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)', 'rgba(168, 85, 247, 0.8)',
-             'rgba(244, 114, 182, 0.8)', 'rgba(192, 132, 252, 0.8)', 'rgba(232, 121, 249, 0.8)',
-             'rgba(167, 139, 250, 0.8)', 'rgba(251, 146, 60, 0.8)', 'rgba(74, 222, 128, 0.8)',
-             'rgba(56, 189, 248, 0.8)'],
-        border: ['rgba(139, 92, 246, 1)', 'rgba(236, 72, 153, 1)', 'rgba(168, 85, 247, 1)',
-                 'rgba(244, 114, 182, 1)', 'rgba(192, 132, 252, 1)', 'rgba(232, 121, 249, 1)',
-                 'rgba(167, 139, 250, 1)', 'rgba(251, 146, 60, 1)', 'rgba(74, 222, 128, 1)',
-                 'rgba(56, 189, 248, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy
+             'rgba(20, 83, 45, 0.85)',     // Verde bosque
+             'rgba(55, 65, 81, 0.85)',     // Gris acero
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(30, 64, 175, 0.85)',    // Azul royal
+             'rgba(4, 120, 87, 0.85)',     // Verde esmeralda
+             'rgba(71, 85, 105, 0.85)',    // Gris slate
+             'rgba(17, 94, 89, 0.85)',     // Teal
+             'rgba(37, 99, 235, 0.85)',    // Azul
+             'rgba(5, 150, 105, 0.85)'],   // Verde
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)',
+                 'rgba(22, 78, 99, 1)', 'rgba(30, 64, 175, 1)', 'rgba(4, 120, 87, 1)',
+                 'rgba(71, 85, 105, 1)', 'rgba(17, 94, 89, 1)', 'rgba(37, 99, 235, 1)',
+                 'rgba(5, 150, 105, 1)']
     };
 
     const colorsPatrullas = {
-        bg: ['rgba(6, 182, 212, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(245, 158, 11, 0.8)',
-             'rgba(239, 68, 68, 0.8)', 'rgba(99, 102, 241, 0.8)'],
-        border: ['rgba(6, 182, 212, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)',
-                 'rgba(239, 68, 68, 1)', 'rgba(99, 102, 241, 1)']
+        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy
+             'rgba(20, 83, 45, 0.85)',     // Verde oscuro
+             'rgba(55, 65, 81, 0.85)',     // Gris
+             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
+             'rgba(71, 85, 105, 0.85)'],   // Gris slate
+        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)',
+                 'rgba(22, 78, 99, 1)', 'rgba(71, 85, 105, 1)']
     };
 
     const colorsGPS = {
-        bg: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)'],
-        border: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)']
+        bg: ['rgba(20, 83, 45, 0.85)',    // Verde oscuro (con GPS)
+             'rgba(55, 65, 81, 0.85)'],    // Gris oscuro (sin GPS)
+        border: ['rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)']
     };
 
-    // Colores para documentos (rojo=vencido, ámbar=7días, amarillo=30días, verde=vigente)
+    // Colores para documentos (mantener semáforo pero más sobrio)
     const colorsDocumentos = {
-        bg: ['rgba(239, 68, 68, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(34, 197, 94, 0.8)'],
-        border: ['rgba(239, 68, 68, 1)', 'rgba(245, 158, 11, 1)', 'rgba(234, 179, 8, 1)', 'rgba(34, 197, 94, 1)']
+        bg: ['rgba(127, 29, 29, 0.85)',   // Rojo oscuro (vencido)
+             'rgba(146, 64, 14, 0.85)',    // Ámbar oscuro (7 días)
+             'rgba(113, 63, 18, 0.85)',    // Marrón dorado (30 días)
+             'rgba(20, 83, 45, 0.85)'],    // Verde oscuro (vigente)
+        border: ['rgba(127, 29, 29, 1)', 'rgba(146, 64, 14, 1)', 'rgba(113, 63, 18, 1)', 'rgba(20, 83, 45, 1)']
     };
 
     // Opciones comunes para gráficos de barras
@@ -748,25 +725,143 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCharts();
     });
 });
-    // Diagnóstico del mapa
-    console.log('=== DIAGNÓSTICO MAPA ===');
-    console.log('window.L (Leaflet):', typeof window.L !== 'undefined' ? '✅ ' + window.L.version : '❌ No disponible');
-    console.log('L.heatLayer:', typeof L !== 'undefined' && typeof L.heatLayer === 'function' ? '✅ Disponible' : '❌ No disponible');
-
-    // Probar mapa directamente
-    setTimeout(() => {
-        const testContainer = document.getElementById('test-map');
-        if (testContainer && typeof L !== 'undefined') {
-            console.log('🧪 Probando Leaflet directamente...');
-            const testMap = L.map('test-map').setView([-38.8827, -68.0447], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(testMap);
-            L.marker([-38.8827, -68.0447])
-                .addTo(testMap)
-                .bindPopup('¡Leaflet funciona!')
-                .openPopup();
-            console.log('✅ Leaflet funciona correctamente');
+    // ========== MAPA DE CALOR ==========
+    
+    function initHeatmap() {
+        const container = document.getElementById('heatmap-container');
+        const loading = document.getElementById('heatmap-loading');
+        const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+        
+        // Verificar que Leaflet esté cargado
+        if (typeof L === 'undefined') {
+            console.error('Leaflet no está disponible');
+            if (loading) {
+                loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
+            }
+            return;
         }
-    }, 1000);
+        
+        // Obtener datos de la API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Ocultar loading
+                if (loading) loading.style.display = 'none';
+                
+                // Crear el mapa
+                const map = L.map('heatmap-container', {
+                    center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
+                    zoom: 10,
+                    zoomControl: true
+                });
+                
+                // Capa base satelital (Esri World Imagery)
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // Capa de etiquetas con rutas y nombres (superpuesta)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                    attribution: '',
+                    subdomains: 'abcd',
+                    maxZoom: 19,
+                    pane: 'shadowPane'
+                }).addTo(map);
+                
+                if (data && data.length > 0) {
+                    // Calcular intensidad máxima para normalizar
+                    const maxCount = Math.max(...data.map(p => p.count || 1));
+                    
+                    // Preparar datos para el heatmap [lat, lng, intensity]
+                    const heatData = data.map(point => [
+                        point.lat,
+                        point.lng,
+                        (point.count || 1) / maxCount // Normalizar intensidad
+                    ]);
+                    
+                    // Crear capa de calor con colores profesionales de seguridad
+                    const heat = L.heatLayer(heatData, {
+                        radius: 35,
+                        blur: 25,
+                        maxZoom: 17,
+                        max: 1.0,
+                        minOpacity: 0.6,
+                        gradient: {
+                            0.0: '#1e40af',  // Azul royal
+                            0.3: '#0891b2',  // Cyan
+                            0.5: '#059669',  // Verde esmeralda
+                            0.7: '#ca8a04',  // Dorado/ámbar
+                            1.0: '#b91c1c'   // Rojo (zonas críticas)
+                        }
+                    }).addTo(map);
+                    
+                    // Ajustar vista a los puntos
+                    const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                    
+                    // Agregar marcadores para cada ubicación con eventos
+                    data.forEach(point => {
+                        if (point.lat && point.lng) {
+                            const count = point.count || 1;
+                            const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
+                            
+                            // Colores profesionales según cantidad de eventos
+                            let fillColor = '#1e3a8a'; // Azul navy por defecto
+                            if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
+                            else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
+                            else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
+                            
+                            const marker = L.circleMarker([point.lat, point.lng], {
+                                radius: radius,
+                                fillColor: fillColor,
+                                color: '#e5e7eb',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            }).addTo(map);
+                            
+                            marker.bindPopup(`
+                                <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
+                                    <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
+                                    <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
+                                </div>
+                            `);
+                        }
+                    });
+                    
+                    console.log(`Mapa de calor cargado con ${data.length} eventos`);
+                } else {
+                    // Mostrar mensaje si no hay datos
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
+                    infoDiv.innerHTML = `
+                        <div class="text-center text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            </svg>
+                            <p>No hay eventos con ubicación geográfica</p>
+                        </div>
+                    `;
+                    container.style.position = 'relative';
+                    container.appendChild(infoDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando datos del mapa:', error);
+                if (loading) {
+                    loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
+                }
+            });
+    }
+    
+    // Inicializar mapa cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeatmap);
+    } else {
+        initHeatmap();
+    }
 </script>
 @endpush
 @endsection

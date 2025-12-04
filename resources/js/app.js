@@ -7,20 +7,19 @@ import HeatmapChart from './Components/Dashboard/HeatmapChart.vue';
 console.log('app.js cargando...');
 console.log('Leaflet disponible?', typeof L !== 'undefined' ? 'Sí' : 'No');
 
-// Esperar a que el DOM esté listo
+// NOTA: Alpine.js es incluido automáticamente por Livewire 3
+// No importar manualmente para evitar conflictos con @livewireScripts
+
+// Esperar a que el DOM esté listo para Vue
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM cargado');
-    // App principal
+    // App principal Vue
     const appElement = document.getElementById('app');
     if (appElement) {
-        console.log('#app encontrado');
-        const app = createApp({});
-        app.component('eventos-barras', EventosBarras);
+const app = createApp({});
+app.component('eventos-barras', EventosBarras);
         app.component('client-dashboard', ClientDashboard);
         app.component('bar-chart', BarChart);
-        app.component('heatmap-chart', HeatmapChart);
-        app.mount('#app');
-        console.log('App principal montada');
+app.mount('#app');
     }
 
     // App para el dashboard del cliente
