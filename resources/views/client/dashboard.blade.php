@@ -201,40 +201,93 @@
                 <!-- Filtro por cliente -->
                 <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
                     <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por cliente</h3>
-                    <p class="text-xs text-gray-500 mb-1">Puedes seleccionar uno o varios clientes.</p>
-                    <select
-                        id="heatmap_cliente"
-                        multiple
-                        class="w-full bg-gray-800 border border-gray-600 text-gray-200 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px]"
-                    >
-                        @foreach($empresasAsociadas as $empresa)
-                            <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
-                        @endforeach
-                    </select>
+
+                    <div class="space-y-2">
+                        <!-- Checkbox: seleccionar todos -->
+                        <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                id="heatmap_cliente_todos"
+                                class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                            >
+                            <span>Seleccionar todos los clientes</span>
+                        </label>
+
+                        <!-- Lista de clientes -->
+                        <div class="max-h-40 overflow-y-auto space-y-1 mt-1">
+                            @foreach($empresasAsociadas as $empresa)
+                                <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded">
+                                    <input
+                                        type="checkbox"
+                                        class="heatmap-cliente-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                        value="{{ $empresa->id }}"
+                                    >
+                                    <span>{{ $empresa->nombre }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Filtros por categoría y tipo de evento -->
                 <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4 space-y-3">
+                    <!-- Categorías como checkboxes -->
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-200 mb-2">Categorías de evento</h3>
-                        <p class="text-xs text-gray-500 mb-1">Puedes seleccionar una o varias categorías.</p>
-                        <select id="heatmap_categorias" multiple
-                                class="w-full bg-gray-800 border border-gray-600 text-gray-200 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px]">
-                            @if(isset($categoriasTiposMapa))
-                                @foreach($categoriasTiposMapa as $cat)
-                                    <option value="{{ $cat['id'] }}">{{ $cat['nombre'] }}</option>
-                                @endforeach
-                            @endif
-                        </select>
+                        <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por Categoria</h3>
+                        
+                        <div class="space-y-2">
+                            <!-- Checkbox: seleccionar todas las categorías -->
+                            <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    id="heatmap_categoria_todos"
+                                    class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                >
+                                <span>Seleccionar todas las categorías</span>
+                            </label>
+
+                            <!-- Lista de categorías -->
+                            <div class="max-h-40 overflow-y-auto space-y-1 mt-1 custom-scrollbar" id="heatmap_categorias_lista">
+                                @if(isset($categoriasTiposMapa))
+                                    @foreach($categoriasTiposMapa as $cat)
+                                        <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded">
+                                            <input
+                                                type="checkbox"
+                                                class="heatmap-categoria-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                                value="{{ $cat['id'] }}"
+                                                data-tipos="{{ json_encode($cat['tipos'] ?? []) }}"
+                                            >
+                                            <span>{{ $cat['nombre'] }}</span>
+                                        </label>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Tipos de evento (select multiple, se actualiza dinámicamente) -->
                     <div>
                         <h3 class="text-sm font-semibold text-gray-200 mb-2">Tipos de evento</h3>
-                        <p class="text-xs text-gray-500 mb-1">Se actualizan según las categorías seleccionadas.</p>
-                        <select id="heatmap_tipos" multiple
-                                class="w-full bg-gray-800 border border-gray-600 text-gray-400 text-xs rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-h-[90px] disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled>
-                        </select>
+                        
+                        <div class="space-y-2">
+                            <!-- Checkbox: seleccionar todos los tipos -->
+                            <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    id="heatmap_tipo_todos"
+                                    class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                    disabled
+                                >
+                                <span>Seleccionar todos los tipos</span>
+                            </label>
+
+                            <!-- Lista de tipos (se llena dinámicamente) -->
+                            <div id="heatmap_tipos_lista" class="max-h-40 overflow-y-auto space-y-1 mt-1 custom-scrollbar">
+                                <!-- Se llena dinámicamente con JavaScript -->
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="flex gap-2 pt-1">
                         <button id="heatmap_aplicar_filtros"
                                 class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg px-3 py-2 transition-colors">
@@ -248,7 +301,7 @@
                 </div>
 
                 <!-- Menú desplegable dinámico para detalle de punto -->
-                <div class="bg-gray-900/60 border border-gray-700 rounded-xl">
+                <!-- <div class="bg-gray-900/60 border border-gray-700 rounded-xl">
                     <button type="button"
                             id="heatmap_detalle_toggle"
                             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-200 hover:bg-gray-800/70 rounded-t-xl">
@@ -259,14 +312,14 @@
                     </button>
                     <div id="heatmap_detalle_panel" class="px-4 pb-4 pt-2 text-xs text-gray-400 space-y-2 hidden">
                         <!-- Estructura del menú desplegable dinámico. El contenido se completará en una etapa posterior. -->
-                        <p class="text-gray-500">
+                        <!-- <p class="text-gray-500">
                             Aquí se mostrará un menú con imágenes y datos del evento asociado al punto seleccionado en el mapa.
                         </p>
                         <div id="heatmap_detalle_contenido" class="space-y-2">
                             <!-- Contenido dinámico futuro -->
-                        </div>
+                        <!-- </div>
                     </div>
-                </div>
+                </div> --> 
             </div>
         </div>
     </div>
@@ -524,6 +577,43 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+<style>
+    /* Scrollbar personalizada para los contenedores de filtros */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #4b5563 #1f2937;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #1f2937;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #4b5563;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #6b7280;
+    }
+    
+    /* Estilos para cuando el contenedor de tipos está vacío/deshabilitado */
+    #heatmap_tipos_lista:empty {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-style: italic;
+        font-size: 11px;
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
@@ -809,320 +899,659 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCharts();
     });
 });
-    // ========== MAPA DE CALOR ==========
 
-    // (function () {
-    //     const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
-    //     const categoriasTiposMapa = @json($categoriasTiposMapa ?? []);
-
-    //     let mapInstance = null;
-    //     let heatLayer = null;
-    //     let markersLayer = null;
-
-    //     const container = document.getElementById('heatmap-container');
-    //     const loading = document.getElementById('heatmap-loading');
-
-    //     const selectCliente = document.getElementById('heatmap_cliente');
-    //     const selectCategorias = document.getElementById('heatmap_categorias');
-    //     const selectTipos = document.getElementById('heatmap_tipos');
-    //     const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
-    //     const btnLimpiar = document.getElementById('heatmap_limpiar_filtros');
-
-    //     const detalleToggle = document.getElementById('heatmap_detalle_toggle');
-    //     const detallePanel = document.getElementById('heatmap_detalle_panel');
-    //     const detalleIcon = document.getElementById('heatmap_detalle_icon');
-
-    //     // Verificar que Leaflet esté cargado
-    //     if (typeof L === 'undefined') {
-    //         console.error('Leaflet no está disponible');
-    //         if (loading) {
-    //             loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
-    //         }
-    //         return;
-    //     }
-
-    //     // Mapa inicial
-    //     function initMap() {
-    //         if (mapInstance) return;
-
-    //         mapInstance = L.map('heatmap-container', {
-    //             center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
-    //             zoom: 10,
-    //             zoomControl: true
-    //         });
-
-    //         // Capa base satelital (Esri World Imagery)
-    //         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    //             attribution: '&copy; Esri, Maxar, Earthstar Geographics',
-    //             maxZoom: 19
-    //         }).addTo(mapInstance);
-
-    //         // Capa de etiquetas con rutas y nombres (superpuesta)
-    //         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-    //             attribution: '',
-    //             subdomains: 'abcd',
-    //             maxZoom: 19,
-    //             pane: 'shadowPane'
-    //         }).addTo(mapInstance);
-
-    //         markersLayer = L.layerGroup().addTo(mapInstance);
-    //     }
-
-    //     function buildQueryParams() {
-    //         const params = new URLSearchParams();
-
-    //         // Filtro por cliente
-    //         if (selectCliente && selectCliente.value) {
-    //             params.append('empresa_asociada_id', selectCliente.value);
-    //         }
-
-    //         // Filtro por categorías (múltiple)
-    //         if (selectCategorias) {
-    //             const selectedCategorias = Array.from(selectCategorias.selectedOptions).map(o => o.value);
-    //             if (selectedCategorias.length > 0) {
-    //                 params.append('categorias', selectedCategorias.join(','));
-    //             }
-    //         }
-
-    //         // Filtro por tipos (múltiple)
-    //         if (selectTipos && !selectTipos.disabled) {
-    //             const selectedTipos = Array.from(selectTipos.selectedOptions).map(o => o.value);
-    //             if (selectedTipos.length > 0) {
-    //                 params.append('tipos', selectedTipos.join(','));
-    //             }
-    //         }
-
-    //         return params.toString() ? `?${params.toString()}` : '';
-    //     }
-
-    //     async function loadHeatmap() {
-    //         initMap();
-
-    //         if (loading) {
-    //             loading.classList.remove('hidden');
-    //             loading.style.display = 'flex';
-    //         }
-
-    //         const queryString = buildQueryParams();
-
-    //         try {
-    //             const response = await fetch(apiUrl + queryString);
-    //             const data = await response.json();
-
-    //             if (loading) {
-    //                 loading.style.display = 'none';
-    //             }
-
-    //             // Limpiar capas anteriores
-    //             if (heatLayer) {
-    //                 heatLayer.remove();
-    //                 heatLayer = null;
-    //             }
-    //             if (markersLayer) {
-    //                 markersLayer.clearLayers();
-    //             }
-
-    //             if (data && data.length > 0) {
-    //                 // Calcular intensidad máxima para normalizar
-    //                 const maxCount = Math.max(...data.map(p => p.count || 1));
-
-    //                 // Preparar datos para el heatmap [lat, lng, intensity]
-    //                 const heatData = data.map(point => [
-    //                     point.lat,
-    //                     point.lng,
-    //                     (point.count || 1) / maxCount // Normalizar intensidad
-    //                 ]);
-
-    //                 // Crear capa de calor con colores profesionales de seguridad
-    //                 heatLayer = L.heatLayer(heatData, {
-    //                     radius: 35,
-    //                     blur: 25,
-    //                     maxZoom: 17,
-    //                     max: 1.0,
-    //                     minOpacity: 0.6,
-    //                     gradient: {
-    //                         0.0: '#1e40af',  // Azul royal
-    //                         0.3: '#0891b2',  // Cyan
-    //                         0.5: '#059669',  // Verde esmeralda
-    //                         0.7: '#ca8a04',  // Dorado/ámbar
-    //                         1.0: '#b91c1c'   // Rojo (zonas críticas)
-    //                     }
-    //                 }).addTo(mapInstance);
-
-    //                 // Ajustar vista a los puntos
-    //                 const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
-    //                 mapInstance.fitBounds(bounds, { padding: [40, 40] });
-
-    //                 // Agregar marcadores para cada ubicación con eventos
-    //                 data.forEach(point => {
-    //                     if (point.lat && point.lng) {
-    //                         const count = point.count || 1;
-    //                         const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
-
-    //                         // Colores profesionales según cantidad de eventos
-    //                         let fillColor = '#1e3a8a'; // Azul navy por defecto
-    //                         if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
-    //                         else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
-    //                         else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
-
-    //                         const marker = L.circleMarker([point.lat, point.lng], {
-    //                             radius: radius,
-    //                             fillColor: fillColor,
-    //                             color: '#e5e7eb',
-    //                             weight: 2,
-    //                             opacity: 1,
-    //                             fillOpacity: 0.9
-    //                         });
-
-    //                         // Popup básico
-    //                         marker.bindPopup(`
-    //                             <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
-    //                                 <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
-    //                                 <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
-    //                                 <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
-    //                             </div>
-    //                         `);
-
-    //                         // Click en marcador: preparar datos para menú desplegable (estructura sin contenido aún)
-    //                         marker.on('click', () => {
-    //                             if (detallePanel) {
-    //                                 detallePanel.classList.remove('hidden');
-    //                             }
-    //                             if (detalleIcon) {
-    //                                 detalleIcon.classList.add('rotate-180');
-    //                             }
-    //                             // Aquí en el futuro se actualizará el contenido dinámico del menú
-    //                         });
-
-    //                         marker.addTo(markersLayer);
-    //                     }
-    //                 });
-    //             } else {
-    //                 // Mostrar mensaje si no hay datos
-    //                 const infoDiv = document.createElement('div');
-    //                 infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
-    //                 infoDiv.innerHTML = `
-    //                     <div class="text-center text-gray-400">
-    //                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    //                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-    //                         </svg>
-    //                         <p>No hay eventos con ubicación geográfica</p>
-    //                     </div>
-    //                 `;
-    //                 container.style.position = 'relative';
-    //                 container.appendChild(infoDiv);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error cargando datos del mapa:', error);
-    //             if (loading) {
-    //                 loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
-    //             }
-    //         }
-    //     }
-
-    //     // Actualiza las opciones de tipos según las categorías seleccionadas
-    //     function actualizarTiposPorCategorias() {
-    //         if (!selectCategorias || !selectTipos) return;
-
-    //         const selectedCategorias = Array.from(selectCategorias.selectedOptions).map(o => parseInt(o.value, 10));
-
-    //         // Limpiamos opciones
-    //         selectTipos.innerHTML = '';
-
-    //         if (selectedCategorias.length === 0) {
-    //             selectTipos.disabled = true;
-    //             return;
-    //         }
-
-    //         const tiposSet = new Set();
-
-    //         categoriasTiposMapa.forEach(cat => {
-    //             if (selectedCategorias.includes(cat.id)) {
-    //                 (cat.tipos || []).forEach(t => tiposSet.add(t));
-    //             }
-    //         });
-
-    //         Array.from(tiposSet).sort().forEach(tipo => {
-    //             const opt = document.createElement('option');
-    //             opt.value = tipo;
-    //             opt.textContent = tipo;
-    //             selectTipos.appendChild(opt);
-    //         });
-
-    //         selectTipos.disabled = tiposSet.size === 0;
-    //     }
-
-    //     // Listeners de filtros
-    //     if (selectCategorias) {
-    //         selectCategorias.addEventListener('change', actualizarTiposPorCategorias);
-    //     }
-
-    //     if (btnAplicar) {
-    //         btnAplicar.addEventListener('click', () => {
-    //             loadHeatmap();
-    //         });
-    //     }
-
-    //     if (btnLimpiar) {
-    //         btnLimpiar.addEventListener('click', () => {
-    //             if (selectCliente) selectCliente.value = '';
-    //             if (selectCategorias) {
-    //                 Array.from(selectCategorias.options).forEach(o => (o.selected = false));
-    //             }
-    //             if (selectTipos) {
-    //                 selectTipos.innerHTML = '';
-    //                 selectTipos.disabled = true;
-    //             }
-    //             loadHeatmap();
-    //         });
-    //     }
-
-    //     // Toggle del menú desplegable de detalle
-    //     if (detalleToggle && detallePanel && detalleIcon) {
-    //         detalleToggle.addEventListener('click', () => {
-    //             const isHidden = detallePanel.classList.contains('hidden');
-    //             detallePanel.classList.toggle('hidden');
-    //             detalleIcon.classList.toggle('rotate-180', isHidden);
-    //         });
-    //     }
-
-    //     // Inicializar mapa y datos al cargar
-    //     if (document.readyState === 'loading') {
-    //         document.addEventListener('DOMContentLoaded', loadHeatmap);
-    //     } else {
-    //         loadHeatmap();
-    //     }
-    // })();
-</script>
-<script>
+// ========== INTERACCIÓN FILTROS MAPA DE CALOR ==========
 document.addEventListener('DOMContentLoaded', function () {
-    const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
-    const btnLimpiar = document.getElementById('heatmap_limpiar_filtros');
-    const selectCliente = document.getElementById('heatmap_cliente');
+    const btnAplicar   = document.getElementById('heatmap_aplicar_filtros');
+    const btnLimpiar   = document.getElementById('heatmap_limpiar_filtros');
+    const chkTodos     = document.getElementById('heatmap_cliente_todos');
+    const chkClientes  = document.querySelectorAll('.heatmap-cliente-item');
+    const chkCategoriaTodos = document.getElementById('heatmap_categoria_todos');
+    const chkCategorias = document.querySelectorAll('.heatmap-categoria-item');
+    const chkTipoTodos = document.getElementById('heatmap_tipo_todos');
 
+    function setButtonDefault() {
+        if (!btnAplicar) return;
+        btnAplicar.textContent = 'Aplicar filtros del mapa';
+        btnAplicar.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        if (!btnAplicar.classList.contains('bg-blue-600')) {
+            btnAplicar.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }
+    }
+
+    // Manejar "Seleccionar todos los clientes"
+    if (chkTodos) {
+        chkTodos.addEventListener('change', function () {
+            const checked = chkTodos.checked;
+            chkClientes.forEach(c => { c.checked = checked; });
+            setButtonDefault();
+        });
+    }
+
+    // Manejar "Seleccionar todas las categorías"
+    // NOTA: Los listeners de categorías y tipos están manejados en el bloque del mapa de calor
+    // (líneas ~1454 y ~1478) para evitar duplicación. Este bloque solo maneja clientes.
+    // if (chkCategoriaTodos) {
+    //     chkCategoriaTodos.addEventListener('change', function () {
+    //         const checked = chkCategoriaTodos.checked;
+    //         chkCategorias.forEach(c => { 
+    //             c.checked = checked; 
+    //         });
+    //         setButtonDefault();
+    //     });
+    // }
+
+    // Manejar "Seleccionar todos los tipos"
+    // NOTA: Los listeners de tipos están manejados en el bloque del mapa de calor
+    // if (chkTipoTodos) {
+    //     chkTipoTodos.addEventListener('change', function () {
+    //         const checked = chkTipoTodos.checked;
+    //         const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+    //         chkTipos.forEach(c => { 
+    //             c.checked = checked; 
+    //         });
+    //         setButtonDefault();
+    //     });
+    // }
+
+    // Si se cambia cualquier checkbox de cliente, volver a estado "Aplicar filtros"
+    chkClientes.forEach(c => {
+        c.addEventListener('change', function () {
+            if (chkTodos) {
+                const allChecked = Array.from(chkClientes).every(cb => cb.checked);
+                chkTodos.checked = allChecked;
+            }
+            setButtonDefault();
+        });
+    });
+
+
+
+    // Botón aplicar: dispara recarga del mapa
     if (btnAplicar) {
         btnAplicar.addEventListener('click', function (e) {
             e.preventDefault();
             if (window.heatmapReload) {
+                window.heatmapLastActionWasApply = true;
                 window.heatmapReload();
             }
         });
     }
 
+    // Botón limpiar: borra selección y recarga mapa sin filtros
     if (btnLimpiar) {
         btnLimpiar.addEventListener('click', function (e) {
             e.preventDefault();
-            // Limpiar selección de clientes
-            if (selectCliente) {
-                Array.from(selectCliente.options).forEach(o => o.selected = false);
+            // Limpiar clientes
+            if (chkTodos) chkTodos.checked = false;
+            chkClientes.forEach(c => { c.checked = false; });
+            
+            // Limpiar categorías
+            if (chkCategoriaTodos) chkCategoriaTodos.checked = false;
+            chkCategorias.forEach(c => { c.checked = false; });
+            
+            // Limpiar tipos
+            if (chkTipoTodos) chkTipoTodos.checked = false;
+            const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+            chkTipos.forEach(c => { c.checked = false; });
+            
+            // Vaciar lista de tipos
+            const tiposLista = document.getElementById('heatmap_tipos_lista');
+            if (tiposLista) {
+                tiposLista.innerHTML = '';
             }
-            // En el futuro también limpiaremos categorías/tipos aquí
+            
+            setButtonDefault();
             if (window.heatmapReload) {
                 window.heatmapReload();
             }
         });
     }
+
+    // Estado inicial del botón
+    setButtonDefault();
 });
+    // ========== MAPA DE CALOR ==========
+
+    (function () {
+        const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+        const categoriasTiposMapa = @json($categoriasTiposMapa ?? []);
+
+        let mapInstance = null;
+        let heatLayer = null;
+        let markersLayer = null;
+
+        const container = document.getElementById('heatmap-container');
+        const loading = document.getElementById('heatmap-loading');
+
+        const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
+        const btnLimpiar = document.getElementById('heatmap_limpiar_filtros');
+
+        const chkClienteTodos = document.getElementById('heatmap_cliente_todos');
+        const chkClientes = document.querySelectorAll('.heatmap-cliente-item');
+
+        // Categorias y tipos
+        const chkCategoriaTodos = document.getElementById('heatmap_categoria_todos');
+        const chkCategorias = document.querySelectorAll('.heatmap-categoria-item');
+
+        const selectTipos = document.getElementById('heatmap_tipos');
+
+        const detalleToggle = document.getElementById('heatmap_detalle_toggle');
+        const detallePanel = document.getElementById('heatmap_detalle_panel');
+        const detalleIcon = document.getElementById('heatmap_detalle_icon');
+
+        let tiposPorCategoria = {};
+
+        // Verificar que Leaflet esté cargado
+        if (typeof L === 'undefined') {
+            console.error('Leaflet no está disponible');
+            if (loading) {
+                loading.innerHTML = '<div class="text-center text-red-400"><p>Error: No se pudo cargar la biblioteca de mapas</p></div>';
+            }
+            return;
+        }
+
+        // Inicializar tipos por categoría
+        function inicializarTiposPorCategoria() {
+            tiposPorCategoria = {};
+            categoriasTiposMapa.forEach(cat => {
+                // Usar tanto string como número como clave para evitar problemas de tipo
+                const id = String(cat.id);
+                tiposPorCategoria[id] = cat.tipos || [];
+                tiposPorCategoria[cat.id] = cat.tipos || []; // También como número
+            });
+            console.log('Tipos por categoría inicializados:', tiposPorCategoria);
+        }
+
+        // Mapa inicial
+        function initMap() {
+            if (mapInstance) return;
+
+            mapInstance = L.map('heatmap-container', {
+                center: [-38.9516, -68.0591], // Centro en Neuquén por defecto
+                zoom: 10,
+                zoomControl: true
+            });
+
+            // Capa base satelital (Esri World Imagery)
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+                maxZoom: 19
+            }).addTo(mapInstance);
+
+            // Capa de etiquetas con rutas y nombres (superpuesta)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                attribution: '',
+                subdomains: 'abcd',
+                maxZoom: 19,
+                pane: 'shadowPane'
+            }).addTo(mapInstance);
+
+            markersLayer = L.layerGroup().addTo(mapInstance);
+        }
+
+        function buildQueryParams() {
+            const params = new URLSearchParams();
+
+            // Filtro por clientes (checkboxes)
+            if (chkClientes && chkClientes.length > 0) {
+                const selectedClientes = Array.from(chkClientes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value)
+                    .filter(Boolean);
+
+                if (selectedClientes.length > 0) {
+                    params.append('empresa_asociada_id', selectedClientes.join(','));
+                    console.log('Filtro clientes:', selectedClientes);
+                }
+            }
+
+            // Filtro por categorías (checkboxes)
+            if (chkCategorias && chkCategorias.length > 0) {
+                const selectedCategorias = Array.from(chkCategorias)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value)
+                    .filter(Boolean);
+
+                if (selectedCategorias.length > 0) {
+                    params.append('categorias', selectedCategorias.join(','));
+                    console.log('Filtro categorías:', selectedCategorias);
+                } else {
+                    console.log('Filtro categorías: NINGUNA seleccionada');
+                }
+            }
+
+            // Filtro por tipos de evento (checkboxes)
+            const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+            if (chkTipos && chkTipos.length > 0) {
+                const selectedTipos = Array.from(chkTipos)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value)
+                    .filter(Boolean);
+
+                if (selectedTipos.length > 0) {
+                    params.append('tipos', selectedTipos.join(','));
+                    console.log('Filtro tipos:', selectedTipos);
+                } else {
+                    console.log('Filtro tipos: NINGUNO seleccionado');
+                }
+            }
+            
+            console.log('Query params:', params.toString());
+            return params.toString() ? `?${params.toString()}` : '';
+        }
+
+        // Actualiza las opciones de tipos según las categorías seleccionadas
+        function actualizarTiposPorCategorias() {
+            console.log('actualizarTiposPorCategorias() llamada');
+
+            const tiposLista = document.getElementById('heatmap_tipos_lista');
+            const chkTipoTodos = document.getElementById('heatmap_tipo_todos');
+            
+            if (!tiposLista) {
+                console.error('No se encontró heatmap_tipos_lista');
+                return;
+            }
+
+            const selectedCategorias = Array.from(chkCategorias)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value)
+                .filter(Boolean);
+            
+            console.log('Categorías seleccionadas:', selectedCategorias);
+            console.log('Tipos por categoría disponibles:', tiposPorCategoria);
+
+            // Limpiamos lista actual
+            tiposLista.innerHTML = '';
+
+            if (selectedCategorias.length === 0) {
+                // Habilitar/deshabilitar checkbox "todos"
+                if (chkTipoTodos) {
+                    chkTipoTodos.disabled = true;
+                    chkTipoTodos.checked = false;
+                }
+                
+                // Mostrar mensaje cuando no hay categorías seleccionadas
+                tiposLista.innerHTML = '<div class="text-center py-3 text-gray-500 text-xs italic">Selecciona categorías primero</div>';
+                return;
+            }
+
+            // Recopilar todos los tipos únicos de las categorías seleccionadas
+            const tiposSet = new Set();
+            selectedCategorias.forEach(categoriaId => {
+                console.log(`Buscando tipos para categoría ID: ${categoriaId} (tipo: ${typeof categoriaId})`);
+                // Buscar tanto como string como número para asegurar compatibilidad
+                let tipos = tiposPorCategoria[categoriaId] || tiposPorCategoria[String(categoriaId)] || tiposPorCategoria[Number(categoriaId)] || [];
+                
+                // Si aún no encontramos, buscar en categoriasTiposMapa directamente
+                if (!tipos || tipos.length === 0) {
+                    const categoria = categoriasTiposMapa.find(cat => String(cat.id) === String(categoriaId));
+                    tipos = categoria ? (categoria.tipos || []) : [];
+                    console.log(`Tipos encontrados directamente en categoriasTiposMapa para ${categoriaId}:`, tipos);
+                } else {
+                    console.log(`Tipos encontrados en tiposPorCategoria para ${categoriaId}:`, tipos);
+                }
+                
+                if (Array.isArray(tipos)) {
+                    tipos.forEach(tipo => {
+                        if (tipo) tiposSet.add(String(tipo));
+                    });
+                }
+            });
+
+            console.log(`Total de tipos únicos encontrados: ${tiposSet.size}`, Array.from(tiposSet));
+
+            if (tiposSet.size === 0) {
+                // Habilitar/deshabilitar checkbox "todos"
+                if (chkTipoTodos) {
+                    chkTipoTodos.disabled = true;
+                    chkTipoTodos.checked = false;
+                }
+                
+                // Mostrar mensaje cuando no hay tipos disponibles
+                tiposLista.innerHTML = '<div class="text-center py-3 text-gray-500 text-xs italic">No hay tipos disponibles para las categorías seleccionadas</div>';
+                return;
+            }
+
+            console.log(`Creando ${tiposSet.size} checkboxes de tipos`);
+            // Ordenar y agregar checkboxes
+            Array.from(tiposSet).sort().forEach(tipo => {
+                console.log(`Creando checkbox para tipo: ${tipo}`);
+                const label = document.createElement('label');
+                label.className = 'flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'heatmap-tipo-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500';
+                checkbox.value = tipo;
+                
+                const span = document.createElement('span');
+                span.textContent = tipo;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                tiposLista.appendChild(label);
+                
+                // Event listener para cada checkbox de tipo
+                checkbox.addEventListener('change', function() {
+                    // Actualizar checkbox "todos"
+                    const allTipos = document.querySelectorAll('.heatmap-tipo-item');
+                    const allChecked = Array.from(allTipos).every(cb => cb.checked);
+                    
+                    if (chkTipoTodos) {
+                        chkTipoTodos.checked = allChecked;
+                    }
+                    
+                    setButtonDefault();
+                });
+            });
+
+            // Habilitar checkbox "todos"
+            if (chkTipoTodos) {
+                chkTipoTodos.disabled = false;
+                chkTipoTodos.checked = false;
+            }
+        }
+
+        async function loadHeatmap() {
+            initMap();
+
+            if (loading) {
+                loading.classList.remove('hidden');
+                loading.style.display = 'flex';
+            }
+
+            const queryString = buildQueryParams();
+            console.log('Solicitando datos a:', apiUrl + queryString);
+
+
+            try {
+                const response = await fetch(apiUrl + queryString);
+                console.log('Respuesta recibida, status:', response.status);
+                const data = await response.json();
+
+                console.log('Datos recibidos:', {
+                    totalPuntos: data?.length || 0,
+                    esArray: Array.isArray(data),
+                    tieneError: data?.error,
+                    primerosPuntos: data?.slice(0, 3)
+                });
+
+                if (loading) {
+                    loading.style.display = 'none';
+                }
+
+                // Limpiar capas anteriores
+                if (heatLayer) {
+                    heatLayer.remove();
+                    heatLayer = null;
+                }
+                if (markersLayer) {
+                    markersLayer.clearLayers();
+                }
+
+                if (data && data.length > 0) {
+                    // Calcular intensidad máxima para normalizar
+                    const maxCount = Math.max(...data.map(p => p.count || 1));
+
+                    // Preparar datos para el heatmap [lat, lng, intensity]
+                    const heatData = data.map(point => [
+                        point.lat,
+                        point.lng,
+                        (point.count || 1) / maxCount // Normalizar intensidad
+                    ]);
+
+                    // Crear capa de calor con colores profesionales de seguridad
+                    heatLayer = L.heatLayer(heatData, {
+                        radius: 35,
+                        blur: 25,
+                        maxZoom: 17,
+                        max: 1.0,
+                        minOpacity: 0.6,
+                        gradient: {
+                            0.0: '#1e40af',  // Azul royal
+                            0.3: '#0891b2',  // Cyan
+                            0.5: '#059669',  // Verde esmeralda
+                            0.7: '#ca8a04',  // Dorado/ámbar
+                            1.0: '#b91c1c'   // Rojo (zonas críticas)
+                        }
+                    }).addTo(mapInstance);
+
+                    // Ajustar vista a los puntos
+                    const bounds = L.latLngBounds(heatData.map(p => [p[0], p[1]]));
+                    mapInstance.fitBounds(bounds, { padding: [40, 40] });
+
+                    // Agregar marcadores para cada ubicación con eventos
+                    data.forEach(point => {
+                        if (point.lat && point.lng) {
+                            const count = point.count || 1;
+                            const radius = Math.min(6 + count * 2, 18); // Radio según cantidad
+
+                            // Colores profesionales según cantidad de eventos
+                            let fillColor = '#1e3a8a'; // Azul navy por defecto
+                            if (count >= 5) fillColor = '#7f1d1d'; // Rojo oscuro para muchos (alerta)
+                            else if (count >= 3) fillColor = '#115e59'; // Teal oscuro para varios
+                            else if (count >= 2) fillColor = '#166534'; // Verde oscuro para pocos
+
+                            const marker = L.circleMarker([point.lat, point.lng], {
+                                radius: radius,
+                                fillColor: fillColor,
+                                color: '#e5e7eb',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            });
+
+                            // Popup básico
+                            marker.bindPopup(`
+                                <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
+                                    <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
+                                    <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
+                                </div>
+                            `);
+
+                            // Click en marcador: preparar datos para menú desplegable (estructura sin contenido aún)
+                            marker.on('click', () => {
+                                if (detallePanel) {
+                                    detallePanel.classList.remove('hidden');
+                                }
+                                if (detalleIcon) {
+                                    detalleIcon.classList.add('rotate-180');
+                                }
+                                // Aquí en el futuro se actualizará el contenido dinámico del menú
+                            });
+
+                            marker.addTo(markersLayer);
+                        }
+                    });
+                } else {
+                    // Mostrar mensaje si no hay datos
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
+                    infoDiv.innerHTML = `
+                        <div class="text-center text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            </svg>
+                            <p>No hay eventos con ubicación geográfica</p>
+                        </div>
+                    `;
+                    container.style.position = 'relative';
+                    container.appendChild(infoDiv);
+                }
+            } catch (error) {
+                console.error('Error cargando datos del mapa:', error);
+                if (loading) {
+                    loading.innerHTML = '<div class="text-center text-red-400"><p>Error al cargar datos del mapa</p></div>';
+                }
+            }
+        }
+
+        // Inicializar eventos
+        function inicializarEventos() {
+            // Inicializar tipos por categoría
+            inicializarTiposPorCategoria();
+
+            // Manejar "Seleccionar todos los clientes"
+            if (chkClienteTodos) {
+                chkClienteTodos.addEventListener('change', function () {
+                    const checked = chkClienteTodos.checked;
+                    chkClientes.forEach(c => { c.checked = checked; });
+                    setButtonDefault();
+                });
+            }
+
+            // Manejar "Seleccionar todas las categorías"
+            if (chkCategoriaTodos) {
+                chkCategoriaTodos.addEventListener('change', function () {
+                    const checked = chkCategoriaTodos.checked;
+                    chkCategorias.forEach(c => { 
+                        c.checked = checked; 
+                    });
+                    // Actualizar tipos cuando cambian las categorías
+                    actualizarTiposPorCategorias();
+                    setButtonDefault();
+                });
+            }
+
+            // Si se cambia cualquier checkbox de cliente, volver a estado "Aplicar filtros"
+            chkClientes.forEach(c => {
+                c.addEventListener('change', function () {
+                    if (chkClienteTodos) {
+                        const allChecked = Array.from(chkClientes).every(cb => cb.checked);
+                        chkClienteTodos.checked = allChecked;
+                    }
+                    setButtonDefault();
+                });
+            });
+
+            // Si se cambia cualquier checkbox de categoría, actualizar tipos y botón
+            chkCategorias.forEach(c => {
+                c.addEventListener('change', function () {
+                    if (chkCategoriaTodos) {
+                        const allChecked = Array.from(chkCategorias).every(cb => cb.checked);
+                        chkCategoriaTodos.checked = allChecked;
+                    }
+                    // Actualizar tipos cuando cambian las categorías
+                    actualizarTiposPorCategorias();
+                    setButtonDefault();
+                });
+            });
+
+            // Manejar "Seleccionar todos los tipos" - delegación de eventos para elementos dinámicos
+            const chkTipoTodos = document.getElementById('heatmap_tipo_todos');
+            if (chkTipoTodos) {
+                chkTipoTodos.addEventListener('change', function () {
+                    const checked = chkTipoTodos.checked;
+                    const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+                    chkTipos.forEach(c => { 
+                        c.checked = checked; 
+                    });
+                    setButtonDefault();
+                });
+            }
+
+            // Delegación de eventos para checkboxes de tipos dinámicos
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.classList.contains('heatmap-tipo-item')) {
+                    // Actualizar checkbox "todos" cuando cambian los tipos individuales
+                    const chkTipoTodos = document.getElementById('heatmap_tipo_todos');
+                    if (chkTipoTodos && !chkTipoTodos.disabled) {
+                        const allTipos = document.querySelectorAll('.heatmap-tipo-item');
+                        const allChecked = Array.from(allTipos).every(cb => cb.checked);
+                        chkTipoTodos.checked = allChecked;
+                    }
+                    setButtonDefault();
+                }
+            });
+
+            // Botón aplicar
+            if (btnAplicar) {
+                btnAplicar.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    window.heatmapLastActionWasApply = true;
+                    loadHeatmap();
+                });
+            }
+
+            // Botón limpiar
+            if (btnLimpiar) {
+                btnLimpiar.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    // Limpiar clientes
+                    if (chkClienteTodos) chkClienteTodos.checked = false;
+                    chkClientes.forEach(c => { c.checked = false; });
+                    
+                    // Limpiar categorías
+                    if (chkCategoriaTodos) chkCategoriaTodos.checked = false;
+                    chkCategorias.forEach(c => { c.checked = false; });
+                    
+                    // Limpiar tipos
+                    const chkTipoTodos = document.getElementById('heatmap_tipo_todos');
+                    if (chkTipoTodos) {
+                        chkTipoTodos.checked = false;
+                        chkTipoTodos.disabled = true;
+                    }
+                    
+                    // Vaciar lista de tipos
+                    const tiposLista = document.getElementById('heatmap_tipos_lista');
+                    if (tiposLista) {
+                        tiposLista.innerHTML = '<div class="text-center py-3 text-gray-500 text-xs italic">Selecciona categorías primero</div>';
+                    }
+                    
+                    // También limpiar cualquier checkbox de tipo existente
+                    const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+                    chkTipos.forEach(c => { c.checked = false; });
+                    
+                    setButtonDefault();
+                    loadHeatmap();
+                });
+            }
+
+            // Toggle del menú desplegable de detalle
+            // if (detalleToggle && detallePanel && detalleIcon) {
+            //     detalleToggle.addEventListener('click', () => {
+            //         const isHidden = detallePanel.classList.contains('hidden');
+            //         detallePanel.classList.toggle('hidden');
+            //         detalleIcon.classList.toggle('rotate-180', isHidden);
+            //     });
+            // }
+        }
+
+        function setButtonDefault() {
+        if (!btnAplicar) return;
+        btnAplicar.textContent = 'Aplicar filtros del mapa';
+        btnAplicar.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        if (!btnAplicar.classList.contains('bg-blue-600')) {
+            btnAplicar.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }
+    }
+
+    // Inicializar eventos y cargar mapa
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarEventos();
+            // Llamar a actualizarTiposPorCategorias después de inicializar para mostrar tipos si hay categorías preseleccionadas
+            setTimeout(() => {
+                actualizarTiposPorCategorias();
+            }, 100);
+            loadHeatmap();
+        });
+    } else {
+        inicializarEventos();
+        // Llamar a actualizarTiposPorCategorias después de inicializar para mostrar tipos si hay categorías preseleccionadas
+        setTimeout(() => {
+            actualizarTiposPorCategorias();
+        }, 100);
+        loadHeatmap();
+    }
+
+    window.heatmapReload = loadHeatmap;
+    window.actualizarTiposPorCategorias = actualizarTiposPorCategorias;
+    })();
 </script>
+
 @endpush
 @endsection

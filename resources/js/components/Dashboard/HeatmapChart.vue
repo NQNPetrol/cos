@@ -144,10 +144,14 @@ const loadHeatmapData = async () => {
     if (props.fechaDesde) params.append('fecha_desde', props.fechaDesde);
     if (props.fechaHasta) params.append('fecha_hasta', props.fechaHasta);
 
-    // 🔹 Leer clientes seleccionados del filtro Blade (multi-select)
-    const clienteSelect = document.getElementById('heatmap_cliente');
-    if (clienteSelect) {
-      const selectedClientes = Array.from(clienteSelect.selectedOptions).map(o => o.value).filter(Boolean);
+    // Leer clientes seleccionados (checkboxes)
+    const clienteCheckboxes = document.querySelectorAll('.heatmap-cliente-item');
+    if (clienteCheckboxes && clienteCheckboxes.length > 0) {
+      const selectedClientes = Array.from(clienteCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value)
+        .filter(Boolean);
+
       if (selectedClientes.length > 0) {
         // Enviamos como CSV: 1,3,5...
         params.append('empresa_asociada_id', selectedClientes.join(','));
@@ -229,7 +233,17 @@ const loadHeatmapData = async () => {
     
     loading.value = false;
     status.value = 'Completado';
-    
+
+    // Si la recarga vino desde el botón "Aplicar filtros", marcar botón como aplicado
+    if (typeof window !== 'undefined' && window.heatmapLastActionWasApply) {
+      const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
+      if (btnAplicar) {
+        btnAplicar.textContent = 'Filtros aplicados';
+        btnAplicar.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        btnAplicar.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      }
+      window.heatmapLastActionWasApply = false;
+    }
   } catch (error) {
     console.error('Error cargando datos:', error);
     status.value = 'Error cargando datos';
