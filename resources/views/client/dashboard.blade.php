@@ -175,13 +175,12 @@
                     </div>
                 </div>
 
-                <!-- Mapa de calor con Leaflet (ancho reducido y fijo en altura) -->
+                <!-- Mapa de calor con Leaflet (altura fija) -->
                 <div
                     id="heatmap-container"
                     class="w-full"
-                    style="height: 420px; border-radius: 12px; overflow: hidden; background: #1f2937;"
+                    style="height: 600px; border-radius: 12px; overflow: hidden; background: #1f2937;"
                     data-api-url="{{ route('client.dashboard.eventos-mapa-calor') }}"
-                    data-height="420px"
                 >
                     <div id="heatmap-loading" class="flex items-center justify-center h-full">
                         <div class="flex flex-col items-center gap-3">
@@ -193,7 +192,7 @@
             </div>
 
             <!-- Panel lateral: filtros y menú desplegable -->
-            <div class="w-full lg:w-80 space-y-4">
+            <div id="heatmap-filters-panel" class="w-full lg:w-80 space-y-4">
                 <!-- Filtro por cliente -->
                 <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
                     <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por cliente</h3>
@@ -210,7 +209,7 @@
                         </label>
 
                         <!-- Lista de clientes -->
-                        <div class="max-h-40 overflow-y-auto space-y-1 mt-1">
+                        <div class="max-h-40 overflow-y-auto space-y-1 mt-1 custom-scrollbar">
                             @foreach($empresasAsociadas as $empresa)
                                 <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded">
                                     <input
@@ -295,27 +294,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Menú desplegable dinámico para detalle de punto -->
-                <!-- <div class="bg-gray-900/60 border border-gray-700 rounded-xl">
-                    <button type="button"
-                            id="heatmap_detalle_toggle"
-                            class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-200 hover:bg-gray-800/70 rounded-t-xl">
-                        <span>Detalle de punto seleccionado</span>
-                        <svg id="heatmap_detalle_icon" class="w-4 h-4 text-gray-400 transform transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <div id="heatmap_detalle_panel" class="px-4 pb-4 pt-2 text-xs text-gray-400 space-y-2 hidden">
-                        <!-- Estructura del menú desplegable dinámico. El contenido se completará en una etapa posterior. -->
-                        <!-- <p class="text-gray-500">
-                            Aquí se mostrará un menú con imágenes y datos del evento asociado al punto seleccionado en el mapa.
-                        </p>
-                        <div id="heatmap_detalle_contenido" class="space-y-2">
-                            <!-- Contenido dinámico futuro -->
-                        <!-- </div>
-                    </div>
-                </div> --> 
             </div>
         </div>
     </div>
@@ -649,6 +627,58 @@
     .popup-eventos-scroll::-webkit-scrollbar-thumb:hover {
         background-color: #4b5563;
     }
+    
+    /* Estilos para el botón de restablecer vista del mapa - mismo estilo que controles de zoom */
+    .leaflet-control-reset-view {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: black;
+        box-sizing: border-box;
+    }
+    
+    .leaflet-control-reset-view:hover {
+        background-color: #f4f4f4;
+    }
+    
+    .leaflet-control-reset-view svg {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        vertical-align: middle;
+        stroke: currentColor;
+    }
+    
+    /* Estilos para el botón de cambio de estilo del mapa - mismo estilo que controles de zoom */
+    .leaflet-control-map-style {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: black;
+        box-sizing: border-box;
+    }
+    
+    .leaflet-control-map-style:hover {
+        background-color: #f4f4f4;
+    }
+    
+    .leaflet-control-map-style svg {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        vertical-align: middle;
+        stroke: currentColor;
+    }
 </style>
 
 <script>
@@ -693,10 +723,8 @@ function copyCoords(coords, buttonElement) {
 }
 
 function verEvento(eventoId) {
-    // Por ahora no hace nada, como solicitó el usuario
-    console.log('Ver evento:', eventoId);
-    // En el futuro aquí se puede redirigir a la página de detalle del evento
-    // window.location.href = `/eventos/${eventoId}`;
+    // Redirigir a la página de reporte del evento
+    window.location.href = `/client/eventos/${eventoId}/reporte`;
 }
 </script>
 
@@ -1106,6 +1134,9 @@ document.addEventListener('DOMContentLoaded', function () {
         let mapInstance = null;
         let heatLayer = null;
         let markersLayer = null;
+        let baseLayers = {};
+        let currentBaseLayer = null;
+        let labelsLayer = null;
 
         const container = document.getElementById('heatmap-container');
         const loading = document.getElementById('heatmap-loading');
@@ -1159,21 +1190,107 @@ document.addEventListener('DOMContentLoaded', function () {
                 zoomControl: true
             });
 
-            // Capa base satelital (Esri World Imagery)
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            // Crear capas base
+            // Capa satelital (Esri World Imagery)
+            baseLayers.satelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: '&copy; Esri, Maxar, Earthstar Geographics',
                 maxZoom: 19
-            }).addTo(mapInstance);
+            });
 
-            // Capa de etiquetas con rutas y nombres (superpuesta)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+            // Capa física/normal (OpenStreetMap)
+            baseLayers.fisico = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            });
+
+            // Capa de etiquetas con rutas y nombres (solo para satelital)
+            labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
                 attribution: '',
                 subdomains: 'abcd',
                 maxZoom: 19,
                 pane: 'shadowPane'
-            }).addTo(mapInstance);
+            });
+
+            // Agregar capa satelital por defecto con etiquetas
+            baseLayers.satelital.addTo(mapInstance);
+            labelsLayer.addTo(mapInstance);
+            currentBaseLayer = 'satelital';
 
             markersLayer = L.layerGroup().addTo(mapInstance);
+
+            // Guardar posición inicial del mapa
+            const initialCenter = [-38.9516, -68.0591];
+            const initialZoom = 10;
+
+            // Crear control personalizado para restablecer vista
+            const ResetViewControl = L.Control.extend({
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    const button = L.DomUtil.create('a', 'leaflet-control-reset-view', container);
+                    button.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
+                    button.href = '#';
+                    button.title = 'Restablecer vista inicial y refrescar mapa';
+                    
+                    L.DomEvent.disableClickPropagation(button);
+                    L.DomEvent.on(button, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        // Restablecer vista inicial
+                        mapInstance.setView(initialCenter, initialZoom, {
+                            animate: true,
+                            duration: 0.5
+                        });
+                        // Recargar el mapa para refrescar los datos
+                        if (window.heatmapReload) {
+                            window.heatmapReload();
+                        }
+                    });
+
+                    return container;
+                }
+            });
+
+            // Agregar control al mapa
+            new ResetViewControl({ position: 'topleft' }).addTo(mapInstance);
+
+            // Crear control para cambiar estilo del mapa
+            const MapStyleControl = L.Control.extend({
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    const button = L.DomUtil.create('a', 'leaflet-control-map-style', container);
+                    button.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"></path></svg>';
+                    button.href = '#';
+                    button.title = 'Cambiar estilo del mapa';
+                    
+                    L.DomEvent.disableClickPropagation(button);
+                    L.DomEvent.on(button, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        
+                        // Cambiar entre capas
+                        if (currentBaseLayer === 'satelital') {
+                            // Cambiar a físico
+                            mapInstance.removeLayer(baseLayers.satelital);
+                            mapInstance.removeLayer(labelsLayer);
+                            baseLayers.fisico.addTo(mapInstance);
+                            currentBaseLayer = 'fisico';
+                            button.title = 'Cambiar estilo del mapa';
+                        } else {
+                            // Cambiar a satelital
+                            mapInstance.removeLayer(baseLayers.fisico);
+                            baseLayers.satelital.addTo(mapInstance);
+                            labelsLayer.addTo(mapInstance);
+                            currentBaseLayer = 'satelital';
+                            button.title = 'Cambiar estilo del mapa';
+                        }
+                    });
+
+                    return container;
+                }
+            });
+
+            // Agregar control de cambio de estilo al mapa (debajo del botón de reset)
+            new MapStyleControl({ position: 'topleft' }).addTo(mapInstance);
         }
 
         function buildQueryParams() {
@@ -1375,6 +1492,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (markersLayer) {
                     markersLayer.clearLayers();
                 }
+                
+                // Eliminar cualquier placeholder existente
+                const existingPlaceholder = container.querySelector('.absolute.inset-0');
+                if (existingPlaceholder) {
+                    existingPlaceholder.remove();
+                }
 
                 if (data && data.length > 0) {
                     // Calcular intensidad máxima para normalizar
@@ -1512,7 +1635,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     // Construir HTML del listado de eventos
                                     let eventosHTML = `
                                         <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px; font-weight: 500;">LISTADO DE EVENTOS</div>
-                                        <div class="popup-eventos-scroll" style="max-height: 300px; overflow-y: auto;">
+                                        <div class="popup-eventos-scroll" style="max-height: 200px; overflow-y: auto;">
                                     `;
 
                                     data.eventos.forEach((evento, index) => {
@@ -1573,20 +1696,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             marker.addTo(markersLayer);
                         }
                     });
-                } else {
-                    // Mostrar mensaje si no hay datos
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-800/80 z-[1000]';
-                    infoDiv.innerHTML = `
-                        <div class="text-center text-gray-400">
-                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                            </svg>
-                            <p>No hay eventos con ubicación geográfica</p>
-                        </div>
-                    `;
-                    container.style.position = 'relative';
-                    container.appendChild(infoDiv);
                 }
             } catch (error) {
                 console.error('Error cargando datos del mapa:', error);
