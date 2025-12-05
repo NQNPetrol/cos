@@ -32,7 +32,9 @@
                                                 <option value="{{ $mision->id }}"
                                                     data-nombre="{{ $mision->nombre }}"
                                                     data-drone="{{ $mision->drone->drone ?? 'No asignado'}}"
-                                                    data-descripcion="{{ $mision->descripcion ?? 'Sin descripcion disponible' }}">
+                                                    data-descripcion="{{ $mision->descripcion ?? 'Sin descripcion disponible' }}"
+                                                    data-waypoints="{{ $mision->waypoints ? json_encode($mision->waypoints) : '' }}"
+                                                    data-kmz-file-path="{{ $mision->kmz_file_path ?? '' }}">
                                                     {{ $mision->nombre}}
                                                     @if($mision->cliente)
                                                         - {{ $mision->cliente->nombre }}
@@ -173,6 +175,17 @@
                                             </span>
                                         </div>
                                     </div>
+
+                                    <!-- Mapa de Ruta -->
+                                    <div id="missionMapContainer" class="bg-gray-750 rounded-lg p-4 border border-gray-600 hidden">
+                                        <div class="flex items-center mb-3">
+                                            <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                                            </svg>
+                                            <h4 class="text-sm font-medium text-gray-200">Ruta de la Misión</h4>
+                                        </div>
+                                        <div id="missionMap" style="height: 400px; width: 100%; border-radius: 8px; overflow: hidden;"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -189,15 +202,24 @@
             updateMissionSummary(this);
         });
 
+        let missionMap = null;
+        let missionMapLayer = null;
+
         function updateMissionSummary(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
             const emptyState = document.getElementById('emptyMissionState');
             const missionSummary = document.getElementById('missionSummary');
+            const mapContainer = document.getElementById('missionMapContainer');
 
             if (selectedOption.value === '') {
                 // Mostrar estado vacío
                 emptyState.classList.remove('hidden');
                 missionSummary.classList.add('hidden');
+                mapContainer.classList.add('hidden');
+                if (missionMap) {
+                    missionMap.remove();
+                    missionMap = null;
+                }
             } else {
                 // Ocultar estado vacío y mostrar resumen
                 emptyState.classList.add('hidden');
@@ -207,7 +229,113 @@
                 document.getElementById('summaryNombre').textContent = selectedOption.getAttribute('data-nombre') || '-';
                 document.getElementById('summaryDrone').textContent = selectedOption.getAttribute('data-drone') || '-';
                 document.getElementById('summaryDescripcion').textContent = selectedOption.getAttribute('data-descripcion') || 'Sin descripción disponible';
+
+                // Obtener waypoints
+                const waypointsData = selectedOption.getAttribute('data-waypoints');
+                const kmzFilePath = selectedOption.getAttribute('data-kmz-file-path');
+
+                if (waypointsData && waypointsData !== '') {
+                    try {
+                        const waypoints = JSON.parse(waypointsData);
+                        if (waypoints && waypoints.length > 0) {
+                            // Mostrar mapa y dibujar ruta
+                            mapContainer.classList.remove('hidden');
+                            drawMissionRoute(waypoints);
+                        } else {
+                            mapContainer.classList.add('hidden');
+                        }
+                    } catch (e) {
+                        console.error('Error al parsear waypoints:', e);
+                        mapContainer.classList.add('hidden');
+                    }
+                } else {
+                    mapContainer.classList.add('hidden');
+                }
             }
+        }
+
+        function drawMissionRoute(waypoints) {
+            // Esperar a que Leaflet esté disponible
+            if (typeof L === 'undefined') {
+                console.error('Leaflet no está disponible, esperando...');
+                setTimeout(() => drawMissionRoute(waypoints), 100);
+                return;
+            }
+
+            // Limpiar mapa anterior si existe
+            if (missionMap) {
+                missionMap.remove();
+            }
+
+            // Crear mapa
+            missionMap = L.map('missionMap', {
+                center: [parseFloat(waypoints[0].latitud), parseFloat(waypoints[0].longitud)],
+                zoom: 15,
+                zoomControl: true
+            });
+
+            // Configurar iconos de Leaflet
+            delete L.Icon.Default.prototype._getIconUrl;
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+                iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            });
+
+            // Añadir capa base satelital
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri, Maxar, Earthstar Geographics',
+                maxZoom: 19
+            }).addTo(missionMap);
+
+            // Capa de etiquetas
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                attribution: '',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(missionMap);
+
+            // Convertir waypoints a coordenadas de Leaflet [lat, lng]
+            const routeCoordinates = waypoints.map(wp => [
+                parseFloat(wp.latitud),
+                parseFloat(wp.longitud)
+            ]);
+
+            // Dibujar línea que conecta todos los waypoints
+            const polyline = L.polyline(routeCoordinates, {
+                color: '#3b82f6',
+                weight: 4,
+                opacity: 0.8
+            }).addTo(missionMap);
+
+            // Agregar marcadores en cada waypoint
+            waypoints.forEach((wp, index) => {
+                const marker = L.marker([parseFloat(wp.latitud), parseFloat(wp.longitud)], {
+                    icon: L.icon({
+                        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34]
+                    })
+                }).addTo(missionMap);
+
+                // Agregar popup con información del waypoint
+                const popupContent = `
+                    <div class="text-sm">
+                        <strong>Waypoint ${index + 1}</strong><br>
+                        Lat: ${wp.latitud}<br>
+                        Lng: ${wp.longitud}<br>
+                        Altitud: ${wp.altitud || 'N/A'} m
+                        ${wp.acciones && wp.acciones.length > 0 ? `<br>Acciones: ${wp.acciones.join(', ')}` : ''}
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            });
+
+            // Ajustar el mapa para mostrar toda la ruta
+            missionMap.fitBounds(polyline.getBounds(), {
+                padding: [20, 20]
+            });
         }
 
         // Inicializar el resumen al cargar la página
@@ -367,4 +495,9 @@
             hideTriggerSuccessMessage();
         });
     </script>
+@push('scripts')
+<!-- Leaflet CSS y JS para el mapa de rutas -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@endpush
 @endsection

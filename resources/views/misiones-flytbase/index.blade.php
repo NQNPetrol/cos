@@ -83,7 +83,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <button onclick="openEditModal({{ $mision->id }}, '{{ addslashes($mision->nombre) }}', '{{ addslashes($mision->descripcion) }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }}, {{ $mision->drone_id ?? 'null' }}, {{ $mision->dock_id ?? 'null' }}, {{ $mision->site_id ?? 'null' }}, '{{ $mision->route_altitude }}', '{{ $mision->route_speed }}', '{{ $mision->route_waypoint_type }}', '{{ addslashes($mision->observaciones) }}', `{{ addslashes(json_encode($mision->waypoints, JSON_PRETTY_PRINT)) }}`)"
+                                            <button onclick="openEditModal({{ $mision->id }}, '{{ addslashes($mision->nombre) }}', '{{ addslashes($mision->descripcion) }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }}, {{ $mision->drone_id ?? 'null' }}, {{ $mision->dock_id ?? 'null' }}, {{ $mision->site_id ?? 'null' }}, '{{ $mision->route_altitude }}', '{{ $mision->route_speed }}', '{{ $mision->route_waypoint_type }}', '{{ addslashes($mision->observaciones) }}', `{{ addslashes(json_encode($mision->waypoints, JSON_PRETTY_PRINT)) }}`, '{{ $mision->kmz_file_path ?? 'null' }}')"
                                                     class="text-blue-400 hover:text-blue-300 transition-colors p-1 rounded hover:bg-blue-900/30"
                                                     title="Editar misión">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -138,7 +138,7 @@
                 </button>
             </div>
             
-            <form id="createForm" method="POST" action="{{ route('misiones-flytbase.store') }}">
+            <form id="createForm" method="POST" action="{{ route('misiones-flytbase.store') }}" enctype="multipart/form-data">
                 @csrf
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -247,24 +247,51 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">JSON Waypoints</label>
-                            <textarea name="waypoints" rows="8"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
-                                      placeholder='[
-                                                        {
-                                                            "altitud": 35,
-                                                            "latitud": "-38.85047",
-                                                            "acciones": ["take_panorama_image"],
-                                                            "longitud": "-68.12660"
-                                                        },
-                                                        {
-                                                            "altitud": 35,
-                                                            "latitud": "-38.84919",
-                                                            "acciones": [],
-                                                            "longitud": "-68.12503"
-                                                        }
-                                                    ]'></textarea>
-                            <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
+                            
+                            <!-- Tabs para elegir entre JSON y KMZ -->
+                            <div class="mb-3 border-b border-gray-600">
+                                <div class="flex space-x-4">
+                                    <button type="button" onclick="switchWaypointInput('create', 'json')" 
+                                            id="createWaypointTabJson"
+                                            class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-400">
+                                        JSON Manual
+                                    </button>
+                                    <button type="button" onclick="switchWaypointInput('create', 'kmz')" 
+                                            id="createWaypointTabKmz"
+                                            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+                                        Importar KMZ
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor JSON -->
+                            <div id="createWaypointJsonContainer">
+                                <textarea name="waypoints" id="createWaypoints" rows="8"
+                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
+                                          placeholder='[
+                                                            {
+                                                                "altitud": 35,
+                                                                "latitud": "-38.85047",
+                                                                "acciones": ["take_panorama_image"],
+                                                                "longitud": "-68.12660"
+                                                            },
+                                                            {
+                                                                "altitud": 35,
+                                                                "latitud": "-38.84919",
+                                                                "acciones": [],
+                                                                "longitud": "-68.12503"
+                                                            }
+                                                        ]'></textarea>
+                                <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                            </div>
+
+                            <!-- Contenedor KMZ -->
+                            <div id="createWaypointKmzContainer" class="hidden">
+                                <input type="file" name="kmz_file" id="createKmzFile" accept=".kmz"
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                                <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
+                            </div>
                         </div>
 
                         <div class="flex items-center">
@@ -301,7 +328,7 @@
                 </button>
             </div>
             
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -408,24 +435,52 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">JSON Waypoints</label>
-                            <textarea name="waypoints" id="editWaypoints" rows="8"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
-                                      placeholder='[
-                                                    {
-                                                        "altitud": 35,
-                                                        "latitud": "-38.85047",
-                                                        "acciones": ["take_panorama_image"],
-                                                        "longitud": "-68.12660"
-                                                    },
-                                                    {
-                                                        "altitud": 35,
-                                                        "latitud": "-38.84919",
-                                                        "acciones": [],
-                                                        "longitud": "-68.12503"
-                                                    }
-                                                    ]'></textarea>
-                            <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
+                            
+                            <!-- Tabs para elegir entre JSON y KMZ -->
+                            <div class="mb-3 border-b border-gray-600">
+                                <div class="flex space-x-4">
+                                    <button type="button" onclick="switchWaypointInput('edit', 'json')" 
+                                            id="editWaypointTabJson"
+                                            class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-400">
+                                        JSON Manual
+                                    </button>
+                                    <button type="button" onclick="switchWaypointInput('edit', 'kmz')" 
+                                            id="editWaypointTabKmz"
+                                            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+                                        Importar KMZ
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor JSON -->
+                            <div id="editWaypointJsonContainer">
+                                <textarea name="waypoints" id="editWaypoints" rows="8"
+                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
+                                          placeholder='[
+                                                            {
+                                                                "altitud": 35,
+                                                                "latitud": "-38.85047",
+                                                                "acciones": ["take_panorama_image"],
+                                                                "longitud": "-68.12660"
+                                                            },
+                                                            {
+                                                                "altitud": 35,
+                                                                "latitud": "-38.84919",
+                                                                "acciones": [],
+                                                                "longitud": "-68.12503"
+                                                            }
+                                                        ]'></textarea>
+                                <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
+                            </div>
+
+                            <!-- Contenedor KMZ -->
+                            <div id="editWaypointKmzContainer" class="hidden">
+                                <input type="file" name="kmz_file" id="editKmzFile" accept=".kmz"
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                                <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
+                                <p id="editKmzFileInfo" class="text-xs text-green-400 mt-1 hidden"></p>
+                            </div>
                         </div>
 
                         <div class="flex items-center">
@@ -450,11 +505,38 @@
         </div>
     </div>
     <script>
+        // Función para cambiar entre tabs de waypoints
+        function switchWaypointInput(modal, type) {
+            const jsonTab = document.getElementById(modal + 'WaypointTabJson');
+            const kmzTab = document.getElementById(modal + 'WaypointTabKmz');
+            const jsonContainer = document.getElementById(modal + 'WaypointJsonContainer');
+            const kmzContainer = document.getElementById(modal + 'WaypointKmzContainer');
+            const form = document.getElementById(modal + 'Form');
+
+            if (type === 'json') {
+                jsonTab.classList.add('border-blue-500', 'text-blue-400');
+                jsonTab.classList.remove('border-transparent', 'text-gray-400');
+                kmzTab.classList.remove('border-blue-500', 'text-blue-400');
+                kmzTab.classList.add('border-transparent', 'text-gray-400');
+                jsonContainer.classList.remove('hidden');
+                kmzContainer.classList.add('hidden');
+            } else {
+                kmzTab.classList.add('border-blue-500', 'text-blue-400');
+                kmzTab.classList.remove('border-transparent', 'text-gray-400');
+                jsonTab.classList.remove('border-blue-500', 'text-blue-400');
+                jsonTab.classList.add('border-transparent', 'text-gray-400');
+                kmzContainer.classList.remove('hidden');
+                jsonContainer.classList.add('hidden');
+            }
+        }
+
         // Funciones para el modal de crear
         function openCreateModal() {
             document.getElementById('createModal').classList.remove('hidden');
             document.getElementById('createForm').reset();
             document.getElementById('createActivo').checked = true;
+            // Resetear a tab JSON
+            switchWaypointInput('create', 'json');
         }
 
         function closeCreateModal() {
@@ -462,11 +544,11 @@
         }
 
         // Funciones para el modal de editar
-        function openEditModal(id, nombre, descripcion, clienteId, url, activo, droneId = null, dockId = null, siteId = null, routeAltitude = '35.00', routeSpeed = '5.33', routeWaypointType = 'linear_route', observaciones = '', waypoints = '') {
+        function openEditModal(id, nombre, descripcion, clienteId, url, activo, droneId = null, dockId = null, siteId = null, routeAltitude = '35.00', routeSpeed = '5.33', routeWaypointType = 'linear_route', observaciones = '', waypoints = '', kmzFilePath = null) {
             console.log('Abriendo modal de edición con datos:', { 
                 id, nombre, descripcion, clienteId, url, activo, 
                 droneId, dockId, siteId, routeAltitude, routeSpeed, 
-                routeWaypointType, observaciones, waypoints 
+                routeWaypointType, observaciones, waypoints, kmzFilePath
             });
             
             document.getElementById('editModal').classList.remove('hidden');
@@ -486,23 +568,35 @@
             document.getElementById('editRouteWaypointType').value = routeWaypointType || 'linear_route';
             document.getElementById('editObservaciones').value = observaciones || '';
 
-            // Manejar waypoints
-            if (waypoints && waypoints !== 'null' && waypoints !== '""') {
-                try {
-                    // Si waypoints ya es un string JSON, intentar formatearlo
-                    if (typeof waypoints === 'string') {
-                        const parsedWaypoints = JSON.parse(waypoints);
-                        document.getElementById('editWaypoints').value = JSON.stringify(parsedWaypoints, null, 2);
-                    } else {
-                        document.getElementById('editWaypoints').value = JSON.stringify(waypoints, null, 2);
-                    }
-                } catch (e) {
-                    console.error('Error al parsear waypoints:', e);
-                    // Si hay error al parsear, usar el valor original
-                    document.getElementById('editWaypoints').value = waypoints;
-                }
+            // Manejar waypoints y KMZ
+            if (kmzFilePath && kmzFilePath !== 'null' && kmzFilePath !== '""') {
+                // Si hay archivo KMZ, mostrar tab KMZ
+                switchWaypointInput('edit', 'kmz');
+                document.getElementById('editKmzFileInfo').textContent = 'Archivo KMZ actual: ' + kmzFilePath.split('/').pop();
+                document.getElementById('editKmzFileInfo').classList.remove('hidden');
             } else {
-                document.getElementById('editWaypoints').value = '';
+                // Si no hay KMZ, mostrar tab JSON
+                switchWaypointInput('edit', 'json');
+                document.getElementById('editKmzFileInfo').classList.add('hidden');
+                
+                // Manejar waypoints JSON
+                if (waypoints && waypoints !== 'null' && waypoints !== '""') {
+                    try {
+                        // Si waypoints ya es un string JSON, intentar formatearlo
+                        if (typeof waypoints === 'string') {
+                            const parsedWaypoints = JSON.parse(waypoints);
+                            document.getElementById('editWaypoints').value = JSON.stringify(parsedWaypoints, null, 2);
+                        } else {
+                            document.getElementById('editWaypoints').value = JSON.stringify(waypoints, null, 2);
+                        }
+                    } catch (e) {
+                        console.error('Error al parsear waypoints:', e);
+                        // Si hay error al parsear, usar el valor original
+                        document.getElementById('editWaypoints').value = waypoints;
+                    }
+                } else {
+                    document.getElementById('editWaypoints').value = '';
+                }
             }
             
             console.log('Modal configurado correctamente');

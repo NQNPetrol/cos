@@ -24,6 +24,7 @@ class MisionFlytbase extends Model
         'route_speed',
         'route_waypoint_type',
         'waypoints',
+        'kmz_file_path',
         'url',
         'activo',
         'observaciones',
