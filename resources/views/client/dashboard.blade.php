@@ -158,13 +158,9 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-white">Concentración Geográfica de Eventos</h2>
-                        <p class="text-gray-400 text-sm mt-1">Mapa de calor que muestra zonas con mayor frecuencia de eventos</p>
                     </div>
                     <div class="flex flex-col items-end gap-2">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
-                            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                            Intensidad
-                        </span>
+                        
                         <!-- Leyenda de colores -->
                         <div class="flex flex-col items-end gap-1">
                             <div class="flex items-center gap-2">
@@ -613,7 +609,96 @@
         font-style: italic;
         font-size: 11px;
     }
+    
+    /* Estilos para el popup personalizado del mapa */
+    .custom-popup .leaflet-popup-content-wrapper {
+        background: transparent;
+        padding: 0;
+        border-radius: 8px;
+    }
+    
+    .custom-popup .leaflet-popup-content {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .custom-popup .leaflet-popup-tip {
+        background: #1f2937;
+    }
+    
+    /* Scrollbar personalizado para el listado de eventos en el popup */
+    .popup-eventos-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #1f2937 #1f2937;
+    }
+    
+    .popup-eventos-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .popup-eventos-scroll::-webkit-scrollbar-track {
+        background: #1f2937;
+        border-radius: 3px;
+    }
+    
+    .popup-eventos-scroll::-webkit-scrollbar-thumb {
+        background-color: #374151;
+        border-radius: 3px;
+    }
+    
+    .popup-eventos-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: #4b5563;
+    }
 </style>
+
+<script>
+// Funciones globales para el mapa de calor
+function copyCoords(coords, buttonElement) {
+    navigator.clipboard.writeText(coords).then(function() {
+        // Mostrar feedback visual
+        if (buttonElement) {
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Copiado!';
+            buttonElement.style.background = '#10b981';
+            setTimeout(() => {
+                buttonElement.textContent = originalText;
+                buttonElement.style.background = '#3b82f6';
+            }, 2000);
+        }
+    }).catch(function(err) {
+        console.error('Error al copiar:', err);
+        // Fallback para navegadores que no soportan clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = coords;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            if (buttonElement) {
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copiado!';
+                buttonElement.style.background = '#10b981';
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.style.background = '#3b82f6';
+                }, 2000);
+            } else {
+                alert('Coordenadas copiadas: ' + coords);
+            }
+        } catch (e) {
+            alert('Error al copiar coordenadas');
+        }
+        document.body.removeChild(textarea);
+    });
+}
+
+function verEvento(eventoId) {
+    // Por ahora no hace nada, como solicitó el usuario
+    console.log('Ver evento:', eventoId);
+    // En el futuro aquí se puede redirigir a la página de detalle del evento
+    // window.location.href = `/eventos/${eventoId}`;
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
@@ -1015,6 +1100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     (function () {
         const apiUrl = "{{ route('client.dashboard.eventos-mapa-calor') }}";
+        const apiUrlEventosUbicacion = "{{ route('client.dashboard.eventos-por-ubicacion') }}";
         const categoriasTiposMapa = @json($categoriasTiposMapa ?? []);
 
         let mapInstance = null;
@@ -1342,24 +1428,146 @@ document.addEventListener('DOMContentLoaded', function () {
                                 fillOpacity: 0.9
                             });
 
-                            // Popup básico
-                            marker.bindPopup(`
-                                <div style="padding: 10px; min-width: 140px; text-align: center; background: #1f2937; border-radius: 8px;">
-                                    <div style="font-size: 24px; font-weight: bold; color: #e5e7eb;">${count}</div>
-                                    <div style="color: #9ca3af; font-size: 13px;">evento${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}</div>
-                                    <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">en esta ubicación</div>
+                            // Crear popup con contenido dinámico
+                            const popupContent = document.createElement('div');
+                            popupContent.style.cssText = 'min-width: 300px; max-width: 400px;';
+                            popupContent.innerHTML = `
+                                <div style="padding: 16px; background: #1f2937; border-radius: 8px;">
+                                    <div style="text-align: center; margin-bottom: 16px;">
+                                        <div style="font-size: 28px; font-weight: bold; color: #e5e7eb;">${count}</div>
+                                        <div style="color: #9ca3af; font-size: 13px; margin-top: 4px; font-weight: 500; letter-spacing: 0.5px;">EVENTOS</div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+                                        <code style="background: #111827; padding: 4px 8px; border-radius: 4px; color: #60a5fa; font-size: 12px;" id="coords-${point.lat}-${point.lng}">${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</code>
+                                        <button onclick="copyCoords('${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}', this)" title="Copiar" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div id="eventos-list-${point.lat}-${point.lng}">
+                                        <div style="text-align: center; padding: 20px; color: #6b7280;">
+                                            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
+                                            <div style="font-size: 12px;">Cargando eventos...</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            `);
+                            `;
 
-                            // Click en marcador: preparar datos para menú desplegable (estructura sin contenido aún)
-                            marker.on('click', () => {
-                                if (detallePanel) {
-                                    detallePanel.classList.remove('hidden');
+                            marker.bindPopup(popupContent, {
+                                maxWidth: 400,
+                                className: 'custom-popup'
+                            });
+
+                            // Función para cargar eventos de la ubicación
+                            async function loadEventosForMarker(lat, lng) {
+                                const eventosListDiv = document.getElementById(`eventos-list-${lat}-${lng}`);
+                                if (!eventosListDiv) return;
+
+                                try {
+                                    // Construir parámetros de filtros actuales
+                                    const params = new URLSearchParams();
+                                    params.append('lat', lat);
+                                    params.append('lng', lng);
+
+                                    // Agregar filtros activos
+                                    const selectedClientes = Array.from(chkClientes)
+                                        .filter(cb => cb.checked)
+                                        .map(cb => cb.value)
+                                        .filter(Boolean);
+                                    if (selectedClientes.length > 0) {
+                                        params.append('empresa_asociada_id', selectedClientes.join(','));
+                                    }
+
+                                    const selectedCategorias = Array.from(chkCategorias)
+                                        .filter(cb => cb.checked)
+                                        .map(cb => cb.value)
+                                        .filter(Boolean);
+                                    if (selectedCategorias.length > 0) {
+                                        params.append('categorias', selectedCategorias.join(','));
+                                    }
+
+                                    const chkTipos = document.querySelectorAll('.heatmap-tipo-item');
+                                    const selectedTipos = Array.from(chkTipos)
+                                        .filter(cb => cb.checked)
+                                        .map(cb => cb.value)
+                                        .filter(Boolean);
+                                    if (selectedTipos.length > 0) {
+                                        params.append('tipos', selectedTipos.join(','));
+                                    }
+
+                                    const response = await fetch(apiUrlEventosUbicacion + '?' + params.toString());
+                                    const data = await response.json();
+
+                                    if (data.error) {
+                                        eventosListDiv.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center;">Error al cargar eventos</div>`;
+                                        return;
+                                    }
+
+                                    if (!data.eventos || data.eventos.length === 0) {
+                                        eventosListDiv.innerHTML = `<div style="color: #6b7280; font-size: 12px; text-align: center;">No hay eventos en esta ubicación</div>`;
+                                        return;
+                                    }
+
+                                    // Construir HTML del listado de eventos
+                                    let eventosHTML = `
+                                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px; font-weight: 500;">LISTADO DE EVENTOS</div>
+                                        <div class="popup-eventos-scroll" style="max-height: 300px; overflow-y: auto;">
+                                    `;
+
+                                    data.eventos.forEach((evento, index) => {
+                                        eventosHTML += `
+                                            <div style="background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 10px; margin-bottom: 8px;">
+                                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                                                    <div style="flex: 1;">
+                                                        <div style="font-size: 12px; font-weight: 600; color: #e5e7eb; margin-bottom: 4px;">${evento.fecha_hora_formatted}</div>
+                                                        <div style="font-size: 11px; color: #9ca3af;">
+                                                            <span style="color: #60a5fa;">${evento.categoria}</span>
+                                                            ${evento.tipo ? ` • ${evento.tipo}` : ''}
+                                                        </div>
+                                                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                                                            Cliente: <span style="color: #9ca3af;">${evento.cliente}</span>
+                                                        </div>
+                                                    </div>
+                                                    <button onclick="verEvento(${evento.id})" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; margin-left: 8px; white-space: nowrap;">Ver evento</button>
+                                                </div>
+                                            </div>
+                                        `;
+                                    });
+
+                                    eventosHTML += `</div>`;
+                                    eventosListDiv.innerHTML = eventosHTML;
+
+                                } catch (error) {
+                                    console.error('Error cargando eventos:', error);
+                                    eventosListDiv.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center;">Error al cargar eventos</div>`;
                                 }
-                                if (detalleIcon) {
-                                    detalleIcon.classList.add('rotate-180');
+                            }
+
+                            // Click en marcador: hacer zoom y cargar eventos
+                            marker.on('click', async function(e) {
+                                // Hacer zoom al punto
+                                mapInstance.setView([point.lat, point.lng], Math.max(mapInstance.getZoom(), 15), {
+                                    animate: true,
+                                    duration: 0.5
+                                });
+
+                                // Abrir popup
+                                marker.openPopup();
+
+                                // Cargar eventos si aún no se han cargado
+                                const eventosListDiv = document.getElementById(`eventos-list-${point.lat}-${point.lng}`);
+                                if (eventosListDiv && eventosListDiv.innerHTML.includes('Cargando eventos...')) {
+                                    await loadEventosForMarker(point.lat, point.lng);
                                 }
-                                // Aquí en el futuro se actualizará el contenido dinámico del menú
+                            });
+
+                            // Cargar eventos al hacer hover (opcional, para precargar)
+                            marker.on('mouseover', function() {
+                                const eventosListDiv = document.getElementById(`eventos-list-${point.lat}-${point.lng}`);
+                                if (eventosListDiv && eventosListDiv.innerHTML.includes('Cargando eventos...')) {
+                                    loadEventosForMarker(point.lat, point.lng);
+                                }
                             });
 
                             marker.addTo(markersLayer);

@@ -511,5 +511,96 @@ class ClientDashboardController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener eventos individuales de una ubicación específica para el popup del mapa
+     */
+    public function getEventosPorUbicacion(Request $request)
+    {
+        try {
+            $clienteIds = $this->getClienteIds();
+            
+            if ($clienteIds->isEmpty()) {
+                return response()->json([]);
+            }
+
+            $lat = $request->input('lat');
+            $lng = $request->input('lng');
+
+            if (!$lat || !$lng) {
+                return response()->json(['error' => 'Coordenadas requeridas'], 400);
+            }
+
+            $query = Evento::whereIn('cliente_id', $clienteIds)
+                ->where('es_anulado', false)
+                ->whereRaw('ROUND(latitud, 4) = ?', [round($lat, 4)])
+                ->whereRaw('ROUND(longitud, 4) = ?', [round($lng, 4)])
+                ->with(['categoria', 'empresaAsociada'])
+                ->orderBy('fecha_hora', 'desc');
+
+            // Aplicar los mismos filtros que el mapa de calor
+            if ($request->filled('fecha_desde')) {
+                $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
+            }
+            if ($request->filled('fecha_hasta')) {
+                $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+            }
+
+            $empresas = $request->input('empresa_asociada_id');
+            if (!empty($empresas)) {
+                $empresaIds = is_array($empresas) ? $empresas : array_filter(explode(',', $empresas));
+                if (!empty($empresaIds)) {
+                    $query->whereIn('empresa_asociada_id', $empresaIds);
+                }
+            }
+
+            $categorias = $request->input('categorias');
+            if (!empty($categorias)) {
+                $categoriaIds = is_array($categorias) ? $categorias : array_filter(explode(',', $categorias));
+                if (!empty($categoriaIds)) {
+                    $query->whereIn('categoria_id', $categoriaIds);
+                }
+            }
+
+            $tipos = $request->input('tipos');
+            if (!empty($tipos)) {
+                $tiposArray = is_array($tipos) ? $tipos : array_filter(explode(',', $tipos));
+                if (!empty($tiposArray)) {
+                    $query->whereIn('tipo', $tiposArray);
+                }
+            }
+
+            $eventos = $query->get()->map(function ($evento) {
+                return [
+                    'id' => $evento->id,
+                    'fecha_hora' => $evento->fecha_hora->format('Y-m-d H:i:s'),
+                    'fecha_hora_formatted' => $evento->fecha_hora->format('d/m/Y H:i'),
+                    'categoria' => $evento->categoria ? $evento->categoria->nombre : 'Sin categoría',
+                    'tipo' => $evento->tipo ?? 'Sin tipo',
+                    'cliente' => $evento->empresaAsociada ? $evento->empresaAsociada->nombre : 'Sin cliente',
+                    'descripcion' => $evento->descripcion ?? '',
+                ];
+            });
+
+            return response()->json([
+                'lat' => (float) $lat,
+                'lng' => (float) $lng,
+                'count' => $eventos->count(),
+                'eventos' => $eventos
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en getEventosPorUbicacion:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->json([
+                'error' => true,
+                'message' => 'Error interno del servidor'
+            ], 500);
+        }
+    }
 }
 
