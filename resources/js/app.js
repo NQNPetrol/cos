@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
-import EventosBarras from './Components/EventosBarras.vue';
-import ClientDashboard from './Components/Dashboard/ClientDashboard.vue';
-import BarChart from './Components/Dashboard/BarChart.vue';
-import HeatmapChart from './Components/Dashboard/HeatmapChart.vue';
+import EventosBarras from './components/EventosBarras.vue';
+import ClientDashboard from './components/Dashboard/ClientDashboard.vue';
+import BarChart from './components/Dashboard/BarChart.vue';
+import HeatmapChart from './components/Dashboard/HeatmapChart.vue';
 
 console.log('app.js cargando...');
 console.log('Leaflet disponible?', typeof L !== 'undefined' ? 'Sí' : 'No');
