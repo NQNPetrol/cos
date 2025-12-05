@@ -47,9 +47,17 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     
     Route::get('/dashboard/eventos-por-categoria', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorCategoria'])
         ->name('dashboard.eventos-por-categoria');
+    
+    Route::get('/dashboard/eventos-stacked', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosStacked'])
+        ->name('dashboard.eventos-stacked');
+    
+    Route::get('/dashboard/eventos-mensual', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosMensual'])
+        ->name('dashboard.eventos-mensual');
 
     Route::get('/dashboard/eventos-mapa-calor', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosMapaCalor'])
         ->name('dashboard.eventos-mapa-calor');
+    Route::get('/dashboard/eventos-por-ubicacion', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorUbicacion'])
+        ->name('dashboard.eventos-por-ubicacion');
 
     // PROFILE
     Route::get('/profile', function () {

@@ -74,11 +74,11 @@ const waitForLeaflet = () => {
     const checkLeaflet = () => {
       if (typeof window.L !== 'undefined') {
         L = window.L;
-        console.log('✅ Leaflet disponible:', L.version);
+        console.log('Leaflet disponible:', L.version);
         status.value = 'Leaflet cargado';
         resolve();
       } else {
-        console.log('⏳ Esperando Leaflet...');
+        console.log('Esperando Leaflet...');
         status.value = 'Esperando Leaflet...';
         loadingMessage.value = 'Cargando biblioteca de mapas...';
         setTimeout(checkLeaflet, 100);
@@ -106,9 +106,16 @@ const initMap = () => {
     map.value = L.map(mapContainer.value).setView(center, 12);
     
     // Añadir capa base
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© Esri, Maxar, Earthstar Geographics',
+      maxZoom: 19
+    }).addTo(map.value);
+
+    // Capa de etiquetas con rutas y nombres (superpuesta, opcional)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+      attribution: '',
+      subdomains: 'abcd',
+      maxZoom: 19
     }).addTo(map.value);
     
     console.log('Mapa creado');
@@ -123,15 +130,37 @@ const initMap = () => {
 
 const loadHeatmapData = async () => {
   try {
+
+    // Limpiar capa de heatmap anterior si existe
+    if (heatLayer.value) {
+      heatLayer.value.remove();
+      heatLayer.value = null;
+    }
+
     status.value = 'Cargando datos...';
     loadingMessage.value = 'Obteniendo datos de eventos...';
     
     const params = new URLSearchParams();
     if (props.fechaDesde) params.append('fecha_desde', props.fechaDesde);
     if (props.fechaHasta) params.append('fecha_hasta', props.fechaHasta);
-    
+
+    // Leer clientes seleccionados (checkboxes)
+    const clienteCheckboxes = document.querySelectorAll('.heatmap-cliente-item');
+    if (clienteCheckboxes && clienteCheckboxes.length > 0) {
+      const selectedClientes = Array.from(clienteCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value)
+        .filter(Boolean);
+
+      if (selectedClientes.length > 0) {
+        // Enviamos como CSV: 1,3,5...
+        params.append('empresa_asociada_id', selectedClientes.join(','));
+      }
+    }
+
+
     const url = params.toString() ? `${props.apiUrl}?${params.toString()}` : props.apiUrl;
-    console.log('📡 Solicitando datos a:', url);
+    console.log('Solicitando datos a:', url);
     
     const response = await fetch(url);
     const data = await response.json();
@@ -171,10 +200,10 @@ const loadHeatmapData = async () => {
         minOpacity: 0.5
       }).addTo(map.value);
       
-      console.log('✅ Heatmap creado');
+      console.log('Heatmap creado');
       status.value = 'Heatmap cargado';
     } else {
-      console.warn('⚠️ L.heatLayer no disponible, usando marcadores');
+      console.warn('L.heatLayer no disponible, usando marcadores');
       status.value = 'Usando marcadores (heatmap no disponible)';
       
       // Usar marcadores circulares como alternativa
@@ -204,13 +233,30 @@ const loadHeatmapData = async () => {
     
     loading.value = false;
     status.value = 'Completado';
-    
+
+    // Si la recarga vino desde el botón "Aplicar filtros", marcar botón como aplicado
+    if (typeof window !== 'undefined' && window.heatmapLastActionWasApply) {
+      const btnAplicar = document.getElementById('heatmap_aplicar_filtros');
+      if (btnAplicar) {
+        btnAplicar.textContent = 'Filtros aplicados';
+        btnAplicar.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        btnAplicar.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      }
+      window.heatmapLastActionWasApply = false;
+    }
   } catch (error) {
-    console.error('❌ Error cargando datos:', error);
+    console.error('Error cargando datos:', error);
     status.value = 'Error cargando datos';
     loading.value = false;
   }
 };
+
+// Permitir que el layout Blade dispare una recarga del mapa
+if (typeof window !== 'undefined') {
+  window.heatmapReload = async () => {
+    await loadHeatmapData();
+  };
+}
 </script>
 
 <style scoped>
