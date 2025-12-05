@@ -38,8 +38,10 @@ class ClientDashboardController extends Controller
             return view('client.dashboard', [
                 'chartData' => [],
                 'chartDataCategorias' => [],
+                'chartDataStacked' => ['clientes' => [], 'datasets' => []],
+                'chartDataMensual' => ['labels' => [], 'data' => [], 'promedio' => 0],
                 'totalEventos' => 0,
-                'eventosSinEmpresa' => 0,
+                'eventosUltimos7Dias' => 0,
                 'empresasAsociadas' => collect(),
                 // Patrullas
                 'totalPatrullas' => 0,
@@ -81,18 +83,13 @@ class ClientDashboardController extends Controller
             ];
         }
 
-        // Agregar eventos sin cliente asignado
-        $eventosSinEmpresa = Evento::whereIn('cliente_id', $clienteIds)
+        // Calcular eventos de los últimos 7 días (no afectado por filtros temporales)
+        $fechaHace7Dias = Carbon::today()->subDays(7);
+        $eventosUltimos7Dias = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
-            ->whereNull('empresa_asociada_id')
+            ->whereDate('fecha_hora', '>=', $fechaHace7Dias)
+            ->whereDate('fecha_hora', '<=', Carbon::today())
             ->count();
-
-        if ($eventosSinEmpresa > 0) {
-            $chartData[] = [
-                'nombre' => 'Sin Cliente',
-                'total' => $eventosSinEmpresa
-            ];
-        }
 
         // Ordenar por total de eventos (mayor a menor)
         usort($chartData, function($a, $b) {
@@ -130,6 +127,145 @@ class ClientDashboardController extends Controller
         usort($chartDataCategorias, function($a, $b) {
             return $b['total'] - $a['total'];
         });
+
+        // ========== DATOS PARA GRÁFICO STACKED (Categorías x Clientes) ==========
+        
+        // Obtener IDs de categorías que tienen eventos
+        $categoriaIdsConEventos = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('empresa_asociada_id')
+            ->whereNotNull('categoria_id')
+            ->distinct()
+            ->pluck('categoria_id');
+        
+        // Obtener categorías que tienen eventos
+        $categoriasConEventos = Categoria::whereIn('id', $categoriaIdsConEventos)->get();
+
+        // Obtener IDs de empresas asociadas que tienen eventos
+        $empresaIdsConEventos = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('categoria_id')
+            ->whereNotNull('empresa_asociada_id')
+            ->distinct()
+            ->pluck('empresa_asociada_id');
+        
+        // Obtener empresas asociadas que tienen eventos
+        $empresasConEventos = EmpresaAsociada::whereIn('id', $empresaIdsConEventos)->get();
+
+        // Obtener recuentos por categoría y empresa
+        $eventosStacked = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('categoria_id')
+            ->whereNotNull('empresa_asociada_id')
+            ->select('categoria_id', 'empresa_asociada_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('categoria_id', 'empresa_asociada_id')
+            ->get();
+
+        // Crear estructura de datos para el gráfico stacked (Clientes en X, Categorías como segmentos)
+        $chartDataStacked = [
+            'clientes' => $empresasConEventos->pluck('nombre')->toArray(),
+            'datasets' => []
+        ];
+
+        // Colores en tonos azules y verdes oscuros
+        $colorsStacked = [
+            ['bg' => 'rgba(30, 58, 138, 0.85)', 'border' => 'rgba(30, 58, 138, 1)'], // Azul navy oscuro
+            ['bg' => 'rgba(49, 91, 103, 0.85)', 'border' => 'rgba(49, 91, 103, 0.85)'], // Verde oscuro
+            ['bg' => 'rgba(22, 78, 99, 0.85)', 'border' => 'rgba(22, 78, 99, 1)'], // Cyan oscuro
+            ['bg' => 'rgba(30, 64, 175, 0.85)', 'border' => 'rgba(30, 64, 175, 1)'], // Azul royal
+            ['bg' => 'rgba(4, 120, 87, 0.85)', 'border' => 'rgba(4, 120, 87, 1)'], // Verde esmeralda
+            ['bg' => 'rgba(17, 94, 89, 0.85)', 'border' => 'rgba(17, 94, 89, 1)'], // Teal oscuro
+            ['bg' => 'rgba(37, 99, 235, 0.85)', 'border' => 'rgba(37, 99, 235, 1)'], // Azul medio
+            ['bg' => 'rgba(5, 150, 105, 0.85)', 'border' => 'rgba(5, 150, 105, 1)'], // Verde medio
+            ['bg' => '59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 1)'], // Azul claro
+            ['bg' => 'rgba(16, 185, 129, 0.85)', 'border' => 'rgba(16, 185, 129, 1)'], // Verde claro
+        ];
+
+        // Colores específicos para categorías (comparación case-insensitive)
+        $coloresEspecificos = [
+            'Seguridad vial y patrullaje' => ['bg' => 'rgba(71, 102, 151, 0.85)', 'border' => 'rgba(71, 102, 151, 0.85)'], 
+            'Tecnológicos/comunicación' => ['bg' => 'rgba(22, 57, 100, 0.85)', 'border' => 'rgba(22, 57, 100, 0.85)'], 
+        ];
+
+        // Función helper para obtener color específico (comparación case-insensitive)
+        $getColorEspecifico = function($nombreCategoria) use ($coloresEspecificos) {
+            $nombreNormalizado = mb_strtolower(trim($nombreCategoria));
+            
+            foreach ($coloresEspecificos as $nombreExacto => $color) {
+                if (mb_strtolower(trim($nombreExacto)) === $nombreNormalizado) {
+                    return $color;
+                }
+            }
+            return null;
+        };
+
+        $colorIndex = 0;
+        foreach ($categoriasConEventos as $categoria) {
+            $data = [];
+            foreach ($empresasConEventos as $empresa) {
+                $count = $eventosStacked
+                    ->where('categoria_id', $categoria->id)
+                    ->where('empresa_asociada_id', $empresa->id)
+                    ->sum('total');
+                $data[] = $count;
+            }
+
+            // Solo agregar el dataset si tiene al menos un evento
+            if (array_sum($data) > 0) {
+                // Asignar color específico si existe, sino usar color de la lista
+                $colorEspecifico = $getColorEspecifico($categoria->nombre);
+                $color = $colorEspecifico ?? $colorsStacked[$colorIndex % count($colorsStacked)];
+                $chartDataStacked['datasets'][] = [
+                    'label' => $categoria->nombre,
+                    'data' => $data,
+                    'backgroundColor' => $color['bg'],
+                    'borderColor' => $color['border'],
+                    'borderWidth' => 2
+                ];
+                // Solo incrementar el índice si no usamos un color específico
+                if ($colorEspecifico === null) {
+                    $colorIndex++;
+                }
+            }
+        }
+
+        // ========== DATOS PARA GRÁFICO MENSUAL (Barras + Línea de tendencia) ==========
+        
+        // Obtener eventos agrupados por mes
+        $eventosMensuales = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->select(
+                DB::raw('YEAR(fecha_hora) as año'),
+                DB::raw('MONTH(fecha_hora) as mes'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('año', 'mes')
+            ->orderBy('año', 'asc')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        // Crear estructura de datos para el gráfico mensual
+        $chartDataMensual = [
+            'labels' => [],
+            'data' => [],
+            'promedio' => 0
+        ];
+
+        $meses = [
+            1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+        ];
+
+        foreach ($eventosMensuales as $evento) {
+            $label = $meses[$evento->mes] . ' ' . $evento->año;
+            $chartDataMensual['labels'][] = $label;
+            $chartDataMensual['data'][] = $evento->total;
+        }
+
+        // Calcular promedio (total de eventos / cantidad de meses)
+        $totalEventos = array_sum($chartDataMensual['data']);
+        $cantidadMeses = count($chartDataMensual['data']);
+        $chartDataMensual['promedio'] = $cantidadMeses > 0 ? round($totalEventos / $cantidadMeses) : 0;
 
         // ========== MAPA DE CALOR - CATEGORÍAS Y TIPOS PARA FILTROS ==========
 
@@ -272,8 +408,10 @@ class ClientDashboardController extends Controller
         return view('client.dashboard', [
             'chartData' => $chartData,
             'chartDataCategorias' => $chartDataCategorias,
+            'chartDataStacked' => $chartDataStacked,
+            'chartDataMensual' => $chartDataMensual,
             'totalEventos' => $totalEventos,
-            'eventosSinEmpresa' => $eventosSinEmpresa,
+            'eventosUltimos7Dias' => $eventosUltimos7Dias,
             'empresasAsociadas' => $empresasAsociadas,
             'categoriasTiposMapa' => $categoriasTipos,
             // Patrullas
@@ -361,6 +499,208 @@ class ClientDashboardController extends Controller
         });
 
         return response()->json($chartData);
+    }
+
+    /**
+     * API endpoint para obtener datos del gráfico stacked (categorías x clientes) con filtros de fecha
+     */
+    public function getEventosStacked(Request $request)
+    {
+        $clienteIds = $this->getClienteIds();
+
+        if ($clienteIds->isEmpty()) {
+            return response()->json([
+                'clientes' => [],
+                'datasets' => []
+            ]);
+        }
+
+        $query = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('categoria_id')
+            ->whereNotNull('empresa_asociada_id');
+
+        // Filtrar por rango de fechas si se proporciona
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+
+        // Obtener IDs de categorías que tienen eventos (con filtros aplicados)
+        $queryCategorias = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('empresa_asociada_id')
+            ->whereNotNull('categoria_id');
+        
+        if ($request->filled('fecha_desde')) {
+            $queryCategorias->whereDate('fecha_hora', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $queryCategorias->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        
+        $categoriaIds = $queryCategorias->distinct()->pluck('categoria_id');
+        $categorias = Categoria::whereIn('id', $categoriaIds)->get();
+
+        // Obtener IDs de empresas asociadas que tienen eventos (con filtros aplicados)
+        $queryEmpresas = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false)
+            ->whereNotNull('categoria_id')
+            ->whereNotNull('empresa_asociada_id');
+        
+        if ($request->filled('fecha_desde')) {
+            $queryEmpresas->whereDate('fecha_hora', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $queryEmpresas->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        
+        $empresaIds = $queryEmpresas->distinct()->pluck('empresa_asociada_id');
+        $empresasAsociadas = EmpresaAsociada::whereIn('id', $empresaIds)->get();
+
+        // Obtener recuentos por categoría y empresa
+        $eventosPorCategoriaEmpresa = $query
+            ->select('categoria_id', 'empresa_asociada_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('categoria_id', 'empresa_asociada_id')
+            ->get();
+
+        // Crear estructura de datos para el gráfico (Clientes en X, Categorías como segmentos)
+        $clientesLabels = $empresasAsociadas->pluck('nombre')->toArray();
+        
+        // Colores en tonos azules y verdes oscuros
+        $colors = [
+            ['bg' => 'rgba(30, 58, 138, 0.85)', 'border' => 'rgba(30, 58, 138, 1)'], // Azul navy oscuro
+            ['bg' => 'rgba(20, 83, 45, 0.85)', 'border' => 'rgba(20, 83, 45, 1)'], // Verde oscuro
+            ['bg' => 'rgba(22, 78, 99, 0.85)', 'border' => 'rgba(22, 78, 99, 1)'], // Cyan oscuro
+            ['bg' => 'rgba(30, 64, 175, 0.85)', 'border' => 'rgba(30, 64, 175, 1)'], // Azul royal
+            ['bg' => 'rgba(4, 120, 87, 0.85)', 'border' => 'rgba(4, 120, 87, 1)'], // Verde esmeralda
+            ['bg' => 'rgba(17, 94, 89, 0.85)', 'border' => 'rgba(17, 94, 89, 1)'], // Teal oscuro
+            ['bg' => 'rgba(37, 99, 235, 0.85)', 'border' => 'rgba(37, 99, 235, 1)'], // Azul medio
+            ['bg' => 'rgba(5, 150, 105, 0.85)', 'border' => 'rgba(5, 150, 105, 1)'], // Verde medio
+            ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 1)'], // Azul claro
+            ['bg' => 'rgba(16, 185, 129, 0.85)', 'border' => 'rgba(16, 185, 129, 1)'], // Verde claro
+        ];
+
+        // Colores específicos para categorías (comparación case-insensitive)
+        $coloresEspecificos = [
+            'Seguridad vial y patrullaje' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 1)'], 
+            'Tecnológicos/comunicación' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 0.85)'], 
+        ];
+
+        // Función helper para obtener color específico (comparación case-insensitive)
+        $getColorEspecifico = function($nombreCategoria) use ($coloresEspecificos) {
+            $nombreNormalizado = mb_strtolower(trim($nombreCategoria));
+            
+            foreach ($coloresEspecificos as $nombreExacto => $color) {
+                if (mb_strtolower(trim($nombreExacto)) === $nombreNormalizado) {
+                    return $color;
+                }
+            }
+            return null;
+        };
+
+        $datasets = [];
+        $colorIndex = 0;
+
+        foreach ($categorias as $categoria) {
+            $data = [];
+            foreach ($empresasAsociadas as $empresa) {
+                $count = $eventosPorCategoriaEmpresa
+                    ->where('categoria_id', $categoria->id)
+                    ->where('empresa_asociada_id', $empresa->id)
+                    ->sum('total');
+                $data[] = $count;
+            }
+
+            // Solo agregar el dataset si tiene al menos un evento
+            if (array_sum($data) > 0) {
+                // Asignar color específico si existe, sino usar color de la lista
+                $colorEspecifico = $getColorEspecifico($categoria->nombre);
+                $color = $colorEspecifico ?? $colors[$colorIndex % count($colors)];
+                $datasets[] = [
+                    'label' => $categoria->nombre,
+                    'data' => $data,
+                    'backgroundColor' => $color['bg'],
+                    'borderColor' => $color['border'],
+                    'borderWidth' => 2
+                ];
+                // Solo incrementar el índice si no usamos un color específico
+                if ($colorEspecifico === null) {
+                    $colorIndex++;
+                }
+            }
+        }
+
+        return response()->json([
+            'clientes' => $clientesLabels,
+            'datasets' => $datasets
+        ]);
+    }
+
+    /**
+     * API endpoint para obtener datos del gráfico mensual con filtros de fecha
+     */
+    public function getEventosMensual(Request $request)
+    {
+        $clienteIds = $this->getClienteIds();
+
+        if ($clienteIds->isEmpty()) {
+            return response()->json([
+                'labels' => [],
+                'data' => [],
+                'promedio' => 0
+            ]);
+        }
+
+        $query = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false);
+
+        // Filtrar por rango de fechas si se proporciona
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_hora', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+
+        // Obtener eventos agrupados por mes
+        $eventosMensuales = $query
+            ->select(
+                DB::raw('YEAR(fecha_hora) as año'),
+                DB::raw('MONTH(fecha_hora) as mes'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('año', 'mes')
+            ->orderBy('año', 'asc')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        // Crear estructura de datos para el gráfico mensual
+        $chartDataMensual = [
+            'labels' => [],
+            'data' => [],
+            'promedio' => 0
+        ];
+
+        $meses = [
+            1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+        ];
+
+        foreach ($eventosMensuales as $evento) {
+            $label = $meses[$evento->mes] . ' ' . $evento->año;
+            $chartDataMensual['labels'][] = $label;
+            $chartDataMensual['data'][] = $evento->total;
+        }
+
+        // Calcular promedio (total de eventos / cantidad de meses)
+        $totalEventos = array_sum($chartDataMensual['data']);
+        $cantidadMeses = count($chartDataMensual['data']);
+        $chartDataMensual['promedio'] = $cantidadMeses > 0 ? round($totalEventos / $cantidadMeses) : 0;
+
+        return response()->json($chartDataMensual);
     }
 
     /**

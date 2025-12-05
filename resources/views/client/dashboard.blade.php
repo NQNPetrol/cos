@@ -1,6 +1,6 @@
 @extends('layouts.cliente')
 
-@section('title', 'Dashboard - Área Cliente')
+@section('title', 'Dashboard Principal')
 
 @section('content')
 <div class="space-y-6">
@@ -79,30 +79,30 @@
             </div>
         </div>
 
-        <!-- Eventos sin cliente -->
+        <!-- Eventos últimos 7 días -->
         <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Sin Cliente Asignado</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $eventosSinEmpresa ?? 0 }}</p>
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Últimos 7 días</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $eventosUltimos7Dias ?? 0 }}</p>
                 </div>
                 <div class="w-14 h-14 bg-amber-600/20 rounded-xl flex items-center justify-center">
                     <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Grid de gráficos de eventos - 2 columnas en pantallas lg -->
+    <!-- Grid de gráficos de eventos - 2 columnas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Gráfico de eventos por cliente -->
+        <!-- Gráfico stacked de eventos por categoría y cliente -->
         <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-white">Eventos por Cliente</h2>
-                    <p class="text-gray-400 text-sm mt-1">Distribución de eventos de seguridad por cliente</p>
+                    <h2 class="text-xl font-bold text-white">Eventos por Categoría y Cliente</h2>
+                    <p class="text-gray-400 text-sm mt-1">Distribución de eventos por categoría segmentada por cliente</p>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-600/20 text-blue-400">
                     <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
@@ -110,11 +110,11 @@
                 </span>
             </div>
             
-            <div class="relative" style="height: 350px;">
-                <canvas id="chartEventosPorCliente"></canvas>
+            <div class="relative" style="height: 400px;">
+                <canvas id="chartEventosStacked"></canvas>
             </div>
             
-            <div id="loading-clientes" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+            <div id="loading-stacked" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
                 <div class="flex flex-col items-center gap-3">
                     <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
                     <span class="text-gray-300 text-sm">Cargando datos...</span>
@@ -122,24 +122,24 @@
             </div>
         </div>
 
-        <!-- Gráfico de eventos por categoría -->
+        <!-- Gráfico combinado de eventos por mes -->
         <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-white">Eventos por Categoría</h2>
-                    <p class="text-gray-400 text-sm mt-1">Distribución de eventos según su tipo</p>
+                    <h2 class="text-xl font-bold text-white">Tendencia Mensual de Eventos</h2>
+                    <p class="text-gray-400 text-sm mt-1">Evolución de eventos por mes con promedio</p>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-violet-600/20 text-violet-400">
                     <span class="w-2 h-2 bg-violet-500 rounded-full mr-2"></span>
-                    Por categoría
+                    Tendencia
                 </span>
             </div>
             
-            <div class="relative" style="height: 350px;">
-                <canvas id="chartEventosPorCategoria"></canvas>
+            <div class="relative" style="height: 400px;">
+                <canvas id="chartEventosMensual"></canvas>
             </div>
             
-            <div id="loading-categorias" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+            <div id="loading-mensual" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
                 <div class="flex flex-col items-center gap-3">
                     <div class="animate-spin rounded-full h-10 w-10 border-4 border-violet-500 border-t-transparent"></div>
                     <span class="text-gray-300 text-sm">Cargando datos...</span>
@@ -732,8 +732,8 @@ function verEvento(eventoId) {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Datos iniciales - Eventos
-    const initialDataClientes = @json($chartData ?? []);
-    const initialDataCategorias = @json($chartDataCategorias ?? []);
+    const initialDataStacked = @json($chartDataStacked ?? ['clientes' => [], 'datasets' => []]);
+    const initialDataMensual = @json($chartDataMensual ?? ['labels' => [], 'data' => [], 'promedio' => 0]);
     
     // Datos iniciales - Patrullas
     const initialDataPatrullasEstado = @json($chartDataPatrullasEstado ?? []);
@@ -743,8 +743,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const initialDataDocumentos = @json($chartDataDocumentos ?? []);
     
     // URLs de API
-    const urlClientes = "{{ route('client.dashboard.eventos-por-empresa') }}";
-    const urlCategorias = "{{ route('client.dashboard.eventos-por-categoria') }}";
+    const urlStacked = "{{ route('client.dashboard.eventos-stacked') }}";
+    const urlMensual = "{{ route('client.dashboard.eventos-mensual') }}";
     
     // Paleta de colores profesional para empresa de seguridad
     // Tonos: Azules oscuros, grises, verdes, cyans - sin fucsia ni rosa
@@ -872,40 +872,243 @@ document.addEventListener('DOMContentLoaded', function() {
         animation: { duration: 1000, easing: 'easeOutQuart' }
     });
 
-    // ========== GRÁFICOS DE EVENTOS ==========
+    // ========== GRÁFICO STACKED DE EVENTOS ==========
     
-    // Gráfico de eventos por cliente
-    const ctxClientes = document.getElementById('chartEventosPorCliente').getContext('2d');
-    const chartClientes = new Chart(ctxClientes, {
-        type: 'bar',
-        data: {
-            labels: initialDataClientes.map(i => i.nombre),
-            datasets: [{
-                label: 'Eventos',
-                data: initialDataClientes.map(i => i.total),
-                backgroundColor: initialDataClientes.map((_, i) => colorsClientes.bg[i % colorsClientes.bg.length]),
-                borderColor: initialDataClientes.map((_, i) => colorsClientes.border[i % colorsClientes.border.length]),
-                borderWidth: 2, borderRadius: 8, borderSkipped: false
-            }]
+    // Opciones para gráfico stacked
+    const getStackedBarChartOptions = () => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: { 
+                    color: '#9ca3af', 
+                    padding: 15, 
+                    font: { size: 11 },
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                titleColor: '#fff',
+                bodyColor: '#9ca3af',
+                borderColor: 'rgba(75, 85, 99, 0.3)',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function(context) {
+                        const label = context.dataset.label || '';
+                        const value = context.raw || 0;
+                        return `${label}: ${value}`;
+                    }
+                }
+            }
         },
-        options: getBarChartOptions()
+        scales: {
+            x: {
+                stacked: true,
+                grid: { color: 'rgba(75, 85, 99, 0.2)', drawBorder: false },
+                ticks: { color: '#9ca3af', font: { size: 11 }, maxRotation: 45, minRotation: 45 }
+            },
+            y: {
+                stacked: true,
+                beginAtZero: true,
+                grid: { color: 'rgba(75, 85, 99, 0.2)', drawBorder: false },
+                ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+            }
+        },
+        animation: { duration: 1000, easing: 'easeOutQuart' }
     });
 
-    // Gráfico de eventos por categoría
-    const ctxCategorias = document.getElementById('chartEventosPorCategoria').getContext('2d');
-    const chartCategorias = new Chart(ctxCategorias, {
+    // Gráfico stacked de eventos por categoría y cliente
+    const ctxStacked = document.getElementById('chartEventosStacked').getContext('2d');
+    const chartStacked = new Chart(ctxStacked, {
         type: 'bar',
         data: {
-            labels: initialDataCategorias.map(i => i.nombre),
-            datasets: [{
-                label: 'Eventos',
-                data: initialDataCategorias.map(i => i.total),
-                backgroundColor: initialDataCategorias.map((_, i) => colorsCategorias.bg[i % colorsCategorias.bg.length]),
-                borderColor: initialDataCategorias.map((_, i) => colorsCategorias.border[i % colorsCategorias.border.length]),
-                borderWidth: 2, borderRadius: 8, borderSkipped: false
-            }]
+            labels: initialDataStacked.clientes || [],
+            datasets: initialDataStacked.datasets || []
         },
-        options: getBarChartOptions()
+        options: getStackedBarChartOptions()
+    });
+
+    // ========== GRÁFICO MENSUAL COMBINADO (Barras + Línea) ==========
+    
+    // Opciones para gráfico combinado mensual
+    const getMensualChartOptions = (promedio) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: { 
+                    color: '#9ca3af', 
+                    padding: 15, 
+                    font: { size: 11 },
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                titleColor: '#fff',
+                bodyColor: '#9ca3af',
+                borderColor: 'rgba(75, 85, 99, 0.3)',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+                filter: function(tooltipItem) {
+                    // Ocultar tooltip para el último punto vacío
+                    return tooltipItem.dataIndex < tooltipItem.chart.data.labels.length - 1;
+                },
+                callbacks: {
+                    label: function(context) {
+                        if (context.raw === null) return null;
+                        if (context.datasetIndex === 0) {
+                            return `Eventos: ${context.raw}`;
+                        } else if (context.datasetIndex === 1) {
+                            return `Tendencia: ${context.raw}`;
+                        } else {
+                            return `Promedio: ${Math.round(context.raw)}`;
+                        }
+                    }
+                }
+            },
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(75, 85, 99, 0.2)', drawBorder: false },
+                ticks: { 
+                    color: '#9ca3af', 
+                    font: { size: 11 }, 
+                    maxRotation: 45, 
+                    minRotation: 45,
+                    callback: function(value, index) {
+                        // No mostrar label para el último punto vacío
+                        if (index === this.chart.data.labels.length - 1) {
+                            return '';
+                        }
+                        return this.chart.data.labels[index];
+                    }
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(75, 85, 99, 0.2)', drawBorder: false },
+                ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+            }
+        },
+        animation: { duration: 1000, easing: 'easeOutQuart' }
+    });
+
+    // Plugin personalizado para etiquetas en puntos y línea de promedio
+    let promedioActual = initialDataMensual.promedio || 0;
+    const labelPlugin = {
+        id: 'labelPlugin',
+        afterDatasetsDraw: (chart) => {
+            const ctx = chart.ctx;
+            const meta = chart.getDatasetMeta(1); // Dataset de tendencia
+            const promedio = promedioActual;
+            
+            // Dibujar etiquetas en puntos de la línea de tendencia
+            meta.data.forEach((point, index) => {
+                const value = chart.data.datasets[1].data[index];
+                const x = point.x;
+                const y = point.y;
+                
+                ctx.save();
+                ctx.fillStyle = '#e5e7eb';
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(value, x, y - 10);
+                ctx.restore();
+            });
+            
+            // Dibujar etiqueta en línea de promedio (después del último punto)
+            if (chart.data.labels.length > 0) {
+                const lastIndex = chart.data.labels.length - 1;
+                const lastPoint = chart.scales.x.getPixelForValue(lastIndex);
+                const promedioY = chart.scales.y.getPixelForValue(promedio);
+                const promedioTexto = 'Promedio: ' + Math.round(promedio);
+                
+                // Calcular espacio adicional (aproximadamente el ancho de una barra)
+                const spacing = chart.scales.x.width / (chart.data.labels.length - 1);
+                const labelX = lastPoint + spacing * 0.3; // Espacio después de la última barra
+                
+                ctx.save();
+                
+                // Texto en gris claro sin recuadro, posicionado ligeramente arriba de la línea
+                ctx.fillStyle = 'rgba(209, 213, 219, 1)';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(promedioTexto, labelX, promedioY - 12);
+                ctx.restore();
+            }
+        }
+    };
+
+    // Preparar datos con espacio adicional para la línea de promedio
+    const labelsConEspacio = [...(initialDataMensual.labels || []), ''];
+    const dataBarras = [...(initialDataMensual.data || []), null];
+    const dataTendencia = [...(initialDataMensual.data || []), null];
+    const dataPromedio = Array(labelsConEspacio.length).fill(initialDataMensual.promedio || 0);
+
+    // Gráfico mensual combinado
+    const ctxMensual = document.getElementById('chartEventosMensual').getContext('2d');
+    const chartMensual = new Chart(ctxMensual, {
+        type: 'bar',
+        data: {
+            labels: labelsConEspacio,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Eventos',
+                    data: dataBarras,
+                    backgroundColor: 'rgba(37, 99, 235, 0.85)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
+                },
+                {
+                    type: 'line',
+                    label: 'Tendencia',
+                    data: dataTendencia,
+                    borderColor: 'rgba(30, 58, 138, 1)',
+                    backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgba(30, 58, 138, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointStyle: 'circle',
+                    spanGaps: false
+                },
+                {
+                    type: 'line',
+                    label: 'Promedio',
+                    data: dataPromedio,
+                    borderColor: 'rgba(209, 213, 219, 0.8)',
+                    backgroundColor: 'rgba(209, 213, 219, 0.1)',
+                    borderWidth: 3,
+                    borderDash: [8, 4],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    spanGaps: true
+                }
+            ]
+        },
+        options: getMensualChartOptions(initialDataMensual.promedio),
+        plugins: [labelPlugin]
     });
 
     // ========== GRÁFICOS DE PATRULLAS ==========
@@ -965,8 +1168,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaDesde = document.getElementById('fecha_desde').value;
         const fechaHasta = document.getElementById('fecha_hasta').value;
         
-        document.getElementById('loading-clientes').classList.remove('hidden');
-        document.getElementById('loading-categorias').classList.remove('hidden');
+        document.getElementById('loading-stacked').classList.remove('hidden');
+        document.getElementById('loading-mensual').classList.remove('hidden');
 
         try {
             const params = new URLSearchParams();
@@ -974,33 +1177,38 @@ document.addEventListener('DOMContentLoaded', function() {
             if (fechaHasta) params.append('fecha_hasta', fechaHasta);
             const queryString = params.toString() ? `?${params.toString()}` : '';
 
-            const [resClientes, resCategorias] = await Promise.all([
-                fetch(urlClientes + queryString),
-                fetch(urlCategorias + queryString)
+            const [resStacked, resMensual] = await Promise.all([
+                fetch(urlStacked + queryString),
+                fetch(urlMensual + queryString)
             ]);
 
-            const dataClientes = await resClientes.json();
-            const dataCategorias = await resCategorias.json();
+            const dataStacked = await resStacked.json();
+            const dataMensual = await resMensual.json();
 
-            // Actualizar gráfico de clientes
-            chartClientes.data.labels = dataClientes.map(i => i.nombre);
-            chartClientes.data.datasets[0].data = dataClientes.map(i => i.total);
-            chartClientes.data.datasets[0].backgroundColor = dataClientes.map((_, i) => colorsClientes.bg[i % colorsClientes.bg.length]);
-            chartClientes.data.datasets[0].borderColor = dataClientes.map((_, i) => colorsClientes.border[i % colorsClientes.border.length]);
-            chartClientes.update('active');
+            // Actualizar gráfico stacked
+            chartStacked.data.labels = dataStacked.clientes || [];
+            chartStacked.data.datasets = dataStacked.datasets || [];
+            chartStacked.update('active');
 
-            // Actualizar gráfico de categorías
-            chartCategorias.data.labels = dataCategorias.map(i => i.nombre);
-            chartCategorias.data.datasets[0].data = dataCategorias.map(i => i.total);
-            chartCategorias.data.datasets[0].backgroundColor = dataCategorias.map((_, i) => colorsCategorias.bg[i % colorsCategorias.bg.length]);
-            chartCategorias.data.datasets[0].borderColor = dataCategorias.map((_, i) => colorsCategorias.border[i % colorsCategorias.border.length]);
-            chartCategorias.update('active');
+            // Actualizar gráfico mensual con espacio adicional para la línea de promedio
+            const labelsConEspacio = [...(dataMensual.labels || []), ''];
+            const dataBarras = [...(dataMensual.data || []), null];
+            const dataTendencia = [...(dataMensual.data || []), null];
+            const dataPromedio = Array(labelsConEspacio.length).fill(dataMensual.promedio || 0);
+            
+            chartMensual.data.labels = labelsConEspacio;
+            chartMensual.data.datasets[0].data = dataBarras;
+            chartMensual.data.datasets[1].data = dataTendencia;
+            chartMensual.data.datasets[2].data = dataPromedio;
+            // Actualizar el promedio en el plugin personalizado
+            promedioActual = dataMensual.promedio || 0;
+            chartMensual.update('active');
 
         } catch (error) {
             console.error('Error al cargar datos:', error);
         } finally {
-            document.getElementById('loading-clientes').classList.add('hidden');
-            document.getElementById('loading-categorias').classList.add('hidden');
+            document.getElementById('loading-stacked').classList.add('hidden');
+            document.getElementById('loading-mensual').classList.add('hidden');
         }
     }
 
