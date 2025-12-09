@@ -45,6 +45,48 @@ class MisionFlytbaseController extends Controller
         return view('misiones-flytbase.index', compact('misiones', 'clientes', 'drones', 'docks', 'sites'));
     }
 
+    /**
+     * Procesar archivo KMZ y retornar waypoints
+     */
+    public function processKmz(Request $request)
+    {
+        try {
+            $request->validate([
+                'kmz_file' => 'required|file|mimetypes:application/vnd.google-earth.kmz,application/zip|max:10240'
+            ]);
+
+            $kmzFile = $request->file('kmz_file');
+            $kmzFilePath = $kmzFile->store('misiones/kmz/temp', 'public');
+            
+            // Parsear KMZ y extraer waypoints
+            $kmzParser = new KmzParserService();
+            $waypoints = $kmzParser->parseKmzToWaypoints($kmzFilePath);
+            
+            // Eliminar archivo temporal
+            Storage::disk('public')->delete($kmzFilePath);
+            
+            if (empty($waypoints)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudieron extraer waypoints del archivo KMZ. Verifique que el archivo contenga coordenadas válidas.'
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'waypoints' => $waypoints,
+                'count' => count($waypoints)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al procesar KMZ: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar el archivo KMZ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -108,82 +150,46 @@ class MisionFlytbaseController extends Controller
         try {
             $kmzFilePath = null;
             
-            // Manejar archivo KMZ si se proporciona
+            // Manejar archivo KMZ si se proporciona (para guardar el archivo)
             if ($request->hasFile('kmz_file')) {
-                Log::info('Archivo KMZ detectado, iniciando procesamiento...');
+                Log::info('Archivo KMZ detectado, guardando...');
                 try {
                     $kmzFile = $request->file('kmz_file');
-                    Log::info('Información del archivo KMZ:', [
-                        'original_name' => $kmzFile->getClientOriginalName(),
-                        'mime_type' => $kmzFile->getMimeType(),
-                        'size' => $kmzFile->getSize(),
-                        'extension' => $kmzFile->getClientOriginalExtension()
-                    ]);
-                    
                     $kmzFilePath = $kmzFile->store('misiones/kmz', 'public');
                     Log::info('Archivo KMZ guardado en:', ['path' => $kmzFilePath]);
-                    
-                    // Parsear KMZ y extraer waypoints
-                    Log::info('Iniciando parseo del archivo KMZ...');
-                    $kmzParser = new KmzParserService();
-                    $waypointsFromKmz = $kmzParser->parseKmzToWaypoints($kmzFilePath);
-                    
-                    Log::info('Waypoints extraídos del KMZ:', [
-                        'count' => count($waypointsFromKmz),
-                        'waypoints' => $waypointsFromKmz
-                    ]);
-                    
-                    if (!empty($waypointsFromKmz)) {
-                        // Si hay waypoints del KMZ, usarlos (sobrescriben el JSON si existe)
-                        $validated['waypoints'] = $waypointsFromKmz;
-                        $validated['kmz_file_path'] = $kmzFilePath;
-                        Log::info('Waypoints del KMZ asignados correctamente');
-                    } else {
-                        // Si no se encontraron waypoints, eliminar el archivo y mostrar error
-                        Log::warning('No se encontraron waypoints en el archivo KMZ');
-                        Storage::disk('public')->delete($kmzFilePath);
-                        return redirect()->back()->with('error', 'No se pudieron extraer waypoints del archivo KMZ. Verifique que el archivo contenga coordenadas válidas.');
-                    }
+                    $validated['kmz_file_path'] = $kmzFilePath;
                 } catch (\Exception $e) {
-                    Log::error('Error al procesar archivo KMZ:', [
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine()
+                    Log::error('Error al guardar archivo KMZ:', [
+                        'message' => $e->getMessage()
                     ]);
-                    if ($kmzFilePath) {
-                        Storage::disk('public')->delete($kmzFilePath);
+                    return redirect()->back()->with('error', 'Error al guardar el archivo KMZ: ' . $e->getMessage());
+                }
+            }
+            
+            // Procesar waypoints desde el campo hidden (JSON string)
+            if (!empty($validated['waypoints'])) {
+                try {
+                    Log::info('Procesando waypoints desde formulario:', ['waypoints_raw' => $validated['waypoints']]);
+                    $waypointsArray = json_decode($validated['waypoints'], true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        Log::error('Error al parsear JSON de waypoints:', [
+                            'json_error' => json_last_error_msg(),
+                            'waypoints_raw' => $validated['waypoints']
+                        ]);
+                        return redirect()->back()->with('error', 'El formato de waypoints no es válido.');
                     }
-                    return redirect()->back()->with('error', 'Error al procesar el archivo KMZ: ' . $e->getMessage());
+                    $validated['waypoints'] = $waypointsArray;
+                    Log::info('Waypoints procesados correctamente:', ['count' => count($waypointsArray)]);
+                } catch (\Exception $e) {
+                    Log::error('Error al procesar waypoints:', [
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
                 }
             } else {
-                Log::info('No se detectó archivo KMZ, procesando waypoints JSON...');
-                // Si no hay archivo KMZ, procesar waypoints JSON
-                if (!empty($validated['waypoints'])) {
-                    try {
-                        Log::info('Procesando waypoints JSON:', ['waypoints_raw' => $validated['waypoints']]);
-                        // Validar que el JSON sea válido
-                        $waypointsArray = json_decode($validated['waypoints'], true);
-                        if (json_last_error() !== JSON_ERROR_NONE) {
-                            Log::error('Error al parsear JSON de waypoints:', [
-                                'json_error' => json_last_error_msg(),
-                                'waypoints_raw' => $validated['waypoints']
-                            ]);
-                            return redirect()->back()->with('error', 'El formato de JSON en waypoints no es válido.');
-                        }
-                        $validated['waypoints'] = $waypointsArray;
-                        Log::info('Waypoints JSON procesados correctamente:', ['count' => count($waypointsArray)]);
-                    } catch (\Exception $e) {
-                        Log::error('Error al procesar waypoints JSON:', [
-                            'message' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString()
-                        ]);
-                        return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
-                    }
-                } else {
-                    $validated['waypoints'] = null;
-                    Log::info('No hay waypoints (ni KMZ ni JSON)');
-                }
+                $validated['waypoints'] = null;
+                Log::info('No hay waypoints en el formulario');
             }
 
             Log::info('Datos finales antes de crear la misión:', [
@@ -278,57 +284,69 @@ class MisionFlytbaseController extends Controller
 
         try {
             $kmzFilePath = null;
+            $oldKmzFilePath = null; // Guardar ruta del archivo anterior
             
-            // Manejar archivo KMZ si se proporciona
+            // Manejar archivo KMZ si se proporciona (guardar primero el nuevo)
             if ($request->hasFile('kmz_file')) {
                 try {
-                    // Eliminar archivo KMZ anterior si existe
+                    // Guardar la ruta del archivo anterior antes de guardar el nuevo
                     if ($misionesFlytbase->kmz_file_path) {
-                        Storage::disk('public')->delete($misionesFlytbase->kmz_file_path);
+                        $oldKmzFilePath = $misionesFlytbase->kmz_file_path;
                     }
                     
+                    // Guardar el nuevo archivo KMZ primero
                     $kmzFile = $request->file('kmz_file');
                     $kmzFilePath = $kmzFile->store('misiones/kmz', 'public');
+                    $validated['kmz_file_path'] = $kmzFilePath;
                     
-                    // Parsear KMZ y extraer waypoints
-                    $kmzParser = new KmzParserService();
-                    $waypointsFromKmz = $kmzParser->parseKmzToWaypoints($kmzFilePath);
-                    
-                    if (!empty($waypointsFromKmz)) {
-                        // Si hay waypoints del KMZ, usarlos (sobrescriben el JSON si existe)
-                        $validated['waypoints'] = $waypointsFromKmz;
-                        $validated['kmz_file_path'] = $kmzFilePath;
-                    } else {
-                        // Si no se encontraron waypoints, eliminar el archivo y mostrar error
-                        Storage::disk('public')->delete($kmzFilePath);
-                        return redirect()->back()->with('error', 'No se pudieron extraer waypoints del archivo KMZ. Verifique que el archivo contenga coordenadas válidas.');
-                    }
+                    Log::info('Nuevo archivo KMZ guardado:', ['path' => $kmzFilePath, 'old_path' => $oldKmzFilePath]);
                 } catch (\Exception $e) {
-                    Log::error('Error al procesar archivo KMZ: ' . $e->getMessage());
-                    if ($kmzFilePath) {
-                        Storage::disk('public')->delete($kmzFilePath);
-                    }
-                    return redirect()->back()->with('error', 'Error al procesar el archivo KMZ: ' . $e->getMessage());
-                }
-            } else {
-                // Si no hay archivo KMZ, procesar waypoints JSON
-                if (!empty($validated['waypoints'])) {
-                    try {
-                        // Validar que el JSON sea válido
-                        $waypointsArray = json_decode($validated['waypoints'], true);
-                        if (json_last_error() !== JSON_ERROR_NONE) {
-                            return redirect()->back()->with('error', 'El formato de JSON en waypoints no es válido.');
-                        }
-                        $validated['waypoints'] = $waypointsArray;
-                    } catch (\Exception $e) {
-                        return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
-                    }
-                } else {
-                    $validated['waypoints'] = null;
+                    Log::error('Error al guardar archivo KMZ: ' . $e->getMessage());
+                    return redirect()->back()->with('error', 'Error al guardar el archivo KMZ: ' . $e->getMessage());
                 }
             }
+            
+            // Procesar waypoints desde el campo hidden (JSON string)
+            if (!empty($validated['waypoints'])) {
+                try {
+                    $waypointsArray = json_decode($validated['waypoints'], true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        // Si hay error y se guardó un nuevo archivo, limpiarlo
+                        if ($kmzFilePath) {
+                            Storage::disk('public')->delete($kmzFilePath);
+                            Log::info('Archivo KMZ nuevo eliminado por error de validación de waypoints');
+                        }
+                        return redirect()->back()->with('error', 'El formato de waypoints no es válido.');
+                    }
+                    $validated['waypoints'] = $waypointsArray;
+                } catch (\Exception $e) {
+                    // Si hay error y se guardó un nuevo archivo, limpiarlo
+                    if ($kmzFilePath) {
+                        Storage::disk('public')->delete($kmzFilePath);
+                        Log::info('Archivo KMZ nuevo eliminado por error al procesar waypoints');
+                    }
+                    return redirect()->back()->with('error', 'Error al procesar los waypoints: ' . $e->getMessage());
+                }
+            } else {
+                $validated['waypoints'] = null;
+            }
 
+            // Actualizar la misión con el nuevo archivo y waypoints
             $misionesFlytbase->update($validated);
+            
+            // Solo después de actualizar exitosamente, eliminar el archivo anterior
+            if ($oldKmzFilePath && $kmzFilePath) {
+                try {
+                    Storage::disk('public')->delete($oldKmzFilePath);
+                    Log::info('Archivo KMZ anterior eliminado exitosamente:', ['old_path' => $oldKmzFilePath]);
+                } catch (\Exception $e) {
+                    // No fallar la actualización si no se puede eliminar el archivo anterior
+                    Log::warning('No se pudo eliminar el archivo KMZ anterior, pero la actualización fue exitosa:', [
+                        'old_path' => $oldKmzFilePath,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
             
             if ($request->ajax()) {
                 return response()->json([
@@ -342,6 +360,19 @@ class MisionFlytbaseController extends Controller
                 
         } catch (\Exception $e) {
             Log::error('Error al actualizar misión Flytbase: ' . $e->getMessage());
+            
+            // Si se guardó un nuevo archivo pero falló la actualización, limpiarlo
+            if (isset($kmzFilePath) && $kmzFilePath) {
+                try {
+                    Storage::disk('public')->delete($kmzFilePath);
+                    Log::info('Archivo KMZ nuevo eliminado por error en la actualización');
+                } catch (\Exception $deleteException) {
+                    Log::error('Error al eliminar archivo KMZ nuevo después de fallo:', [
+                        'path' => $kmzFilePath,
+                        'error' => $deleteException->getMessage()
+                    ]);
+                }
+            }
             
             if ($request->ajax()) {
                 return response()->json([

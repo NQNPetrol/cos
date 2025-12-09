@@ -34,7 +34,11 @@
                                                     data-drone="{{ $mision->drone->drone ?? 'No asignado'}}"
                                                     data-descripcion="{{ $mision->descripcion ?? 'Sin descripcion disponible' }}"
                                                     data-waypoints="{{ $mision->waypoints ? json_encode($mision->waypoints) : '' }}"
-                                                    data-kmz-file-path="{{ $mision->kmz_file_path ?? '' }}">
+                                                    data-kmz-file-path="{{ $mision->kmz_file_path ?? '' }}"
+                                                    data-dock-latitud="{{ $mision->dock->latitud ?? '' }}"
+                                                    data-dock-longitud="{{ $mision->dock->longitud ?? '' }}"
+                                                    data-dock-altitude="{{ $mision->dock->altitude ?? '' }}"
+                                                    data-dock-nombre="{{ $mision->dock->nombre ?? '' }}">
                                                     {{ $mision->nombre}}
                                                     @if($mision->cliente)
                                                         - {{ $mision->cliente->nombre }}
@@ -230,17 +234,29 @@
                 document.getElementById('summaryDrone').textContent = selectedOption.getAttribute('data-drone') || '-';
                 document.getElementById('summaryDescripcion').textContent = selectedOption.getAttribute('data-descripcion') || 'Sin descripción disponible';
 
-                // Obtener waypoints
+                // Obtener waypoints y datos del dock
                 const waypointsData = selectedOption.getAttribute('data-waypoints');
                 const kmzFilePath = selectedOption.getAttribute('data-kmz-file-path');
+                const dockLatitud = selectedOption.getAttribute('data-dock-latitud');
+                const dockLongitud = selectedOption.getAttribute('data-dock-longitud');
+                const dockAltitude = selectedOption.getAttribute('data-dock-altitude');
+                const dockNombre = selectedOption.getAttribute('data-dock-nombre');
+
+                // Preparar datos del dock si existen
+                const dockData = (dockLatitud && dockLongitud) ? {
+                    latitud: dockLatitud,
+                    longitud: dockLongitud,
+                    altitude: dockAltitude || 'N/A',
+                    nombre: dockNombre || 'Base'
+                } : null;
 
                 if (waypointsData && waypointsData !== '') {
                     try {
                         const waypoints = JSON.parse(waypointsData);
                         if (waypoints && waypoints.length > 0) {
-                            // Mostrar mapa y dibujar ruta
+                            // Mostrar mapa y dibujar ruta con dock
                             mapContainer.classList.remove('hidden');
-                            drawMissionRoute(waypoints);
+                            drawMissionRoute(waypoints, dockData);
                         } else {
                             mapContainer.classList.add('hidden');
                         }
@@ -254,11 +270,11 @@
             }
         }
 
-        function drawMissionRoute(waypoints) {
+        function drawMissionRoute(waypoints, dockData = null) {
             // Esperar a que Leaflet esté disponible
             if (typeof L === 'undefined') {
                 console.error('Leaflet no está disponible, esperando...');
-                setTimeout(() => drawMissionRoute(waypoints), 100);
+                setTimeout(() => drawMissionRoute(waypoints, dockData), 100);
                 return;
             }
 
@@ -267,9 +283,14 @@
                 missionMap.remove();
             }
 
+            // Determinar centro inicial (dock si existe, sino primer waypoint)
+            const initialCenter = dockData 
+                ? [parseFloat(dockData.latitud), parseFloat(dockData.longitud)]
+                : [parseFloat(waypoints[0].latitud), parseFloat(waypoints[0].longitud)];
+
             // Crear mapa
             missionMap = L.map('missionMap', {
-                center: [parseFloat(waypoints[0].latitud), parseFloat(waypoints[0].longitud)],
+                center: initialCenter,
                 zoom: 15,
                 zoomControl: true
             });
@@ -308,32 +329,184 @@
                 opacity: 0.8
             }).addTo(missionMap);
 
-            // Agregar marcadores en cada waypoint
-            waypoints.forEach((wp, index) => {
-                const marker = L.marker([parseFloat(wp.latitud), parseFloat(wp.longitud)], {
-                    icon: L.icon({
-                        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34]
-                    })
+            // Agregar marcador del dock si existe
+            let dockMarker = null;
+            if (dockData && dockData.latitud && dockData.longitud) {
+                // Función para crear icono redondo verde para el dock
+                function createDockIcon() {
+                    return L.divIcon({
+                        className: 'custom-dock-icon',
+                        html: `<div style="
+                            background-color: #22c55e;
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                        ">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M6 12h12v-2a2 2 0 0 1 2 -2a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2a2 2 0 0 1 2 2v2z" />
+                                <path d="M6 15h12" />
+                                <path d="M6 18h12" />
+                                <path d="M21 11v7" />
+                                <path d="M3 11v7" />
+                            </svg>
+                        </div>`,
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16],
+                        popupAnchor: [0, -16]
+                    });
+                }
+
+                // Crear marcador del dock
+                dockMarker = L.marker([parseFloat(dockData.latitud), parseFloat(dockData.longitud)], {
+                    icon: createDockIcon()
                 }).addTo(missionMap);
 
-                // Agregar popup con información del waypoint
-                const popupContent = `
-                    <div class="text-sm">
-                        <strong>Waypoint ${index + 1}</strong><br>
-                        Lat: ${wp.latitud}<br>
-                        Lng: ${wp.longitud}<br>
-                        Altitud: ${wp.altitud || 'N/A'} m
-                        ${wp.acciones && wp.acciones.length > 0 ? `<br>Acciones: ${wp.acciones.join(', ')}` : ''}
+                // Popup del dock
+                const dockPopupContent = `
+                    <div class="text-sm" style="min-width: 200px;">
+                        <strong>Base</strong><br>
+                        <div class="mt-2 space-y-1">
+                            <div><span class="text-gray-600">Latitud:</span> ${dockData.latitud}</div>
+                            <div><span class="text-gray-600">Longitud:</span> ${dockData.longitud}</div>
+                            <div><span class="text-gray-600">Altitud:</span> ${dockData.altitude} m</div>
+                        </div>
                     </div>
                 `;
+                dockMarker.bindPopup(dockPopupContent);
+
+                // Dibujar línea de despegue (dock al primer waypoint) - verde punteada
+                if (waypoints.length > 0) {
+                    const takeoffLine = L.polyline([
+                        [parseFloat(dockData.latitud), parseFloat(dockData.longitud)],
+                        [parseFloat(waypoints[0].latitud), parseFloat(waypoints[0].longitud)]
+                    ], {
+                        color: '#22c55e',
+                        weight: 3,
+                        opacity: 0.7,
+                        dashArray: '10, 5'
+                    }).addTo(missionMap);
+                }
+
+                // Dibujar línea de retorno RTH (último waypoint al dock) - roja punteada
+                if (waypoints.length > 0) {
+                    const lastWaypoint = waypoints[waypoints.length - 1];
+                    const rthLine = L.polyline([
+                        [parseFloat(lastWaypoint.latitud), parseFloat(lastWaypoint.longitud)],
+                        [parseFloat(dockData.latitud), parseFloat(dockData.longitud)]
+                    ], {
+                        color: '#ef4444',
+                        weight: 3,
+                        opacity: 0.7,
+                        dashArray: '10, 5'
+                    }).addTo(missionMap);
+                }
+            }
+
+            // Función para crear icono circular personalizado con número
+            function createNumberedIcon(number) {
+                return L.divIcon({
+                    className: 'custom-numbered-marker',
+                    html: `<div style="
+                        background-color: #3b82f6;
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        border: 3px solid white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 14px;
+                        text-align: center;
+                        line-height: 1;
+                    ">${number}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16],
+                    popupAnchor: [0, -16]
+                });
+            }
+
+            // Agregar marcadores en cada waypoint
+            waypoints.forEach((wp, index) => {
+                const waypointNumber = index + 1;
+                const marker = L.marker([parseFloat(wp.latitud), parseFloat(wp.longitud)], {
+                    icon: createNumberedIcon(waypointNumber)
+                }).addTo(missionMap);
+
+                // Función helper para obtener etiqueta de acción
+                function getActionLabel(action) {
+                    // Si es un objeto (drone_yaw)
+                    if (typeof action === 'object' && action.type === 'drone_yaw') {
+                        return `Rotar Yaw del Drone: ${action.angle}°`;
+                    }
+                    
+                    const acciones = {
+                        'take_thermal_image': 'Capturar Imagen Térmica',
+                        'take_wide_image': 'Capturar Imagen Angular',
+                        'take_panorama_image': 'Capturar Imagen Panoramica',
+                        'start_recording': 'Iniciar Grabación',
+                        'stop_recording': 'Detener Grabación',
+                        'zoom_in': 'Activar Zoom',
+                        'set_gimbal_90': 'Rotar Camara a 90°',
+                        'set_gimbal_45': 'Rotar Camara 45°'
+                    };
+                    return acciones[action] || action;
+                }
+
+                // Agregar popup con información del waypoint
+                let popupContent = `
+                    <div class="text-sm" style="min-width: 200px;">
+                        <strong>Waypoint ${waypointNumber}</strong><br>
+                        <div class="mt-2 space-y-1">
+                            <div><span class="text-gray-600">Lat:</span> ${wp.latitud}</div>
+                            <div><span class="text-gray-600">Lng:</span> ${wp.longitud}</div>
+                            <div><span class="text-gray-600">Altitud:</span> ${wp.altitud || 'N/A'} m</div>
+                        </div>
+                `;
+                
+                if (wp.acciones && wp.acciones.length > 0) {
+                    popupContent += `
+                        <div class="mt-3 pt-2 border-t border-gray-300">
+                            <div class="text-xs font-medium text-gray-600 mb-1">Acciones:</div>
+                            <div class="flex flex-wrap gap-1">
+                                ${wp.acciones.map(accion => `
+                                    <span class="inline-block px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                                        ${getActionLabel(accion)}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                popupContent += `</div>`;
                 marker.bindPopup(popupContent);
             });
 
-            // Ajustar el mapa para mostrar toda la ruta
-            missionMap.fitBounds(polyline.getBounds(), {
+            // Ajustar el mapa para mostrar toda la ruta incluyendo el dock
+            let bounds = polyline.getBounds();
+            if (dockMarker) {
+                bounds = bounds.extend(dockMarker.getLatLng());
+            }
+            missionMap.fitBounds(bounds, {
                 padding: [20, 20]
             });
         }

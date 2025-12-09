@@ -358,7 +358,7 @@ class AlertasClientController extends Controller
     {
         return MisionFlytbase::activas()
             ->porClienteUsuario($user) // Nuevo scope que filtra por cliente del usuario
-            ->with('cliente', 'drone')
+            ->with('cliente', 'drone', 'dock')
             ->get();
     }
 

@@ -554,6 +554,10 @@ Route::middleware([
         ->name('misiones-flytbase.index')
         ->middleware('can:ver.misiones');
 
+    Route::post('/misiones-flytbase/process-kmz', [\App\Http\Controllers\MisionFlytbaseController::class, 'processKmz'])
+        ->name('misiones-flytbase.process-kmz')
+        ->middleware('can:crear.misiones');
+
     Route::post('/misiones-flytbase/{misionesFlytbase}/toggle-status', [\App\Http\Controllers\MisionFlytbaseController::class, 'toggleStatus'])
         ->name('misiones-flytbase.toggle-status')
         ->middleware('can:crear.misiones');

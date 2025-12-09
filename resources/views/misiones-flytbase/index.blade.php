@@ -249,48 +249,42 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
                             
-                            <!-- Tabs para elegir entre JSON y KMZ -->
-                            <div class="mb-3 border-b border-gray-600">
-                                <div class="flex space-x-4">
-                                    <button type="button" onclick="switchWaypointInput('create', 'json')" 
-                                            id="createWaypointTabJson"
-                                            class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-400">
-                                        JSON Manual
-                                    </button>
-                                    <button type="button" onclick="switchWaypointInput('create', 'kmz')" 
-                                            id="createWaypointTabKmz"
-                                            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300">
-                                        Importar KMZ
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Contenedor JSON -->
-                            <div id="createWaypointJsonContainer">
-                                <textarea name="waypoints" id="createWaypoints" rows="8"
-                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
-                                          placeholder='[
-                                                            {
-                                                                "altitud": 35,
-                                                                "latitud": "-38.85047",
-                                                                "acciones": ["take_panorama_image"],
-                                                                "longitud": "-68.12660"
-                                                            },
-                                                            {
-                                                                "altitud": 35,
-                                                                "latitud": "-38.84919",
-                                                                "acciones": [],
-                                                                "longitud": "-68.12503"
-                                                            }
-                                                        ]'></textarea>
-                                <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
-                            </div>
-
-                            <!-- Contenedor KMZ -->
-                            <div id="createWaypointKmzContainer" class="hidden">
+                            <!-- Input para archivo KMZ -->
+                            <div id="createKmzUploadContainer">
                                 <input type="file" name="kmz_file" id="createKmzFile" accept=".kmz"
                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
                                 <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
+                                
+                                <!-- Mensaje de carga -->
+                                <div id="createKmzLoading" class="hidden mt-3 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span class="text-sm text-blue-300">Procesando archivo KMZ...</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mensaje de error -->
+                                <div id="createKmzError" class="hidden mt-3 p-3 bg-red-900/30 border border-red-700 rounded-lg">
+                                    <p class="text-sm text-red-300"></p>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor de waypoints procesados -->
+                            <div id="createWaypointsContainer" class="hidden mt-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-sm font-medium text-gray-300">Waypoints Importados</h4>
+                                    <span id="createWaypointsCount" class="text-xs text-gray-400">0 waypoints</span>
+                                </div>
+                                
+                                <div id="createWaypointsList" class="space-y-3 max-h-96 overflow-y-auto">
+                                    <!-- Los waypoints se agregarán aquí dinámicamente -->
+                                </div>
+                                
+                                <!-- Campo hidden para enviar waypoints como JSON -->
+                                <input type="hidden" name="waypoints" id="createWaypointsJson">
                             </div>
                         </div>
 
@@ -437,49 +431,45 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
                             
-                            <!-- Tabs para elegir entre JSON y KMZ -->
-                            <div class="mb-3 border-b border-gray-600">
-                                <div class="flex space-x-4">
-                                    <button type="button" onclick="switchWaypointInput('edit', 'json')" 
-                                            id="editWaypointTabJson"
-                                            class="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-400">
-                                        JSON Manual
-                                    </button>
-                                    <button type="button" onclick="switchWaypointInput('edit', 'kmz')" 
-                                            id="editWaypointTabKmz"
-                                            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300">
-                                        Importar KMZ
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Contenedor JSON -->
-                            <div id="editWaypointJsonContainer">
-                                <textarea name="waypoints" id="editWaypoints" rows="8"
-                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 font-mono text-sm"
-                                          placeholder='[
-                                                            {
-                                                                "altitud": 35,
-                                                                "latitud": "-38.85047",
-                                                                "acciones": ["take_panorama_image"],
-                                                                "longitud": "-68.12660"
-                                                            },
-                                                            {
-                                                                "altitud": 35,
-                                                                "latitud": "-38.84919",
-                                                                "acciones": [],
-                                                                "longitud": "-68.12503"
-                                                            }
-                                                        ]'></textarea>
-                                <p class="text-xs text-gray-400 mt-1">Ingrese el JSON con los waypoints de la misión. Formato válido requerido.</p>
-                            </div>
-
-                            <!-- Contenedor KMZ -->
-                            <div id="editWaypointKmzContainer" class="hidden">
+                            <!-- Input para archivo KMZ -->
+                            <div id="editKmzUploadContainer">
                                 <input type="file" name="kmz_file" id="editKmzFile" accept=".kmz"
                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
                                 <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
+                                
+                                <!-- Mensaje de carga -->
+                                <div id="editKmzLoading" class="hidden mt-3 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span class="text-sm text-blue-300">Procesando archivo KMZ...</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mensaje de error -->
+                                <div id="editKmzError" class="hidden mt-3 p-3 bg-red-900/30 border border-red-700 rounded-lg">
+                                    <p class="text-sm text-red-300"></p>
+                                </div>
+                                
+                                <!-- Info de archivo existente -->
                                 <p id="editKmzFileInfo" class="text-xs text-green-400 mt-1 hidden"></p>
+                            </div>
+
+                            <!-- Contenedor de waypoints procesados -->
+                            <div id="editWaypointsContainer" class="hidden mt-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-sm font-medium text-gray-300">Waypoints</h4>
+                                    <span id="editWaypointsCount" class="text-xs text-gray-400">0 waypoints</span>
+                                </div>
+                                
+                                <div id="editWaypointsList" class="space-y-3 max-h-96 overflow-y-auto">
+                                    <!-- Los waypoints se agregarán aquí dinámicamente -->
+                                </div>
+                                
+                                <!-- Campo hidden para enviar waypoints como JSON -->
+                                <input type="hidden" name="waypoints" id="editWaypointsJson">
                             </div>
                         </div>
 
@@ -504,39 +494,189 @@
             </form>
         </div>
     </div>
-    <script>
-        // Función para cambiar entre tabs de waypoints
-        function switchWaypointInput(modal, type) {
-            const jsonTab = document.getElementById(modal + 'WaypointTabJson');
-            const kmzTab = document.getElementById(modal + 'WaypointTabKmz');
-            const jsonContainer = document.getElementById(modal + 'WaypointJsonContainer');
-            const kmzContainer = document.getElementById(modal + 'WaypointKmzContainer');
-            const form = document.getElementById(modal + 'Form');
 
-            if (type === 'json') {
-                jsonTab.classList.add('border-blue-500', 'text-blue-400');
-                jsonTab.classList.remove('border-transparent', 'text-gray-400');
-                kmzTab.classList.remove('border-blue-500', 'text-blue-400');
-                kmzTab.classList.add('border-transparent', 'text-gray-400');
-                jsonContainer.classList.remove('hidden');
-                kmzContainer.classList.add('hidden');
-            } else {
-                kmzTab.classList.add('border-blue-500', 'text-blue-400');
-                kmzTab.classList.remove('border-transparent', 'text-gray-400');
-                jsonTab.classList.remove('border-blue-500', 'text-blue-400');
-                jsonTab.classList.add('border-transparent', 'text-gray-400');
-                kmzContainer.classList.remove('hidden');
-                jsonContainer.classList.add('hidden');
-            }
+    <!-- Modal de Acciones para Waypoints -->
+    <div id="actionsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-100">Agregar Acciones</h3>
+                <button onclick="closeActionsModal()" class="text-gray-400 hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="actionsList" class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- Las acciones se agregarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para configurar Yaw del Drone -->
+    <div id="yawModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-100">Configurar Yaw del Drone</h3>
+                <button onclick="closeYawModal()" class="text-gray-400 hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Ángulo (-180° a 180°)</label>
+                    <input type="number" id="yawAngle" min="-180" max="180" step="1" value="0"
+                           class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                    <p class="text-xs text-gray-400 mt-1">Ingrese el ángulo de rotación del yaw del drone</p>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeYawModal()" 
+                            class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors">
+                        Cancelar
+                    </button>
+                    <button onclick="confirmYaw()" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Estilos para scrollbars - mismo color que el contenedor */
+        .overflow-y-auto::-webkit-scrollbar,
+        .overflow-x-auto::-webkit-scrollbar,
+        .overflow-auto::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
+        
+        .overflow-y-auto::-webkit-scrollbar-track,
+        .overflow-x-auto::-webkit-scrollbar-track,
+        .overflow-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb,
+        .overflow-x-auto::-webkit-scrollbar-thumb,
+        .overflow-auto::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 4px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover,
+        .overflow-auto::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5);
+        }
+        
+        /* Scrollbars para contenedores específicos */
+        #actionsList::-webkit-scrollbar,
+        #createWaypointsList::-webkit-scrollbar,
+        #editWaypointsList::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #actionsList::-webkit-scrollbar-track,
+        #createWaypointsList::-webkit-scrollbar-track,
+        #editWaypointsList::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #actionsList::-webkit-scrollbar-thumb,
+        #createWaypointsList::-webkit-scrollbar-thumb,
+        #editWaypointsList::-webkit-scrollbar-thumb {
+            background: rgba(55, 65, 81, 0.6);
+            border-radius: 4px;
+        }
+        
+        #actionsList::-webkit-scrollbar-thumb:hover,
+        #createWaypointsList::-webkit-scrollbar-thumb:hover,
+        #editWaypointsList::-webkit-scrollbar-thumb:hover {
+            background: rgba(55, 65, 81, 0.8);
+        }
+        
+        /* Scrollbars para modales y otros contenedores */
+        .bg-gray-800::-webkit-scrollbar,
+        .bg-gray-900::-webkit-scrollbar,
+        .bg-gray-700::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .bg-gray-800::-webkit-scrollbar-track,
+        .bg-gray-900::-webkit-scrollbar-track,
+        .bg-gray-700::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .bg-gray-800::-webkit-scrollbar-thumb,
+        .bg-gray-900::-webkit-scrollbar-thumb,
+        .bg-gray-700::-webkit-scrollbar-thumb {
+            background: rgba(55, 65, 81, 0.6);
+            border-radius: 4px;
+        }
+        
+        .bg-gray-800::-webkit-scrollbar-thumb:hover,
+        .bg-gray-900::-webkit-scrollbar-thumb:hover,
+        .bg-gray-700::-webkit-scrollbar-thumb:hover {
+            background: rgba(55, 65, 81, 0.8);
+        }
+        
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(55, 65, 81, 0.6) transparent;
+        }
+        
+        #actionsList,
+        #createWaypointsList,
+        #editWaypointsList {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(55, 65, 81, 0.6) transparent;
+        }
+    </style>
+
+    <script>
+        // Variables globales para manejar waypoints
+        let createWaypoints = [];
+        let editWaypoints = [];
+        let currentWaypointIndex = null;
+        let currentModal = null; // 'create' o 'edit'
+
+        // Acciones disponibles
+        const accionesDisponibles = {
+            'take_thermal_image': 'Capturar Imagen Térmica',
+            'take_wide_image': 'Capturar Imagen Angular',
+            'take_panorama_image': 'Capturar Imagen Panoramica',
+            'start_recording': 'Iniciar Grabación',
+            'stop_recording': 'Detener Grabación',
+            'zoom_in': 'Activar Zoom',
+            'set_gimbal_90': 'Rotar Camara a 90°',
+            'set_gimbal_45': 'Rotar Camara 45°',
+            'drone_yaw': 'Rotar Yaw del Drone'
+        };
 
         // Funciones para el modal de crear
         function openCreateModal() {
             document.getElementById('createModal').classList.remove('hidden');
             document.getElementById('createForm').reset();
             document.getElementById('createActivo').checked = true;
-            // Resetear a tab JSON
-            switchWaypointInput('create', 'json');
+            createWaypoints = [];
+            document.getElementById('createWaypointsContainer').classList.add('hidden');
+            document.getElementById('createWaypointsList').innerHTML = '';
+            document.getElementById('createWaypointsJson').value = '';
+            document.getElementById('createKmzLoading').classList.add('hidden');
+            document.getElementById('createKmzError').classList.add('hidden');
+            const kmzFileInput = document.getElementById('createKmzFile');
+            if (kmzFileInput) {
+                kmzFileInput.value = '';
+            }
         }
 
         function closeCreateModal() {
@@ -568,35 +708,37 @@
             document.getElementById('editRouteWaypointType').value = routeWaypointType || 'linear_route';
             document.getElementById('editObservaciones').value = observaciones || '';
 
-            // Manejar waypoints y KMZ
+            // Manejar waypoints existentes
+            editWaypoints = [];
+            if (waypoints && waypoints !== 'null' && waypoints !== '""') {
+                try {
+                    let parsedWaypoints;
+                    if (typeof waypoints === 'string') {
+                        parsedWaypoints = JSON.parse(waypoints);
+                    } else {
+                        parsedWaypoints = waypoints;
+                    }
+                    
+                    if (Array.isArray(parsedWaypoints) && parsedWaypoints.length > 0) {
+                        editWaypoints = parsedWaypoints;
+                        displayWaypoints('edit', editWaypoints);
+                    } else {
+                        document.getElementById('editWaypointsContainer').classList.add('hidden');
+                    }
+                } catch (e) {
+                    console.error('Error al parsear waypoints:', e);
+                    document.getElementById('editWaypointsContainer').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('editWaypointsContainer').classList.add('hidden');
+            }
+            
+            // Mostrar info de archivo KMZ si existe
             if (kmzFilePath && kmzFilePath !== 'null' && kmzFilePath !== '""') {
-                // Si hay archivo KMZ, mostrar tab KMZ
-                switchWaypointInput('edit', 'kmz');
                 document.getElementById('editKmzFileInfo').textContent = 'Archivo KMZ actual: ' + kmzFilePath.split('/').pop();
                 document.getElementById('editKmzFileInfo').classList.remove('hidden');
             } else {
-                // Si no hay KMZ, mostrar tab JSON
-                switchWaypointInput('edit', 'json');
                 document.getElementById('editKmzFileInfo').classList.add('hidden');
-                
-                // Manejar waypoints JSON
-                if (waypoints && waypoints !== 'null' && waypoints !== '""') {
-                    try {
-                        // Si waypoints ya es un string JSON, intentar formatearlo
-                        if (typeof waypoints === 'string') {
-                            const parsedWaypoints = JSON.parse(waypoints);
-                            document.getElementById('editWaypoints').value = JSON.stringify(parsedWaypoints, null, 2);
-                        } else {
-                            document.getElementById('editWaypoints').value = JSON.stringify(waypoints, null, 2);
-                        }
-                    } catch (e) {
-                        console.error('Error al parsear waypoints:', e);
-                        // Si hay error al parsear, usar el valor original
-                        document.getElementById('editWaypoints').value = waypoints;
-                    }
-                } else {
-                    document.getElementById('editWaypoints').value = '';
-                }
             }
             
             console.log('Modal configurado correctamente');
@@ -604,18 +746,36 @@
 
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
+            editWaypoints = [];
+            document.getElementById('editWaypointsContainer').classList.add('hidden');
+            document.getElementById('editWaypointsList').innerHTML = '';
+            document.getElementById('editWaypointsJson').value = '';
+            document.getElementById('editKmzLoading').classList.add('hidden');
+            document.getElementById('editKmzError').classList.add('hidden');
+            const kmzFileInput = document.getElementById('editKmzFile');
+            if (kmzFileInput) {
+                kmzFileInput.value = '';
+            }
         }
 
         // Cerrar modales al hacer click fuera
         document.addEventListener('click', function(event) {
             const createModal = document.getElementById('createModal');
             const editModal = document.getElementById('editModal');
+            const actionsModal = document.getElementById('actionsModal');
             
             if (event.target === createModal) {
                 closeCreateModal();
             }
             if (event.target === editModal) {
                 closeEditModal();
+            }
+            if (event.target === actionsModal) {
+                closeActionsModal();
+            }
+            const yawModal = document.getElementById('yawModal');
+            if (event.target === yawModal) {
+                closeYawModal();
             }
         });
 
@@ -631,6 +791,18 @@
         });
 
         function submitForm(form) {
+            // Asegurar que los waypoints estén en el formulario
+            const isCreate = form.id === 'createForm';
+            const modal = isCreate ? 'create' : 'edit';
+            updateWaypointsJson(modal);
+            
+            // Validar que haya waypoints
+            const waypoints = isCreate ? createWaypoints : editWaypoints;
+            if (!waypoints || waypoints.length === 0) {
+                alert('Debe importar al menos un waypoint desde un archivo KMZ');
+                return;
+            }
+            
             const formData = new FormData(form);
             const submitButton = form.querySelector('button[type="submit"]');
             const originalText = submitButton.innerHTML;
@@ -677,7 +849,285 @@
             if (event.key === 'Escape') {
                 closeCreateModal();
                 closeEditModal();
+                closeActionsModal();
             }
         });
+
+        // ========== FUNCIONES PARA PROCESAR KMZ ==========
+        
+        // Manejar cambio de archivo KMZ en modal de crear
+        document.getElementById('createKmzFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                processKmzFile('create', e.target.files[0]);
+            }
+        });
+
+        // Manejar cambio de archivo KMZ en modal de editar
+        document.getElementById('editKmzFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                processKmzFile('edit', e.target.files[0]);
+            }
+        });
+
+        // Función para procesar archivo KMZ
+        function processKmzFile(modal, file) {
+            const loadingEl = document.getElementById(modal + 'KmzLoading');
+            const errorEl = document.getElementById(modal + 'KmzError');
+            const containerEl = document.getElementById(modal + 'WaypointsContainer');
+            
+            // Mostrar loading
+            loadingEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+            containerEl.classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append('kmz_file', file);
+
+            fetch('{{ route("misiones-flytbase.process-kmz") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingEl.classList.add('hidden');
+                
+                if (data.success && data.waypoints) {
+                    if (modal === 'create') {
+                        createWaypoints = data.waypoints;
+                    } else {
+                        editWaypoints = data.waypoints;
+                    }
+                    displayWaypoints(modal, data.waypoints);
+                } else {
+                    errorEl.querySelector('p').textContent = data.message || 'Error al procesar el archivo KMZ';
+                    errorEl.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                loadingEl.classList.add('hidden');
+                errorEl.querySelector('p').textContent = 'Error al procesar el archivo: ' + error.message;
+                errorEl.classList.remove('hidden');
+                console.error('Error:', error);
+            });
+        }
+
+        // Función para mostrar waypoints
+        function displayWaypoints(modal, waypoints) {
+            const container = document.getElementById(modal + 'WaypointsContainer');
+            const list = document.getElementById(modal + 'WaypointsList');
+            const count = document.getElementById(modal + 'WaypointsCount');
+            
+            list.innerHTML = '';
+            
+            if (!waypoints || waypoints.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            count.textContent = waypoints.length + ' waypoint' + (waypoints.length !== 1 ? 's' : '');
+            
+            waypoints.forEach((wp, index) => {
+                const waypointCard = createWaypointCard(modal, wp, index);
+                list.appendChild(waypointCard);
+            });
+            
+            container.classList.remove('hidden');
+            updateWaypointsJson(modal);
+        }
+
+        // Función para crear tarjeta de waypoint
+        function createWaypointCard(modal, waypoint, index) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-700 rounded-lg p-4 border border-gray-600';
+            card.dataset.index = index;
+            
+            const acciones = waypoint.acciones || [];
+            const accionesHtml = acciones.length > 0 
+                ? acciones.map((accion, accIndex) => {
+                    let accionLabel = '';
+                    let accionKey = '';
+                    
+                    if (typeof accion === 'object' && accion.type === 'drone_yaw') {
+                        accionLabel = `Rotar Yaw del Drone: ${accion.angle}°`;
+                        accionKey = JSON.stringify(accion);
+                    } else {
+                        accionLabel = accionesDisponibles[accion] || accion;
+                        accionKey = accion;
+                    }
+                    
+                    return `
+                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-600 text-white mr-1 mb-1">
+                            ${accionLabel}
+                            <button type="button" onclick="removeAction('${modal}', ${index}, ${accIndex})" 
+                                    class="ml-2 text-blue-200 hover:text-white">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </span>
+                    `;
+                }).join('')
+                : '<span class="text-xs text-gray-500 italic">No hay acciones</span>';
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h5 class="text-sm font-medium text-gray-200">Waypoint ${index + 1}</h5>
+                    <button type="button" onclick="openActionsModal('${modal}', ${index})" 
+                            class="text-blue-400 hover:text-blue-300 text-xs flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Agregar Acciones
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-xs mb-3">
+                    <div>
+                        <span class="text-gray-400">Latitud:</span>
+                        <span class="text-gray-200 ml-1">${waypoint.latitud}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Longitud:</span>
+                        <span class="text-gray-200 ml-1">${waypoint.longitud}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Altitud:</span>
+                        <span class="text-gray-200 ml-1">${waypoint.altitud || '35'} m</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-400">Acciones:</span>
+                    <div class="mt-1 flex flex-wrap">
+                        ${accionesHtml}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Función para abrir modal de acciones
+        function openActionsModal(modal, waypointIndex) {
+            currentModal = modal;
+            currentWaypointIndex = waypointIndex;
+            
+            const modalEl = document.getElementById('actionsModal');
+            const actionsList = document.getElementById('actionsList');
+            actionsList.innerHTML = '';
+            
+            // Agregar botones para cada acción disponible
+            Object.keys(accionesDisponibles).forEach(accionKey => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors border border-gray-600 hover:border-gray-500';
+                button.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-200 font-medium">${accionesDisponibles[accionKey]}</span>
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </div>
+                `;
+                // Si es drone_yaw, abrir modal de configuración, sino agregar directamente
+                if (accionKey === 'drone_yaw') {
+                    button.onclick = () => openYawModal(modal, waypointIndex);
+                } else {
+                    button.onclick = () => addAction(modal, waypointIndex, accionKey);
+                }
+                actionsList.appendChild(button);
+            });
+            
+            modalEl.classList.remove('hidden');
+        }
+
+        // Función para cerrar modal de acciones
+        function closeActionsModal() {
+            document.getElementById('actionsModal').classList.add('hidden');
+            currentModal = null;
+            currentWaypointIndex = null;
+        }
+
+        // Función para agregar acción a un waypoint
+        function addAction(modal, waypointIndex, accion, angle = null) {
+            const waypoints = modal === 'create' ? createWaypoints : editWaypoints;
+            
+            if (!waypoints[waypointIndex].acciones) {
+                waypoints[waypointIndex].acciones = [];
+            }
+            
+            // Si es drone_yaw, guardar como objeto con el ángulo
+            let actionToAdd;
+            if (accion === 'drone_yaw' && angle !== null) {
+                actionToAdd = {
+                    type: 'drone_yaw',
+                    angle: parseInt(angle)
+                };
+            } else {
+                actionToAdd = accion;
+            }
+            
+            // Verificar si la acción ya existe
+            const exists = waypoints[waypointIndex].acciones.some(a => {
+                if (typeof a === 'object' && a.type === 'drone_yaw' && accion === 'drone_yaw') {
+                    return true;
+                }
+                return a === accion;
+            });
+            
+            if (!exists) {
+                waypoints[waypointIndex].acciones.push(actionToAdd);
+                displayWaypoints(modal, waypoints);
+                closeActionsModal();
+            }
+        }
+
+        // Función para abrir modal de yaw
+        function openYawModal(modal, waypointIndex) {
+            currentModal = modal;
+            currentWaypointIndex = waypointIndex;
+            document.getElementById('yawAngle').value = '0';
+            document.getElementById('yawModal').classList.remove('hidden');
+            document.getElementById('actionsModal').classList.add('hidden');
+        }
+
+        // Función para cerrar modal de yaw
+        function closeYawModal() {
+            document.getElementById('yawModal').classList.add('hidden');
+            document.getElementById('actionsModal').classList.remove('hidden');
+        }
+
+        // Función para confirmar yaw
+        function confirmYaw() {
+            const angle = document.getElementById('yawAngle').value;
+            if (angle === '' || angle < -180 || angle > 180) {
+                alert('Por favor ingrese un ángulo válido entre -180° y 180°');
+                return;
+            }
+            addAction(currentModal, currentWaypointIndex, 'drone_yaw', angle);
+            closeYawModal();
+        }
+
+        // Función para eliminar acción de un waypoint
+        function removeAction(modal, waypointIndex, accionIndex) {
+            const waypoints = modal === 'create' ? createWaypoints : editWaypoints;
+            
+            if (waypoints[waypointIndex].acciones) {
+                waypoints[waypointIndex].acciones.splice(accionIndex, 1);
+                displayWaypoints(modal, waypoints);
+            }
+        }
+
+        // Función para actualizar el campo hidden con el JSON de waypoints
+        function updateWaypointsJson(modal) {
+            const waypoints = modal === 'create' ? createWaypoints : editWaypoints;
+            const jsonField = document.getElementById(modal + 'WaypointsJson');
+            
+            if (jsonField && waypoints.length > 0) {
+                jsonField.value = JSON.stringify(waypoints);
+            }
+        }
     </script>
 </x-app-layout>
