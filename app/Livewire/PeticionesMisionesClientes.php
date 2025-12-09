@@ -147,6 +147,7 @@ class PeticionesMisionesClientes extends Component
                 'route_speed' => $this->selectedPeticion->route_speed,
                 'route_waypoint_type' => $this->selectedPeticion->route_waypoint_type,
                 'waypoints' => $this->selectedPeticion->waypoints,
+                'kmz_file_path' => $this->selectedPeticion->kmz_file_path,
                 'observaciones' => $this->selectedPeticion->observaciones,
                 'user_id' => $this->selectedPeticion->user_id,
                 'url' => '', // Se completará manualmente por el admin

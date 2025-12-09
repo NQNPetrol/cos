@@ -34,6 +34,8 @@ class PeticionesMisionesClient extends Component
             
     public $currentWaypointIndex = 0;
     public $showActionModal = false;
+    public $waypointInputMode = 'manual'; // 'manual' o 'kmz'
+    public $kmz_file_path = null; // Path del archivo KMZ subido
 
     // Filtros
     public $filtroEstado = '';
@@ -243,6 +245,79 @@ class PeticionesMisionesClient extends Component
         return $acciones[$action] ?? $action;
     }
 
+    public function setWaypointsFromKmz($waypointsJson, $kmzFilePath = null, $confirmed = false)
+    {
+        try {
+            // Si hay waypoints manuales y no está confirmado, retornar para mostrar advertencia
+            if (!empty($this->waypoints) && !$confirmed) {
+                $this->dispatch('show-kmz-warning', [
+                    'waypointsCount' => count($this->waypoints),
+                    'waypointsJson' => $waypointsJson,
+                    'kmzFilePath' => $kmzFilePath
+                ]);
+                return;
+            }
+
+            $waypoints = json_decode($waypointsJson, true);
+            
+            if (!is_array($waypoints) || empty($waypoints)) {
+                session()->flash('error', 'No se pudieron extraer waypoints del archivo KMZ.');
+                return;
+            }
+
+            // Asegurar que cada waypoint tenga el campo acciones inicializado
+            foreach ($waypoints as &$wp) {
+                if (!isset($wp['acciones'])) {
+                    $wp['acciones'] = [];
+                }
+                // Asegurar que altitud sea numérico
+                if (isset($wp['altitud'])) {
+                    $wp['altitud'] = (float)$wp['altitud'];
+                } else {
+                    $wp['altitud'] = $this->route_altitude;
+                }
+            }
+
+            // Reemplazar waypoints manuales con los del KMZ
+            $this->waypoints = $waypoints;
+            $this->currentWaypointIndex = 0;
+            $this->waypointInputMode = 'kmz';
+            
+            // Guardar el path del archivo KMZ
+            if ($kmzFilePath) {
+                $this->kmz_file_path = $kmzFilePath;
+            }
+            
+            session()->flash('success', 'Waypoints importados exitosamente desde el archivo KMZ. Los waypoints manuales anteriores han sido reemplazados.');
+            
+        } catch (\Exception $e) {
+            Log::error('Error al procesar waypoints desde KMZ: ' . $e->getMessage());
+            session()->flash('error', 'Error al procesar los waypoints del archivo KMZ.');
+        }
+    }
+
+    public function switchWaypointMode($mode)
+    {
+        // Si se cambia a modo KMZ y hay waypoints manuales, limpiarlos
+        if ($mode === 'kmz' && !empty($this->waypoints)) {
+            $this->waypoints = [];
+            $this->currentWaypointIndex = 0;
+            $this->kmz_file_path = null; // Limpiar path si se cambia a modo KMZ
+            session()->flash('info', 'Se han limpiado los waypoints manuales al cambiar al modo de importación KMZ.');
+        }
+        
+        // Si se cambia a modo manual, limpiar el path del KMZ
+        if ($mode === 'manual') {
+            $this->kmz_file_path = null;
+            if (empty($this->waypoints)) {
+                $this->waypoints = [];
+            }
+        }
+        
+        $this->waypointInputMode = $mode;
+        $this->dispatch('waypointModeChanged');
+    }
+
     public function render()
     {
         Log::info('Renderizando componente', [
@@ -322,6 +397,7 @@ class PeticionesMisionesClient extends Component
             'route_speed' => $this->route_speed,
             'route_waypoint_type' => $this->route_waypoint_type,
             'waypoints' => $this->waypoints,
+            'kmz_file_path' => $this->kmz_file_path,
             'observaciones' => $this->observaciones,
             'user_id' => $user->id,
             'estado' => 'pendiente'
@@ -377,7 +453,12 @@ class PeticionesMisionesClient extends Component
             'route_altitude',
             'route_speed',
             'route_waypoint_type',
-            'observaciones'
+            'observaciones',
+            'waypoints',
+            'currentWaypointIndex',
+            'showActionModal',
+            'kmz_file_path',
+            'waypointInputMode'
         ]);
 
         $this->waypoints = [
@@ -388,5 +469,7 @@ class PeticionesMisionesClient extends Component
                 'acciones' => []
             ]
         ];
+        $this->currentWaypointIndex = 0;
+        $this->waypointInputMode = 'manual';
     }
 }

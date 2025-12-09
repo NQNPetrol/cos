@@ -146,11 +146,67 @@
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <label class="block text-sm font-medium text-gray-300">Waypoints *</label>
-                    <button type="button" wire:click="agregarWaypoint" 
-                            class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                        <i class="fas fa-plus mr-1"></i>Agregar Waypoint
-                    </button>
+                    <div class="flex space-x-2">
+                        <!-- Tabs para elegir entre Manual y KMZ -->
+                        <div class="flex space-x-1 bg-gray-700 rounded-lg p-1">
+                            <button type="button" 
+                                    wire:click="switchWaypointMode('manual')"
+                                    class="px-3 py-1 rounded text-sm transition-colors {{ $waypointInputMode === 'manual' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white' }}">
+                                Manual
+                            </button>
+                            <button type="button" 
+                                    wire:click="switchWaypointMode('kmz')"
+                                    class="px-3 py-1 rounded text-sm transition-colors {{ $waypointInputMode === 'kmz' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white' }}">
+                                Importar KMZ
+                            </button>
+                        </div>
+                        @if($waypointInputMode === 'manual')
+                        <button type="button" wire:click="agregarWaypoint" 
+                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-plus mr-1"></i>Agregar Waypoint
+                        </button>
+                        @endif
+                    </div>
                 </div>
+
+                <!-- Contenedor para importar KMZ -->
+                @if($waypointInputMode === 'kmz')
+                <div class="bg-gray-700 rounded-lg p-4 mb-4 border border-gray-600">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Subir archivo KMZ</label>
+                    <input type="file" 
+                           id="kmzFileInput"
+                           accept=".kmz"
+                           wire:ignore.self
+                           class="w-full rounded-md bg-gray-600 border-gray-500 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                    @if($kmz_file_path)
+                    <p class="text-xs text-green-400 mt-1">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Archivo cargado: {{ basename($kmz_file_path) }}
+                    </p>
+                    @endif
+                    <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión.</p>
+                    <p class="text-xs text-yellow-400 mt-1 font-medium">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        Al importar un archivo KMZ, se reemplazarán todos los waypoints manuales existentes.
+                    </p>
+                    
+                    <!-- Mensaje de carga -->
+                    <div id="kmzLoading" class="hidden mt-3 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+                        <div class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-sm text-blue-300">Procesando archivo KMZ...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje de error -->
+                    <div id="kmzError" class="hidden mt-3 p-3 bg-red-900/30 border border-red-700 rounded-lg">
+                        <p class="text-sm text-red-300"></p>
+                    </div>
+                </div>
+                @endif
 
                 @if(count($waypoints) > 0)
                 <!-- Navegación del carrusel -->
@@ -429,8 +485,53 @@
         </div>
     </div>
     @endif
-</div>
 
+    <!-- Modal de confirmación para importar KMZ -->
+    <div id="kmzWarningModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-100">Confirmar Importación KMZ</h3>
+                <button onclick="closeKmzWarningModal()" class="text-gray-400 hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mb-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-yellow-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-yellow-300 mb-2">Advertencia</p>
+                            <p class="text-sm text-yellow-200">
+                                Tienes <span id="warningWaypointsCount" class="font-bold"></span> waypoint(s) creado(s) manualmente.
+                            </p>
+                            <p class="text-sm text-yellow-200 mt-2">
+                                Al importar el archivo KMZ, <strong>todos los waypoints manuales serán reemplazados</strong> y se perderán permanentemente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-300">¿Deseas continuar con la importación?</p>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeKmzWarningModal()" 
+                        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="confirmKmzImport()" 
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Confirmar Importación
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin del componente Livewire -->
 
 <!-- Modal de Ver Petición -->
 @if($showViewModal && $selectedPeticion)
@@ -566,3 +667,177 @@
     </div>
 </div>
 @endif
+
+@script
+<script>
+    let pendingKmzData = null;
+    let pendingKmzFilePath = null;
+    
+
+    // Función para procesar archivo KMZ (debe estar disponible globalmente)
+    window.processKmzFile = function(file) {
+        console.log('[KMZ] Procesando archivo:', file.name, file.size, 'bytes');
+        const loadingEl = document.getElementById('kmzLoading');
+        const errorEl = document.getElementById('kmzError');
+        
+        // Mostrar loading
+        if (loadingEl) loadingEl.classList.remove('hidden');
+        if (errorEl) errorEl.classList.add('hidden');
+
+        const formData = new FormData();
+        formData.append('kmz_file', file);
+
+        console.log('[KMZ] Enviando archivo al servidor...');
+        fetch('{{ route("peticiones-misiones.process-kmz") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            console.log('[KMZ] Respuesta recibida:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('[KMZ] Datos recibidos:', data);
+            if (loadingEl) loadingEl.classList.add('hidden');
+            
+            if (data.success && data.waypoints) {
+                console.log('[KMZ] Waypoints extraídos:', data.waypoints.length);
+                console.log('[KMZ] Primer waypoint:', data.waypoints[0]);
+                console.log('[KMZ] Path del archivo:', data.kmz_file_path);
+                
+                // Guardar datos del KMZ procesado
+                pendingKmzData = JSON.stringify(data.waypoints);
+                pendingKmzFilePath = data.kmz_file_path || null;
+                console.log('[KMZ] JSON generado, longitud:', pendingKmzData.length);
+                
+                // Llamar al método Livewire (sin confirmar aún)
+                // Este método verificará si hay waypoints manuales y mostrará el modal
+                console.log('[KMZ] Llamando a setWaypointsFromKmz...');
+                @this.call('setWaypointsFromKmz', pendingKmzData, pendingKmzFilePath, false).then(() => {
+                    console.log('[KMZ] setWaypointsFromKmz completado');
+                });
+            } else {
+                console.error('[KMZ] Error en respuesta:', data);
+                if (errorEl) {
+                    errorEl.querySelector('p').textContent = data.message || 'Error al procesar el archivo KMZ';
+                    errorEl.classList.remove('hidden');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('[KMZ] Error al procesar:', error);
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (errorEl) {
+                errorEl.querySelector('p').textContent = 'Error al procesar el archivo: ' + error.message;
+                errorEl.classList.remove('hidden');
+            }
+        });
+    };
+
+    // Función para inicializar el listener del input KMZ
+    function initKmzInputListener() {
+        console.log('[KMZ] Inicializando listener del input KMZ...');
+        const kmzFileInput = document.getElementById('kmzFileInput');
+        if (kmzFileInput) {
+            console.log('[KMZ] Input encontrado, agregando listener');
+            // Remover listener anterior si existe (clonar para limpiar listeners)
+            const newInput = kmzFileInput.cloneNode(true);
+            kmzFileInput.parentNode.replaceChild(newInput, kmzFileInput);
+            
+            // Agregar nuevo listener
+            newInput.addEventListener('change', function(e) {
+                console.log('[KMZ] Archivo seleccionado:', e.target.files[0]?.name);
+                if (e.target.files.length > 0) {
+                    window.processKmzFile(e.target.files[0]);
+                }
+            });
+            console.log('[KMZ] Listener configurado correctamente');
+        } else {
+            console.log('[KMZ] Input no encontrado (puede que no esté en modo KMZ)');
+        }
+    }
+
+    // Manejar cambio de archivo KMZ
+    document.addEventListener('livewire:initialized', () => {
+        console.log('[KMZ] Livewire inicializado, configurando listeners...');
+        initKmzInputListener();
+    });
+
+    // Reinicializar cuando Livewire actualiza el DOM
+    document.addEventListener('livewire:update', () => {
+        console.log('[KMZ] Livewire actualizado, reinicializando listeners...');
+        // Solo reinicializar si estamos en modo KMZ
+        const currentMode = @this.get('waypointInputMode');
+        if (currentMode === 'kmz') {
+            console.log('[KMZ] Modo KMZ activo, preservando input del archivo');
+            // Esperar un poco para que el DOM se actualice
+            setTimeout(() => {
+                initKmzInputListener();
+            }, 100);
+        }
+    });
+
+    // Manejar evento de advertencia desde Livewire
+    Livewire.on('show-kmz-warning', (data) => {
+        const modal = document.getElementById('kmzWarningModal');
+        const countEl = document.getElementById('warningWaypointsCount');
+        
+        if (modal && countEl) {
+            countEl.textContent = data.waypointsCount;
+            pendingKmzData = data.waypointsJson;
+            pendingKmzFilePath = data.kmzFilePath || null;
+            modal.classList.remove('hidden');
+        }
+    });
+
+    function closeKmzWarningModal() {
+        const modal = document.getElementById('kmzWarningModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        pendingKmzData = null;
+        pendingKmzFilePath = null;
+    }
+
+    function confirmKmzImport() {
+        console.log('[KMZ] Confirmando importación...');
+        if (pendingKmzData) {
+            console.log('[KMZ] Llamando a setWaypointsFromKmz con confirmación...');
+            // Llamar al método Livewire con confirmación
+            @this.call('setWaypointsFromKmz', pendingKmzData, pendingKmzFilePath, true).then(() => {
+                console.log('[KMZ] Importación confirmada y completada');
+                closeKmzWarningModal();
+            });
+        } else {
+            console.error('[KMZ] No hay datos pendientes para importar');
+        }
+    }
+
+    // Reiniciar input cuando cambia el modo
+    Livewire.on('waypointModeChanged', () => {
+        console.log('[KMZ] Modo de waypoint cambiado, reinicializando...');
+        const kmzFileInput = document.getElementById('kmzFileInput');
+        if (kmzFileInput) {
+            // Solo limpiar el input si se cambia a modo manual
+            // Si está en modo KMZ, preservar el archivo
+            const currentMode = @this.get('waypointInputMode');
+            if (currentMode === 'manual') {
+                kmzFileInput.value = '';
+            }
+        }
+        const loadingEl = document.getElementById('kmzLoading');
+        const errorEl = document.getElementById('kmzError');
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (errorEl) errorEl.classList.add('hidden');
+        
+        // Reinicializar el listener cuando cambia el modo (con delay para que el DOM se actualice)
+        setTimeout(() => {
+            initKmzInputListener();
+        }, 200);
+    });
+</script>
+@endscript
