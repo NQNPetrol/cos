@@ -56,25 +56,33 @@ class MisionFlytbaseController extends Controller
             ]);
 
             $kmzFile = $request->file('kmz_file');
-            $kmzFilePath = $kmzFile->store('misiones/kmz/temp', 'public');
+            
+            // Guardar archivo temporalmente para parsear
+            $tempKmzFilePath = $kmzFile->store('misiones/kmz/temp', 'public');
             
             // Parsear KMZ y extraer waypoints
             $kmzParser = new KmzParserService();
-            $waypoints = $kmzParser->parseKmzToWaypoints($kmzFilePath);
-            
-            // Eliminar archivo temporal
-            Storage::disk('public')->delete($kmzFilePath);
+            $waypoints = $kmzParser->parseKmzToWaypoints($tempKmzFilePath);
             
             if (empty($waypoints)) {
+                // Eliminar archivo temporal si no hay waypoints
+                Storage::disk('public')->delete($tempKmzFilePath);
                 return response()->json([
                     'success' => false,
                     'message' => 'No se pudieron extraer waypoints del archivo KMZ. Verifique que el archivo contenga coordenadas válidas.'
                 ], 400);
             }
 
+            // Guardar archivo permanentemente (no en temp)
+            $kmzFilePath = $kmzFile->store('misiones/kmz', 'public');
+            
+            // Eliminar archivo temporal
+            Storage::disk('public')->delete($tempKmzFilePath);
+
             return response()->json([
                 'success' => true,
                 'waypoints' => $waypoints,
+                'kmz_file_path' => $kmzFilePath,
                 'count' => count($waypoints)
             ]);
 

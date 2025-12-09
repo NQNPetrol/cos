@@ -23,6 +23,7 @@ class PeticionMisionFlytbase extends Model
         'route_speed',
         'route_waypoint_type',
         'waypoints',
+        'kmz_file_path',
         'observaciones',
         'user_id',
         'estado',
@@ -131,6 +132,7 @@ class PeticionMisionFlytbase extends Model
             'route_speed' => $this->route_speed,
             'route_waypoint_type' => $this->route_waypoint_type,
             'waypoints' => $this->waypoints,
+            'kmz_file_path' => $this->kmz_file_path,
             'observaciones' => $this->observaciones,
             'url' => '', // Se generará después
             'activo' => true
