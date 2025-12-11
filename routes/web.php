@@ -579,6 +579,11 @@ Route::middleware([
         ->name('misiones-flytbase.destroy')
         ->middleware('can:crear.misiones');
     
+    // FLIGHT LOGS ADMIN
+    Route::get('/flight-logs', function () {
+        return view('flightlogs.admin.index');
+    })->name('flight-logs.index')->middleware('can:ver.flightlogs');
+
     // LIVESTREAM 
     Route::get('/drones/{droneName}/liveview', [App\Http\Controllers\FlytbaseDroneController::class, 'liveview'])
         ->name('streaming.drone.liveview')

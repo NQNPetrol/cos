@@ -1,13 +1,13 @@
 @extends('layouts.cliente')
 @section('content')
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4">
+        <div class="w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-5 text-gray-100 dark:text-gray-100">
+                <div class="p-4 text-gray-100 dark:text-gray-100">
                     <!-- Header -->
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <div class="flex justify-between items-center">
-                            <h2 class="text-2xl font-semibold text-gray-100">Despliegue de Misiones</h2>
+                            <h2 class="text-xl font-semibold text-gray-100">Despliegue de Misiones</h2>
                             <a href="https://console.flytbase.com" target="_blank" 
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150">
                                 Flytbase Console
@@ -18,11 +18,11 @@
                         </div>
                     </div>
 
-                    <div class="space-y-8 mt-4">
+                    <div class="space-y-4 mt-2">
                         <!-- Panel de Configuración de Alertas -->
                         <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
-                            <div class="p-6">
-                                <div class="space-y-6">
+                            <div class="p-4">
+                                <div class="space-y-4">
                                     <!-- Selección de Misión -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-3">Seleccionar Misión</label>
@@ -38,7 +38,15 @@
                                                     data-dock-latitud="{{ $mision->dock->latitud ?? '' }}"
                                                     data-dock-longitud="{{ $mision->dock->longitud ?? '' }}"
                                                     data-dock-altitude="{{ $mision->dock->altitude ?? '' }}"
-                                                    data-dock-nombre="{{ $mision->dock->nombre ?? '' }}">
+                                                    data-dock-nombre="{{ $mision->dock->nombre ?? '' }}"
+                                                    data-site-nombre="{{ $mision->site->nombre ?? '' }}"
+                                                    data-observaciones="{{ $mision->observaciones ?? '' }}"
+                                                    data-route-altitude="{{ $mision->route_altitude ?? '' }}"
+                                                    data-route-speed="{{ $mision->route_speed ?? '' }}"
+                                                    data-est-total-duration="{{ $mision->est_total_duration ?? '' }}"
+                                                    data-est-total-distance="{{ $mision->est_total_distance ?? '' }}"
+                                                    data-route-waypoint-type="{{ $mision->route_waypoint_type ?? '' }}"
+                                                    data-waypoints-count="{{ $mision->waypoints_count ?? '' }}">
                                                     {{ $mision->nombre}}
                                                     @if($mision->cliente)
                                                         - {{ $mision->cliente->nombre }}
@@ -54,7 +62,7 @@
                                                 No hay misiones disponibles para su cliente. Contacte al administrador.
                                             </p>
                                         @else
-                                            <p class="text-xs text-gray-400 mt-2">Seleccione la misión junto con drone que desea volar.</p>
+                                            
                                         @endif
                                     </div>
 
@@ -66,8 +74,7 @@
                                             </svg>
                                             <div class="flex-1">
                                                 <h4 class="text-sm font-medium text-gray-200">Tener en cuenta</h4>
-                                                <p class="text-xs text-gray-400 mt-1">Condiciones climáticas entre otros factores inesperados pueden impedir que el drone despliegue.</p>
-                                                <p class="text-xs text-gray-400 mt-1">En caso de que salte un error, comunicarse con el soporte del COS (cos.support@cyhsur.com)</p>
+                                                <p class="text-xs text-gray-400 mt-1">Condiciones climáticas entre otros factores inesperados pueden impedir que el drone despliegue. En caso de que salte un error, comunicarse con el soporte del COS (cos.support@cyhsur.com)</p>
                                                 
                                                 <!-- Mensaje dinámico para trigger misión exitoso -->
                                                 <div id="triggerSuccessMessage" class="hidden mt-4 p-3 bg-green-900/30 border border-green-700 rounded-lg">
@@ -131,64 +138,93 @@
 
                                 <!-- Contenido del resumen (oculto inicialmente) -->
                                 <div id="missionSummary" class="hidden">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                        <!-- Información Básica -->
-                                        <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                                            <div class="flex items-center mb-3">
-                                                <svg class="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <h4 class="text-sm font-medium text-gray-200">Información Básica</h4>
-                                            </div>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <p class="text-xs text-gray-400">Nombre de la Misión</p>
-                                                    <p id="summaryNombre" class="text-sm font-medium text-gray-100">-</p>
+                                    <div class="w-full">
+                                        <div class="grid grid-cols-1 md:grid-cols-10 gap-3 mb-3">
+                                            <!-- Información Básica -->
+                                            <div class="bg-gray-750 rounded-lg p-3 border border-gray-600 md:col-span-2">
+                                                <div class="flex items-center mb-2">
+                                                    <svg class="w-4 h-4 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <h4 class="text-xs font-medium text-gray-200">Información Básica</h4>
                                                 </div>
-                                                <div>
-                                                    <p class="text-xs text-gray-400">Drone Asignado</p>
-                                                    <p id="summaryDrone" class="text-sm font-medium text-gray-100">-</p>
+                                                <div class="space-y-1.5">
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Site</p>
+                                                        <p id="summarySite" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Nombre de la Misión</p>
+                                                        <p id="summaryNombre" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Dispositivos Asignados</p>
+                                                        <p id="summaryDispositivos" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div id="summaryObservacionesContainer" class="hidden">
+                                                        <p class="text-xs text-gray-400">Observaciones</p>
+                                                        <p id="summaryObservaciones" class="text-xs text-gray-300">-</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Descripción -->
-                                        <div class="bg-gray-750 rounded-lg p-4 border border-gray-600 md:col-span-2">
-                                            <div class="flex items-center mb-3">
-                                                <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <!-- Información de Vuelo -->
+                                            <div class="bg-gray-750 rounded-lg px-2 py-2 border border-gray-600 md:col-span-2">
+                                                <div class="flex items-center mb-2">
+                                                    <svg class="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                                    </svg>
+                                                    <h4 class="text-xs font-medium text-gray-200">Información de Vuelo</h4>
+                                                </div>
+                                                <div class="grid grid-cols-2">
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Altitud de Vuelo</p>
+                                                        <p id="summaryRouteAltitude" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Velocidad de Vuelo</p>
+                                                        <p id="summaryRouteSpeed" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Duración Estimada</p>
+                                                        <p id="summaryEstDuration" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Distancia Estimada</p>
+                                                        <p id="summaryEstDistance" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Tipo de Waypoint</p>
+                                                        <p id="summaryWaypointType" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-400">Recuento de Waypoints</p>
+                                                        <p id="summaryWaypointsCount" class="text-xs font-medium text-gray-100">-</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Descripción -->
+                                            <div class="bg-gray-750 rounded-lg p-3 border border-gray-600 md:col-span-6">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
-                                                <h4 class="text-sm font-medium text-gray-200">Descripción</h4>
+                                                <h4 class="text-xs font-medium text-gray-200">Descripción</h4>
                                             </div>
-                                            <p id="summaryDescripcion" class="text-sm text-gray-300 leading-relaxed">-</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Estado de la Misión -->
-                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center">
-                                                <svg class="w-5 h-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <h4 class="text-sm font-medium text-gray-200">Estado Actual</h4>
-                                            </div>
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                                                <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-                                                Lista para Desplegar
-                                            </span>
+                                            <p id="summaryDescripcion" class="text-xs text-gray-300 leading-relaxed">-</p>
                                         </div>
                                     </div>
 
                                     <!-- Mapa de Ruta -->
-                                    <div id="missionMapContainer" class="bg-gray-750 rounded-lg p-4 border border-gray-600 hidden">
-                                        <div class="flex items-center mb-3">
-                                            <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div id="missionMapContainer" class="bg-gray-750 rounded-lg p-3 border border-gray-600 hidden mt-3">
+                                        <div class="flex items-center mb-2">
+                                            <svg class="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
                                             </svg>
-                                            <h4 class="text-sm font-medium text-gray-200">Ruta de la Misión</h4>
+                                            <h4 class="text-xs font-medium text-gray-200">Ruta de la Misión</h4>
                                         </div>
-                                        <div id="missionMap" style="height: 400px; width: 100%; border-radius: 8px; overflow: hidden;"></div>
+                                        <div id="missionMap" style="height: 300px; width: 100%; border-radius: 8px; overflow: hidden;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -230,9 +266,79 @@
                 missionSummary.classList.remove('hidden');
 
                 // Actualizar información del resumen
+                const siteNombre = selectedOption.getAttribute('data-site-nombre') || '-';
+                const dockNombre = selectedOption.getAttribute('data-dock-nombre') || '';
+                const droneNombre = selectedOption.getAttribute('data-drone') || '';
+                const observaciones = selectedOption.getAttribute('data-observaciones') || '';
+                
+                document.getElementById('summarySite').textContent = siteNombre;
                 document.getElementById('summaryNombre').textContent = selectedOption.getAttribute('data-nombre') || '-';
-                document.getElementById('summaryDrone').textContent = selectedOption.getAttribute('data-drone') || '-';
+                
+                // Dispositivos asignados: dock - drone
+                let dispositivosTexto = '-';
+                if (dockNombre && droneNombre && droneNombre !== 'No asignado') {
+                    dispositivosTexto = `${dockNombre} - ${droneNombre}`;
+                } else if (dockNombre) {
+                    dispositivosTexto = dockNombre;
+                } else if (droneNombre && droneNombre !== 'No asignado') {
+                    dispositivosTexto = droneNombre;
+                }
+                document.getElementById('summaryDispositivos').textContent = dispositivosTexto;
+                
+                // Observaciones (solo si no es null/vacío)
+                const observacionesContainer = document.getElementById('summaryObservacionesContainer');
+                if (observaciones && observaciones.trim() !== '') {
+                    document.getElementById('summaryObservaciones').textContent = observaciones;
+                    observacionesContainer.classList.remove('hidden');
+                } else {
+                    observacionesContainer.classList.add('hidden');
+                }
+                
                 document.getElementById('summaryDescripcion').textContent = selectedOption.getAttribute('data-descripcion') || 'Sin descripción disponible';
+                
+                // Información de vuelo
+                const routeAltitude = selectedOption.getAttribute('data-route-altitude') || '';
+                const routeSpeed = selectedOption.getAttribute('data-route-speed') || '';
+                const estDuration = selectedOption.getAttribute('data-est-total-duration') || '';
+                const estDistance = selectedOption.getAttribute('data-est-total-distance') || '';
+                const waypointType = selectedOption.getAttribute('data-route-waypoint-type') || '';
+                const waypointsCount = selectedOption.getAttribute('data-waypoints-count') || '';
+                
+                document.getElementById('summaryRouteAltitude').textContent = routeAltitude ? `${routeAltitude} m` : '-';
+                document.getElementById('summaryRouteSpeed').textContent = routeSpeed ? `${routeSpeed} m/s` : '-';
+                
+                // Formatear duración estimada (segundos a minutos:segundos)
+                if (estDuration && estDuration !== '') {
+                    const seconds = parseInt(estDuration);
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    document.getElementById('summaryEstDuration').textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                } else {
+                    document.getElementById('summaryEstDuration').textContent = '-';
+                }
+                
+                // Formatear distancia estimada (metros a km si es mayor a 1000)
+                if (estDistance && estDistance !== '') {
+                    const distance = parseFloat(estDistance);
+                    if (distance >= 1000) {
+                        document.getElementById('summaryEstDistance').textContent = `${(distance / 1000).toFixed(2)} km`;
+                    } else {
+                        document.getElementById('summaryEstDistance').textContent = `${distance.toFixed(0)} m`;
+                    }
+                } else {
+                    document.getElementById('summaryEstDistance').textContent = '-';
+                }
+                
+                // Tipo de waypoint (traducir)
+                const waypointTypeLabels = {
+                    'linear_route': 'Ruta Lineal',
+                    'transits_waypoint': 'Tránsitos Waypoint',
+                    'curved_route_drone_stops': 'Ruta Curva (Drone Se Detiene)',
+                    'curved_route_drone_continues': 'Ruta Curva (Drone Continúa)'
+                };
+                document.getElementById('summaryWaypointType').textContent = waypointType ? (waypointTypeLabels[waypointType] || waypointType) : '-';
+                
+                document.getElementById('summaryWaypointsCount').textContent = waypointsCount && waypointsCount !== '' ? `${waypointsCount} waypoint${parseInt(waypointsCount) !== 1 ? 's' : ''}` : '-';
 
                 // Obtener waypoints y datos del dock
                 const waypointsData = selectedOption.getAttribute('data-waypoints');
@@ -240,7 +346,7 @@
                 const dockLatitud = selectedOption.getAttribute('data-dock-latitud');
                 const dockLongitud = selectedOption.getAttribute('data-dock-longitud');
                 const dockAltitude = selectedOption.getAttribute('data-dock-altitude');
-                const dockNombre = selectedOption.getAttribute('data-dock-nombre');
+                
 
                 // Preparar datos del dock si existen
                 const dockData = (dockLatitud && dockLongitud) ? {

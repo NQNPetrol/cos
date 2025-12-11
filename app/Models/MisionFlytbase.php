@@ -28,6 +28,9 @@ class MisionFlytbase extends Model
         'url',
         'activo',
         'observaciones',
+        'est_total_distance',
+        'est_total_duration',
+        'waypoints_count',
     ];
 
     protected $casts = [
@@ -35,6 +38,9 @@ class MisionFlytbase extends Model
         'route_altitude' => 'decimal:2',
         'route_speed' => 'decimal:2',
         'waypoints' => 'array',
+        'est_total_distance' => 'float',
+        'est_total_duration' => 'integer',
+        'waypoints_count' => 'integer',
     ];
 
     const TIPO_RUTA_LINEAL = 'linear_route';

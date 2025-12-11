@@ -468,383 +468,418 @@
                     </div>
                     
                     <nav class="space-y-2">
-                        <!-- Clientes -->
+                        <!-- Administración -->
                         <div class="submenu-container">
-                            <button id="toggleClientes" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                            <button id="toggleAdministracion" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-person-arms-up text-white text-sm"></i>
-                                    </div>
-                                    <span>Clientes</span>
+                                    <span>Administración</span>
                                 </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconClientes" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 transition-transform duration-300" id="iconAdministracion" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
 
-                            <div id="submenuClientes" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('crear.cliente') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-person-plus text-lg"></i>
-                                    <span>Administrar Clientes</span>
-                                </a>
-                                <a href="{{ route('empresas-asociadas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-people text-lg"></i>
-                                    <span>Empresas Asociadas</span>
-                                </a>
-                                <a href="{{ route('contratos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-file-earmark-medical text-lg"></i>
-                                    <span>Contratos</span>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Eventos -->
-                        <div class="submenu-container">
-                            <button id="toggleEventos" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-bell-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Eventos</span>
-                                </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconEventos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-
-                            <div id="submenuEventos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('eventos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-search text-lg"></i>
-                                    <span>Listado</span>
-                                </a>
-                                <a href="{{ route('eventos.create') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-plus text-lg"></i>
-                                    <span>Nuevo</span>
-                                </a>
-                                <a href="{{ route('seguimientos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-search text-lg"></i>
-                                    <span>Administrar Seguimientos</span>
-                                </a>
-                            </div>
-                        </div>
-
-                
-                        
-
-                        <!-- Configuración -->
-                        <div class="submenu-container">
-                            <button id="toggleConfiguracion" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-gear-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Configuración</span>
-                                </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconConfiguracion" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-
-                            <div id="submenuConfiguracion" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('sistema.permisos') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-shield-check text-lg"></i>
-                                    <span>Permisos</span>
-                                </a>
-                                <a href="{{ route('asignar.permisos') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-person-gear text-lg"></i>
-                                    <span>Asignación de Permisos</span>
-                                </a>
-                                <a href="{{ route('crear.roles') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-tags text-lg"></i>
-                                    <span>Roles</span>
-                                </a>
-                                <a href="{{ route('notifications.admin') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-bell-slash text-lg"></i>
-                                    <span>Admin Notificaciones</span>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Personal -->
-                        <div class="submenu-container">
-                            <button id="togglePersonal" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-people-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Personal</span>
-                                </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconPersonal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-
-                            <div id="submenuPersonal" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('personal.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-search text-lg"></i>
-                                    <span>Listado</span>
-                                </a>
-                                <a href="{{ route('personal.create') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-plus-circle text-lg"></i>
-                                    <span>Nuevo</span>
-                                </a>
-                            </div>
-                        </div>
-
-                   
-
-                        <!-- Alertas (hikvision - flytbase) -->
-                         <div class="submenu-container">
-                            <button id="togglePatrullas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                   
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="23"
-                                            height="23"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="white"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            >
-                                            <path d="M17.464 6.518a6 6 0 1 0 -3.023 7.965" />
-                                            <path d="M17.482 17.464a6 6 0 1 0 -7.965 -3.023" />
-                                            <path d="M6.54 17.482a6 6 0 1 0 3.024 -7.965" />
-                                            <path d="M6.518 6.54a6 6 0 1 0 7.965 3.024" />
-                                        </svg>
-
-                                    </div>
-                                    <span>HikCentral</span>
-                                </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconPatrullas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-
-                            <div id="submenuPatrullas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('cameras.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-camera text-lg"></i>
-                                    <span>Encoding Devices</span>
-                                </a>
-                                <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-taxi-front-fill text-blue text-sm"></i>
-                                    <span>On board Devices</span>
-                                </a>
-                                <a href="{{ route('patrullas.location') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-geo-alt text-lg"></i>
-                                    <span>Real-Time Monitoring</span>
-                                </a>
-                                <a href="{{ route('anpr.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                            
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        >
-                                        <path d="M17 5h2a2 2 0 0 1 2 2v2" />
-                                        <path d="M21 15v2a2 2 0 0 1 -2 2h-2" />
-                                        <path d="M7 19h-2a2 2 0 0 1 -2 -2v-2" />
-                                        <path d="M3 9v-2a2 2 0 0 1 2 -2h2" />
-                                        <path d="M7 9m0 1a1 1 0 0 1 1 -1h8a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1z" />
-                                    </svg>
-
-                                    <span>ANPR</span>
-                                </a>
-                            </div>
-                        </div>
-
-
-                        <div class="submenu-container">
-                            <button id="toggleAlertas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-rocket-takeoff text-white text-sm"></i>
-                                    </div>
-                                    <span>Flytbase</span>
-                                </div>
-                                <svg class="w-5 h-5 transition-transform duration-300" id="iconAlertas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-
-                            <div id="submenuAlertas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                <a href="{{ route('pilotos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-person-badge-fill"></i>
-                                    <span>Pilotos</span>
-                                </a>
-                                <a href="{{ route('misiones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-calendar-check"></i>
-                                    <span>Misiones</span>
-                                </a>
-
-                                <a href="{{ route('alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-
-                                    <i class="bi bi-bell"></i>
-
-                                    <span>Alertas</span>
-                                </a>
-                                
-                                <a href="{{ route('gallery.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                    <i class="bi bi-grid-1x2"></i>
-                                    <span>Galeria</span>
-                                </a>
-
-                                <a href="{{ route('sites.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="22"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        >
-                                        <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
-                                        <path d="M4 16v2a2 2 0 0 0 2 2h2" />
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v2" />
-                                        <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
-                                        <path d="M12 11l0 .01" />
-                                        <path d="M12 18l-3.5 -5a4 4 0 1 1 7 0l-3.5 5" />
-                                    </svg>
-
-                                    <span>Sites</span>
-                                </a>
-
+                            <div id="submenuAdministracion" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                <!-- Clientes -->
                                 <div class="submenu-container">
-                                    <button id="toggleDispositivos" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                    <button id="toggleClientes" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                         <div class="flex items-center space-x-3">
-                    
-                                            <span>Dispositivos</span>
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-person-arms-up text-white text-sm"></i>
+                                            </div>
+                                            <span>Clientes</span>
                                         </div>
-                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconDispositivos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconClientes" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                         </svg>
                                     </button>
 
-                                    <div id="submenuDispositivos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
-                                        <a href="{{ route('drones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-                                            
-                                            <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            >
-                                                <path d="M10 10h4v4h-4z" />
-                                                <path d="M10 10l-3.5 -3.5" />
-                                                <path d="M9.96 6a3.5 3.5 0 1 0 -3.96 3.96" />
-                                                <path d="M14 10l3.5 -3.5" />
-                                                <path d="M18 9.96a3.5 3.5 0 1 0 -3.96 -3.96" />
-                                                <path d="M14 14l3.5 3.5" />
-                                                <path d="M14.04 18a3.5 3.5 0 1 0 3.96 -3.96" />
-                                                <path d="M10 14l-3.5 3.5" />
-                                                <path d="M6 14.04a3.5 3.5 0 1 0 3.96 3.96" />
-                                            </svg>
-
-                                            <span class="transition-colors duration-200">Drones</span>
+                                    <div id="submenuClientes" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('crear.cliente') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-person-plus text-lg"></i>
+                                            <span>Administrar Clientes</span>
                                         </a>
-                                        <a href="{{ route('docks-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-
-                                            <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            >
-                                                <path d="M6 12h12v-2a2 2 0 0 1 2 -2a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2a2 2 0 0 1 2 2v2z" />
-                                                <path d="M6 15h12" />
-                                                <path d="M6 18h12" />
-                                                <path d="M21 11v7" />
-                                                <path d="M3 11v7" />
-                                            </svg>
-
-                                            <span class="transition-colors duration-200">Docks</span>
+                                        <a href="{{ route('empresas-asociadas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-people text-lg"></i>
+                                            <span>Empresas Asociadas</span>
+                                        </a>
+                                        <a href="{{ route('contratos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-file-earmark-medical text-lg"></i>
+                                            <span>Contratos</span>
                                         </a>
                                     </div>
                                 </div>
-                                </a>
+
+                                <!-- Personal -->
+                                <div class="submenu-container">
+                                    <button id="togglePersonal" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-people-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Personal</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconPersonal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuPersonal" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('personal.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-search text-lg"></i>
+                                            <span>Listado</span>
+                                        </a>
+                                        <a href="{{ route('personal.create') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-plus-circle text-lg"></i>
+                                            <span>Nuevo</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Inventario -->
+                        <!-- Operaciones -->
                         <div class="submenu-container">
-                            <a href="{{ route('inventario.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <button id="toggleOperaciones" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-box-seam text-white text-sm"></i>
-                                    </div>
-                                    <span>Inventario</span>
+                                    <span>Operaciones</span>
                                 </div>
-                            </a>
+                                <svg class="w-5 h-5 transition-transform duration-300" id="iconOperaciones" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <div id="submenuOperaciones" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                <!-- Eventos -->
+                                <div class="submenu-container">
+                                    <button id="toggleEventos" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-bell-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Eventos</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconEventos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuEventos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('eventos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-search text-lg"></i>
+                                            <span>Listado</span>
+                                        </a>
+                                        <a href="{{ route('eventos.create') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-plus text-lg"></i>
+                                            <span>Nuevo</span>
+                                        </a>
+                                        <a href="{{ route('seguimientos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-search text-lg"></i>
+                                            <span>Administrar Seguimientos</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- HikCentral -->
+                                <div class="submenu-container">
+                                    <button id="togglePatrullas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="23"
+                                                    height="23"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="white"
+                                                    stroke-width="1.5"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    >
+                                                    <path d="M17.464 6.518a6 6 0 1 0 -3.023 7.965" />
+                                                    <path d="M17.482 17.464a6 6 0 1 0 -7.965 -3.023" />
+                                                    <path d="M6.54 17.482a6 6 0 1 0 3.024 -7.965" />
+                                                    <path d="M6.518 6.54a6 6 0 1 0 7.965 3.024" />
+                                                </svg>
+                                            </div>
+                                            <span>HikCentral</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconPatrullas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuPatrullas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('cameras.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-camera text-lg"></i>
+                                            <span>Encoding Devices</span>
+                                        </a>
+                                        <a href="" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-taxi-front-fill text-blue text-sm"></i>
+                                            <span>On board Devices</span>
+                                        </a>
+                                        <a href="{{ route('patrullas.location') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-geo-alt text-lg"></i>
+                                            <span>Real-Time Monitoring</span>
+                                        </a>
+                                        <a href="{{ route('anpr.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                >
+                                                <path d="M17 5h2a2 2 0 0 1 2 2v2" />
+                                                <path d="M21 15v2a2 2 0 0 1 -2 2h-2" />
+                                                <path d="M7 19h-2a2 2 0 0 1 -2 -2v-2" />
+                                                <path d="M3 9v-2a2 2 0 0 1 2 -2h2" />
+                                                <path d="M7 9m0 1a1 1 0 0 1 1 -1h8a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1z" />
+                                            </svg>
+                                            <span>ANPR</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Flytbase -->
+                                <div class="submenu-container">
+                                    <button id="toggleAlertas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-rocket-takeoff text-white text-sm"></i>
+                                            </div>
+                                            <span>Flytbase</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconAlertas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuAlertas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('pilotos.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-person-badge-fill"></i>
+                                            <span>Pilotos</span>
+                                        </a>
+                                        <a href="{{ route('misiones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-calendar-check"></i>
+                                            <span>Misiones</span>
+                                        </a>
+                                        <a href="{{ route('alertas.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-bell"></i>
+                                            <span>Alertas</span>
+                                        </a>
+                                        <a href="{{ route('flight-logs.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-clock-history"></i>
+                                            <span>Flight Logs</span>
+                                        </a>
+                                        <a href="{{ route('sites.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="22"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                >
+                                                <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+                                                <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+                                                <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+                                                <path d="M12 11l0 .01" />
+                                                <path d="M12 18l-3.5 -5a4 4 0 1 1 7 0l-3.5 5" />
+                                            </svg>
+                                            <span>Sites</span>
+                                        </a>
+                                        <div class="submenu-container">
+                                            <button id="toggleDispositivos" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                                <div class="flex items-center space-x-3">
+                                                    <span>Dispositivos</span>
+                                                </div>
+                                                <svg class="w-5 h-5 transition-transform duration-300" id="iconDispositivos" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                </svg>
+                                            </button>
+                                            <div id="submenuDispositivos" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                                <a href="{{ route('drones-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="1"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        >
+                                                        <path d="M10 10h4v4h-4z" />
+                                                        <path d="M10 10l-3.5 -3.5" />
+                                                        <path d="M9.96 6a3.5 3.5 0 1 0 -3.96 3.96" />
+                                                        <path d="M14 10l3.5 -3.5" />
+                                                        <path d="M18 9.96a3.5 3.5 0 1 0 -3.96 -3.96" />
+                                                        <path d="M14 14l3.5 3.5" />
+                                                        <path d="M14.04 18a3.5 3.5 0 1 0 3.96 -3.96" />
+                                                        <path d="M10 14l-3.5 3.5" />
+                                                        <path d="M6 14.04a3.5 3.5 0 1 0 3.96 3.96" />
+                                                    </svg>
+                                                    <span class="transition-colors duration-200">Drones</span>
+                                                </a>
+                                                <a href="{{ route('docks-flytbase.index') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="1"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        >
+                                                        <path d="M6 12h12v-2a2 2 0 0 1 2 -2a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2a2 2 0 0 1 2 2v2z" />
+                                                        <path d="M6 15h12" />
+                                                        <path d="M6 18h12" />
+                                                        <path d="M21 11v7" />
+                                                        <path d="M3 11v7" />
+                                                    </svg>
+                                                    <span class="transition-colors duration-200">Docks</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Objetivos -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('objetivos-aipem.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-bullseye text-white text-sm"></i>
+                                            </div>
+                                            <span>Objetivos</span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Patrullas -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('patrullas.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-taxi-front-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Patrullas</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Tickets - Sin submenu, va directo -->
+                        <!-- Sistemas -->
                         <div class="submenu-container">
-                            <a href="{{ route('tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                            <button id="toggleSistemas" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-bookmarks-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Tickets</span>
+                                    <span>Sistema</span>
                                 </div>
-                            </a>
+                                <svg class="w-5 h-5 transition-transform duration-300" id="iconSistemas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <div id="submenuSistemas" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                <!-- Configuración -->
+                                <div class="submenu-container">
+                                    <button id="toggleConfiguracion" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex justify-between items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-gear-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Configuración</span>
+                                        </div>
+                                        <svg class="w-5 h-5 transition-transform duration-300" id="iconConfiguracion" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <div id="submenuConfiguracion" class="ml-4 mt-2 space-y-1 hidden animate-slideDown">
+                                        <a href="{{ route('sistema.permisos') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-shield-check text-lg"></i>
+                                            <span>Permisos</span>
+                                        </a>
+                                        <a href="{{ route('asignar.permisos') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-person-gear text-lg"></i>
+                                            <span>Asignación de Permisos</span>
+                                        </a>
+                                        <a href="{{ route('crear.roles') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-tags text-lg"></i>
+                                            <span>Roles</span>
+                                        </a>
+                                        <a href="{{ route('notifications.admin') }}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                                            <i class="bi bi-bell-slash text-lg"></i>
+                                            <span>Admin Notificaciones</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Usuarios -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('usuarios.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-person-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Usuarios</span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Tickets -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('tickets.nuevo') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-bookmarks-fill text-white text-sm"></i>
+                                            </div>
+                                            <span>Tickets</span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Inventario -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('inventario.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-box-seam text-white text-sm"></i>
+                                            </div>
+                                            <span>Inventario</span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Galería -->
+                                <div class="submenu-container">
+                                    <a href="{{ route('gallery.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                                <i class="bi bi-grid-1x2 text-white text-sm"></i>
+                                            </div>
+                                            <span>Galería</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="submenu-container">
-                            <a href="{{ route('objetivos-aipem.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-bullseye text-white text-sm"></i>
-                                    </div>
-                                    <span>Objetivos</span>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="submenu-container">
-                            <a href="{{ route('patrullas.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-taxi-front-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Patrullas</span>
-                                </div>
-                            </a>
-                        </div>
 
-                        <!-- Usuarios - Sin submenu, va directo -->
-                        <div class="submenu-container">
-                            <a href="{{ route('usuarios.index') }}" class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:text-blue-700 rounded-xl flex items-center font-medium transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <i class="bi bi-person-fill text-white text-sm"></i>
-                                    </div>
-                                    <span>Usuarios</span>
-                                </div>
-                            </a>
-                        </div>
                     </nav>
                 </div>
             </div>
@@ -1271,6 +1306,42 @@
             togglePatrullas.addEventListener('click', () => {
                 submenuPatrullas.classList.toggle('hidden');
                 iconPatrullas.classList.toggle('rotate-180');
+            });
+        }
+
+        //administracion
+        const toggleAdministracion = document.getElementById('toggleAdministracion');
+        const submenuAdministracion = document.getElementById('submenuAdministracion');
+        const iconAdministracion = document.getElementById('iconAdministracion');
+
+        if (toggleAdministracion && submenuAdministracion && iconAdministracion) {
+            toggleAdministracion.addEventListener('click', () => {
+                submenuAdministracion.classList.toggle('hidden');
+                iconAdministracion.classList.toggle('rotate-180');
+            });
+        }
+
+        //operaciones
+        const toggleOperaciones = document.getElementById('toggleOperaciones');
+        const submenuOperaciones = document.getElementById('submenuOperaciones');
+        const iconOperaciones = document.getElementById('iconOperaciones');
+
+        if (toggleOperaciones && submenuOperaciones && iconOperaciones) {
+            toggleOperaciones.addEventListener('click', () => {
+                submenuOperaciones.classList.toggle('hidden');
+                iconOperaciones.classList.toggle('rotate-180');
+            });
+        }
+
+        //sistemas
+        const toggleSistemas = document.getElementById('toggleSistemas');
+        const submenuSistemas = document.getElementById('submenuSistemas');
+        const iconSistemas = document.getElementById('iconSistemas');
+
+        if (toggleSistemas && submenuSistemas && iconSistemas) {
+            toggleSistemas.addEventListener('click', () => {
+                submenuSistemas.classList.toggle('hidden');
+                iconSistemas.classList.toggle('rotate-180');
             });
         }
 
