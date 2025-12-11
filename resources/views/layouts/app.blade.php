@@ -535,6 +535,14 @@
                                         </a>
                                     </div>
                                 </div>
+
+                                <!-- Rodados -->
+                                <a href="{{ route('rodados.index') }}" class="flex items-center space-x-3 text-gray-700 hover:text-blue-700 hover:bg-blue-50 px-4 py-3 rounded-xl transition-all duration-200 font-medium">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <i class="bi bi-truck text-white text-sm"></i>
+                                    </div>
+                                    <span>Gestión de Rodados</span>
+                                </a>
                             </div>
                         </div>
 
