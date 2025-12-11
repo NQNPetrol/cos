@@ -129,7 +129,10 @@ class MisionFlytbaseController extends Controller
             'kmz_file' => 'nullable|file|mimetypes:application/vnd.google-earth.kmz,application/zip|max:10240', // Máximo 10MB - acepta KMZ y ZIP
             'url' => 'required|url',
             'observaciones' => 'nullable|string',
-            'activo' => 'boolean'
+            'activo' => 'boolean',
+            'est_total_distance' => 'nullable|numeric|min:0',
+            'est_total_duration' => 'nullable|integer|min:0',
+            'waypoints_count' => 'nullable|integer|min:0'
             ]);
             
             Log::info('Validación exitosa. Datos validados:', ['validated' => $validated]);
@@ -187,7 +190,16 @@ class MisionFlytbaseController extends Controller
                         return redirect()->back()->with('error', 'El formato de waypoints no es válido.');
                     }
                     $validated['waypoints'] = $waypointsArray;
-                    Log::info('Waypoints procesados correctamente:', ['count' => count($waypointsArray)]);
+                    
+                    // Calcular waypoints_count automáticamente si no viene en el request o si hay waypoints
+                    if (!isset($validated['waypoints_count']) || $validated['waypoints_count'] === null || $validated['waypoints_count'] === '') {
+                        $validated['waypoints_count'] = count($waypointsArray);
+                    }
+                    
+                    Log::info('Waypoints procesados correctamente:', [
+                        'count' => count($waypointsArray),
+                        'waypoints_count' => $validated['waypoints_count']
+                    ]);
                 } catch (\Exception $e) {
                     Log::error('Error al procesar waypoints:', [
                         'message' => $e->getMessage(),
@@ -197,6 +209,10 @@ class MisionFlytbaseController extends Controller
                 }
             } else {
                 $validated['waypoints'] = null;
+                // Si no hay waypoints, establecer waypoints_count en null
+                if (!isset($validated['waypoints_count']) || $validated['waypoints_count'] === null || $validated['waypoints_count'] === '') {
+                    $validated['waypoints_count'] = null;
+                }
                 Log::info('No hay waypoints en el formulario');
             }
 
@@ -287,7 +303,10 @@ class MisionFlytbaseController extends Controller
             'kmz_file' => 'nullable|file|mimetypes:application/vnd.google-earth.kmz,application/zip|max:10240', // Máximo 10MB - acepta KMZ y ZIP
             'url' => 'required|url',
             'observaciones' => 'nullable|string',
-            'activo' => 'boolean'
+            'activo' => 'boolean',
+            'est_total_distance' => 'nullable|numeric|min:0',
+            'est_total_duration' => 'nullable|integer|min:0',
+            'waypoints_count' => 'nullable|integer|min:0'
         ]);
 
         try {
@@ -327,6 +346,11 @@ class MisionFlytbaseController extends Controller
                         return redirect()->back()->with('error', 'El formato de waypoints no es válido.');
                     }
                     $validated['waypoints'] = $waypointsArray;
+                    
+                    // Calcular waypoints_count automáticamente si no viene en el request o si hay waypoints
+                    if (!isset($validated['waypoints_count']) || $validated['waypoints_count'] === null || $validated['waypoints_count'] === '') {
+                        $validated['waypoints_count'] = count($waypointsArray);
+                    }
                 } catch (\Exception $e) {
                     // Si hay error y se guardó un nuevo archivo, limpiarlo
                     if ($kmzFilePath) {
@@ -337,6 +361,10 @@ class MisionFlytbaseController extends Controller
                 }
             } else {
                 $validated['waypoints'] = null;
+                // Si no hay waypoints, establecer waypoints_count en null
+                if (!isset($validated['waypoints_count']) || $validated['waypoints_count'] === null || $validated['waypoints_count'] === '') {
+                    $validated['waypoints_count'] = null;
+                }
             }
 
             // Actualizar la misión con el nuevo archivo y waypoints

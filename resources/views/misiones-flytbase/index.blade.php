@@ -83,7 +83,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <button onclick="openEditModal({{ $mision->id }}, '{{ addslashes($mision->nombre) }}', '{{ addslashes($mision->descripcion) }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }}, {{ $mision->drone_id ?? 'null' }}, {{ $mision->dock_id ?? 'null' }}, {{ $mision->site_id ?? 'null' }}, '{{ $mision->route_altitude }}', '{{ $mision->route_speed }}', '{{ $mision->route_waypoint_type }}', '{{ addslashes($mision->observaciones) }}', `{{ addslashes(json_encode($mision->waypoints, JSON_PRETTY_PRINT)) }}`, '{{ $mision->kmz_file_path ?? 'null' }}')"
+                                            <button onclick="openEditModal({{ $mision->id }}, '{{ addslashes($mision->nombre) }}', '{{ addslashes($mision->descripcion) }}', {{ $mision->cliente_id }}, '{{ $mision->url }}', {{ $mision->activo ? 'true' : 'false' }}, {{ $mision->drone_id ?? 'null' }}, {{ $mision->dock_id ?? 'null' }}, {{ $mision->site_id ?? 'null' }}, '{{ $mision->route_altitude }}', '{{ $mision->route_speed }}', '{{ $mision->route_waypoint_type }}', '{{ addslashes($mision->observaciones) }}', `{{ addslashes(json_encode($mision->waypoints, JSON_PRETTY_PRINT)) }}`, '{{ $mision->kmz_file_path ?? 'null' }}', {{ $mision->est_total_distance ?? 'null' }}, {{ $mision->est_total_duration ?? 'null' }}, {{ $mision->waypoints_count ?? 'null' }})"
                                                     class="text-blue-400 hover:text-blue-300 transition-colors p-1 rounded hover:bg-blue-900/30"
                                                     title="Editar misión">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -246,6 +246,22 @@
                             </select>
                         </div>
 
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Distancia Total Estimada (m)</label>
+                                <input type="number" name="est_total_distance" step="0.01" 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Duración Total Estimada (seg)</label>
+                                <input type="number" name="est_total_duration" 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       placeholder="0">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
                             
@@ -285,6 +301,8 @@
                                 
                                 <!-- Campo hidden para enviar waypoints como JSON -->
                                 <input type="hidden" name="waypoints" id="createWaypointsJson">
+                                <!-- Campo hidden para enviar contador de waypoints -->
+                                <input type="hidden" name="waypoints_count" id="createWaypointsCount">
                             </div>
                         </div>
 
@@ -428,6 +446,22 @@
                             </select>
                         </div>
 
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Distancia Total Estimada (m)</label>
+                                <input type="number" name="est_total_distance" id="editEstTotalDistance" step="0.01" 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Duración Total Estimada (seg)</label>
+                                <input type="number" name="est_total_duration" id="editEstTotalDuration" 
+                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       placeholder="0">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Waypoints</label>
                             
@@ -470,6 +504,8 @@
                                 
                                 <!-- Campo hidden para enviar waypoints como JSON -->
                                 <input type="hidden" name="waypoints" id="editWaypointsJson">
+                                <!-- Campo hidden para enviar contador de waypoints -->
+                                <input type="hidden" name="waypoints_count" id="editWaypointsCount">
                             </div>
                         </div>
 
@@ -671,6 +707,10 @@
             document.getElementById('createWaypointsContainer').classList.add('hidden');
             document.getElementById('createWaypointsList').innerHTML = '';
             document.getElementById('createWaypointsJson').value = '';
+            const countField = document.getElementById('createWaypointsCount');
+            if (countField) {
+                countField.value = '';
+            }
             document.getElementById('createKmzLoading').classList.add('hidden');
             document.getElementById('createKmzError').classList.add('hidden');
             const kmzFileInput = document.getElementById('createKmzFile');
@@ -684,11 +724,12 @@
         }
 
         // Funciones para el modal de editar
-        function openEditModal(id, nombre, descripcion, clienteId, url, activo, droneId = null, dockId = null, siteId = null, routeAltitude = '35.00', routeSpeed = '5.33', routeWaypointType = 'linear_route', observaciones = '', waypoints = '', kmzFilePath = null) {
+        function openEditModal(id, nombre, descripcion, clienteId, url, activo, droneId = null, dockId = null, siteId = null, routeAltitude = '35.00', routeSpeed = '5.33', routeWaypointType = 'linear_route', observaciones = '', waypoints = '', kmzFilePath = null, estTotalDistance = null, estTotalDuration = null, waypointsCount = null) {
             console.log('Abriendo modal de edición con datos:', { 
                 id, nombre, descripcion, clienteId, url, activo, 
                 droneId, dockId, siteId, routeAltitude, routeSpeed, 
-                routeWaypointType, observaciones, waypoints, kmzFilePath
+                routeWaypointType, observaciones, waypoints, kmzFilePath,
+                estTotalDistance, estTotalDuration, waypointsCount
             });
             
             document.getElementById('editModal').classList.remove('hidden');
@@ -707,6 +748,8 @@
             document.getElementById('editRouteSpeed').value = routeSpeed || '5.33';
             document.getElementById('editRouteWaypointType').value = routeWaypointType || 'linear_route';
             document.getElementById('editObservaciones').value = observaciones || '';
+            document.getElementById('editEstTotalDistance').value = estTotalDistance && estTotalDistance !== 'null' ? estTotalDistance : '';
+            document.getElementById('editEstTotalDuration').value = estTotalDuration && estTotalDuration !== 'null' ? estTotalDuration : '';
 
             // Manejar waypoints existentes
             editWaypoints = [];
@@ -722,6 +765,13 @@
                     if (Array.isArray(parsedWaypoints) && parsedWaypoints.length > 0) {
                         editWaypoints = parsedWaypoints;
                         displayWaypoints('edit', editWaypoints);
+                        // Actualizar contador de waypoints si no viene en el parámetro
+                        if (!waypointsCount || waypointsCount === 'null') {
+                            const countField = document.getElementById('editWaypointsCount');
+                            if (countField) {
+                                countField.value = parsedWaypoints.length;
+                            }
+                        }
                     } else {
                         document.getElementById('editWaypointsContainer').classList.add('hidden');
                     }
@@ -731,6 +781,17 @@
                 }
             } else {
                 document.getElementById('editWaypointsContainer').classList.add('hidden');
+            }
+            
+            // Cargar waypoints_count si existe
+            const countField = document.getElementById('editWaypointsCount');
+            if (countField && waypointsCount && waypointsCount !== 'null') {
+                countField.value = waypointsCount;
+            } else if (countField && editWaypoints.length > 0) {
+                // Si no viene waypointsCount pero hay waypoints, calcularlo
+                countField.value = editWaypoints.length;
+            } else if (countField) {
+                countField.value = '';
             }
             
             // Mostrar info de archivo KMZ si existe
@@ -750,6 +811,10 @@
             document.getElementById('editWaypointsContainer').classList.add('hidden');
             document.getElementById('editWaypointsList').innerHTML = '';
             document.getElementById('editWaypointsJson').value = '';
+            const countField = document.getElementById('editWaypointsCount');
+            if (countField) {
+                countField.value = '';
+            }
             document.getElementById('editKmzLoading').classList.add('hidden');
             document.getElementById('editKmzError').classList.add('hidden');
             const kmzFileInput = document.getElementById('editKmzFile');
@@ -900,6 +965,12 @@
                         createWaypoints = data.waypoints;
                     } else {
                         editWaypoints = data.waypoints;
+                    }
+                    // Actualizar contador de waypoints
+                    const waypointsCount = data.waypoints.length;
+                    const countField = document.getElementById(modal + 'WaypointsCount');
+                    if (countField) {
+                        countField.value = waypointsCount;
                     }
                     displayWaypoints(modal, data.waypoints);
                 } else {
@@ -1124,9 +1195,15 @@
         function updateWaypointsJson(modal) {
             const waypoints = modal === 'create' ? createWaypoints : editWaypoints;
             const jsonField = document.getElementById(modal + 'WaypointsJson');
+            const countField = document.getElementById(modal + 'WaypointsCount');
             
             if (jsonField && waypoints.length > 0) {
                 jsonField.value = JSON.stringify(waypoints);
+            }
+            
+            // Actualizar contador de waypoints
+            if (countField) {
+                countField.value = waypoints.length;
             }
         }
     </script>
