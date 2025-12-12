@@ -81,7 +81,7 @@
                 @endif
 
                 <!-- Contenedor del Mapa -->
-                <div class="bg-gray-800 rounded-lg p-4">
+                <div class="bg-[#252728] rounded-lg p-4">
                     <div class="h-[600px] bg-gray-700 rounded-lg" id="map-container">
                         <div id="map" style="height: 100%; width: 100%;"></div>
                     </div>
@@ -92,7 +92,7 @@
             <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
-                        <thead class="bg-gray-600">
+                        <thead class="bg-[#3b3d3f]">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                     Código
@@ -108,7 +108,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-gray-800 divide-y divide-gray-600" id="vehicles-table-body">
+                        <tbody class="bg-[#232527] divide-y divide-gray-600" id="vehicles-table-body">
                             @forelse($mobileVehicles as $vehicle)
                                 <tr class="hover:bg-gray-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
                                     <td class="px-6 py-4 whitespace-nowrap">

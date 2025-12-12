@@ -45,11 +45,11 @@
             </thead>
             <tbody>
                 @forelse ($patrullas as $patrulla)
-                    <tr class="bg-gray-300 border-b border-gray-200 hover:bg-gray-100 transition-colors">
-                        <td class="px-4 py-2 font-medium text-gray-800">{{ $patrulla->patente }}</td>
-                        <td class="px-4 py-2 text-gray-700">{{ $patrulla->marca }}</td>
-                        <td class="px-4 py-2 text-gray-700">{{ $patrulla->modelo }}</td>   
-                        <td class="px-4 py-2 text-gray-700">{{ $patrulla->año ?? 'N/A'}}</td>
+                    <tr class="table-row-hover transition-colors">
+                        <td class="px-4 py-2 font-medium text-gray-300">{{ $patrulla->patente }}</td>
+                        <td class="px-4 py-2 text-gray-300">{{ $patrulla->marca }}</td>
+                        <td class="px-4 py-2 text-gray-300">{{ $patrulla->modelo }}</td>   
+                        <td class="px-4 py-2 text-gray-300">{{ $patrulla->año ?? 'N/A'}}</td>
                         <td class="px-4 py-2">
                             @if ($editingEstadoId === $patrulla->id)
                                 <!-- Modo edición -->
@@ -108,7 +108,7 @@
                                 </div>
                             @else
                                 <div class="flex items-center gap-1">
-                                    <span class="max-w-xs truncate text-gray-700">
+                                    <span class="max-w-xs truncate text-gray-300">
                                         {{ $patrulla->ultimoRegistroFlota->objetivo_servicio ?? 'N/A' }}
                                     </span>
                                     <button wire:click="iniciarEdicionObjetivo({{ $patrulla->id }}, '{{ $patrulla->ultimoRegistroFlota->objetivo_servicio ?? '' }}')"
@@ -140,7 +140,7 @@
                                 </div>
                             @else
                                 <div class="flex items-center gap-1">
-                                    <span class="max-w-xs truncate text-gray-700">
+                                    <span class="max-w-xs truncate text-gray-300">
                                         {{ $patrulla->ultimoRegistroFlota->observacion ?? 'N/A' }}
                                     </span>
                                     <button wire:click="iniciarEdicionObservacion({{ $patrulla->id }}, '{{ $patrulla->ultimoRegistroFlota->observacion ?? '' }}')"
@@ -179,8 +179,8 @@
                         </td>
                     </tr>
                 @empty
-                    <tr class="bg-gray-50">
-                        <td colspan="8" class="text-center px-4 py-8 text-gray-600">
+                    <tr>
+                        <td colspan="8" class="text-center px-4 py-8 text-gray-300">
                             <div class="flex flex-col items-center">
                                 <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -226,39 +226,34 @@
     <!-- Modal -->
     @if($mostrarModal && $patrullaSeleccionada)
         <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-            <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 <!-- Header del Modal -->
-                <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+                <div class="bg-[#1a1d1f] px-6 py-4 border-b border-gray-200">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-100">
+                        <h2 class="text-xl font-bold text-gray-200">
                             PATRULLA {{ $patrullaSeleccionada->patente }}
                         </h2>
                         <button wire:click="cerrarModal" 
-                                class="text-gray-400 hover:text-gray-300 transition-colors">
+                                class="text-gray-400 hover:text-gray-200 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
                             </svg>
                         </button>
                     </div>
-                    <p class="text-sm text-gray-400 mt-1">
+                    <p class="text-sm text-gray-300 mt-1">
                         {{ $patrullaSeleccionada->marca }} {{ $patrullaSeleccionada->modelo }} - {{ $patrullaSeleccionada->año }}
                     </p>
                 </div>
 
                 <!-- Contenido del Modal -->
                 <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)] custom-scrollbar">
-                    <div class="mt-6 bg-gray-900 rounded-lg p-4">
-                        <!-- - Sistemas -->
-                        <div class="bg-gray-900 rounded-lg p-4">
-                            @livewire('flotas-vehiculares.sistema-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
-                        </div>
+                    <div class="mb-6">
+                        @livewire('flotas-vehiculares.sistema-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
                     </div>
 
                     <!-- Documental -->
-                    <div class="mt-6 bg-gray-900 rounded-lg p-4">
-                        <div class="bg-gray-900 rounded-lg p-4">
-                            @livewire('flotas-vehiculares.documentacion-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
-                        </div>
+                    <div>
+                        @livewire('flotas-vehiculares.documentacion-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
                     </div>
                 </div>
             </div>
@@ -270,24 +265,23 @@
             }
             
             .custom-scrollbar::-webkit-scrollbar-track {
-                background: #1f2937; /* gray-800 - igual que el modal */
-                border-radius: 0px;
+                background: #252728;
+                border-radius: 4px;
             }
             
             .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: #374151; /* gray-700 */
+                background: #3a3b3c;
                 border-radius: 4px;
-                border: 2px solid #1f2937; /* gray-800 */
             }
             
             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: #4b5563; /* gray-600 */
+                background: #4a4b4c;
             }
             
             /* Para Firefox */
             .custom-scrollbar {
                 scrollbar-width: thin;
-                scrollbar-color: #374151 #1f2937; /* gray-700 / gray-800 */
+                scrollbar-color: #3a3b3c #252728;
             }
         </style>
     @endif
@@ -372,6 +366,38 @@
         .overflow-x-auto {
             scrollbar-width: thin;
             scrollbar-color: #3a3b3c #252728;
+        }
+
+        /* Línea más fina y hover para filas de tabla */
+        .table-row-hover {
+            border-bottom: 0.1px solid #e5e7eb !important;
+        }
+
+        .table-row-hover:hover {
+            background-color: #1f2937 !important;
+        }
+
+        .table-row-hover:hover td {
+            color: #e5e7eb !important;
+        }
+
+        /* Estilos para filas de tablas en el modal */
+        .table-row-hover-modal {
+            border-bottom: 0.1px solid #e5e7eb !important;
+        }
+
+        .table-row-hover-modal:hover {
+            background-color: #1f2937 !important;
+        }
+
+        .table-row-hover-modal:hover td {
+            color: #e5e7eb !important;
+        }
+
+        /* Estilos para opciones de dropdowns en el modal */
+        .modal-select option {
+            background-color:rgb(195, 201, 211);
+            color:rgb(22, 27, 35);
         }
     </style>
 </div>
