@@ -1,12 +1,11 @@
 <div class="modern-search-bar-container" x-data="searchBarData" x-cloak>
-    <!-- Search Bar Input (always visible) -->
+    <!-- Search Bar Input (only icon visible, input hidden) -->
     <div class="modern-search-bar" @click="searchModalOpen = true">
-        <svg class="modern-search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="modern-search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Buscar">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input 
             type="text" 
-            placeholder="Buscar en la aplicación..." 
             x-model="query"
             @input="search()"
             @keydown.arrow-down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1)"
@@ -154,6 +153,30 @@ document.addEventListener('alpine:init', () => {
             }
         };
     });
+});
+
+// Convertir title a data-tooltip para evitar tooltip nativo
+document.addEventListener('DOMContentLoaded', function() {
+    // Procesar botones
+    const buttons = document.querySelectorAll('.modern-top-nav-button[title]');
+    buttons.forEach(button => {
+        const title = button.getAttribute('title');
+        if (title) {
+            button.setAttribute('data-tooltip', title);
+            button.removeAttribute('title');
+        }
+    });
+    
+    // Procesar barra de búsqueda - mover title del SVG al contenedor
+    const searchIcon = document.querySelector('.modern-search-bar-icon[title]');
+    const searchBar = document.querySelector('.modern-search-bar');
+    if (searchIcon && searchBar) {
+        const title = searchIcon.getAttribute('title');
+        if (title) {
+            searchBar.setAttribute('data-tooltip', title);
+            searchIcon.removeAttribute('title');
+        }
+    }
 });
 </script>
 

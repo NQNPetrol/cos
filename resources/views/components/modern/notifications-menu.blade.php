@@ -1,6 +1,6 @@
 <div id="notificationsMenu" class="modern-dropdown hidden" style="width: 360px;">
     <div style="padding: 12px 16px; border-bottom: 1px solid var(--fb-border); display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="font-weight: 600; font-size: 16px; color: var(--fb-text-primary);">Notificaciones</h3>
+        <h3 style="font-weight: 600; font-size: 18px; color: var(--fb-text-primary);">Notificaciones</h3>
         <div style="display: flex; align-items: center; gap: 8px;">
             <button id="viewAllNotifications" style="background: transparent; border: none; color: var(--fb-accent-blue); font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;" onmouseover="this.style.backgroundColor='var(--fb-bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
                 Ver todas
@@ -29,7 +29,7 @@
     </div>
     
     <!-- Notifications List -->
-    <div id="notificationsList" style="max-height: calc(100vh - 250px); overflow-y: auto;">
+    <div id="notificationsList" style="max-height: calc(2 * 80px) !important; height: calc(2 * 80px) !important; overflow-y: auto !important; overflow-x: hidden !important;">
         <div id="notificationsLoading" style="padding: 24px; text-align: center; color: var(--fb-text-secondary);">
             <div style="display: inline-block; width: 20px; height: 20px; border: 2px solid var(--fb-border); border-top-color: var(--fb-accent-blue); border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
             <p style="margin-top: 12px; font-size: 14px;">Cargando notificaciones...</p>

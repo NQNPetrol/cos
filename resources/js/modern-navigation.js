@@ -67,6 +67,7 @@ class ModernNavigation {
         }
     }
 
+
     setupTopBarButtons() {
         const buttons = document.querySelectorAll('.modern-top-nav-button[data-dashboard]');
         buttons.forEach(button => {
@@ -652,10 +653,58 @@ class ModernNavigation {
             
             if (response.ok) {
                 // Reload notifications
-                this.loadNotifications(this.currentNotificationFilter);
+                this.loadNotifications();
             }
         } catch (error) {
             console.error('Error marking notification as read:', error);
+        }
+    }
+
+    async markAllNotificationsAsRead() {
+        try {
+            const response = await fetch('/notificaciones/leer-todas', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Si estamos en tab "sin leer", cambiar a "leídas"
+                if (this.currentNotificationTab === 'unread') {
+                    this.switchNotificationTab('read');
+                } else {
+                    // Recargar notificaciones
+                    this.loadNotifications();
+                }
+                
+                // Actualizar contador de notificaciones sin leer
+                this.updateUnreadCount();
+            } else {
+                console.error('Error al marcar todas como leídas:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error marking all as read:', error);
+        }
+    }
+
+    updateUnreadCount() {
+        // Actualizar contador de notificaciones sin leer en el icono de la barra superior
+        const unreadCountElement = document.getElementById('unreadNotificationsCount');
+        const badge = document.getElementById('notificationBadge');
+        
+        if (unreadCountElement) {
+            unreadCountElement.textContent = '0';
+            unreadCountElement.style.display = 'none';
+        }
+        
+        if (badge) {
+            badge.textContent = '0';
+            badge.classList.add('hidden');
         }
     }
 }

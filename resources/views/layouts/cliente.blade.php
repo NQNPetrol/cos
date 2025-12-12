@@ -24,8 +24,8 @@
         @elseif(isset($slot))
             {{ $slot }}
         @endif
-    </main>
-
+        </main>                                        
+    
     @livewireScripts
     @stack('scripts')
 </body>

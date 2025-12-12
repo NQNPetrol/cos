@@ -50,6 +50,9 @@ body.modern-ui {
     display: flex;
     align-items: center;
     gap: 16px;
+    width: var(--fb-sidebar-width); /* Ancho igual al sidebar para alineación */
+    justify-content: space-between; /* Distribuye logo y búsqueda */
+    position: relative;
 }
 
 .modern-top-nav-logo-container {
@@ -143,6 +146,118 @@ body.modern-ui {
     color: var(--fb-text-primary);
 }
 
+/* ============================================
+   TOOLTIPS - Solución simple y directa
+   ============================================ */
+
+/* Asegurar que los botones tengan contexto de posicionamiento */
+.modern-top-nav-button {
+    position: relative;
+}
+
+/* Tooltip para botones de la barra superior */
+.modern-top-nav-button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: #d1d5db;
+    color: #1c1e21;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease 0.05s, visibility 0.1s ease 0.05s;
+    z-index: 10000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modern-top-nav-button[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Flecha del tooltip (apunta hacia arriba) */
+.modern-top-nav-button[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 2px;
+    border: 5px solid transparent;
+    border-bottom-color: #d1d5db;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 10001;
+}
+
+.modern-top-nav-button[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Tooltip para barra de búsqueda */
+.modern-search-bar {
+    position: relative;
+}
+
+.modern-search-bar[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: #d1d5db;
+    color: #1c1e21;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease 0.05s, visibility 0.1s ease 0.05s;
+    z-index: 10000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modern-search-bar[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modern-search-bar[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 2px;
+    border: 5px solid transparent;
+    border-bottom-color: #d1d5db;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 10001;
+}
+
+.modern-search-bar[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
 .modern-top-nav-avatar {
     width: var(--fb-button-size);
     height: var(--fb-button-size);
@@ -161,34 +276,38 @@ body.modern-ui {
 }
 
 /* Search Bar */
+.modern-search-bar-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Empuja la barra de búsqueda hacia la derecha del contenedor */
+}
+
 .modern-search-bar {
-    width: 240px;
+    width: 180px; /* Más pequeña: reducida de 240px para alinearse con el sidebar */
     height: 40px;
     background-color: var(--fb-bg-tertiary);
     border-radius: 20px;
     padding: 8px 16px;
-    border: none;
+    border: none !important;
+    outline: none !important;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     transition: width 0.2s ease;
+    cursor: pointer;
 }
 
-.modern-search-bar:focus-within {
-    width: 268px;
+.modern-search-bar:focus,
+.modern-search-bar:focus-within,
+.modern-search-bar:focus-visible {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .modern-search-bar input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--fb-text-primary);
-    font-size: 15px;
-}
-
-.modern-search-bar input::placeholder {
-    color: var(--fb-text-secondary);
+    display: none; /* Ocultar input en la barra principal */
 }
 
 .modern-search-bar-icon {
@@ -196,6 +315,17 @@ body.modern-ui {
     height: 20px;
     color: var(--fb-text-secondary);
     flex-shrink: 0;
+    position: relative; /* Para tooltip */
+    transition: transform 0.3s ease;
+}
+
+.modern-search-bar:focus-within .modern-search-bar-icon {
+    animation: searchIconPulse 0.3s ease;
+}
+
+@keyframes searchIconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 /* Sidebar */
@@ -500,9 +630,40 @@ body.modern-ui {
     color: var(--fb-text-secondary);
 }
 
+/* Título del modal de notificaciones */
+#notificationsMenu h3 {
+    font-size: 18px !important; /* Aumentado de 16px */
+    font-weight: 600;
+    color: var(--fb-text-primary);
+}
+
 #notificationsList {
-    max-height: calc(5 * 80px);
-    overflow-y: auto;
+    max-height: calc(2 * 80px) !important; /* 2 notificaciones */
+    height: calc(2 * 80px) !important; /* Altura fija para mostrar exactamente 2 */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin; /* Custom scrollbar */
+    scrollbar-color: var(--fb-bg-tertiary) var(--fb-bg-secondary);
+}
+
+/* Custom scrollbar styles for Webkit browsers */
+#notificationsList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#notificationsList::-webkit-scrollbar-track {
+    background: var(--fb-bg-secondary); /* Mismo color que el modal */
+    border-radius: 10px;
+}
+
+#notificationsList::-webkit-scrollbar-thumb {
+    background-color: var(--fb-bg-tertiary);
+    border-radius: 10px;
+    border: 2px solid var(--fb-bg-secondary);
+}
+
+#notificationsList::-webkit-scrollbar-thumb:hover {
+    background-color: var(--fb-border);
 }
 
 .modern-notifications-options-btn {
@@ -676,6 +837,9 @@ body.modern-ui {
     
     .modern-search-bar:focus-within {
         width: 200px;
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 }
 
@@ -699,17 +863,17 @@ body.modern-ui {
 
 .modern-search-bar input:focus {
     outline: none;
+    border: none;
 }
 
 .modern-search-bar:focus-within {
-    outline: 2px solid var(--fb-accent-blue);
-    outline-offset: 2px;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* ARIA Labels for screen readers */
-[aria-label] {
-    /* Styles for elements with ARIA labels */
-}
+/* Styles for elements with ARIA labels can be added here if needed */
 
 /* Skip to main content link */
 .skip-to-main {
