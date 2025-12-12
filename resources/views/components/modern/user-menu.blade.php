@@ -1,4 +1,4 @@
-<div id="userMenu" class="modern-dropdown hidden" style="right: 0; margin-top: 8px; width: 300px;">
+<div id="userMenu" class="modern-dropdown hidden" style="width: 300px;">
     <!-- Header -->
     <div style="padding: 16px; border-bottom: 1px solid var(--fb-border);">
         <div style="display: flex; align-items: center; gap: 12px;">

@@ -1,4 +1,4 @@
-<div id="notificationsMenu" class="modern-dropdown hidden" style="right: 0; margin-top: 8px; width: 360px;">
+<div id="notificationsMenu" class="modern-dropdown hidden" style="width: 360px;">
     <div style="padding: 12px 16px; border-bottom: 1px solid var(--fb-border); display: flex; justify-content: space-between; align-items: center;">
         <h3 style="font-weight: 600; font-size: 16px; color: var(--fb-text-primary);">Notificaciones</h3>
         <button id="viewAllNotifications" style="background: transparent; border: none; color: var(--fb-accent-blue); font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;" onmouseover="this.style.backgroundColor='var(--fb-bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">

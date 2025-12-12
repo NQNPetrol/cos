@@ -14,13 +14,13 @@
     --fb-badge-red: #e41e3f;
     
     /* Facebook Dimensions */
-    --fb-topbar-height: 56px;
-    --fb-button-size: 40px;
-    --fb-icon-size: 28px;
+    --fb-topbar-height: 60px;
+    --fb-button-size: 44px;
+    --fb-icon-size: 32px;
     --fb-sidebar-width: 240px;
     --fb-sidebar-item-height: 44px;
     --fb-sidebar-icon-size: 24px;
-    --fb-button-spacing: 4px;
+    --fb-button-spacing: 8px;
     --fb-button-padding: 8px;
 }
 
@@ -52,10 +52,37 @@ body.modern-ui {
     gap: 16px;
 }
 
-.modern-top-nav-logo {
+.modern-top-nav-logo-container {
+    background-color: var(--fb-white);
+    border-radius: 50%;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
     height: 40px;
-    width: auto;
-    padding: 8px 0;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.modern-top-nav-logo-container:hover {
+    transform: scale(1.05);
+}
+
+.modern-top-nav-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* Responsive: larger on bigger screens */
+@media (min-width: 1200px) {
+    .modern-top-nav-logo-container {
+        width: 48px;
+        height: 48px;
+    }
 }
 
 .modern-top-nav-center {
@@ -84,7 +111,7 @@ body.modern-ui {
     border: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    position: relative;
+    position: relative; /* For dropdown positioning */
 }
 
 .modern-top-nav-button:hover {
@@ -96,13 +123,15 @@ body.modern-ui {
 }
 
 .modern-top-nav-button.active svg {
-    color: var(--fb-accent-blue);
+    color: var(--fb-accent-blue) !important;
+    fill: var(--fb-accent-blue);
 }
 
 .modern-top-nav-button svg {
     width: var(--fb-icon-size);
     height: var(--fb-icon-size);
     color: var(--fb-text-secondary);
+    fill: none;
 }
 
 .modern-top-nav-button:hover svg {
@@ -116,6 +145,9 @@ body.modern-ui {
     border: 2px solid transparent;
     cursor: pointer;
     transition: border-color 0.2s ease;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .modern-top-nav-avatar:hover,
@@ -246,6 +278,8 @@ body.modern-ui {
     padding: 24px;
     background-color: var(--fb-bg-primary);
     min-height: calc(100vh - var(--fb-topbar-height));
+    position: relative;
+    z-index: 1;
 }
 
 .modern-content-card {
@@ -259,6 +293,8 @@ body.modern-ui {
 /* Dropdown Menus */
 .modern-dropdown {
     position: absolute;
+    top: calc(100% + 8px); /* Position below button */
+    right: 0; /* Align to right edge */
     background-color: var(--fb-bg-secondary);
     border: 1px solid var(--fb-border);
     border-radius: 8px;

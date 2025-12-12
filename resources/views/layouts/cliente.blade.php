@@ -19,7 +19,11 @@
 
     <!-- Main Content Area -->
     <main class="modern-content">
-        @yield('content')
+        @hasSection('content')
+            @yield('content')
+        @elseif(isset($slot))
+            {{ $slot }}
+        @endif
     </main>
 
     @livewireScripts

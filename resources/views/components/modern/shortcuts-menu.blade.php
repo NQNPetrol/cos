@@ -1,6 +1,6 @@
 @props(['isClient' => false])
 
-<div id="shortcutsMenu" class="modern-dropdown hidden" style="right: 0; margin-top: 8px; width: 360px;">
+<div id="shortcutsMenu" class="modern-dropdown hidden" style="width: 360px;">
     <div style="padding: 12px 16px; border-bottom: 1px solid var(--fb-border);">
         <h3 style="font-weight: 600; font-size: 16px; color: var(--fb-text-primary);">Accesos Rápidos</h3>
     </div>

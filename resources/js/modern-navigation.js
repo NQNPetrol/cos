@@ -122,7 +122,16 @@ class ModernNavigation {
             }
 
             // Handle regular route navigation
-            const route = item.dataset.route || item.href;
+            // If item has href attribute, allow normal anchor navigation
+            if (item.tagName === 'A' && item.href) {
+                // Allow normal anchor navigation - don't prevent default
+                this.setActiveRoute(item.href);
+                // Let the browser handle the navigation naturally
+                return;
+            }
+            
+            // For items with data-route but no href, use JavaScript navigation
+            const route = item.dataset.route;
             if (route) {
                 this.setActiveRoute(route);
                 window.location.href = route;
@@ -200,8 +209,51 @@ class ModernNavigation {
         // Toggle current menu
         if (isHidden) {
             menu.classList.remove('hidden');
+            // Position dropdown relative to its trigger button
+            this.positionDropdown(menu);
         } else {
             menu.classList.add('hidden');
+        }
+    }
+
+    positionDropdown(menu) {
+        // Find the trigger button for this menu
+        let triggerButton = null;
+        
+        if (menu.id === 'shortcutsMenu') {
+            triggerButton = document.getElementById('shortcutsMenuBtn');
+        } else if (menu.id === 'notificationsMenu') {
+            triggerButton = document.getElementById('notificationsBtn');
+        } else if (menu.id === 'userMenu') {
+            triggerButton = document.getElementById('userMenuBtn');
+        }
+        
+        if (!triggerButton) return;
+        
+        // Get button position
+        const buttonRect = triggerButton.getBoundingClientRect();
+        const menuRect = menu.getBoundingClientRect();
+        
+        // Position menu below button, aligned to right
+        menu.style.position = 'fixed';
+        menu.style.top = `${buttonRect.bottom + 8}px`;
+        menu.style.right = `${window.innerWidth - buttonRect.right}px`;
+        menu.style.left = 'auto';
+        
+        // Ensure menu doesn't go off-screen
+        const viewportHeight = window.innerHeight;
+        const menuHeight = menuRect.height || 400; // Fallback height
+        const spaceBelow = viewportHeight - buttonRect.bottom;
+        
+        if (spaceBelow < menuHeight && buttonRect.top > menuHeight) {
+            // Position above button if not enough space below
+            menu.style.top = `${buttonRect.top - menuHeight - 8}px`;
+        }
+        
+        // Ensure menu doesn't go off right edge
+        if (buttonRect.right < menuRect.width) {
+            menu.style.right = '8px';
+            menu.style.left = 'auto';
         }
     }
 

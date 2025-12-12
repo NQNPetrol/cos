@@ -4,8 +4,8 @@
     <!-- Left Section: Logo and Search -->
     <div class="modern-top-nav-left">
         <!-- Logo -->
-        <a href="{{ $isClient ? route('client.dashboard') : route('dashboard') }}" class="modern-top-nav-logo">
-            <img src="{{ asset('cyh.png') }}" alt="Logo" class="modern-top-nav-logo" style="height: 40px; width: auto;">
+        <a href="{{ $isClient ? route('client.dashboard') : route('dashboard') }}" class="modern-top-nav-logo-container">
+            <img src="{{ asset('cyh.png') }}" alt="Logo" class="modern-top-nav-logo">
         </a>
         
         <!-- Search Bar -->
@@ -94,7 +94,7 @@
             @if(Laravel\Jetstream\Jetstream::managesProfilePhotos() && Auth::user()->profile_photo_path)
                 <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="modern-top-nav-avatar">
             @else
-                <div class="modern-top-nav-avatar" style="background-color: var(--fb-bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--fb-text-primary); font-weight: bold;">
+                <div class="modern-top-nav-avatar" style="background-color: var(--fb-bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--fb-text-primary); font-weight: bold; aspect-ratio: 1 / 1;">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
             @endif
