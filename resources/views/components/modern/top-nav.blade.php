@@ -5,7 +5,20 @@
     <div class="modern-top-nav-left">
         <!-- Logo -->
         <a href="{{ $isClient ? route('client.dashboard') : route('dashboard') }}" class="modern-top-nav-logo-container">
-            <img src="{{ asset('cyh.png') }}" alt="Logo" class="modern-top-nav-logo">
+            @if($isClient)
+                @php
+                    $user = auth()->user();
+                    $logoUrl = $user->logo_cliente ?? null;
+                    $clienteNombre = $user->nombre_cliente ?? 'Cliente';
+                @endphp
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo {{ $clienteNombre }}" class="modern-top-nav-logo" onerror="this.onerror=null; this.src='{{ asset('cyh.png') }}';">
+                @else
+                    <img src="{{ asset('cyh.png') }}" alt="Logo" class="modern-top-nav-logo">
+                @endif
+            @else
+                <img src="{{ asset('cyh.png') }}" alt="Logo" class="modern-top-nav-logo">
+            @endif
         </a>
         
         <!-- Search Bar -->

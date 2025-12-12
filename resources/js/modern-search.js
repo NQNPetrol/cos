@@ -480,6 +480,9 @@ class ModernSearch {
     }
 }
 
+// Export search index to window for Alpine.js
+window.searchIndex = searchIndex;
+
 // Initialize search
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

@@ -10,6 +10,8 @@ class ModernNavigation {
         this.navigationHistory = [];
         this.scrollPositions = {};
         this.isClient = document.body.classList.contains('client-layout') || window.location.pathname.includes('/client');
+        this.currentNotificationTab = 'unread';
+        this.allNotifications = [];
         
         this.init();
     }
@@ -43,8 +45,9 @@ class ModernNavigation {
         // Load initial sidebar content
         this.loadSidebarContent(this.currentDashboard, this.currentLevel);
         
-        // Set active route
+        // Set active route and top bar button
         this.setActiveRoute(window.location.pathname);
+        this.setActiveTopBarButton(this.currentDashboard);
     }
 
     detectDashboardFromURL() {
@@ -161,6 +164,9 @@ class ModernNavigation {
             });
         }
 
+        // Setup notification tabs
+        this.setupNotificationTabs();
+
         // User menu
         const userMenuBtn = document.getElementById('userMenuBtn');
         const userMenu = document.getElementById('userMenu');
@@ -179,6 +185,41 @@ class ModernNavigation {
                 });
             }
         });
+    }
+
+    setupNotificationTabs() {
+        const unreadTab = document.getElementById('notificationsTabUnread');
+        const readTab = document.getElementById('notificationsTabRead');
+        
+        if (unreadTab) {
+            unreadTab.addEventListener('click', () => {
+                this.switchNotificationTab('unread');
+            });
+        }
+        
+        if (readTab) {
+            readTab.addEventListener('click', () => {
+                this.switchNotificationTab('read');
+            });
+        }
+    }
+
+    switchNotificationTab(tab) {
+        const unreadTab = document.getElementById('notificationsTabUnread');
+        const readTab = document.getElementById('notificationsTabRead');
+        
+        // Update active state
+        if (tab === 'unread') {
+            unreadTab?.classList.add('active');
+            readTab?.classList.remove('active');
+        } else {
+            readTab?.classList.add('active');
+            unreadTab?.classList.remove('active');
+        }
+        
+        // Reload notifications with filter
+        this.currentNotificationTab = tab;
+        this.loadNotifications();
     }
 
     setupShortcutsNavigation() {
@@ -456,27 +497,76 @@ class ModernNavigation {
             if (empty) empty.classList.add('hidden');
             
             // Fetch notifications
-            const response = await fetch('/api/notifications/unread-count');
+            const response = await fetch('/notificaciones?page=1');
+            if (!response.ok) throw new Error('Failed to load notifications');
+            
             const data = await response.json();
+            
+            // Store all notifications
+            this.allNotifications = data.data || [];
+            
+            // Filter by current tab
+            const filteredNotifications = this.currentNotificationTab === 'unread' 
+                ? this.allNotifications.filter(n => !n.is_read)
+                : this.allNotifications.filter(n => n.is_read);
             
             // Update badge
             const badge = document.getElementById('notificationBadge');
-            if (badge && data.unread_count > 0) {
-                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+            const unreadCount = this.allNotifications.filter(n => !n.is_read).length;
+            if (badge && unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
                 badge.classList.remove('hidden');
             } else if (badge) {
                 badge.classList.add('hidden');
             }
             
-            // Load notifications list (you'll need to implement this endpoint)
-            // For now, just hide loading
+            // Render notifications
+            this.renderNotifications(filteredNotifications, list);
+            
+            // Hide loading
             if (loading) loading.classList.add('hidden');
+            
+            // Show empty state if no notifications
+            if (filteredNotifications.length === 0) {
+                if (empty) empty.classList.remove('hidden');
+            } else {
+                if (empty) empty.classList.add('hidden');
+            }
             
         } catch (error) {
             console.error('Error loading notifications:', error);
             if (loading) loading.classList.add('hidden');
             if (empty) empty.classList.remove('hidden');
         }
+    }
+
+    renderNotifications(notifications, container) {
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        notifications.forEach(notification => {
+            const item = document.createElement('div');
+            item.className = 'modern-sidebar-item';
+            item.style.cssText = 'padding: 12px 16px; border-bottom: 1px solid var(--fb-border); cursor: pointer;';
+            item.innerHTML = `
+                <div style="display: flex; align-items: start; gap: 12px;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px; color: var(--fb-text-primary); margin-bottom: 4px;">
+                            ${notification.title || 'Notificación'}
+                        </div>
+                        <div style="font-size: 13px; color: var(--fb-text-secondary); margin-bottom: 6px;">
+                            ${notification.message || ''}
+                        </div>
+                        <div style="font-size: 12px; color: var(--fb-text-secondary);">
+                            ${notification.created_at_human || notification.created_at || ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        });
     }
 }
 

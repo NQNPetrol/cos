@@ -7,11 +7,11 @@
     </div>
     
     <!-- Tabs -->
-    <div style="display: flex; border-bottom: 1px solid var(--fb-border);">
-        <button id="notificationsTabUnread" class="notification-tab active" data-tab="unread" style="flex: 1; padding: 12px; background: transparent; border: none; border-bottom: 2px solid var(--fb-accent-blue); color: var(--fb-text-primary); font-weight: 500; cursor: pointer;">
+    <div style="display: flex; border-bottom: 1px solid var(--fb-border); padding: 8px;">
+        <button id="notificationsTabUnread" class="notification-tab active" data-tab="unread" style="flex: 1; padding: 6px 16px; background: rgba(24, 119, 242, 0.2); border: none; border-radius: 18px; color: #42a5f5; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s ease;">
             Sin leer
         </button>
-        <button id="notificationsTabRead" class="notification-tab" data-tab="read" style="flex: 1; padding: 12px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--fb-text-secondary); font-weight: 500; cursor: pointer;">
+        <button id="notificationsTabRead" class="notification-tab" data-tab="read" style="flex: 1; padding: 6px 16px; background: transparent; border: none; border-radius: 18px; color: var(--fb-text-primary); font-weight: 500; cursor: pointer; font-size: 14px; transition: all 0.2s ease;">
             Leídas
         </button>
     </div>
@@ -45,13 +45,18 @@
     to { transform: rotate(360deg); }
 }
 
-.notification-tab:hover {
+.notification-tab:hover:not(.active) {
     background-color: var(--fb-bg-tertiary) !important;
 }
 
 .notification-tab.active {
-    color: var(--fb-accent-blue) !important;
-    border-bottom-color: var(--fb-accent-blue) !important;
+    background-color: rgba(24, 119, 242, 0.2) !important;
+    color: #42a5f5 !important;
+}
+
+.notification-tab:not(.active) {
+    background-color: transparent !important;
+    color: var(--fb-text-primary) !important;
 }
 </style>
 

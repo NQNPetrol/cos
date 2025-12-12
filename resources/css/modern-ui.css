@@ -20,7 +20,7 @@
     --fb-sidebar-width: 240px;
     --fb-sidebar-item-height: 44px;
     --fb-sidebar-icon-size: 24px;
-    --fb-button-spacing: 8px;
+    --fb-button-spacing: 12px;
     --fb-button-padding: 8px;
 }
 
@@ -124,7 +124,8 @@ body.modern-ui {
 
 .modern-top-nav-button.active svg {
     color: var(--fb-accent-blue) !important;
-    fill: var(--fb-accent-blue);
+    fill: var(--fb-accent-blue) !important;
+    stroke: var(--fb-accent-blue) !important;
 }
 
 .modern-top-nav-button svg {
@@ -132,9 +133,11 @@ body.modern-ui {
     height: var(--fb-icon-size);
     color: var(--fb-text-secondary);
     fill: none;
+    stroke: currentColor;
+    transition: color 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
 }
 
-.modern-top-nav-button:hover svg {
+.modern-top-nav-button:hover:not(.active) svg {
     color: var(--fb-text-primary);
 }
 
@@ -269,6 +272,65 @@ body.modern-ui {
 
 .modern-sidebar-back-button:hover {
     background-color: var(--fb-bg-tertiary);
+}
+
+/* Sidebar Section Titles */
+.modern-sidebar-section-title {
+    padding: 20px 16px 12px 16px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--fb-text-primary);
+    text-transform: none;
+    letter-spacing: -0.3px;
+    border-bottom: none;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+/* Search Results Styling */
+.modern-search-result {
+    width: 100%;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease;
+    color: var(--fb-text-primary);
+}
+
+.modern-search-result:hover,
+.modern-search-result-active {
+    background-color: var(--fb-bg-tertiary);
+}
+
+.modern-search-result-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--fb-text-secondary);
+}
+
+.modern-search-result-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.modern-search-result-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--fb-text-primary);
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.modern-search-result-category {
+    font-size: 13px;
+    color: var(--fb-text-secondary);
+    line-height: 1.2;
 }
 
 /* Main Content Area */

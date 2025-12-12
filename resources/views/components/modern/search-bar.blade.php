@@ -6,7 +6,7 @@
         type="text" 
         placeholder="Buscar en la aplicación..." 
         x-model="query"
-        @input.debounce.300ms="search()"
+        @input="search()"
         @keydown.arrow-down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1)"
         @keydown.arrow-up.prevent="selectedIndex = Math.max(selectedIndex - 1, -1)"
         @keydown.enter.prevent="selectResult(selectedIndex >= 0 ? selectedIndex : 0)"
@@ -25,18 +25,18 @@
          class="modern-dropdown"
          style="position: absolute; top: 100%; left: 0; margin-top: 8px; width: 100%; min-width: 360px; max-height: 400px; overflow-y: auto; z-index: 1001;">
         <template x-for="(result, index) in results" :key="index">
-            <div 
+            <button 
                 @click="selectResult(index)"
                 @mouseenter="selectedIndex = index"
-                :class="{'bg-fb-tertiary': selectedIndex === index}"
-                class="modern-sidebar-item"
-                style="cursor: pointer;">
-                <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="result.icon"></svg>
-                <div style="flex: 1;">
-                    <div style="font-weight: 500;" x-text="result.label"></div>
-                    <div style="font-size: 12px; color: var(--fb-text-secondary);" x-text="result.category"></div>
+                :class="{'modern-search-result-active': selectedIndex === index}"
+                class="modern-search-result"
+                type="button">
+                <svg class="modern-search-result-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="result.icon"></svg>
+                <div class="modern-search-result-content">
+                    <div class="modern-search-result-title" x-text="result.label"></div>
+                    <div class="modern-search-result-category" x-text="result.category"></div>
                 </div>
-            </div>
+            </button>
         </template>
     </div>
 </div>
@@ -77,24 +77,25 @@ document.addEventListener('alpine:init', () => {
             },
             
             search() {
-                if (!this.query || this.query.length < 2) {
-                    this.results = [];
-                    this.open = false;
-                    return;
-                }
-                
                 // Reload index if empty
                 if (this.searchIndex.length === 0) {
                     this.loadSearchIndex();
                 }
                 
-                const query = this.query.toLowerCase();
+                if (!this.query || this.query.trim().length < 1) {
+                    this.results = [];
+                    this.open = false;
+                    return;
+                }
+                
+                const query = this.query.toLowerCase().trim();
                 this.results = this.searchIndex
-                    .filter(item => 
-                        item.label.toLowerCase().includes(query) ||
-                        item.category.toLowerCase().includes(query) ||
-                        item.route.toLowerCase().includes(query)
-                    )
+                    .filter(item => {
+                        const labelMatch = item.label && item.label.toLowerCase().includes(query);
+                        const categoryMatch = item.category && item.category.toLowerCase().includes(query);
+                        const routeMatch = item.route && item.route.toLowerCase().includes(query);
+                        return labelMatch || categoryMatch || routeMatch;
+                    })
                     .slice(0, 10);
                 
                 this.selectedIndex = -1;
