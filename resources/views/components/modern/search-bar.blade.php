@@ -1,43 +1,75 @@
-<div class="modern-search-bar" x-data="searchBarData" @click.away="open = false" style="position: relative;" x-cloak>
-    <svg class="modern-search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-    <input 
-        type="text" 
-        placeholder="Buscar en la aplicación..." 
-        x-model="query"
-        @input="search()"
-        @keydown.arrow-down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1)"
-        @keydown.arrow-up.prevent="selectedIndex = Math.max(selectedIndex - 1, -1)"
-        @keydown.enter.prevent="selectResult(selectedIndex >= 0 ? selectedIndex : 0)"
-        @keydown.escape="open = false"
-        @focus="open = true"
-    >
+<div class="modern-search-bar-container" x-data="searchBarData" x-cloak>
+    <!-- Search Bar Input (always visible) -->
+    <div class="modern-search-bar" @click="searchModalOpen = true">
+        <svg class="modern-search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input 
+            type="text" 
+            placeholder="Buscar en la aplicación..." 
+            x-model="query"
+            @input="search()"
+            @keydown.arrow-down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1)"
+            @keydown.arrow-up.prevent="selectedIndex = Math.max(selectedIndex - 1, -1)"
+            @keydown.enter.prevent="selectResult(selectedIndex >= 0 ? selectedIndex : 0)"
+            @keydown.escape="searchModalOpen = false"
+            @focus="searchModalOpen = true"
+            readonly
+        >
+    </div>
     
-    <!-- Search Results Dropdown -->
-    <div x-show="open && results.length > 0" 
+    <!-- Search Modal -->
+    <div x-show="searchModalOpen" 
          x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 transform scale-95"
-         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:enter-start="opacity-0 transform translateY(-10px)"
+         x-transition:enter-end="opacity-100 transform translateY(0)"
          x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 transform scale-100"
-         x-transition:leave-end="opacity-0 transform scale-95"
-         class="modern-dropdown"
-         style="position: absolute; top: 100%; left: 0; margin-top: 8px; width: 100%; min-width: 360px; max-height: 400px; overflow-y: auto; z-index: 1001;">
-        <template x-for="(result, index) in results" :key="index">
-            <button 
-                @click="selectResult(index)"
-                @mouseenter="selectedIndex = index"
-                :class="{'modern-search-result-active': selectedIndex === index}"
-                class="modern-search-result"
-                type="button">
-                <svg class="modern-search-result-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="result.icon"></svg>
-                <div class="modern-search-result-content">
-                    <div class="modern-search-result-title" x-text="result.label"></div>
-                    <div class="modern-search-result-category" x-text="result.category"></div>
-                </div>
+         x-transition:leave-start="opacity-100 transform translateY(0)"
+         x-transition:leave-end="opacity-0 transform translateY(-10px)"
+         @click.away="searchModalOpen = false"
+         class="modern-search-modal">
+        <!-- Modal Header with Back Button -->
+        <div class="modern-search-modal-header">
+            <button @click="searchModalOpen = false" class="modern-search-back-btn" type="button">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
             </button>
-        </template>
+            <input 
+                type="text" 
+                placeholder="Buscar en la aplicación..." 
+                x-model="query"
+                @input="search()"
+                @keydown.arrow-down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1)"
+                @keydown.arrow-up.prevent="selectedIndex = Math.max(selectedIndex - 1, -1)"
+                @keydown.enter.prevent="selectResult(selectedIndex >= 0 ? selectedIndex : 0)"
+                @keydown.escape="searchModalOpen = false"
+                autofocus
+            >
+        </div>
+        
+        <!-- Search Results -->
+        <div class="modern-search-modal-results">
+            <template x-if="results.length === 0 && query.length > 0">
+                <div class="modern-search-empty">
+                    No hay resultados para tu búsqueda
+                </div>
+            </template>
+            <template x-for="(result, index) in results" :key="index">
+                <button 
+                    @click="selectResult(index)"
+                    @mouseenter="selectedIndex = index"
+                    :class="{'modern-search-result-active': selectedIndex === index}"
+                    class="modern-search-result"
+                    type="button">
+                    <svg class="modern-search-result-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="result.icon"></svg>
+                    <div class="modern-search-result-content">
+                        <div class="modern-search-result-title" x-text="result.label"></div>
+                        <div class="modern-search-result-category" x-text="result.category"></div>
+                    </div>
+                </button>
+            </template>
+        </div>
     </div>
 </div>
 
@@ -50,6 +82,7 @@ document.addEventListener('alpine:init', () => {
             results: [],
             selectedIndex: -1,
             open: false,
+            searchModalOpen: false,
             searchIndex: [],
             
             init() {
@@ -100,6 +133,10 @@ document.addEventListener('alpine:init', () => {
                 
                 this.selectedIndex = -1;
                 this.open = this.results.length > 0;
+                // Keep modal open if it's open
+                if (this.searchModalOpen) {
+                    this.searchModalOpen = true;
+                }
             },
             
             selectResult(index) {
@@ -111,6 +148,7 @@ document.addEventListener('alpine:init', () => {
                         window.location.href = result.path;
                     }
                     this.open = false;
+                    this.searchModalOpen = false;
                     this.query = '';
                 }
             }

@@ -1,9 +1,21 @@
 <div id="notificationsMenu" class="modern-dropdown hidden" style="width: 360px;">
     <div style="padding: 12px 16px; border-bottom: 1px solid var(--fb-border); display: flex; justify-content: space-between; align-items: center;">
         <h3 style="font-weight: 600; font-size: 16px; color: var(--fb-text-primary);">Notificaciones</h3>
-        <button id="viewAllNotifications" style="background: transparent; border: none; color: var(--fb-accent-blue); font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;" onmouseover="this.style.backgroundColor='var(--fb-bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
-            Ver todas
-        </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="viewAllNotifications" style="background: transparent; border: none; color: var(--fb-accent-blue); font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;" onmouseover="this.style.backgroundColor='var(--fb-bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
+                Ver todas
+            </button>
+            <div style="position: relative;">
+                <button id="notificationsOptionsBtn" class="modern-notifications-options-btn" type="button">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                </button>
+                <div id="notificationsOptionsMenu" class="modern-notifications-options-menu hidden">
+                    <button id="markAllReadBtn" type="button">Marcar todas como leídas</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Tabs -->

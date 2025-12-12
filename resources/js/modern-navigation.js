@@ -202,6 +202,32 @@ class ModernNavigation {
                 this.switchNotificationTab('read');
             });
         }
+        
+        // Setup options button
+        const optionsBtn = document.getElementById('notificationsOptionsBtn');
+        const optionsMenu = document.getElementById('notificationsOptionsMenu');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        
+        if (optionsBtn && optionsMenu) {
+            optionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                optionsMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!optionsBtn.contains(e.target) && !optionsMenu.contains(e.target)) {
+                    optionsMenu.classList.add('hidden');
+                }
+            });
+        }
+        
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', () => {
+                this.markAllNotificationsAsRead();
+                if (optionsMenu) optionsMenu.classList.add('hidden');
+            });
+        }
     }
 
     switchNotificationTab(tab) {
@@ -547,26 +573,90 @@ class ModernNavigation {
         
         notifications.forEach(notification => {
             const item = document.createElement('div');
-            item.className = 'modern-sidebar-item';
-            item.style.cssText = 'padding: 12px 16px; border-bottom: 1px solid var(--fb-border); cursor: pointer;';
+            item.className = 'modern-notification-item';
+            
+            // Get icon based on notification type
+            const icon = this.getNotificationIcon(notification);
+            
             item.innerHTML = `
-                <div style="display: flex; align-items: start; gap: 12px;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 14px; color: var(--fb-text-primary); margin-bottom: 4px;">
-                            ${notification.title || 'Notificación'}
-                        </div>
-                        <div style="font-size: 13px; color: var(--fb-text-secondary); margin-bottom: 6px;">
-                            ${notification.message || ''}
-                        </div>
-                        <div style="font-size: 12px; color: var(--fb-text-secondary);">
-                            ${notification.created_at_human || notification.created_at || ''}
-                        </div>
+                <div class="modern-notification-icon-container">
+                    ${icon}
+                </div>
+                <div class="modern-notification-content">
+                    <div class="modern-notification-title">
+                        ${notification.title || 'Notificación'}
+                    </div>
+                    <div class="modern-notification-message">
+                        ${notification.message || ''}
+                    </div>
+                    <div class="modern-notification-time">
+                        ${notification.created_at_human || notification.created_at || ''}
                     </div>
                 </div>
             `;
             
+            // Add click handler to mark as read
+            item.addEventListener('click', () => {
+                if (notification.id && !notification.read_at) {
+                    this.markNotificationAsRead(notification.id);
+                }
+            });
+            
             container.appendChild(item);
         });
+    }
+    
+    getNotificationIcon(notification) {
+        const type = notification.type || '';
+        const title = (notification.title || '').toLowerCase();
+        
+        // Determine icon based on type or title
+        if (type.includes('ticket') || title.includes('ticket')) {
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>`;
+        } else if (type.includes('evento') || title.includes('evento')) {
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>`;
+        } else if (type.includes('patrulla') || title.includes('patrulla')) {
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>`;
+        } else if (type.includes('dron') || title.includes('dron') || title.includes('mision')) {
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>`;
+        } else if (type.includes('sistema') || title.includes('sistema')) {
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>`;
+        } else {
+            // Default notification icon
+            return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>`;
+        }
+    }
+    
+    async markNotificationAsRead(notificationId) {
+        try {
+            const response = await fetch(`/notificaciones/${notificationId}/leer`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                // Reload notifications
+                this.loadNotifications(this.currentNotificationFilter);
+            }
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+        }
     }
 }
 
