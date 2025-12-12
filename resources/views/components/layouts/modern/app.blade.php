@@ -18,10 +18,15 @@
 
     <!-- Main Content Area -->
     <main class="modern-content">
-        @yield('content')
-        </main>
+        @hasSection('content')
+            @yield('content')
+        @else
+            {{ $slot }}
+        @endif
+    </main>
 
     @livewireScripts
     @stack('scripts')
 </body>
 </html>
+

@@ -1,0 +1,433 @@
+/**
+ * Modern Navigation System
+ * Handles dynamic sidebar content switching, level-based navigation, and deep navigation
+ */
+
+class ModernNavigation {
+    constructor() {
+        this.currentDashboard = 'home';
+        this.currentLevel = 'main';
+        this.navigationHistory = [];
+        this.scrollPositions = {};
+        this.isClient = document.body.classList.contains('client-layout') || window.location.pathname.includes('/client');
+        
+        this.init();
+    }
+
+    init() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setup());
+        } else {
+            this.setup();
+        }
+    }
+
+    setup() {
+        // Set initial dashboard from URL or sessionStorage
+        this.currentDashboard = sessionStorage.getItem('activeDashboard') || this.detectDashboardFromURL();
+        this.currentLevel = sessionStorage.getItem('activeLevel') || 'main';
+
+        // Setup top bar button clicks
+        this.setupTopBarButtons();
+        
+        // Setup sidebar clicks
+        this.setupSidebarClicks();
+        
+        // Setup dropdown menus
+        this.setupDropdownMenus();
+        
+        // Setup shortcuts navigation
+        this.setupShortcutsNavigation();
+        
+        // Load initial sidebar content
+        this.loadSidebarContent(this.currentDashboard, this.currentLevel);
+        
+        // Set active route
+        this.setActiveRoute(window.location.pathname);
+    }
+
+    detectDashboardFromURL() {
+        const path = window.location.pathname;
+        if (path.includes('/client/')) {
+            if (path.includes('/eventos')) return 'eventos';
+            if (path.includes('/patrullas')) return 'patrullas';
+            if (path.includes('/alertas') || path.includes('/misiones') || path.includes('/flight-logs')) return 'drones';
+            if (path.includes('/gallery')) return 'galeria';
+            if (path.includes('/tickets')) return 'tickets';
+            return 'home';
+        } else {
+            if (path.includes('/clientes') || path.includes('/personal') || path.includes('/empresas-asociadas') || path.includes('/contratos')) return 'administracion';
+            if (path.includes('/eventos') || path.includes('/objetivos') || path.includes('/patrullas') || path.includes('/cameras') || path.includes('/anpr') || path.includes('/pilotos') || path.includes('/misiones-flytbase') || path.includes('/alertas') || path.includes('/flight-logs') || path.includes('/sites') || path.includes('/drones-flytbase') || path.includes('/docks-flytbase') || path.includes('/seguimientos')) return 'operaciones';
+            if (path.includes('/permisos') || path.includes('/roles') || path.includes('/usuarios') || path.includes('/tickets') || path.includes('/inventario') || path.includes('/gallery') || path.includes('/notifications')) return 'sistema';
+            return 'home';
+        }
+    }
+
+    setupTopBarButtons() {
+        const buttons = document.querySelectorAll('.modern-top-nav-button[data-dashboard]');
+        buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dashboard = button.dataset.dashboard;
+                const route = button.dataset.route;
+                
+                // Update active state
+                this.setActiveTopBarButton(dashboard);
+                
+                // Handle Operaciones special case (Level 1)
+                if (dashboard === 'operaciones') {
+                    this.navigateToLevel('operaciones-level1', 'operaciones');
+                } else {
+                    // For other dashboards, navigate to main level
+                    this.navigateToLevel('main', dashboard);
+                    if (route && route !== '#') {
+                        window.location.href = route;
+                    }
+                }
+            });
+        });
+    }
+
+    setupSidebarClicks() {
+        const sidebar = document.getElementById('sidebarContent');
+        if (!sidebar) return;
+
+        sidebar.addEventListener('click', (e) => {
+            const item = e.target.closest('.modern-sidebar-item, .modern-sidebar-back-button');
+            if (!item) return;
+
+            // Handle back button
+            if (item.classList.contains('modern-sidebar-back-button')) {
+                const backTo = item.dataset.backTo;
+                this.goBack(backTo);
+                return;
+            }
+
+            // Handle level 2 navigation (for Administración and Sistema)
+            if (item.dataset.level2) {
+                const level2 = item.dataset.level2;
+                const dashboard = this.currentDashboard;
+                this.navigateToLevel(`${dashboard}-${level2}`, dashboard);
+                return;
+            }
+
+            // Handle Operaciones Level 1 to Level 2 navigation
+            if (this.currentDashboard === 'operaciones' && this.currentLevel === 'operaciones-level1') {
+                if (item.dataset.level2) {
+                    const level2 = item.dataset.level2;
+                    this.navigateToLevel(`operaciones-${level2}`, 'operaciones');
+                    return;
+                }
+            }
+
+            // Handle regular route navigation
+            const route = item.dataset.route || item.href;
+            if (route) {
+                this.setActiveRoute(route);
+                window.location.href = route;
+            }
+        });
+    }
+
+    setupDropdownMenus() {
+        // Shortcuts menu
+        const shortcutsBtn = document.getElementById('shortcutsMenuBtn');
+        const shortcutsMenu = document.getElementById('shortcutsMenu');
+        if (shortcutsBtn && shortcutsMenu) {
+            shortcutsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleDropdown(shortcutsMenu);
+            });
+        }
+
+        // Notifications menu
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const notificationsMenu = document.getElementById('notificationsMenu');
+        if (notificationsBtn && notificationsMenu) {
+            notificationsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleDropdown(notificationsMenu);
+                this.loadNotifications();
+            });
+        }
+
+        // User menu
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userMenu = document.getElementById('userMenu');
+        if (userMenuBtn && userMenu) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleDropdown(userMenu);
+            });
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.modern-dropdown') && !e.target.closest('.modern-top-nav-button')) {
+                document.querySelectorAll('.modern-dropdown').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+    }
+
+    setupShortcutsNavigation() {
+        const shortcuts = document.querySelectorAll('[data-shortcut]');
+        shortcuts.forEach(shortcut => {
+            shortcut.addEventListener('click', (e) => {
+                e.preventDefault();
+                const route = shortcut.dataset.route;
+                const navigation = shortcut.dataset.navigation ? JSON.parse(shortcut.dataset.navigation) : null;
+                
+                if (navigation) {
+                    this.deepNavigate(navigation, route);
+                } else if (route) {
+                    window.location.href = route;
+                }
+            });
+        });
+    }
+
+    toggleDropdown(menu) {
+        const isHidden = menu.classList.contains('hidden');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.modern-dropdown').forEach(m => {
+            m.classList.add('hidden');
+        });
+        
+        // Toggle current menu
+        if (isHidden) {
+            menu.classList.remove('hidden');
+        } else {
+            menu.classList.add('hidden');
+        }
+    }
+
+    navigateToLevel(level, dashboard) {
+        // Save scroll position
+        this.saveScrollPosition();
+        
+        // Update state
+        this.currentLevel = level;
+        this.currentDashboard = dashboard;
+        
+        // Save to sessionStorage
+        sessionStorage.setItem('activeDashboard', dashboard);
+        sessionStorage.setItem('activeLevel', level);
+        
+        // Add to history
+        this.navigationHistory.push({ level, dashboard });
+        
+        // Load sidebar content
+        this.loadSidebarContent(dashboard, level);
+        
+        // Update top bar active state
+        this.setActiveTopBarButton(dashboard);
+    }
+
+    goBack(targetLevel) {
+        // Save current scroll position
+        this.saveScrollPosition();
+        
+        // Determine target level and dashboard
+        let level, dashboard;
+        
+        if (targetLevel === 'operaciones-level1') {
+            level = 'operaciones-level1';
+            dashboard = 'operaciones';
+        } else if (targetLevel === 'administracion') {
+            level = 'main';
+            dashboard = 'administracion';
+        } else if (targetLevel === 'sistema') {
+            level = 'main';
+            dashboard = 'sistema';
+        } else {
+            level = 'main';
+            dashboard = this.currentDashboard;
+        }
+        
+        // Restore previous scroll position
+        const scrollKey = `${dashboard}-${level}`;
+        const savedScroll = this.scrollPositions[scrollKey] || 0;
+        
+        // Navigate back
+        this.navigateToLevel(level, dashboard);
+        
+        // Restore scroll position after a brief delay
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebarContent');
+            if (sidebar) {
+                sidebar.scrollTop = savedScroll;
+            }
+        }, 100);
+    }
+
+    loadSidebarContent(dashboard, level) {
+        const sidebarContent = document.getElementById('sidebarContent');
+        const templates = document.getElementById('sidebarTemplates');
+        
+        if (!sidebarContent || !templates) return;
+        
+        // Determine template ID
+        let templateId;
+        
+        if (level === 'main') {
+            templateId = `sidebar-${dashboard}`;
+        } else if (level.startsWith('operaciones-')) {
+            templateId = `sidebar-${level}`;
+        } else if (level.includes('-')) {
+            templateId = `sidebar-${level}`;
+        } else {
+            templateId = `sidebar-${dashboard}-${level}`;
+        }
+        
+        const template = templates.querySelector(`#${templateId}`);
+        
+        if (template) {
+            // Clone and insert template content
+            const content = template.content.cloneNode(true);
+            sidebarContent.innerHTML = '';
+            sidebarContent.appendChild(content);
+            
+            // Add slide-in animation
+            sidebarContent.classList.add('slide-in');
+            setTimeout(() => {
+                sidebarContent.classList.remove('slide-in');
+            }, 300);
+        } else {
+            sidebarContent.innerHTML = '<div class="modern-sidebar-item" style="justify-content: center; color: var(--fb-text-secondary);">No hay opciones disponibles</div>';
+        }
+    }
+
+    setActiveTopBarButton(dashboard) {
+        const buttons = document.querySelectorAll('.modern-top-nav-button[data-dashboard]');
+        buttons.forEach(btn => {
+            if (btn.dataset.dashboard === dashboard) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    setActiveRoute(route) {
+        const path = typeof route === 'string' ? route : route.pathname || window.location.pathname;
+        const sidebarItems = document.querySelectorAll('.modern-sidebar-item[data-route]');
+        
+        sidebarItems.forEach(item => {
+            const itemRoute = item.dataset.route;
+            if (itemRoute && (path.includes(itemRoute) || itemRoute.includes(path))) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    saveScrollPosition() {
+        const sidebar = document.getElementById('sidebarContent');
+        if (sidebar) {
+            const key = `${this.currentDashboard}-${this.currentLevel}`;
+            this.scrollPositions[key] = sidebar.scrollTop;
+        }
+    }
+
+    deepNavigate(navigation, route) {
+        // Step 1: Change top bar active state
+        if (navigation.topBar) {
+            this.setActiveTopBarButton(navigation.topBar);
+            this.currentDashboard = navigation.topBar;
+        }
+        
+        // Step 2: Navigate through sidebar levels
+        if (navigation.topBar === 'operaciones') {
+            // Navigate to Level 1 first
+            this.navigateToLevel('operaciones-level1', 'operaciones');
+            
+            // Then navigate to Level 2 if specified
+            if (navigation.level1) {
+                setTimeout(() => {
+                    this.navigateToLevel(`operaciones-${navigation.level1}`, 'operaciones');
+                    
+                    // Highlight and navigate to route
+                    setTimeout(() => {
+                        this.setActiveRoute(route);
+                        if (route) {
+                            window.location.href = route;
+                        }
+                    }, 300);
+                }, 300);
+            } else {
+                if (route) {
+                    window.location.href = route;
+                }
+            }
+        } else if (navigation.level1) {
+            // For Administración and Sistema with submenus
+            this.navigateToLevel(`${navigation.topBar}-${navigation.level1}`, navigation.topBar);
+            
+            setTimeout(() => {
+                this.setActiveRoute(route);
+                if (route) {
+                    window.location.href = route;
+                }
+            }, 300);
+        } else {
+            // Direct navigation
+            this.navigateToLevel('main', navigation.topBar);
+            if (route) {
+                window.location.href = route;
+            }
+        }
+    }
+
+    navigateToRoute(routeData) {
+        if (routeData.navigation) {
+            this.deepNavigate(routeData.navigation, routeData.path);
+        } else {
+            window.location.href = routeData.path;
+        }
+    }
+
+    async loadNotifications() {
+        const list = document.getElementById('notificationsList');
+        const loading = document.getElementById('notificationsLoading');
+        const empty = document.getElementById('notificationsEmpty');
+        
+        if (!list) return;
+        
+        try {
+            // Show loading
+            if (loading) loading.classList.remove('hidden');
+            if (empty) empty.classList.add('hidden');
+            
+            // Fetch notifications
+            const response = await fetch('/api/notifications/unread-count');
+            const data = await response.json();
+            
+            // Update badge
+            const badge = document.getElementById('notificationBadge');
+            if (badge && data.unread_count > 0) {
+                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                badge.classList.remove('hidden');
+            } else if (badge) {
+                badge.classList.add('hidden');
+            }
+            
+            // Load notifications list (you'll need to implement this endpoint)
+            // For now, just hide loading
+            if (loading) loading.classList.add('hidden');
+            
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+            if (loading) loading.classList.add('hidden');
+            if (empty) empty.classList.remove('hidden');
+        }
+    }
+}
+
+// Initialize navigation when DOM is ready
+window.modernNavigation = new ModernNavigation();
+
