@@ -142,8 +142,19 @@ body.modern-ui {
     transition: color 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
 }
 
-.modern-top-nav-button:hover:not(.active) svg {
+.modern-top-nav-button i {
+    font-size: 26px;
+    color: var(--fb-text-secondary);
+    transition: color 0.2s ease;
+}
+
+.modern-top-nav-button:hover:not(.active) svg,
+.modern-top-nav-button:hover:not(.active) i {
     color: var(--fb-text-primary);
+}
+
+.modern-top-nav-button.active i {
+    color: var(--fb-accent-blue) !important;
 }
 
 /* ============================================

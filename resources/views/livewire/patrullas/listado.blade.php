@@ -1,51 +1,57 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Listado de Patrullas</h2>
-        <div class="flex space-x-3">
-            <!-- Botón Importar Patrullas (Solo para admin) -->
-            @if(auth()->user()->hasRole('admin'))
-                <button onclick="importarPatrullas()" 
-                        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white font-medium">
+<div>
+    <!-- Contenedor 1: Header (Título + Botones) -->
+    <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-100">Listado de Patrullas</h2>
+            <div class="flex space-x-3">
+                <!-- Botón Importar Patrullas (Solo para admin) -->
+                @if(auth()->user()->hasRole('admin'))
+                    <button onclick="importarPatrullas()" 
+                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white font-medium">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                        </svg>
+                        Importar Patrullas
+                    </button>
+                @endif
+                
+                <button wire:click="openModal"
+                class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Importar Patrullas
+                    Nueva Patrulla
                 </button>
-            @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor 2: Filtros -->
+    <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm mb-1 text-gray-200">Buscar</label>
+                <input type="text" wire:model.live="search"
+                       placeholder="Patente, marca, modelo..."
+                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+            </div>
             
-            <button wire:click="openModal"
-            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-medium">
-                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Nueva Patrulla
-            </a>
+            <div>
+                <label class="block text-sm mb-1 text-gray-200">Estado</label>
+                <select wire:model.live="estadoFilter" 
+                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    <option value="">Todos</option>
+                    <option value="operativa">Operativa</option>
+                    <option value="mantenimiento">En mantenimiento</option>
+                    <option value="baja">Dada de baja</option>
+                </select>
+            </div>
         </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-            <label class="block text-sm mb-1">Buscar</label>
-            <input type="text" wire:model.live="search"
-                   placeholder="Patente, marca, modelo..."
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-        </div>
-        
-        <div>
-            <label class="block text-sm mb-1">Estado</label>
-            <select wire:model.live="estadoFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
-                <option value="">Todos</option>
-                <option value="operativa">Operativa</option>
-                <option value="mantenimiento">En mantenimiento</option>
-                <option value="baja">Dada de baja</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Tabla -->
-    <div class="overflow-x-auto">
+    <!-- Contenedor 3: Listado/Tabla -->
+    <div class="bg-[#252728] rounded-lg p-6 border border-transparent">
+        <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-800 text-gray-300">
                 <tr>
@@ -128,11 +134,12 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
+        </div>
 
-    <!-- Paginación -->
-    <div class="mt-4">
-        {{ $patrullas->links() }}
+        <!-- Paginación -->
+        <div class="mt-4">
+            {{ $patrullas->links() }}
+        </div>
     </div>
 
     <!-- Modal -->
