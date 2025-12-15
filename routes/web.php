@@ -683,6 +683,40 @@ Route::middleware([
     Route::get('/anpr/event-image/{recordId}', \App\Livewire\HikCentralImages\ViewEventImage::class)
         ->name('anpr.view-image')->middleware('can:ver.registros-anpr');
 
+    // RODADOS
+    Route::prefix('rodados')->name('rodados.')->group(function () {
+        // Vista principal (solo middleware en la ruta principal)
+        Route::get('/', [\App\Http\Controllers\RodadoController::class, 'index'])->name('index');
+        
+        // CRUD Rodados
+        Route::post('/', [\App\Http\Controllers\RodadoController::class, 'store'])->name('store');
+        Route::put('/{rodado}', [\App\Http\Controllers\RodadoController::class, 'update'])->name('update');
+        Route::delete('/{rodado}', [\App\Http\Controllers\RodadoController::class, 'destroy'])->name('destroy');
+        
+        // Turnos Rodados (unificado: service y mecánicos)
+        Route::post('/turnos', [\App\Http\Controllers\TurnoRodadoController::class, 'store'])->name('turnos.store');
+        Route::put('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'update'])->name('turnos.update');
+        Route::delete('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'destroy'])->name('turnos.destroy');
+        
+        // Cambios de Equipos
+        Route::post('/cambios-equipos', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'store'])->name('cambios-equipos.store');
+        Route::put('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'update'])->name('cambios-equipos.update');
+        Route::delete('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'destroy'])->name('cambios-equipos.destroy');
+        
+        // Kilometraje
+        Route::post('/kilometraje', [\App\Http\Controllers\RegistroKilometrajeController::class, 'store'])->name('kilometraje.store');
+        Route::delete('/kilometraje/{registro}', [\App\Http\Controllers\RegistroKilometrajeController::class, 'destroy'])->name('kilometraje.destroy');
+        
+        // Pagos Servicios (unificado: patente, alquiler, proveedor, etc.)
+        Route::post('/pagos', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'store'])->name('pagos.store');
+        Route::put('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'update'])->name('pagos.update');
+        Route::delete('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'destroy'])->name('pagos.destroy');
+        
+        // Proveedores y Talleres (CRUD auxiliar)
+        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);
+        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class);
+    });
+
 });
 
 
