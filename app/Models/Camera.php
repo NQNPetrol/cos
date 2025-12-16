@@ -58,4 +58,12 @@ class Camera extends Model
     {
         return $this->hasOne(StreamUrl::class, 'camera_index_code', 'camera_index_code');
     }
+
+    /**
+     * Relación con Dispositivo
+     */
+    public function dispositivo()
+    {
+        return $this->belongsTo(Dispositivo::class);
+    }
 }

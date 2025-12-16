@@ -66,6 +66,11 @@ class Dispositivo extends Model
         return $this->hasMany(CambioEquipoRodado::class);
     }
 
+    public function camera()
+    {
+        return $this->hasOne(Camera::class);
+    }
+
     // Scopes
     
     public function scopeInstalados($query)
@@ -141,5 +146,55 @@ class Dispositivo extends Model
         return $this->proximo_mantenimiento && 
                Carbon::now()->addDays($dias)->gte($this->proximo_mantenimiento) &&
                Carbon::now()->lte($this->proximo_mantenimiento);
+    }
+
+    /**
+     * Obtener coordenadas desde el campo ubicacion
+     */
+    public function getCoordenadasAttribute()
+    {
+        if (!$this->ubicacion) {
+            return null;
+        }
+        
+        // Intentar parsear como JSON primero
+        $json = json_decode($this->ubicacion, true);
+        if (json_last_error() === JSON_ERROR_NONE && isset($json['lat']) && isset($json['lng'])) {
+            $lat = (float) $json['lat'];
+            $lng = (float) $json['lng'];
+            
+            // Validar rango de coordenadas
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return [
+                    'lat' => $lat,
+                    'lng' => $lng
+                ];
+            }
+        }
+        
+        // Buscar patrón de coordenadas: -XX.XXXX, -XX.XXXX
+        $pattern = '/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/';
+        if (preg_match($pattern, $this->ubicacion, $matches)) {
+            $lat = (float) trim($matches[1]);
+            $lng = (float) trim($matches[2]);
+            
+            // Validar rango de coordenadas
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return [
+                    'lat' => $lat,
+                    'lng' => $lng
+                ];
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Verificar si el dispositivo tiene coordenadas válidas
+     */
+    public function tieneCoordenadas()
+    {
+        return $this->coordenadas !== null;
     }
 }

@@ -333,11 +333,11 @@ Route::middleware([
         ->middleware('can:editar.eventos')
         ->name('eventos.edit');
 
-    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])
+    Route::put('/eventos/{evento}/update', [\App\Http\Controllers\EventoController::class, 'update'])
         ->middleware('can:editar.eventos')
         ->name('eventos.update');
 
-    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])
+    Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
     
@@ -740,6 +740,26 @@ Route::middleware(['auth'])->group(function () {
     ->middleware('role:admin')
     ->name('asignar.permisos');
     
+    // Dashboard Operacional - Principal
+    Route::get('/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'index'])
+        ->middleware('can:ver.operaciones')
+        ->name('operaciones.dashboard');
+
+    // Dashboard Operacional - Cliente
+    Route::get('/client/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'index'])
+        ->name('client.operaciones.dashboard');
+
+    // APIs del Dashboard Operacional
+    Route::prefix('api/operaciones')->group(function () {
+        Route::get('/kpis', [App\Http\Controllers\OperacionesDashboardController::class, 'getKPIs'])
+            ->name('api.operaciones.kpis');
+        
+        Route::get('/map-data', [App\Http\Controllers\OperacionesDashboardController::class, 'getMapData'])
+            ->name('api.operaciones.map-data');
+        
+        Route::get('/eventos', [App\Http\Controllers\OperacionesDashboardController::class, 'getEventos'])
+            ->name('api.operaciones.eventos');
+    });
 });
 
 

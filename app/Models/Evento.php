@@ -93,4 +93,22 @@ class Evento extends Model
     {
         return $this->hasMany(ReporteGenerado::class);
     }
+
+    /**
+     * Obtener el último seguimiento del evento
+     */
+    public function ultimoSeguimiento()
+    {
+        return $this->hasOne(Seguimiento::class, 'evento_id')
+                    ->latestOfMany('fecha');
+    }
+
+    /**
+     * Obtener el estado actual del evento basado en el último seguimiento
+     */
+    public function getEstadoActualAttribute()
+    {
+        $ultimo = $this->ultimoSeguimiento;
+        return $ultimo ? $ultimo->estado : 'ABIERTO';
+    }
 }
