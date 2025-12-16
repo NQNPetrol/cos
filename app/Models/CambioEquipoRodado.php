@@ -22,6 +22,10 @@ class CambioEquipoRodado extends Model
         'factura_path',
         'comprobante_pago_path',
         'kilometraje_en_cambio',
+        'dispositivo_id',
+        'detalle_equipo_nuevo',
+        'detalle_equipo_viejo',
+        'motivo',
     ];
 
     protected $casts = [
@@ -43,5 +47,19 @@ class CambioEquipoRodado extends Model
     public function taller(): BelongsTo
     {
         return $this->belongsTo(Taller::class);
+    }
+
+    public function dispositivo(): BelongsTo
+    {
+        return $this->belongsTo(Dispositivo::class);
+    }
+
+    public function scopeRequiereDispositivo($query)
+    {
+        return $query->whereIn('tipo', [
+            self::TIPO_ANTENA_STARLINK,
+            self::TIPO_CAMARA_MOBIL,
+            self::TIPO_DVR,
+        ]);
     }
 }

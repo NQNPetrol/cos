@@ -8,6 +8,7 @@
     @vite(['resources/css/app.css', 'resources/css/modern-ui.css', 'resources/js/app.js', 'resources/js/modern-navigation.js', 'resources/js/modern-search.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     @livewireStyles
+    @stack('styles')
 </head>
 <body class="modern-ui">
     <!-- Top Navigation Bar -->

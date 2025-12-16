@@ -9,6 +9,15 @@
                             <h2 class="text-2xl font-semibold text-gray-100">Gestión de Rodados</h2>
                             <p class="text-gray-400 mt-1">Administra los vehículos, servicios, mantenimientos y pagos</p>
                         </div>
+                        <div>
+                            <a href="{{ route('rodados.calendario.index') }}"
+                                class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-purple-700 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Calendario
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Mensajes -->

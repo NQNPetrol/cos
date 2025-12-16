@@ -53,8 +53,10 @@
             <label class="block text-sm font-medium text-gray-300 mb-2">Propiedad</label>
             <select id="filtro-propiedad" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                 <option value="">Todos</option>
-                <option value="1">Propio</option>
-                <option value="0">Alquilado</option>
+                <option value="propio">Propio</option>
+                @foreach($proveedores as $proveedor)
+                    <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
+                @endforeach
             </select>
         </div>
     </div>
@@ -69,7 +71,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Año</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Cliente</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Kilometraje</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Proveedor</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
@@ -79,7 +81,7 @@
                     data-marca="{{ $rodado->marca }}"
                     data-tipo="{{ $rodado->tipo_vehiculo }}"
                     data-cliente="{{ $rodado->cliente_id }}"
-                    data-propio="{{ $rodado->es_propio ? '1' : '0' }}">
+                    data-proveedor="{{ $rodado->proveedor_id ?? 'propio' }}">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-gray-100">{{ $rodado->marca }} {{ $rodado->modelo }}</div>
                         @if($rodado->patente)
@@ -103,18 +105,11 @@
                             <span class="text-gray-500">Sin registro</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($rodado->es_propio)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400 border border-green-800">
-                                Propio
-                            </span>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        @if($rodado->proveedor)
+                            {{ $rodado->proveedor->nombre }}
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-800">
-                                Alquilado
-                            </span>
-                            @if($rodado->proveedor)
-                                <div class="text-xs text-gray-400 mt-1">{{ $rodado->proveedor->nombre }}</div>
-                            @endif
+                            Vehículo Propio
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -174,7 +169,7 @@
         const marca = document.getElementById('filtro-marca').value.toLowerCase();
         const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
         const cliente = document.getElementById('filtro-cliente').value;
-        const propio = document.getElementById('filtro-propiedad').value;
+        const propiedad = document.getElementById('filtro-propiedad').value;
 
         const filas = document.querySelectorAll('.vehiculo-row');
         
@@ -182,13 +177,13 @@
             const filaMarca = fila.dataset.marca.toLowerCase();
             const filaTipo = fila.dataset.tipo.toLowerCase();
             const filaCliente = fila.dataset.cliente;
-            const filaPropio = fila.dataset.propio;
+            const filaProveedor = fila.dataset.proveedor;
 
             const mostrar = 
                 (marca === '' || filaMarca.includes(marca)) &&
                 (tipo === '' || filaTipo.includes(tipo)) &&
                 (cliente === '' || filaCliente === cliente) &&
-                (propio === '' || filaPropio === propio);
+                (propiedad === '' || filaProveedor === propiedad);
 
             fila.style.display = mostrar ? '' : 'none';
         });
@@ -210,25 +205,17 @@
         document.getElementById('vehiculo-año').value = año;
         document.getElementById('vehiculo-cliente').value = clienteId;
         document.getElementById('vehiculo-proveedor').value = proveedorId || '';
-        document.getElementById('vehiculo-es-propio').checked = esPropio === 'true' || esPropio === true;
         document.getElementById('vehiculo-patente').value = patente || '';
+        
+        // Asegurar que el campo proveedor esté visible (siempre visible ahora)
+        const proveedorField = document.getElementById('vehiculo-proveedor').closest('div');
+        if (proveedorField) {
+            proveedorField.style.display = 'block';
+        }
         
         document.getElementById('vehiculo-form').action = '{{ route("rodados.update", ":id") }}'.replace(':id', id);
         document.getElementById('vehiculo-modal-title').textContent = 'Editar Vehículo';
         document.getElementById('vehiculo-modal').classList.remove('hidden');
-        
-        toggleProveedorField();
-    }
-
-    function toggleProveedorField() {
-        const esPropio = document.getElementById('vehiculo-es-propio').checked;
-        const proveedorField = document.getElementById('vehiculo-proveedor').closest('div');
-        if (esPropio) {
-            proveedorField.style.display = 'none';
-            document.getElementById('vehiculo-proveedor').value = '';
-        } else {
-            proveedorField.style.display = 'block';
-        }
     }
 </script>
 

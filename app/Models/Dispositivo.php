@@ -61,6 +61,11 @@ class Dispositivo extends Model
                     ->withTimestamps();
     }
 
+    public function cambiosEquipos()
+    {
+        return $this->hasMany(CambioEquipoRodado::class);
+    }
+
     // Scopes
     
     public function scopeInstalados($query)

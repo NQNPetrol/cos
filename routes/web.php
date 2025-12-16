@@ -697,11 +697,17 @@ Route::middleware([
         Route::post('/turnos', [\App\Http\Controllers\TurnoRodadoController::class, 'store'])->name('turnos.store');
         Route::put('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'update'])->name('turnos.update');
         Route::delete('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'destroy'])->name('turnos.destroy');
+        Route::post('/turnos/{turno}/adjuntar-factura', [\App\Http\Controllers\TurnoRodadoController::class, 'adjuntarFactura'])->name('turnos.adjuntar-factura');
+        Route::post('/turnos/{turno}/aprobar-cobertura', [\App\Http\Controllers\TurnoRodadoController::class, 'aprobarCobertura'])->name('turnos.aprobar-cobertura');
+        Route::post('/turnos/{turno}/rechazar-cobertura', [\App\Http\Controllers\TurnoRodadoController::class, 'rechazarCobertura'])->name('turnos.rechazar-cobertura');
+        Route::post('/turnos/{turno}/cancelar', [\App\Http\Controllers\TurnoRodadoController::class, 'cancelarTurno'])->name('turnos.cancelar');
+        Route::post('/turnos/{turno}/reprogramar', [\App\Http\Controllers\TurnoRodadoController::class, 'reprogramarTurno'])->name('turnos.reprogramar');
         
         // Cambios de Equipos
         Route::post('/cambios-equipos', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'store'])->name('cambios-equipos.store');
         Route::put('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'update'])->name('cambios-equipos.update');
         Route::delete('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'destroy'])->name('cambios-equipos.destroy');
+        Route::post('/cambios-equipos/{cambio}/adjuntar-factura', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'adjuntarFactura'])->name('cambios-equipos.adjuntar-factura');
         
         // Kilometraje
         Route::post('/kilometraje', [\App\Http\Controllers\RegistroKilometrajeController::class, 'store'])->name('kilometraje.store');
@@ -711,6 +717,12 @@ Route::middleware([
         Route::post('/pagos', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'store'])->name('pagos.store');
         Route::put('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'update'])->name('pagos.update');
         Route::delete('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'destroy'])->name('pagos.destroy');
+        Route::post('/pagos/{pago}/adjuntar-factura', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'adjuntarFactura'])->name('pagos.adjuntar-factura');
+        
+        // Calendario
+        Route::get('/calendario', [\App\Http\Controllers\CalendarioRodadosController::class, 'index'])->name('calendario.index');
+        Route::get('/calendario/eventos', [\App\Http\Controllers\CalendarioRodadosController::class, 'getEventos'])->name('calendario.eventos');
+        Route::get('/calendario/evento/{tipo}/{id}', [\App\Http\Controllers\CalendarioRodadosController::class, 'getDetalleEvento'])->name('calendario.evento');
         
         // Proveedores y Talleres (CRUD auxiliar)
         Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);

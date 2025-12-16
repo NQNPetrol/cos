@@ -23,7 +23,7 @@
                             <option value="">Seleccione un vehículo</option>
                             @foreach($rodados as $rodado)
                                 <option value="{{ $rodado->id }}">
-                                    {{ $rodado->marca }} {{ $rodado->modelo }}
+                                    {{ $rodado->patente ?? 'Sin patente' }}
                                     @if($rodado->kilometrajeActual)
                                         (Actual: {{ number_format($rodado->kilometrajeActual->kilometraje, 0, ',', '.') }} km)
                                     @endif

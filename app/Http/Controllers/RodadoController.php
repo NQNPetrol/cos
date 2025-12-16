@@ -18,15 +18,32 @@ class RodadoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rodados = Rodado::with(['cliente', 'proveedor', 'kilometrajeActual'])
-            ->latest()
-            ->get();
+        $query = Rodado::with(['cliente', 'proveedor', 'kilometrajeActual']);
+
+        // Filtro por propiedad (proveedor o propio)
+        if ($request->filled('propiedad')) {
+            if ($request->propiedad === 'propio') {
+                $query->where('es_propio', true)
+                      ->whereNull('proveedor_id');
+            } elseif ($request->propiedad !== 'todos') {
+                // Filtrar por proveedor específico
+                $query->where('proveedor_id', $request->propiedad);
+            }
+        }
+
+        $rodados = $query->latest()->get();
 
         $clientes = Cliente::orderBy('nombre')->get();
         $proveedores = Proveedor::orderBy('nombre')->get();
         $talleres = Taller::orderBy('nombre')->get();
+        
+        // Dispositivos para el modal de cambio de equipo (camara_ip, nvr_dvr, antena_starlink)
+        $dispositivos = \App\Models\Dispositivo::whereIn('tipo', ['camara_ip', 'nvr_dvr', 'antena_starlink'])
+            ->where('estado_inventario', 'En stock')
+            ->orderBy('nombre')
+            ->get();
 
         // Obtener datos para las pestañas
         $turnos = TurnoRodado::with(['rodado', 'taller'])
@@ -89,7 +106,8 @@ class RodadoController extends Controller
             'turnos',
             'cambiosEquipos',
             'pagos',
-            'todosLosServicios'
+            'todosLosServicios',
+            'dispositivos'
         ));
     }
 
@@ -124,8 +142,8 @@ class RodadoController extends Controller
     public function update(Request $request, Rodado $rodado)
     {
         $validated = $request->validate([
-            'marca' => 'required|string|max:255',
-            'tipo_vehiculo' => 'required|string|max:255',
+            'marca' => ['required', 'string', 'in:' . implode(',', Rodado::getMarcas())],
+            'tipo_vehiculo' => ['required', 'string', 'in:' . implode(',', Rodado::getTiposVehiculo())],
             'modelo' => 'required|string|max:255',
             'año' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'proveedor_id' => 'nullable|exists:proveedores,id',

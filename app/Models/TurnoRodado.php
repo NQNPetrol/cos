@@ -31,6 +31,7 @@ class TurnoRodado extends Model
         'dias_vencimiento',
         'fecha_vencimiento_pago',
         'estado',
+        'partes_afectadas',
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class TurnoRodado extends Model
         'cubre_servicio' => 'boolean',
         'pago_mano_obra' => 'decimal:2',
         'dias_vencimiento' => 'integer',
+        'partes_afectadas' => 'array',
     ];
 
     const TIPO_TURNO_SERVICE = 'turno_service';
@@ -49,6 +51,30 @@ class TurnoRodado extends Model
 
     const ESTADO_PENDIENTE = 'pendiente';
     const ESTADO_COMPLETADO = 'completado';
+    const ESTADO_CANCELADO = 'cancelado';
+    const ESTADO_ATENDIDO = 'atendido';
+
+    public function getPartesAfectadasAttribute($value)
+    {
+        if (is_null($value)) {
+            return [];
+        }
+        
+        if (is_string($value)) {
+            return json_decode($value, true) ?? [];
+        }
+        
+        return $value ?? [];
+    }
+
+    public function setPartesAfectadasAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['partes_afectadas'] = json_encode($value);
+        } else {
+            $this->attributes['partes_afectadas'] = $value;
+        }
+    }
 
     public function rodado(): BelongsTo
     {

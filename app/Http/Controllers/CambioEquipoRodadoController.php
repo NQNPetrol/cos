@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CambioEquipoRodado;
+use App\Models\Dispositivo;
 use Illuminate\Support\Facades\Storage;
 
 class CambioEquipoRodadoController extends Controller
@@ -15,27 +16,52 @@ class CambioEquipoRodadoController extends Controller
             'taller_id' => 'required|exists:talleres,id',
             'tipo' => 'required|in:cubiertas,antena_starlink,camara_mobil,dvr',
             'fecha_hora_estimada' => 'required|date',
-            'tipo_cubierta' => 'nullable|string|max:255',
-            'pago_mano_obra' => 'required|numeric|min:0',
-            'factura' => 'nullable|file|mimes:pdf,jpg,jpeg|max:10240',
-            'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg|max:10240',
-            'kilometraje_en_cambio' => 'required|integer|min:0',
+            'tipo_cubierta' => 'nullable|string|max:255|required_if:tipo,cubiertas',
+            'pago_mano_obra' => 'nullable|numeric|min:0',
+            'motivo' => 'nullable|string',
+            'dispositivo_id' => 'nullable|exists:dispositivos,id',
+            'detalle_equipo_nuevo' => 'nullable|string',
+            'detalle_equipo_viejo' => 'nullable|string',
         ]);
 
-        // Manejar archivos
-        if ($request->hasFile('factura')) {
-            $factura = $request->file('factura');
-            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
-        }
+        // Validar que si tipo requiere dispositivo, se proporcione dispositivo_id o detalle_equipo_nuevo
+        $tiposQueRequierenDispositivo = [
+            CambioEquipoRodado::TIPO_ANTENA_STARLINK,
+            CambioEquipoRodado::TIPO_CAMARA_MOBIL,
+            CambioEquipoRodado::TIPO_DVR,
+        ];
 
-        if ($request->hasFile('comprobante_pago')) {
-            $comprobante = $request->file('comprobante_pago');
-            $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $validated['rodado_id'] . '/comprobantes', 'public');
+        if (in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+            if (empty($validated['dispositivo_id']) && empty($validated['detalle_equipo_nuevo'])) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['dispositivo_id' => 'Debe seleccionar un dispositivo del inventario o proporcionar detalles del equipo nuevo.']);
+            }
         }
 
         // Limpiar tipo_cubierta si no es tipo cubiertas
-        if ($validated['tipo'] !== 'cubiertas') {
+        if ($validated['tipo'] !== CambioEquipoRodado::TIPO_CUBIERTAS) {
             $validated['tipo_cubierta'] = null;
+        }
+
+        // Limpiar campos de dispositivo si no aplican
+        if (!in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+            $validated['dispositivo_id'] = null;
+            $validated['detalle_equipo_nuevo'] = null;
+        }
+
+        // Procesar dispositivo_id_viejo manual si viene del formulario
+        if ($request->has('dispositivo_id_viejo') && $request->dispositivo_id_viejo === 'manual') {
+            // Si es manual, el detalle está en detalle_equipo_viejo_manual
+            if ($request->has('detalle_equipo_viejo_manual')) {
+                $validated['detalle_equipo_viejo'] = $request->detalle_equipo_viejo_manual;
+            }
+        }
+
+        // Procesar dispositivo_id cuando es "manual"
+        if ($request->has('dispositivo_id') && $request->dispositivo_id === 'manual') {
+            // El detalle del nuevo equipo ya está en detalle_equipo_nuevo
+            $validated['dispositivo_id'] = null;
         }
 
         $cambio = CambioEquipoRodado::create($validated);
@@ -51,33 +77,52 @@ class CambioEquipoRodadoController extends Controller
             'taller_id' => 'required|exists:talleres,id',
             'tipo' => 'required|in:cubiertas,antena_starlink,camara_mobil,dvr',
             'fecha_hora_estimada' => 'required|date',
-            'tipo_cubierta' => 'nullable|string|max:255',
-            'pago_mano_obra' => 'required|numeric|min:0',
-            'factura' => 'nullable|file|mimes:pdf,jpg,jpeg|max:10240',
-            'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg|max:10240',
-            'kilometraje_en_cambio' => 'required|integer|min:0',
+            'tipo_cubierta' => 'nullable|string|max:255|required_if:tipo,cubiertas',
+            'pago_mano_obra' => 'nullable|numeric|min:0',
+            'motivo' => 'nullable|string',
+            'dispositivo_id' => 'nullable|exists:dispositivos,id',
+            'detalle_equipo_nuevo' => 'nullable|string',
+            'detalle_equipo_viejo' => 'nullable|string',
         ]);
 
-        // Manejar archivos nuevos
-        if ($request->hasFile('factura')) {
-            if ($cambio->factura_path) {
-                Storage::disk('public')->delete($cambio->factura_path);
-            }
-            $factura = $request->file('factura');
-            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
-        }
+        // Validar que si tipo requiere dispositivo, se proporcione dispositivo_id o detalle_equipo_nuevo
+        $tiposQueRequierenDispositivo = [
+            CambioEquipoRodado::TIPO_ANTENA_STARLINK,
+            CambioEquipoRodado::TIPO_CAMARA_MOBIL,
+            CambioEquipoRodado::TIPO_DVR,
+        ];
 
-        if ($request->hasFile('comprobante_pago')) {
-            if ($cambio->comprobante_pago_path) {
-                Storage::disk('public')->delete($cambio->comprobante_pago_path);
+        if (in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+            if (empty($validated['dispositivo_id']) && empty($validated['detalle_equipo_nuevo'])) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['dispositivo_id' => 'Debe seleccionar un dispositivo del inventario o proporcionar detalles del equipo nuevo.']);
             }
-            $comprobante = $request->file('comprobante_pago');
-            $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $validated['rodado_id'] . '/comprobantes', 'public');
         }
 
         // Limpiar tipo_cubierta si no es tipo cubiertas
-        if ($validated['tipo'] !== 'cubiertas') {
+        if ($validated['tipo'] !== CambioEquipoRodado::TIPO_CUBIERTAS) {
             $validated['tipo_cubierta'] = null;
+        }
+
+        // Limpiar campos de dispositivo si no aplican
+        if (!in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+            $validated['dispositivo_id'] = null;
+            $validated['detalle_equipo_nuevo'] = null;
+        }
+
+        // Procesar dispositivo_id_viejo manual si viene del formulario
+        if ($request->has('dispositivo_id_viejo') && $request->dispositivo_id_viejo === 'manual') {
+            // Si es manual, el detalle está en detalle_equipo_viejo_manual
+            if ($request->has('detalle_equipo_viejo_manual')) {
+                $validated['detalle_equipo_viejo'] = $request->detalle_equipo_viejo_manual;
+            }
+        }
+
+        // Procesar dispositivo_id cuando es "manual"
+        if ($request->has('dispositivo_id') && $request->dispositivo_id === 'manual') {
+            // El detalle del nuevo equipo ya está en detalle_equipo_nuevo
+            $validated['dispositivo_id'] = null;
         }
 
         $cambio->update($validated);
@@ -100,5 +145,38 @@ class CambioEquipoRodadoController extends Controller
 
         return redirect()->route('rodados.index')
             ->with('success', 'Cambio de equipo eliminado exitosamente.');
+    }
+
+    public function adjuntarFactura(Request $request, CambioEquipoRodado $cambio)
+    {
+        $validated = $request->validate([
+            'factura' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        // Manejar factura
+        if ($request->hasFile('factura')) {
+            // Eliminar factura anterior si existe
+            if ($cambio->factura_path) {
+                Storage::disk('public')->delete($cambio->factura_path);
+            }
+            $factura = $request->file('factura');
+            $validated['factura_path'] = $factura->store('rodados/' . $cambio->rodado_id . '/facturas', 'public');
+        }
+
+        // Manejar comprobante de pago
+        if ($request->hasFile('comprobante_pago')) {
+            // Eliminar comprobante anterior si existe
+            if ($cambio->comprobante_pago_path) {
+                Storage::disk('public')->delete($cambio->comprobante_pago_path);
+            }
+            $comprobante = $request->file('comprobante_pago');
+            $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $cambio->rodado_id . '/comprobantes', 'public');
+        }
+
+        $cambio->update($validated);
+
+        return redirect()->route('rodados.index')
+            ->with('success', 'Factura adjuntada exitosamente.');
     }
 }

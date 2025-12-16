@@ -12,7 +12,7 @@
                 </button>
             </div>
 
-            <form id="pago-form" method="POST" action="{{ route('rodados.pagos.store') }}" enctype="multipart/form-data">
+            <form id="pago-form" method="POST" action="{{ route('rodados.pagos.store') }}">
                 @csrf
                 <input type="hidden" id="pago-id" name="id">
                 @method('POST')
@@ -25,8 +25,7 @@
                             <option value="">Seleccione un vehículo</option>
                             @foreach($rodados as $rodado)
                                 <option value="{{ $rodado->id }}" data-es-propio="{{ $rodado->es_propio ? '1' : '0' }}">
-                                    {{ $rodado->marca }} {{ $rodado->modelo }} 
-                                    ({{ $rodado->es_propio ? 'Propio' : 'Alquilado' }})
+                                    {{ $rodado->display_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -36,9 +35,13 @@
                         <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Pago *</label>
                         <select id="pago-tipo" name="tipo" required onchange="togglePagoFields()"
                             class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
-                            <option value="pago_patente">Pago Patente</option>
-                            <option value="pago_alquiler">Pago Alquiler</option>
-                            <option value="pago_proveedor">Pago Proveedor</option>
+                            <option value="pago_patente">Pago patente</option>
+                            <option value="pago_alquiler">Pago alquiler</option>
+                            <option value="pago_a_proveedor">Pago a proveedor</option>
+                            <option value="pago_seguro">Pago seguro</option>
+                            <option value="pago_servicio_starlink">Pago servicio Starlink</option>
+                            <option value="pago_vtv">Pago VTV</option>
+                            <option value="pagos_adicionales">Pagos adicionales</option>
                         </select>
                     </div>
 
@@ -53,41 +56,6 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Mes *</label>
-                            <select id="pago-mes" name="mes" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
-                                @for($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}" {{ $i == date('n') ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::create()->month($i)->locale('es')->monthName }}
-                                    </option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Año *</label>
-                            <select id="pago-año" name="año" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
-                                @for($i = date('Y'); $i >= date('Y') - 5; $i--)
-                                    <option value="{{ $i }}" {{ $i == date('Y') ? 'selected' : '' }}>{{ $i }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Monto *</label>
-                        <input type="number" id="pago-monto" name="monto" step="0.01" min="0" required
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
-                    </div>
-
-                    <div id="pago-monto-service-field" style="display: none;">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Monto Service (incluido en alquiler)</label>
-                        <input type="number" id="pago-monto-service" name="monto_service" step="0.01" min="0"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
-                    </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Fecha de Pago *</label>
                         <input type="date" id="pago-fecha" name="fecha_pago" required
@@ -97,15 +65,25 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Factura (PDF o JPG)</label>
-                            <input type="file" id="pago-factura" name="factura" accept=".pdf,.jpg,.jpeg"
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Moneda *</label>
+                            <select id="pago-moneda" name="moneda" required
                                 class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                <option value="ARS">Pesos argentinos ($)</option>
+                                <option value="USD">Dólares (USD$)</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Comprobante de Pago (PDF o JPG)</label>
-                            <input type="file" id="pago-comprobante" name="comprobante_pago" accept=".pdf,.jpg,.jpeg"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Monto *</label>
+                            <input type="number" id="pago-monto" name="monto" step="0.01" min="0" required
+                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                                placeholder="0.00">
                         </div>
+                    </div>
+
+                    <div id="pago-monto-service-field" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Monto Service (incluido en alquiler)</label>
+                        <input type="number" id="pago-monto-service" name="monto_service" step="0.01" min="0"
+                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                     </div>
                 </div>
 
@@ -165,9 +143,61 @@
         document.getElementById('pago-form').reset();
     }
 
-    // Actualizar método del formulario cuando se edita
+    // Validaciones del formulario de pago
     document.getElementById('pago-form')?.addEventListener('submit', function(e) {
-        const id = document.getElementById('pago-id').value;
+        const rodado = document.getElementById('pago-rodado')?.value;
+        const tipo = document.getElementById('pago-tipo')?.value;
+        const fechaPago = document.getElementById('pago-fecha')?.value;
+        const moneda = document.getElementById('pago-moneda')?.value;
+        const monto = document.getElementById('pago-monto')?.value;
+
+        // Validaciones básicas
+        if (!rodado) {
+            e.preventDefault();
+            alert('Por favor, seleccione un vehículo.');
+            return false;
+        }
+
+        if (!tipo) {
+            e.preventDefault();
+            alert('Por favor, seleccione un tipo de pago.');
+            return false;
+        }
+
+        if (!fechaPago) {
+            e.preventDefault();
+            alert('Por favor, ingrese la fecha de pago.');
+            return false;
+        }
+
+        if (!moneda) {
+            e.preventDefault();
+            alert('Por favor, seleccione una moneda.');
+            return false;
+        }
+
+        if (!monto || parseFloat(monto) <= 0) {
+            e.preventDefault();
+            alert('Por favor, ingrese un monto válido (mayor a 0).');
+            return false;
+        }
+
+        // Validar formato de monto
+        if (isNaN(parseFloat(monto))) {
+            e.preventDefault();
+            alert('Por favor, ingrese un monto numérico válido.');
+            return false;
+        }
+
+        // Validar que el monto no exceda un límite razonable (opcional)
+        if (parseFloat(monto) > 100000000) {
+            if (!confirm('El monto ingresado es muy alto. ¿Está seguro que es correcto?')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        const id = document.getElementById('pago-id')?.value;
         if (id) {
             this.action = '{{ route("rodados.pagos.update", ":id") }}'.replace(':id', id);
             const methodInput = document.createElement('input');
@@ -178,4 +208,3 @@
         }
     });
 </script>
-
