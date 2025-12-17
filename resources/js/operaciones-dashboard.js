@@ -587,8 +587,8 @@ class OperacionesDashboard {
             map: this.map,
             icon: {
                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
-                scaledSize: new google.maps.Size(32, 32),
-                anchor: new google.maps.Point(16, 16), // Centro del círculo
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 20), // Centro del círculo
                 origin: new google.maps.Point(0, 0)
             },
             title: `Evento #${evento.id}`,
@@ -624,11 +624,11 @@ class OperacionesDashboard {
         // Icono SVG de campana (bi bi-bell), adaptado al marker
         
         return `
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                 <!-- Círculo de fondo azul con borde blanco -->
-                <circle cx="16" cy="16" r="14" fill="#1877f2" stroke="#ffffff" stroke-width="2"/>
+                <circle cx="20" cy="20" r="17" fill="#1877f2" stroke="#ffffff" stroke-width="2"/>
                 <!-- Icono SVG blanco centrado (viewBox original 0 0 16 16, escalado a ~16x16) -->
-                <g transform="translate(8, 8) scale(1)">
+                <g transform="translate(10, 10) scale(1)">
                     <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"
                           fill="none"
                           stroke="#ffffff"
@@ -649,8 +649,8 @@ class OperacionesDashboard {
             map: this.map,
             icon: {
                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
-                scaledSize: new google.maps.Size(32, 32),
-                anchor: new google.maps.Point(16, 16),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 20),
                 origin: new google.maps.Point(0, 0),
             },
             title: vehiculo.vehicle_name,
@@ -681,11 +681,11 @@ class OperacionesDashboard {
      */
     createVehiculoMarkerIcon() {
         return `
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                 <!-- Fondo circular color #d56434 con borde blanco -->
-                <circle cx="16" cy="16" r="14" fill="#d56434" stroke="#ffffff" stroke-width="2" />
+                <circle cx="20" cy="20" r="17" fill="#d56434" stroke="#ffffff" stroke-width="2" />
                 <!-- Icono de vehículo centrado (bi bi-car-front-fill) -->
-                <g transform="translate(8, 8)" fill="#ffffff">
+                <g transform="translate(10, 10)" fill="#ffffff">
                     <path d="M2.52 3.515A2.5 2.5 0 0 1 4.82 2h6.362c1 0 1.904.596 2.298 1.515l.792 1.848c.075.175.21.319.38.404.5.25.855.715.965 1.262l.335 1.679q.05.242.049.49v.413c0 .814-.39 1.543-1 1.997V13.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1.338c-1.292.048-2.745.088-4 .088s-2.708-.04-4-.088V13.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1.892c-.61-.454-1-1.183-1-1.997v-.413a2.5 2.5 0 0 1 .049-.49l.335-1.68c.11-.546.465-1.012.964-1.261a.8.8 0 0 0 .381-.404l.792-1.848ZM3 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2m10 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2M6 8a1 1 0 0 0 0 2h4a1 1 0 1 0 0-2zM2.906 5.189a.51.51 0 0 0 .497.731c.91-.073 3.35-.17 4.597-.17s3.688.097 4.597.17a.51.51 0 0 0 .497-.731l-.956-1.913A.5.5 0 0 0 11.691 3H4.309a.5.5 0 0 0-.447.276L2.906 5.19Z"/>
                 </g>
             </svg>
@@ -701,8 +701,8 @@ class OperacionesDashboard {
             map: this.map,
             icon: {
                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
-                scaledSize: new google.maps.Size(32, 32),
-                anchor: new google.maps.Point(16, 16),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 20),
                 origin: new google.maps.Point(0, 0),
             },
             title: dock.nombre,
@@ -732,11 +732,11 @@ class OperacionesDashboard {
      */
     createDockMarkerIcon() {
         return `
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                 <!-- Fondo circular violeta oscuro con borde blanco -->
-                <circle cx="16" cy="16" r="14" fill="#4c1d95" stroke="#ffffff" stroke-width="2" />
+                <circle cx="20" cy="20" r="17" fill="#4c1d95" stroke="#ffffff" stroke-width="2" />
                 <!-- Icono bi bi-box2 centrado -->
-                <g transform="translate(8, 8) scale(1)">
+                <g transform="translate(10, 10) scale(1)">
                     <path d="M2.95.4a1 1 0 0 1 .8-.4h8.5a1 1 0 0 1 .8.4l2.85 3.8a.5.5 0 0 1 .1.3V15a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4.5a.5.5 0 0 1 .1-.3zM7.5 1H3.75L1.5 4h6zm1 0v3h6l-2.25-3zM15 5H1v10h14z"
                           fill="#ffffff" />
                 </g>
@@ -775,8 +775,8 @@ class OperacionesDashboard {
             map: this.map,
             icon: {
                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
-                scaledSize: new google.maps.Size(32, 32),
-                anchor: new google.maps.Point(16, 16),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 20),
                 origin: new google.maps.Point(0, 0),
             },
             title: camara.camera_name,
@@ -810,11 +810,11 @@ class OperacionesDashboard {
      */
     createCamaraMarkerIcon() {
         return `
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                 <!-- Fondo circular color #426760 con borde blanco -->
-                <circle cx="16" cy="16" r="14" fill="#426760" stroke="#ffffff" stroke-width="2" />
+                <circle cx="20" cy="20" r="17" fill="#426760" stroke="#ffffff" stroke-width="2" />
                 <!-- Icono de cámara sencillo centrado, basado en SVG (viewBox 0 0 24 24) -->
-                <g transform="translate(4,4)" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <g transform="translate(5,5)" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12.5 16h-7.5a2 2 0 0 1 -2 -2v-7a2 2 0 0 1 2 -2h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v2" />
                     <path d="M14.933 8.366a3.001 3.001 0 1 0 -2.933 3.634" />
                     <path d="M21.121 16.121a3 3 0 1 0 -4.242 0c.418 .419 1.125 1.045 2.121 1.879c1.051 -.89 1.759 -1.516 2.121 -1.879z" />
@@ -984,7 +984,7 @@ class OperacionesDashboard {
                     </div>
                 </div>
                 <div class="tooltip-footer">
-                    <a href="/cameras/${camara.camera_index_code}/liveview" class="tooltip-btn" target="_blank">
+                    <a href="/cameras/stream/${camara.camera_index_code}" class="tooltip-btn" target="_blank">
                         Ver Liveview
                     </a>
                 </div>

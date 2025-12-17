@@ -977,12 +977,23 @@ body.modern-ui {
     font-size: 18px;
 }
 
-/* KPIs Grid */
+/* KPIs Grid - usa display: contents para que los KPIs sean hijos directos del grid principal */
 .operaciones-kpis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: contents;
+}
+
+/* KPIs Secundarios (debajo del mapa, alineados a la derecha) */
+.operaciones-kpis-secondary {
+    display: flex;
+    flex-direction: column;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-top: 24px;
+    width: 400px;
+    margin-left: auto; /* Alinear a la derecha */
+}
+
+.operaciones-kpis-secondary .operaciones-kpi-card {
+    min-height: auto; /* Permitir altura natural */
 }
 
 .operaciones-kpi-card {
@@ -991,6 +1002,10 @@ body.modern-ui {
     border-radius: 12px;
     padding: 20px;
     transition: all 0.2s ease;
+    min-height: 140px; /* Asegurar altura mínima consistente */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .operaciones-kpi-card:hover {
@@ -1044,7 +1059,7 @@ body.modern-ui {
 /* Mapa Container */
 .operaciones-map-container {
     position: relative;
-    height: 600px;
+    height: 690px;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--fb-border);
@@ -1130,7 +1145,7 @@ body.modern-ui {
     border: 1px solid var(--fb-border);
     border-radius: 12px;
     padding: 16px;
-    height: 600px;
+    height: 690px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1379,11 +1394,67 @@ body.modern-ui {
     color: var(--fb-text-secondary);
 }
 
-/* Grid Principal */
+/* Grid Principal - 6 columnas */
 .operaciones-main-grid {
     display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 24px;
+    grid-template-columns: repeat(5, 1fr) 400px;
+    gap: 16px;
+    align-items: start;
+}
+
+/* Contenedor de botones de acceso rápido (columna 6) */
+.quick-access-container {
+    grid-column: 6;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 140px; /* Misma altura que los KPIs */
+}
+
+/* Mapa Container (5 columnas) */
+.operaciones-map-container {
+    grid-column: span 5;
+}
+
+/* Listado de Eventos (columna 6) */
+.operaciones-eventos-list {
+    grid-column: 6;
+}
+
+/* Botones de acceso rápido en sidebar de eventos */
+.quick-access-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    justify-content: flex-end;
+}
+
+.quick-access-btn-sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background-color: var(--fb-bg-secondary);
+    border: 1px solid var(--fb-border);
+    border-radius: 8px;
+    color: var(--fb-text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+}
+
+.quick-access-btn-sidebar:hover {
+    background-color: var(--fb-bg-tertiary);
+    border-color: var(--fb-accent-blue);
+    transform: translateY(-2px);
+}
+
+.quick-access-btn-sidebar i {
+    font-size: 18px;
 }
 
 /* Quick Access Buttons */
@@ -1522,17 +1593,63 @@ body.modern-ui {
 }
 
 /* Responsive */
+@media (max-width: 1400px) {
+    .operaciones-main-grid {
+        grid-template-columns: repeat(3, 1fr) 350px;
+    }
+    
+    .operaciones-kpis .operaciones-kpi-card:nth-child(4),
+    .operaciones-kpis .operaciones-kpi-card:nth-child(5) {
+        grid-column: span 1;
+    }
+    
+    .operaciones-map-container {
+        grid-column: span 3;
+    }
+    
+    .quick-access-container {
+        grid-column: 4;
+    }
+    
+    .operaciones-eventos-list {
+        grid-column: 4;
+    }
+}
+
 @media (max-width: 1200px) {
     .operaciones-main-grid {
         grid-template-columns: 1fr;
     }
     
-    .operaciones-eventos-list {
-        height: 400px;
+    .operaciones-kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-column: 1;
+    }
+    
+    .operaciones-kpis .operaciones-kpi-card {
+        grid-column: auto;
+    }
+    
+    .quick-access-container {
+        grid-column: 1;
+        flex-direction: row;
+        min-height: auto;
+        gap: 16px;
+    }
+    
+    .quick-access-sidebar {
+        flex-direction: row;
     }
     
     .operaciones-map-container {
-        height: 500px;
+        grid-column: 1;
+        height: 575px;
+    }
+    
+    .operaciones-eventos-list {
+        grid-column: 1;
+        height: 460px;
     }
 }
 
@@ -1542,7 +1659,15 @@ body.modern-ui {
     }
     
     .operaciones-kpis {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .quick-access-container {
+        flex-direction: column;
+    }
+    
+    .quick-access-sidebar {
+        flex-direction: column;
     }
     
     .dashboard-controls {
