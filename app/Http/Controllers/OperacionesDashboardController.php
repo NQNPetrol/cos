@@ -363,21 +363,49 @@ class OperacionesDashboardController extends Controller
         $camarasTotal = $camarasQuery->count();
 
         // 2. Vehículos vs Equipados
-        $vehiculosQuery = Rodado::query();
+        // Total de vehículos: todos los registros en rodados (con filtrado opcional por cliente)
+        $rodadosQuery = Rodado::query();
         if ($clienteId) {
-            $vehiculosQuery->where('cliente_id', $clienteId);
+            $rodadosQuery->where('cliente_id', $clienteId);
         }
-        $vehiculosTotal = $vehiculosQuery->count();
-        
-        // Vehículos equipados: rodados que tienen dispositivos instalados
-        // Esto se calcula a través de cambios de equipo o dispositivos con estado "Instalado"
-        $vehiculosEquipadosQuery = Rodado::whereHas('cambiosEquipos.dispositivo', function($q) {
-            $q->where('estado_inventario', 'Instalado');
-        });
+        $rodados = $rodadosQuery->select('patente')->get();
+        $vehiculosTotal = $rodados->count();
+
+        // Vehículos equipados:
+        // rodados cuya patente coincide con plate_no de mobile_vehicles (vehículos conectados)
+        $normalizePlaca = function ($value) {
+            if ($value === null) {
+                return null;
+            }
+
+            // Eliminar espacios y guiones, pasar a mayúsculas
+            $normalized = strtoupper(preg_replace('/[\s\-]+/', '', (string) $value));
+
+            return $normalized !== '' ? $normalized : null;
+        };
+
+        // Patentes de rodados normalizadas
+        $patentesRodados = $rodados->pluck('patente')
+            ->map($normalizePlaca)
+            ->filter()
+            ->unique();
+
+        // Placas en mobile_vehicles normalizadas
+        $mobileQuery = MobileVehicle::query();
         if ($clienteId) {
-            $vehiculosEquipadosQuery->where('cliente_id', $clienteId);
+            // Filtrar mobile_vehicles por cliente a través de la relación con patrulla
+            $mobileQuery->whereHas('patrulla', function ($q) use ($clienteId) {
+                $q->where('cliente_id', $clienteId);
+            });
         }
-        $vehiculosEquipados = $vehiculosEquipadosQuery->count();
+
+        $platesMobile = $mobileQuery->pluck('plate_no')
+            ->map($normalizePlaca)
+            ->filter()
+            ->unique();
+
+        // Intersección de patentes entre rodados y mobile_vehicles
+        $vehiculosEquipados = $patentesRodados->intersect($platesMobile)->count();
 
         // 3. Trending de Eventos (30 días)
         $hoy = now();

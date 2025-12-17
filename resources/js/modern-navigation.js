@@ -61,7 +61,7 @@ class ModernNavigation {
             return 'home';
         } else {
             if (path.includes('/clientes') || path.includes('/personal') || path.includes('/empresas-asociadas') || path.includes('/contratos')) return 'administracion';
-            if (path.includes('/eventos') || path.includes('/objetivos') || path.includes('/patrullas') || path.includes('/cameras') || path.includes('/anpr') || path.includes('/pilotos') || path.includes('/misiones-flytbase') || path.includes('/alertas') || path.includes('/flight-logs') || path.includes('/sites') || path.includes('/drones-flytbase') || path.includes('/docks-flytbase') || path.includes('/seguimientos')) return 'operaciones';
+            if (path.includes('/operaciones/dashboard') || path.includes('/eventos') || path.includes('/objetivos') || path.includes('/patrullas') || path.includes('/cameras') || path.includes('/anpr') || path.includes('/pilotos') || path.includes('/misiones-flytbase') || path.includes('/alertas') || path.includes('/flight-logs') || path.includes('/sites') || path.includes('/drones-flytbase') || path.includes('/docks-flytbase') || path.includes('/seguimientos')) return 'operaciones';
             if (path.includes('/permisos') || path.includes('/roles') || path.includes('/usuarios') || path.includes('/tickets') || path.includes('/inventario') || path.includes('/gallery') || path.includes('/notifications')) return 'sistema';
             return 'home';
         }

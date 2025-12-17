@@ -1172,6 +1172,26 @@ body.modern-ui {
     min-height: 0;
 }
 
+/* Scrollbar del listado de eventos - casi imperceptible, mismo color que el contenedor */
+.operaciones-eventos-list .eventos-list-content {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--fb-bg-secondary) var(--fb-bg-secondary);
+}
+
+.operaciones-eventos-list .eventos-list-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.operaciones-eventos-list .eventos-list-content::-webkit-scrollbar-track {
+    background: var(--fb-bg-secondary); /* Mismo color que el fondo del contenedor */
+}
+
+.operaciones-eventos-list .eventos-list-content::-webkit-scrollbar-thumb {
+    background-color: var(--fb-bg-secondary); /* Casi se funde con el track */
+    border-radius: 8px;
+    border: 2px solid var(--fb-bg-secondary);
+}
+
 .eventos-loading {
     display: flex;
     flex-direction: column;
