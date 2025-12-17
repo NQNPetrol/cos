@@ -79,11 +79,14 @@ class ModernNavigation {
                 // Update active state
                 this.setActiveTopBarButton(dashboard);
                 
-                // Handle Operaciones special case (Level 1)
+                // Operaciones: mostrar menú de operaciones (nivel 1) y navegar al dashboard operacional
                 if (dashboard === 'operaciones') {
                     this.navigateToLevel('operaciones-level1', 'operaciones');
+                    if (route && route !== '#') {
+                        window.location.href = route;
+                    }
                 } else {
-                    // For other dashboards, navigate to main level
+                    // Otros dashboards: navegar al nivel principal y luego a la ruta asociada
                     this.navigateToLevel('main', dashboard);
                     if (route && route !== '#') {
                         window.location.href = route;

@@ -12,6 +12,12 @@ class OperacionesDashboard {
             docks: [],
             camaras: []
         };
+        this.clusterMarkers = {
+            eventos: [],
+            vehiculos: [],
+            docks: [],
+            camaras: []
+        };
         this.filters = {
             cliente_id: null,
             estado_evento: [],
@@ -103,9 +109,18 @@ class OperacionesDashboard {
             styles: []
         });
         
-        // Ajustar mapa cuando cambie de tamaño
+        // Ajustar comportamiento al cambiar tamaño, zoom o al mover el mapa
         google.maps.event.addListener(this.map, 'resize', () => {
             this.fitMapToMarkers();
+            this.updateMarkerClusters();
+        });
+
+        google.maps.event.addListener(this.map, 'zoom_changed', () => {
+            this.updateMarkerClusters();
+        });
+
+        google.maps.event.addListener(this.map, 'dragend', () => {
+            this.updateMarkerClusters();
         });
     }
     
@@ -209,6 +224,22 @@ class OperacionesDashboard {
             if (!data.success) {
                 throw new Error(data.message || 'Error al cargar datos');
             }
+
+            console.groupCollapsed('[OperacionesDashboard] loadMapData');
+            console.log('Filtros aplicados:', {
+                cliente_id: filters.cliente_id || this.filters.cliente_id || null,
+                estado_evento: filters.estado_evento || this.filters.estado_evento || [],
+            });
+            console.log('Conteos recibidos:', {
+                eventos: data.eventos ? data.eventos.length : 0,
+                vehiculos: data.vehiculos ? data.vehiculos.length : 0,
+                docks: data.docks ? data.docks.length : 0,
+                camaras: data.camaras ? data.camaras.length : 0,
+            });
+            if (data.camaras && data.camaras.length) {
+                console.log('Primeras cámaras recibidas (máx 5):', data.camaras.slice(0, 5));
+            }
+            console.groupEnd();
             
             this.renderMapData(data);
             this.hideLoadingState();
@@ -221,6 +252,14 @@ class OperacionesDashboard {
     }
     
     renderMapData(data) {
+        console.groupCollapsed('[OperacionesDashboard] renderMapData');
+        console.log('Datos de entrada para renderizado:', {
+            eventos: data.eventos ? data.eventos.length : 0,
+            vehiculos: data.vehiculos ? data.vehiculos.length : 0,
+            docks: data.docks ? data.docks.length : 0,
+            camaras: data.camaras ? data.camaras.length : 0,
+        });
+
         this.clearMarkers();
         
         // Crear markers para eventos
@@ -251,11 +290,22 @@ class OperacionesDashboard {
             });
         }
         
+        console.log('Markers creados en memoria:', {
+            eventos: this.markers.eventos.length,
+            vehiculos: this.markers.vehiculos.length,
+            docks: this.markers.docks.length,
+            camaras: this.markers.camaras.length,
+        });
+        console.groupEnd();
+
+        // Actualizar clusters de markers (eventos, vehículos, docks y cámaras)
+        this.updateMarkerClusters();
+
         this.fitMapToMarkers();
     }
     
     clearMarkers() {
-        // Limpiar todos los markers
+        // Limpiar todos los markers individuales
         Object.values(this.markers).forEach(markerArray => {
             markerArray.forEach(marker => {
                 marker.setMap(null);
@@ -269,10 +319,263 @@ class OperacionesDashboard {
             camaras: []
         };
         
+        // Limpiar cluster markers (burbujas negras por tipo)
+        Object.values(this.clusterMarkers).forEach(clusterArray => {
+            clusterArray.forEach(marker => {
+                marker.setMap(null);
+            });
+        });
+
+        this.clusterMarkers = {
+            eventos: [],
+            vehiculos: [],
+            docks: [],
+            camaras: []
+        };
+        
         if (this.currentInfoWindow) {
             this.currentInfoWindow.close();
             this.currentInfoWindow = null;
         }
+    }
+
+    updateMarkerClusters() {
+        if (!this.map) return;
+
+        const bounds = this.map.getBounds();
+        const zoom = this.map.getZoom() || 12;
+        const projection = this.map.getProjection();
+
+        console.groupCollapsed('[OperacionesDashboard] updateMarkerClusters');
+        console.log('Estado inicial clustering:', {
+            zoom,
+            hasBounds: !!bounds,
+            hasProjection: !!projection,
+        });
+
+        // Si aún no hay proyección disponible, no intentamos clusterizar
+        if (!projection) {
+            console.warn('[OperacionesDashboard] Proyección no disponible aún, se omite clustering en esta llamada.');
+            console.groupEnd();
+            return;
+        }
+
+        // Limpiar cluster markers anteriores
+        Object.values(this.clusterMarkers).forEach(clusterArray => {
+            clusterArray.forEach(marker => marker.setMap(null));
+        });
+        this.clusterMarkers = {
+            eventos: [],
+            vehiculos: [],
+            docks: [],
+            camaras: []
+        };
+
+        // A partir de cierto nivel de zoom, no usamos clusters:
+        // se muestran todos los markers individuales y NO se dibujan burbujas.
+        const clusterOffZoom = 16;
+        if (zoom >= clusterOffZoom) {
+            console.log('[OperacionesDashboard] Zoom >= clusterOffZoom, solo markers individuales visibles', {
+                zoom,
+                clusterOffZoom,
+            });
+
+            ['eventos', 'vehiculos', 'docks', 'camaras'].forEach(tipo => {
+                const arr = this.markers[tipo] || [];
+                arr.forEach(marker => {
+                    if (marker && !marker.getMap()) {
+                        marker.setMap(this.map);
+                    }
+                });
+            });
+            console.groupEnd();
+            return;
+        }
+
+        // Umbral de distancia en píxeles según nivel de zoom
+        const thresholdPx = this.getClusterThresholdPixels(zoom);
+        console.log('[OperacionesDashboard] Parámetros de clustering:', {
+            zoom,
+            thresholdPx,
+        });
+
+        ['eventos', 'vehiculos', 'docks', 'camaras'].forEach(tipo => {
+            const sourceMarkers = this.markers[tipo] || [];
+            if (!sourceMarkers.length) return;
+
+            // Tomar solo markers visibles en el viewport para el recuento
+            const visibleMarkers = bounds
+                ? sourceMarkers.filter(m => bounds.contains(m.getPosition()))
+                : sourceMarkers;
+
+            console.groupCollapsed(`[OperacionesDashboard] Tipo ${tipo}`);
+            console.log('Markers por tipo:', {
+                total: sourceMarkers.length,
+                visiblesEnViewport: visibleMarkers.length,
+            });
+
+            if (!visibleMarkers.length) {
+                console.log('No hay markers visibles para este tipo en el viewport actual.');
+                console.groupEnd();
+                return;
+            }
+
+            // En modo "cluster": ocultamos todos los markers de este tipo y luego
+            // dejamos visibles solo los anclas de cada cluster.
+            sourceMarkers.forEach(marker => {
+                if (marker && marker.getMap()) {
+                    marker.setMap(null);
+                }
+            });
+
+            const clusters = this.buildClustersForMarkers(visibleMarkers, thresholdPx, projection, zoom);
+            console.log('Clusters calculados para tipo', tipo, {
+                clustersCount: clusters.length,
+                detalleClusters: clusters.map((cluster, idx) => {
+                    return {
+                        index: idx,
+                        count: cluster.count,
+                        anchorsLatLng: {
+                            lat: cluster.markers[0].getPosition().lat(),
+                            lng: cluster.markers[0].getPosition().lng(),
+                        },
+                    };
+                }),
+            });
+
+            clusters.forEach(cluster => {
+                const anchorMarker = cluster.markers[0];
+                const pos = anchorMarker.getPosition();
+
+                // Mostrar solo el marker ancla de este cluster (1 marker por zona y tipo)
+                if (!anchorMarker.getMap()) {
+                    anchorMarker.setMap(this.map);
+                }
+
+                // Desplazar la burbuja unos metros hacia el norte para que quede "pegada" arriba
+                const bubblePos = this.offsetLatLng(pos, 30); // 30 m al norte
+                const svgIcon = this.createClusterBubbleIcon(cluster.count);
+
+                const clusterMarker = new google.maps.Marker({
+                    position: bubblePos,
+                    map: this.map,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
+                        scaledSize: new google.maps.Size(22, 22),
+                        anchor: new google.maps.Point(11, 22),
+                        origin: new google.maps.Point(0, 0),
+                    },
+                    clickable: false,
+                    zIndex: google.maps.Marker.MAX_ZINDEX + 10
+                });
+
+                this.clusterMarkers[tipo].push(clusterMarker);
+            });
+
+            console.groupEnd();
+        });
+
+        console.groupEnd();
+    }
+
+    /**
+     * Devuelve el umbral de distancia en píxeles para considerar dos markers dentro del mismo cluster,
+     * en función del nivel de zoom actual.
+     */
+    getClusterThresholdPixels(zoom) {
+        // A más zoom, menor umbral en píxeles (en pantalla se ven más separados)
+        // En zooms muy lejanos queremos pocos clusters grandes por zona.
+        if (zoom >= 16) return 40;
+        if (zoom >= 14) return 60;
+        if (zoom >= 12) return 80;
+        if (zoom >= 10) return 110;
+        if (zoom >= 8)  return 150;
+        if (zoom >= 6)  return 200;
+        return 260; // zoom muy lejano (continente / mundo)
+    }
+
+    /**
+     * Agrupa markers por proximidad en PÍXELES (clusterización simple, O(n^2)).
+     */
+    buildClustersForMarkers(markers, thresholdPx, projection, zoom) {
+        const clusters = [];
+        const used = new Set();
+
+        // Precalcular posiciones en píxeles para cada marker
+        const pixels = markers.map(marker => {
+            const latLng = marker.getPosition();
+            return this.latLngToPixel(latLng, projection, zoom);
+        });
+
+        const distancePx = (p1, p2) => {
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        };
+
+        for (let i = 0; i < markers.length; i++) {
+            if (used.has(i)) continue;
+
+            const cluster = {
+                markers: [markers[i]],
+                count: 1
+            };
+            used.add(i);
+
+            for (let j = i + 1; j < markers.length; j++) {
+                if (used.has(j)) continue;
+
+                const dist = distancePx(pixels[i], pixels[j]);
+                if (dist <= thresholdPx) {
+                    cluster.markers.push(markers[j]);
+                    cluster.count++;
+                    used.add(j);
+                }
+            }
+
+            clusters.push(cluster);
+        }
+
+        return clusters;
+    }
+
+    /**
+     * Convierte un LatLng en coordenadas de píxel para el zoom actual.
+     */
+    latLngToPixel(latLng, projection, zoom) {
+        const worldPoint = projection.fromLatLngToPoint(latLng);
+        const scale = Math.pow(2, zoom);
+        return {
+            x: worldPoint.x * scale * 256,
+            y: worldPoint.y * scale * 256,
+        };
+    }
+
+    /**
+     * Desplaza un LatLng una cierta cantidad de metros hacia el norte (positivo) o sur (negativo).
+     */
+    offsetLatLng(latLng, metersNorth) {
+        const R = 6378137; // radio aproximado de la Tierra
+        const dLat = (metersNorth / R) * (180 / Math.PI);
+        return new google.maps.LatLng(latLng.lat() + dLat, latLng.lng());
+    }
+
+    /**
+     * Crea el SVG de la burbuja negra con el número de cluster.
+     */
+    createClusterBubbleIcon(count) {
+        const display = count > 99 ? '99+' : String(count);
+
+        return `
+            <svg width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="9" fill="#111111" stroke="#ffffff" stroke-width="2" />
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+                      font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                      font-size="10" font-weight="600" fill="#ffffff">
+                    ${display}
+                </text>
+            </svg>
+        `;
     }
     
     createEventoMarker(evento) {
@@ -318,21 +621,19 @@ class OperacionesDashboard {
      * - Icono SVG blanco (mismo que sidebar)
      */
     createEventoMarkerIcon() {
-        // Icono SVG del sidebar de eventos (documento/clipboard)
-        // Path del icono: M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z
-        // ViewBox original: 0 0 24 24, necesitamos escalarlo a ~16x16 dentro del círculo de 32x32
+        // Icono SVG de campana (bi bi-bell), adaptado al marker
         
         return `
             <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <!-- Círculo de fondo azul con borde blanco -->
                 <circle cx="16" cy="16" r="14" fill="#1877f2" stroke="#ffffff" stroke-width="2"/>
-                <!-- Icono SVG blanco centrado (escalado desde viewBox 24x24 a ~16x16) -->
-                <g transform="translate(8, 8) scale(0.67)">
-                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
-                          fill="none" 
-                          stroke="#ffffff" 
-                          stroke-width="2.5" 
-                          stroke-linecap="round" 
+                <!-- Icono SVG blanco centrado (viewBox original 0 0 16 16, escalado a ~16x16) -->
+                <g transform="translate(8, 8) scale(1)">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"
+                          fill="none"
+                          stroke="#ffffff"
+                          stroke-width="1"
+                          stroke-linecap="round"
                           stroke-linejoin="round"/>
                 </g>
             </svg>
@@ -370,18 +671,20 @@ class OperacionesDashboard {
     }
     
     createDockMarker(dock) {
+        // Icono SVG personalizado para docks (caja violeta)
+        const svgIcon = this.createDockMarkerIcon();
+
         const marker = new google.maps.Marker({
             position: { lat: parseFloat(dock.latitud), lng: parseFloat(dock.longitud) },
             map: this.map,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: '#10b981',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 2,
-                scale: 16
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 16),
+                origin: new google.maps.Point(0, 0),
             },
-            title: dock.nombre
+            title: dock.nombre,
+            zIndex: google.maps.Marker.MAX_ZINDEX, // debajo de eventos, pero sobre otros
         });
         
         const infoWindow = new google.maps.InfoWindow({
@@ -398,20 +701,64 @@ class OperacionesDashboard {
         
         this.markers.docks.push(marker);
     }
+
+    /**
+     * Icono SVG para docks:
+     * - Círculo violeta oscuro
+     * - Borde blanco
+     * - Icono de caja (bi bi-box2) en blanco, tamaño similar al icono de eventos
+     */
+    createDockMarkerIcon() {
+        return `
+            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <!-- Fondo circular violeta oscuro con borde blanco -->
+                <circle cx="16" cy="16" r="14" fill="#4c1d95" stroke="#ffffff" stroke-width="2" />
+                <!-- Icono bi bi-box2 centrado -->
+                <g transform="translate(8, 8) scale(1)">
+                    <path d="M2.95.4a1 1 0 0 1 .8-.4h8.5a1 1 0 0 1 .8.4l2.85 3.8a.5.5 0 0 1 .1.3V15a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4.5a.5.5 0 0 1 .1-.3zM7.5 1H3.75L1.5 4h6zm1 0v3h6l-2.25-3zM15 5H1v10h14z"
+                          fill="#ffffff" />
+                </g>
+            </svg>
+        `;
+    }
     
     createCamaraMarker(camara) {
+        // Icono SVG personalizado para cámaras (círculo y cámara blanca)
+        const svgIcon = this.createCamaraMarkerIcon();
+
+        const lat = parseFloat(camara.latitud);
+        const lng = parseFloat(camara.longitud);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            console.warn('[OperacionesDashboard] Cámara sin coordenadas válidas. Se omitirá el marker.', {
+                id: camara.id,
+                camera_name: camara.camera_name,
+                latitud: camara.latitud,
+                longitud: camara.longitud,
+            });
+            return;
+        }
+
+        console.debug('[OperacionesDashboard] Creando marker de cámara', {
+            id: camara.id,
+            camera_name: camara.camera_name,
+            lat: lat,
+            lng: lng,
+            dispositivo_id: camara.dispositivo_id,
+            dispositivo_nombre: camara.dispositivo_nombre,
+        });
+
         const marker = new google.maps.Marker({
-            position: { lat: parseFloat(camara.latitud), lng: parseFloat(camara.longitud) },
+            position: { lat, lng },
             map: this.map,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: '#8b5cf6',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 2,
-                scale: 16
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgIcon),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 16),
+                origin: new google.maps.Point(0, 0),
             },
-            title: camara.camera_name
+            title: camara.camera_name,
+            zIndex: google.maps.Marker.MAX_ZINDEX,
         });
         
         const infoWindow = new google.maps.InfoWindow({
@@ -427,6 +774,32 @@ class OperacionesDashboard {
         });
         
         this.markers.camaras.push(marker);
+        console.debug('[OperacionesDashboard] Marker de cámara agregado al mapa', {
+            id: camara.id,
+            camera_name: camara.camera_name,
+        });
+    }
+
+    /**
+     * Icono SVG para cámaras:
+     * - Mismo tamaño que otros markers (32x32, círculo r=14)
+     * - Borde blanco mismo grosor
+     * - Icono de cámara blanco, basado en SVG provisto (simplificado)
+     */
+    createCamaraMarkerIcon() {
+        return `
+            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <!-- Fondo circular color #426760 con borde blanco -->
+                <circle cx="16" cy="16" r="14" fill="#426760" stroke="#ffffff" stroke-width="2" />
+                <!-- Icono de cámara sencillo centrado, basado en SVG (viewBox 0 0 24 24) -->
+                <g transform="translate(4,4)" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.5 16h-7.5a2 2 0 0 1 -2 -2v-7a2 2 0 0 1 2 -2h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v2" />
+                    <path d="M14.933 8.366a3.001 3.001 0 1 0 -2.933 3.634" />
+                    <path d="M21.121 16.121a3 3 0 1 0 -4.242 0c.418 .419 1.125 1.045 2.121 1.879c1.051 -.89 1.759 -1.516 2.121 -1.879z" />
+                    <path d="M19 14v.01" />
+                </g>
+            </svg>
+        `;
     }
     
     generateEventoTooltip(evento) {
@@ -443,6 +816,10 @@ class OperacionesDashboard {
                         <span class="tooltip-value">${this.escapeHtml(evento.cliente)}</span>
                     </div>
                     <div class="tooltip-row">
+                        <span class="tooltip-label">Registrado por:</span>
+                        <span class="tooltip-value">${this.escapeHtml(evento.registrado_por || 'N/A')}</span>
+                    </div>
+                    <div class="tooltip-row">
                         <span class="tooltip-label">Estado:</span>
                         <span class="tooltip-badge estado-${estadoClass}">${this.escapeHtml(evento.estado)}</span>
                     </div>
@@ -454,12 +831,6 @@ class OperacionesDashboard {
                         <span class="tooltip-label">Categoría:</span>
                         <span class="tooltip-value">${this.escapeHtml(evento.categoria)}</span>
                     </div>
-                    ${evento.descripcion ? `
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Descripción:</span>
-                        <span class="tooltip-value">${this.escapeHtml(evento.descripcion.substring(0, 100))}</span>
-                    </div>
-                    ` : ''}
                 </div>
                 <div class="tooltip-footer">
                     <a href="/eventos/${evento.id}/reporte" class="tooltip-btn" target="_blank">
@@ -516,6 +887,12 @@ class OperacionesDashboard {
                         <span class="tooltip-label">Site:</span>
                         <span class="tooltip-value">${this.escapeHtml(dock.site)}</span>
                     </div>
+                    ${dock.drone ? `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Drone asignado:</span>
+                        <span class="tooltip-value">${this.escapeHtml(dock.drone)}</span>
+                    </div>
+                    ` : ''}
                     <div class="tooltip-row">
                         <span class="tooltip-label">Estado:</span>
                         <span class="tooltip-value">${dock.active ? 'Activo' : 'Inactivo'}</span>
@@ -561,6 +938,22 @@ class OperacionesDashboard {
                         <span class="tooltip-value">${camara.direccion_ip}</span>
                     </div>
                     ` : ''}
+                    ${camara.observaciones ? `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Observaciones:</span>
+                        <span class="tooltip-value">${this.escapeHtml(String(camara.observaciones).substring(0, 100))}</span>
+                    </div>
+                    ` : ''}
+                    ${camara.fecha_instalacion_formatted ? `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Instalada el:</span>
+                        <span class="tooltip-value">${this.escapeHtml(camara.fecha_instalacion_formatted)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Coordenadas:</span>
+                        <span class="tooltip-value">${camara.latitud.toFixed(6)}, ${camara.longitud.toFixed(6)}</span>
+                    </div>
                 </div>
                 <div class="tooltip-footer">
                     <a href="/cameras/${camara.camera_index_code}/liveview" class="tooltip-btn" target="_blank">
@@ -1015,22 +1408,4 @@ document.addEventListener('DOMContentLoaded', () => {
         window.operacionesDashboard = new OperacionesDashboard();
     }
 });
-
-// Actualizar navegación para operaciones
-if (typeof ModernNavigation !== 'undefined') {
-    const originalSetupTopBarButtons = ModernNavigation.prototype.setupTopBarButtons;
-    ModernNavigation.prototype.setupTopBarButtons = function() {
-        originalSetupTopBarButtons.call(this);
-        
-        const operacionesBtn = document.querySelector('[data-dashboard="operaciones"]');
-        if (operacionesBtn) {
-            operacionesBtn.addEventListener('click', (e) => {
-                const route = operacionesBtn.dataset.route;
-                if (route && route !== '#') {
-                    window.location.href = route;
-                }
-            });
-        }
-    };
-}
 

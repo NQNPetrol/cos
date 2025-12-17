@@ -1403,7 +1403,6 @@ body.modern-ui {
     min-width: 280px;
     max-width: 350px;
     background-color: var(--fb-bg-secondary);
-    border: 1px solid var(--fb-border);
     border-radius: 8px;
     padding: 0;
     color: var(--fb-text-primary);
@@ -1453,7 +1452,6 @@ body.modern-ui {
 
 .tooltip-footer {
     padding: 12px;
-    border-top: 1px solid var(--fb-border);
 }
 
 .tooltip-btn {
@@ -1472,6 +1470,22 @@ body.modern-ui {
 
 .tooltip-btn:hover {
     background-color: var(--fb-hover-blue);
+}
+
+/* Eliminar el contenedor blanco por defecto del InfoWindow de Google Maps para TODOS los tooltips */
+.gm-style .gm-style-iw-c {
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+}
+
+.gm-style .gm-style-iw-d {
+    overflow: visible !important;
+}
+
+.gm-style .gm-style-iw-t::after {
+    display: none !important;
 }
 
 /* Error Messages */

@@ -33,28 +33,62 @@ class OperacionesDashboardController extends Controller
     }
 
     /**
-     * Vista principal del dashboard
+     * Vista principal del dashboard (layout admin / operadores)
      */
     public function index(Request $request)
     {
-        // Detectar si es layout cliente
-        $isClient = $this->isClientLayout();
-        
-        // Verificar permisos
-        if (!$isClient) {
-            $this->authorize('ver.operaciones');
-        }
+        // En el layout principal el dashboard es global (sin filtro automático por cliente)
+        $isClient = false;
 
-        // Obtener eventos iniciales para el listado
+        // Permitir aplicar un filtro manual opcional por cliente desde el layout principal
         $clienteId = $this->getClienteFilter($request);
         $eventosIniciales = $this->getEventosIniciales($clienteId);
         
-        // Obtener KPIs iniciales
-        $kpisIniciales = Cache::remember("operaciones_kpis_" . ($clienteId ?? 'all'), 60, function() use ($clienteId) {
-            return $this->calculateKPIs($clienteId);
-        });
+        // Obtener KPIs iniciales (cacheados por contexto de cliente)
+        $kpisIniciales = Cache::remember(
+            'operaciones_kpis_' . ($clienteId ?? 'all'),
+            60,
+            function () use ($clienteId) {
+                return $this->calculateKPIs($clienteId);
+            }
+        );
 
         return view('operaciones.dashboard', compact('isClient', 'eventosIniciales', 'kpisIniciales'));
+    }
+
+    /**
+     * Vista del dashboard operacional para clientes (layout clientes)
+     */
+    public function indexClient(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            abort(403);
+        }
+
+        $isClient = true;
+
+        // Para el layout de clientes siempre se filtra por el cliente asociado al usuario
+        $clienteId = $this->getClienteFilter($request);
+
+        if (!$clienteId) {
+            // Si el usuario no tiene cliente asociado no debe ver este dashboard
+            abort(403, 'Usuario cliente sin cliente asociado');
+        }
+
+        $eventosIniciales = $this->getEventosIniciales($clienteId);
+
+        // KPIs cacheados por cliente
+        $kpisIniciales = Cache::remember(
+            'operaciones_kpis_' . $clienteId,
+            60,
+            function () use ($clienteId) {
+                return $this->calculateKPIs($clienteId);
+            }
+        );
+
+        return view('operaciones.client-dashboard', compact('isClient', 'eventosIniciales', 'kpisIniciales'));
     }
 
     /**
@@ -106,10 +140,24 @@ class OperacionesDashboardController extends Controller
                 $validated['cliente_id'] = $clienteId;
             }
 
+            Log::info('OperacionesDashboard@getMapData llamado', [
+                'cliente_id' => $validated['cliente_id'] ?? null,
+                'estado_evento' => $validated['estado_evento'] ?? null,
+                'user_id' => optional($request->user())->id,
+                'is_client_layout' => $this->isClientLayout(),
+            ]);
+
             $eventos = $this->getEventosParaMapa($validated);
             $vehiculos = $this->getVehiculosParaMapa($validated);
             $docks = $this->getDocksParaMapa();
             $camaras = $this->getCamarasParaMapa($validated);
+
+            Log::info('OperacionesDashboard@getMapData resultados', [
+                'eventos_count' => is_countable($eventos) ? count($eventos) : null,
+                'vehiculos_count' => is_countable($vehiculos) ? count($vehiculos) : null,
+                'docks_count' => is_countable($docks) ? count($docks) : null,
+                'camaras_count' => is_countable($camaras) ? count($camaras) : null,
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -199,11 +247,14 @@ class OperacionesDashboardController extends Controller
                 'eventos.fecha_hora',
                 'eventos.descripcion',
                 'eventos.latitud',
-                'eventos.longitud'
+                'eventos.longitud',
+                'eventos.tipo',
+                'eventos.user_id',
             ])
             ->with([
                 'cliente:id,nombre',
-                'categoria:id,nombre'
+                'categoria:id,nombre',
+                'creador:id,name',
             ])
             ->orderBy('eventos.fecha_hora', 'desc');
         
@@ -268,17 +319,28 @@ class OperacionesDashboardController extends Controller
         $eventos->getCollection()->transform(function($evento) use ($ultimosSeguimientos) {
             $ultimoSeguimiento = $ultimosSeguimientos->get($evento->id);
             $estado = $ultimoSeguimiento ? $ultimoSeguimiento->estado : 'ABIERTO';
+
+            // Formato de fecha legible en español: "Viernes, 12 de Enero 2025 11:56hs"
+            $fechaFormateada = $evento->fecha_hora
+                ? \Illuminate\Support\Str::ucfirst(
+                    $evento->fecha_hora
+                        ->locale('es')
+                        ->translatedFormat('l, d \\d\\e F Y H:i\\h\\s')
+                )
+                : null;
             
             return [
                 'id' => $evento->id,
                 'cliente' => $evento->cliente->nombre ?? 'N/A',
                 'estado' => $estado,
                 'fecha_hora' => $evento->fecha_hora->format('Y-m-d H:i:s'),
-                'fecha_hora_formatted' => $evento->fecha_hora->format('d/m/Y H:i'),
-                'categoria' => $evento->categoria->nombre ?? 'N/A',
+                'fecha_hora_formatted' => $fechaFormateada ?? $evento->fecha_hora->format('d/m/Y H:i'),
+                'categoria' => $evento->tipo ?? ($evento->categoria->nombre ?? 'N/A'),
                 'descripcion' => Str::limit($evento->descripcion ?? '', 100),
                 'latitud' => $evento->latitud,
                 'longitud' => $evento->longitud,
+                'registrado_por' => $evento->creador->name
+                    ?? ($evento->user_id ? 'Usuario ID ' . $evento->user_id : 'N/A'),
             ];
         });
         
@@ -472,11 +534,14 @@ class OperacionesDashboardController extends Controller
                     'eventos.fecha_hora',
                     'eventos.descripcion',
                     'eventos.latitud',
-                    'eventos.longitud'
+                    'eventos.longitud',
+                    'eventos.tipo',
+                    'eventos.user_id',
                 ])
                 ->with([
                     'cliente:id,nombre',
-                    'categoria:id,nombre'
+                    'categoria:id,nombre',
+                    'creador:id,name',
                 ])
                 ->whereNotNull('eventos.latitud')
                 ->whereNotNull('eventos.longitud');
@@ -521,6 +586,15 @@ class OperacionesDashboardController extends Controller
                 $ultimoSeguimiento = $ultimosSeguimientos->get($evento->id);
                 $estado = $ultimoSeguimiento ? $ultimoSeguimiento->estado : 'ABIERTO';
 
+                // Formato de fecha legible en español: "Viernes, 12 de Enero 2025 11:56hs"
+                $fechaFormateada = $evento->fecha_hora
+                    ? \Illuminate\Support\Str::ucfirst(
+                        $evento->fecha_hora
+                            ->locale('es')
+                            ->translatedFormat('l, d \\d\\e F Y H:i\\h\\s')
+                    )
+                    : null;
+
                 return [
                     'id' => $evento->id,
                     'latitud' => (float) $evento->latitud,
@@ -528,9 +602,11 @@ class OperacionesDashboardController extends Controller
                     'estado' => $estado,
                     'cliente' => $evento->cliente->nombre ?? 'N/A',
                     'fecha_hora' => $evento->fecha_hora->format('Y-m-d H:i:s'),
-                    'fecha_hora_formatted' => $evento->fecha_hora->format('d/m/Y H:i'),
-                    'categoria' => $evento->categoria->nombre ?? 'N/A',
-                    'descripcion' => $evento->descripcion ?? ''
+                    'fecha_hora_formatted' => $fechaFormateada ?? $evento->fecha_hora->format('d/m/Y H:i'),
+                    'categoria' => $evento->tipo ?? ($evento->categoria->nombre ?? 'N/A'),
+                    'descripcion' => $evento->descripcion ?? '',
+                    'registrado_por' => $evento->creador->name
+                        ?? ($evento->user_id ? 'Usuario ID ' . $evento->user_id : 'N/A'),
                 ];
             });
 
@@ -603,12 +679,19 @@ class OperacionesDashboardController extends Controller
     private function getDocksParaMapa()
     {
         try {
-            return FlytbaseDock::with('site')
+            return FlytbaseDock::with([
+                    'site',
+                    'drones' => function ($q) {
+                        $q->activos();
+                    },
+                ])
                 ->where('active', true)
                 ->whereNotNull('latitud')
                 ->whereNotNull('longitud')
                 ->get()
                 ->map(function($dock) {
+                    $drone = $dock->drones->first();
+
                     return [
                         'id' => $dock->id,
                         'nombre' => $dock->nombre,
@@ -616,7 +699,8 @@ class OperacionesDashboardController extends Controller
                         'longitud' => (float) $dock->longitud,
                         'altitude' => $dock->altitude,
                         'active' => $dock->active,
-                        'site' => $dock->site->nombre ?? 'N/A'
+                        'site' => $dock->site->nombre ?? 'N/A',
+                        'drone' => $drone?->drone,
                     ];
                 });
 
@@ -643,9 +727,7 @@ class OperacionesDashboardController extends Controller
             
             $query = Camera::with(['dispositivo.cliente'])
                 ->whereNotNull('dispositivo_id')
-                ->whereHas('dispositivo', function($q) {
-                    $q->whereNotNull('ubicacion');
-                });
+                ->whereHas('dispositivo');
 
             if (isset($filters['cliente_id'])) {
                 $query->whereHas('dispositivo', function($q) use ($filters) {
@@ -653,12 +735,34 @@ class OperacionesDashboardController extends Controller
                 });
             }
 
-            return $query->get()
+            $camaras = $query->get();
+
+            Log::info('OperacionesDashboard: cámaras encontradas para mapa', [
+                'total' => $camaras->count(),
+            ]);
+
+            $resultado = $camaras
                 ->filter(function($camara) {
-                    return $camara->dispositivo && $camara->dispositivo->tieneCoordenadas();
+                    $tiene = $camara->dispositivo && $camara->dispositivo->tieneCoordenadas();
+                    Log::info('OperacionesDashboard: cámara evaluada para coordenadas', [
+                        'camera_id' => $camara->id,
+                        'camera_name' => $camara->camera_name,
+                        'dispositivo_id' => $camara->dispositivo_id,
+                        'tiene_coordenadas' => $tiene,
+                        'latitud' => $camara->dispositivo->latitud ?? null,
+                        'longitud' => $camara->dispositivo->longitud ?? null,
+                        'ubicacion' => $camara->dispositivo->ubicacion ?? null,
+                        'dispositivo_nombre' => $camara->dispositivo->nombre ?? null,
+                    ]);
+                    return $tiene;
                 })
                 ->map(function($camara) {
                     $coords = $camara->dispositivo->coordenadas;
+
+                    $dispositivoNombre = $camara->dispositivo->nombre
+                        ?? $camara->dispositivo->modelo
+                        ?? $camara->dispositivo->direccion_ip
+                        ?? 'Sin nombre';
 
                     return [
                         'id' => $camara->id,
@@ -666,14 +770,23 @@ class OperacionesDashboardController extends Controller
                         'latitud' => $coords['lat'],
                         'longitud' => $coords['lng'],
                         'dispositivo_id' => $camara->dispositivo_id,
-                        'dispositivo_nombre' => $camara->dispositivo->nombre ?? 'N/A',
+                        'dispositivo_nombre' => $dispositivoNombre,
                         'camera_index_code' => $camara->camera_index_code,
                         'cliente' => $camara->dispositivo->cliente->nombre ?? 'N/A',
                         'status' => $camara->status,
-                        'direccion_ip' => $camara->dispositivo->direccion_ip ?? null
+                        'direccion_ip' => $camara->dispositivo->direccion_ip ?? null,
+                        'observaciones' => $camara->dispositivo->observaciones ?? null,
+                        'fecha_instalacion' => optional($camara->dispositivo->fecha_instalacion)?->format('Y-m-d'),
+                        'fecha_instalacion_formatted' => optional($camara->dispositivo->fecha_instalacion)?->format('d/m/Y'),
                     ];
                 })
                 ->values();
+
+            Log::info('OperacionesDashboard: cámaras con coordenadas para mapa', [
+                'total_con_coordenadas' => $resultado->count(),
+            ]);
+
+            return $resultado;
 
         } catch (\Exception $e) {
             Log::error('Error obteniendo cámaras para mapa: ' . $e->getMessage());
@@ -688,9 +801,18 @@ class OperacionesDashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($this->isClientLayout()) {
-            // Usuario cliente: obtener su cliente_id
-            $userCliente = UserCliente::where('user_id', $user->id)->first();
+        /**
+         * Regla general:
+         * - En layout CLIENTE: siempre se filtra por el cliente asociado al usuario.
+         * - En layout PRINCIPAL: SOLO se filtra si el request trae explícitamente cliente_id
+         *   (por ejemplo, desde el selector visual de clientes).
+         */
+
+        if ($this->isClientLayout($request)) {
+            // Usuario cliente en layout cliente: obtener siempre su cliente_id
+            $userCliente = $user
+                ? UserCliente::where('user_id', $user->id)->first()
+                : null;
 
             if (!$userCliente) {
                 return null;
@@ -699,18 +821,24 @@ class OperacionesDashboardController extends Controller
             return $userCliente->cliente_id;
         }
 
-        // Admin/Operador: usar filtro de request si existe
+        // Layout principal (admin/operador u otros casos):
+        // usar SOLO el filtro explícito enviado en el request (selector visual).
         if ($request) {
             return $request->get('cliente_id');
         }
 
         return null;
     }
-
+    
     /**
-     * Verificar si es layout cliente
+     * Verificar si el request actual corresponde al layout cliente.
+     *
+     * Importante:
+     * - NO usamos solo el hecho de que el usuario tenga un UserCliente,
+     *   para evitar filtrar automáticamente en el layout principal.
+     * - Intentamos inferir el contexto por ruta o referer.
      */
-    private function isClientLayout()
+    private function isClientLayout(Request $request = null)
     {
         $user = Auth::user();
         
@@ -718,8 +846,39 @@ class OperacionesDashboardController extends Controller
             return false;
         }
 
-        // Verificar si el usuario tiene cliente asignado
-        return UserCliente::where('user_id', $user->id)->exists();
+        // Si el usuario no tiene relación UserCliente, nunca es layout cliente
+        $tieneRelacionCliente = UserCliente::where('user_id', $user->id)->exists();
+        if (!$tieneRelacionCliente) {
+            return false;
+        }
+
+        // Si tenemos información del request, intentamos detectar el contexto "client"
+        if ($request) {
+            // 1) Por nombre de ruta (ej: client.operaciones.dashboard)
+            $route = $request->route();
+            $routeName = $route ? $route->getName() : null;
+            if ($routeName && str_starts_with($routeName, 'client.')) {
+                return true;
+            }
+
+            // 2) Por path directo (ej: client/operaciones/dashboard)
+            $path = $request->path();
+            if (str_starts_with($path, 'client/')) {
+                return true;
+            }
+
+            // 3) Por Referer (para las rutas API llamadas desde el layout cliente)
+            $referer = $request->headers->get('referer');
+            if ($referer) {
+                $refererPath = parse_url($referer, PHP_URL_PATH) ?? '';
+                if (str_contains($refererPath, '/client/')) {
+                    return true;
+                }
+            }
+        }
+
+        // En cualquier otro caso, asumimos que NO estamos en el layout cliente
+        return false;
     }
 }
 

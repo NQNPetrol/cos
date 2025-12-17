@@ -474,8 +474,22 @@ Route::middleware([
     });
 
     // CAMARAS LIST Y LIVEVIEW
-    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index')->middleware('can:ver.camaras');
-    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('cameras.stream')->middleware('can:ver.camaras');
+    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])
+        ->name('cameras.index')
+        ->middleware('can:ver.camaras');
+
+    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])
+        ->name('cameras.stream')
+        ->middleware('can:ver.camaras');
+
+    // API para vincular cámaras con dispositivos
+    Route::get('/api/dispositivos/camaras', [App\Http\Controllers\CameraController::class, 'availableDevices'])
+        ->name('api.dispositivos.camaras')
+        ->middleware('can:ver.camaras');
+
+    Route::post('/cameras/{camera}/link-device', [App\Http\Controllers\CameraController::class, 'linkDevice'])
+        ->name('cameras.link-device')
+        ->middleware('can:ver.camaras');
     
     Route::get('/test-env', function () {
         return [
@@ -740,13 +754,14 @@ Route::middleware(['auth'])->group(function () {
     ->middleware('role:admin')
     ->name('asignar.permisos');
     
-    // Dashboard Operacional - Principal
+    // Dashboard Operacional - Principal (layout admin)
     Route::get('/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'index'])
         ->middleware('can:ver.operaciones')
         ->name('operaciones.dashboard');
 
-    // Dashboard Operacional - Cliente
-    Route::get('/client/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'index'])
+    // Dashboard Operacional - Cliente (layout clientes)
+    Route::get('/client/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'indexClient'])
+        ->middleware('can:ver.operaciones-cliente')
         ->name('client.operaciones.dashboard');
 
     // APIs del Dashboard Operacional

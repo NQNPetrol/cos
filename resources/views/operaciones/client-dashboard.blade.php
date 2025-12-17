@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.cliente')
 
 @section('title', 'Dashboard Operacional')
 
 @push('styles')
 <style>
-    /* Estilos específicos del dashboard se agregarán en modern-ui.css */
+    /* Estilos específicos del dashboard se manejan en modern-ui.css */
 </style>
 @endpush
 
@@ -42,4 +42,5 @@
     };
 </script>
 @endpush
+
 

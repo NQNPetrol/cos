@@ -287,11 +287,28 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
+                                <label class="block text-sm mb-1 text-gray-300">Ubicación (descripción)</label>
                                 <input type="text" wire:model="ubicacion"
                                     class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
                                     placeholder="Oficina Principal - Recepción">
                                 @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                                <div>
+                                    <label class="block text-sm mb-1 text-gray-300">Latitud</label>
+                                    <input type="text" wire:model="latitud"
+                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        placeholder="-34.603700">
+                                    @error('latitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1 text-gray-300">Longitud</label>
+                                    <input type="text" wire:model="longitud"
+                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        placeholder="-58.381600">
+                                    @error('longitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
                             </div>
 
                             <div class="md:col-span-2">
