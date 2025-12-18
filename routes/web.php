@@ -64,6 +64,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         return view('client.profile.show');
     })->name('profile.show');
 
+    // SETTINGS (CLIENT LAYOUT)
+    Route::get('/settings/user-profile', \App\Livewire\Client\Settings\UserProfile::class)->name('settings.user-profile');
+    Route::get('/settings/system', \App\Livewire\Client\Settings\SystemSettings::class)->name('settings.system');
+    Route::get('/activity-log', \App\Livewire\Client\ActivityLog\Index::class)->name('activity-log');
+
     //EVENTOS (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos-cliente')
@@ -176,10 +181,13 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+    Route::redirect('settings', 'settings/user-profile');
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+    Route::get('settings/user-profile', \App\Livewire\Settings\UserProfile::class)->name('settings.user-profile');
+    Route::get('settings/system', \App\Livewire\Settings\SystemSettings::class)->name('settings.system');
+    Route::get('activity-log', \App\Livewire\ActivityLog\Index::class)->name('activity-log.index');
 });
 
 require __DIR__.'/auth.php';

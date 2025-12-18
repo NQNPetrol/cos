@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Models\Permission;
 use App\Observers\PermissionObserver;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,7 @@ use App\Livewire\Client\UpdateProfileInformationForm;
 use App\Livewire\Client\UpdatePasswordForm;
 use App\Livewire\Client\LogoutOtherBrowserSessionsForm;
 use App\Livewire\Client\DeleteUserForm;
+use App\Listeners\LogAuthenticationActivity;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -35,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
          Livewire::component('client.update-password-form', UpdatePasswordForm::class);
          Livewire::component('client.logout-other-browser-sessions-form', LogoutOtherBrowserSessionsForm::class);
          Livewire::component('client.delete-user-form', DeleteUserForm::class);
-
+         
+         // Register authentication activity log subscriber
+         Event::subscribe(LogAuthenticationActivity::class);
     }
 }

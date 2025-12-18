@@ -272,6 +272,10 @@ body.modern-ui {
 .modern-top-nav-avatar {
     width: var(--fb-button-size);
     height: var(--fb-button-size);
+    min-width: var(--fb-button-size);
+    min-height: var(--fb-button-size);
+    max-width: var(--fb-button-size);
+    max-height: var(--fb-button-size);
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
@@ -279,10 +283,12 @@ body.modern-ui {
     aspect-ratio: 1 / 1;
     object-fit: cover;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .modern-top-nav-avatar:hover,
-.modern-top-nav-avatar.active {
+.modern-top-nav-avatar.active,
+#userMenuBtn:focus .modern-top-nav-avatar {
     border-color: var(--fb-accent-blue);
 }
 
@@ -870,6 +876,17 @@ body.modern-ui {
 .modern-sidebar-back-button:focus {
     outline: 2px solid var(--fb-accent-blue);
     outline-offset: 2px;
+}
+
+/* Quitar outline del botón de perfil (el que contiene el avatar) */
+.modern-top-nav-button:focus:has(.modern-top-nav-avatar),
+#userMenuBtn:focus {
+    outline: none;
+}
+
+/* Quitar hover gris del botón de usuario */
+#userMenuBtn:hover {
+    background-color: transparent;
 }
 
 .modern-search-bar input:focus {

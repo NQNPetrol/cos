@@ -113,8 +113,8 @@
     </div>
 
     <!-- Dropdown Menus -->
-    <x-modern.shortcuts-menu />
+    <x-modern.shortcuts-menu :is-client="$isClient" />
     <x-modern.notifications-menu />
-    <x-modern.user-menu />
+    <x-modern.user-menu :is-client="$isClient" />
 </nav>
 
