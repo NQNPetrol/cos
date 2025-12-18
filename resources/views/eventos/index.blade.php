@@ -93,9 +93,18 @@
 
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Listado de Eventos</h2>
-                        <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                            <i class="bi bi-plus-circle mr-2"></i>Nuevo Evento
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <!-- Toggle Paginación -->
+                            <a href="{{ route('eventos.index', array_merge(request()->except('paginate', 'page'), $isPaginated ? [] : ['paginate' => 1])) }}" 
+                               class="px-4 py-2 {{ $isPaginated ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white rounded-md transition-colors flex items-center"
+                               title="{{ $isPaginated ? 'Desactivar paginación (mostrar todos)' : 'Activar paginación (15 por página)' }}">
+                                <i class="bi {{ $isPaginated ? 'bi-list-check' : 'bi-list' }} mr-2"></i>
+                                {{ $isPaginated ? 'Paginado' : 'Sin paginar' }}
+                            </a>
+                            <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="bi bi-plus-circle mr-2"></i>Nuevo Evento
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Filtros -->
@@ -284,12 +293,18 @@
                     @if($eventos->count() > 0)
                         <div class="mt-4 flex items-center justify-between">
                             <div class="text-sm text-gray-400">
-                                Mostrando {{ $eventos->firstItem() }} a {{ $eventos->lastItem() }} 
-                                de {{ $eventos->total() }} resultados
+                                @if($isPaginated)
+                                    Mostrando {{ $eventos->firstItem() }} a {{ $eventos->lastItem() }} 
+                                    de {{ $eventos->total() }} resultados
+                                @else
+                                    Mostrando todos los {{ $eventos->total() }} resultados
+                                @endif
                             </div>
+                            @if($isPaginated && $eventos->hasPages())
                             <div>
                                 {{ $eventos->links() }}
                             </div>
+                            @endif
                         </div>
                     @endif
                 </div>

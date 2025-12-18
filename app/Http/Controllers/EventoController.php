@@ -46,13 +46,28 @@ class EventoController extends Controller
             }
         }
 
-        $eventos = $query->paginate(10)->appends($request->query());
+        // Paginación dinámica: si paginate=1 se activa, si no se muestran todos
+        $isPaginated = $request->boolean('paginate', false);
+        
+        if ($isPaginated) {
+            $eventos = $query->paginate(15)->appends($request->query());
+        } else {
+            // Sin paginación: obtener todos los registros pero usar LengthAwarePaginator para mantener compatibilidad
+            $allEventos = $query->get();
+            $eventos = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allEventos,
+                $allEventos->count(),
+                $allEventos->count() ?: 1,
+                1,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
 
         $clientes = Cliente::orderBy('nombre')->get();
 
         $empresas = collect();
 
-        return view('eventos.index', compact(['eventos', 'clientes', 'empresas']));
+        return view('eventos.index', compact(['eventos', 'clientes', 'empresas', 'isPaginated']));
     }
 
     public function create()

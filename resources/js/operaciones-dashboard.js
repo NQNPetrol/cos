@@ -895,8 +895,8 @@ class OperacionesDashboard {
                     </div>
                 </div>
                 <div class="tooltip-footer">
-                    <a href="/patrullas/location" class="tooltip-btn" target="_blank">
-                        Ver Ubicación
+                    <a href="/client/patrullas/mapa" class="tooltip-btn" target="_blank">
+                        Ver mapa detallado
                     </a>
                 </div>
             </div>

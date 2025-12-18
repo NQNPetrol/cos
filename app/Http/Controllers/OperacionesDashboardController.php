@@ -149,7 +149,7 @@ class OperacionesDashboardController extends Controller
 
             $eventos = $this->getEventosParaMapa($validated);
             $vehiculos = $this->getVehiculosParaMapa($validated);
-            $docks = $this->getDocksParaMapa();
+            $docks = $this->getDocksParaMapa($validated);
             $camaras = $this->getCamarasParaMapa($validated);
 
             Log::info('OperacionesDashboard@getMapData resultados', [
@@ -703,20 +703,32 @@ class OperacionesDashboardController extends Controller
 
     /**
      * Obtener docks para el mapa
+     * 
+     * Filtro por cliente: los docks se filtran a través de la relación con FlytbaseSite
+     * - FlytbaseDock.flytbase_site_id -> FlytbaseSite.id
+     * - FlytbaseSite.cliente_id -> Cliente.id
      */
-    private function getDocksParaMapa()
+    private function getDocksParaMapa(array $filters = [])
     {
         try {
-            return FlytbaseDock::with([
-                    'site',
+            $query = FlytbaseDock::with([
+                    'site.cliente',
                     'drones' => function ($q) {
                         $q->activos();
                     },
                 ])
                 ->where('active', true)
                 ->whereNotNull('latitud')
-                ->whereNotNull('longitud')
-                ->get()
+                ->whereNotNull('longitud');
+
+            // Filtrar por cliente a través de la relación site -> cliente_id
+            if (isset($filters['cliente_id'])) {
+                $query->whereHas('site', function($q) use ($filters) {
+                    $q->where('cliente_id', $filters['cliente_id']);
+                });
+            }
+
+            return $query->get()
                 ->map(function($dock) {
                     $drone = $dock->drones->first();
 
@@ -728,6 +740,7 @@ class OperacionesDashboardController extends Controller
                         'altitude' => $dock->altitude,
                         'active' => $dock->active,
                         'site' => $dock->site->nombre ?? 'N/A',
+                        'cliente' => $dock->site->cliente->nombre ?? 'N/A',
                         'drone' => $drone?->drone,
                     ];
                 });
