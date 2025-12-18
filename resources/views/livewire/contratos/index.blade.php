@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-50 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-50 p-6 rounded-lg shadow">
 
     <h2 class="text-2xl font-bold mb-6">Listado de Contratos</h2>
 
@@ -6,7 +6,7 @@
         <div class="flex-1">
             <label class="block text-sm mb-1">Filtrar por Cliente</label>
             <select wire:model.live="searchCliente"
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 @foreach ($clientes as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -17,13 +17,13 @@
         <div class="flex-1">
             <label class="block text-sm mb-1">Buscar</label>
             <input type="text" wire:model.live="searchNombre"
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                    placeholder="Buscar por nombre, empresa asociada...">
         </div>
 
         <div class="flex items-end">
             <button wire:click="clearFilters" 
-                    class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-white">
+                    class="bg-zinc-600 hover:bg-zinc-700 px-4 py-2 rounded text-white">
                 Limpiar Filtros
             </button>
         </div>
@@ -32,7 +32,7 @@
 
     <div class="overflow-x-auto"> 
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 cursor-pointer" wire:click="sortBy('nombre_proyecto')">
                         Nombre del Proyecto
@@ -62,7 +62,7 @@
             </thead>
             <tbody>
                 @forelse ($contratos as $contrato)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                         <td class="px-4 py-2 text-center">{{ $contrato->nombre_proyecto }}</td>
                         <td class="px-4 py-2 text-center">{{ $contrato->cliente?->nombre ?? '-' }}</td>
                         <td class="px-4 py-2 text-center">{{ $contrato->empresaAsociada?->nombre ?? '-' }}</td>

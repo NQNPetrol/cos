@@ -23,7 +23,7 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <!-- Header -->
                     <div class="flex justify-between items-center mb-6">
@@ -32,7 +32,7 @@
                             <p class="text-gray-400 mt-1">Visualiza turnos, cambios de equipos y pagos en el calendario</p>
                         </div>
                         <a href="{{ route('rodados.index') }}"
-                            class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-600 transition">
+                            class="inline-flex items-center px-4 py-2 bg-zinc-700 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-600 transition">
                             Volver a Gestión
                         </a>
                     </div>
@@ -51,7 +51,7 @@
                     @endif
 
                     <!-- Calendario -->
-                    <div id="calendar" class="bg-gray-800 rounded-lg p-4">
+                    <div id="calendar" class="bg-zinc-800 rounded-lg p-4">
                         <div class="text-center text-gray-400 p-8">
                             Cargando calendario...
                         </div>
@@ -66,8 +66,8 @@
     </div>
 
     <!-- Modal de detalles del evento -->
-    <div id="evento-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-gray-800 border-gray-700">
+    <div id="evento-modal" class="hidden fixed inset-0 bg-zinc-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-zinc-800 border-zinc-700">
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
                     <h3 id="evento-modal-title" class="text-lg font-medium text-gray-100">Detalles del Evento</h3>
@@ -403,7 +403,7 @@
                     .catch(error => {
                         console.error('Error al cargar detalles:', error);
                         content.innerHTML = '<p class="text-red-400">Error al cargar los detalles del evento. Por favor, intenta nuevamente.</p>';
-                        actions.innerHTML = '<button onclick="closeEventoModal()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">Cerrar</button>';
+                        actions.innerHTML = '<button onclick="closeEventoModal()" class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition">Cerrar</button>';
                     });
             }
 

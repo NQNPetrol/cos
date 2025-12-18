@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
@@ -23,13 +23,13 @@
                     </div>
 
                     <!-- Panel de Docks -->
-                    <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                    <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700">
                         <div class="p-6">
                            
                             <!-- Tabla de Docks -->
-                            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                            <div class="overflow-x-auto rounded-lg border border-zinc-700">
                                 <table class="min-w-full divide-y divide-gray-700">
-                                    <thead class="bg-gray-750">
+                                    <thead class="bg-zinc-750">
                                         <tr>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
@@ -39,9 +39,9 @@
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    <tbody class="bg-zinc-800 divide-y divide-gray-700">
                                         @forelse($docks as $dock)
-                                        <tr class="hover:bg-gray-750 transition-colors duration-150">
+                                        <tr class="hover:bg-zinc-750 transition-colors duration-150">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#{{ $dock->id }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
@@ -90,7 +90,7 @@
                                                 <div class="flex items-center space-x-2">
                                                     <!-- Botón Editar -->
                                                     <button onclick="openEditModal({{ $dock->id }}, '{{ $dock->nombre }}', '{{ $dock->descripcion }}', {{ $dock->flytbase_site_id }}, {{ $dock->latitud ?? 'null' }}, {{ $dock->longitud ?? 'null' }}, {{ $dock->altitude ?? 'null' }}, {{ $dock->active ? 'true' : 'false' }})"
-                                                    class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-gray-900/30"
+                                                    class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-zinc-900/30"
                                                     title="Editar dock">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -134,7 +134,7 @@
 
     <!-- Modal de Crear Dock -->
     <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Crear Nuevo Dock</h3>
                 <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-300">
@@ -151,21 +151,21 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Nombre del Dock *</label>
                         <input type="text" name="nombre" required 
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             placeholder="Ej: Dock Principal">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
                         <textarea name="descripcion" rows="3"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             placeholder="Descripción del dock..."></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Site *</label>
                         <select name="flytbase_site_id" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             <option value="">Seleccione un site</option>
                             @foreach($sites as $site)
                                 <option value="{{ $site->id }}">{{ $site->nombre }}</option>
@@ -177,13 +177,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Latitud</label>
                             <input type="number" step="any" name="latitud" 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                 placeholder="0.000000">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Longitud</label>
                             <input type="number" step="any" name="longitud" 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                 placeholder="0.000000">
                         </div>
                         <div>
@@ -193,7 +193,7 @@
                                 id="createAltitude"
                                 inputmode="decimal"
                                 pattern="[+-]?[0-9]*[.]?[0-9]+"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 no-spinner"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 no-spinner"
                                 placeholder="0.00"
                                 onkeypress="return validarDecimal(event)">
                         </div>
@@ -201,14 +201,14 @@
 
                     <div class="flex items-center">
                         <input type="checkbox" name="active" id="createActive" value="1" checked
-                            class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                            class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                         <label for="createActive" class="ml-2 text-sm text-gray-300">Dock activo</label>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                     <button type="button" onclick="closeCreateModal()" 
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" 
@@ -222,7 +222,7 @@
 
     <!-- Modal de Editar Dock -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Editar Dock</h3>
                 <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-300">
@@ -240,21 +240,21 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Nombre del Dock *</label>
                         <input type="text" name="nombre" id="editNombre" required 
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             placeholder="Ej: Dock Principal">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
                         <textarea name="descripcion" id="editDescripcion" rows="3"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             placeholder="Descripción del dock..."></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Site *</label>
                         <select name="flytbase_site_id" id="editFlytbaseSiteId" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             <option value="">Seleccione un site</option>
                             @foreach($sites as $site)
                                 <option value="{{ $site->id }}">{{ $site->nombre }}</option>
@@ -266,13 +266,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Latitud</label>
                             <input type="number" step="any" name="latitud" id="editLatitud"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                 placeholder="0.000000">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Longitud</label>
                             <input type="number" step="any" name="longitud" id="editLongitud"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                 placeholder="0.000000">
                         </div>
                         <div>
@@ -282,7 +282,7 @@
                                 id="editAltitude"
                                 inputmode="decimal"
                                 pattern="[+-]?[0-9]*[.]?[0-9]+"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 no-spinner"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 no-spinner"
                                 placeholder="0.00"
                                 onkeypress="return validarDecimal(event)">
                         </div>
@@ -290,14 +290,14 @@
 
                     <div class="flex items-center">
                         <input type="checkbox" name="active" id="editActive" value="1"
-                            class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                            class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                         <label for="editActive" class="ml-2 text-sm text-gray-300">Dock activo</label>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                     <button type="button" onclick="closeEditModal()" 
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" 

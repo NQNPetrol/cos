@@ -1,5 +1,5 @@
 <div>
-    <div class="max-w-7xl mx-auto p-6 bg-gray-900 text-gray-100 rounded shadow-lg">
+    <div class="max-w-7xl mx-auto p-6 bg-zinc-900 text-gray-100 rounded shadow-lg">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold mb-6">Objetivos SEI</h2>
         </div>
@@ -17,13 +17,13 @@
                     <label class="block mb-1 text-sm">Buscar</label>
                     <input wire:model.live.debounce.300ms="search" type="text" 
                            placeholder="Provincia, localidad, nombre, código..." 
-                           class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                           class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                 </div>
 
                 <div>
                     <label class="block mb-1 text-sm">Provincia</label>
                     <select wire:model.live="pcia" 
-                            class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                            class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                         <option value="">Todas las provincias</option>
                         @foreach($provincias as $provincia)
                             <option value="{{ $provincia }}">{{ $provincia }}</option>
@@ -34,7 +34,7 @@
                 <div>
                     <label class="block mb-1 text-sm">Localidad</label>
                     <select wire:model.live="localidad" 
-                            class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                            class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                         <option value="">Todas las localidades</option>
                         @foreach($localidades as $localidadItem)
                             <option value="{{ $localidadItem }}">{{ $localidadItem }}</option>
@@ -44,7 +44,7 @@
 
                 <div class="flex items-end">
                     <button wire:click="resetFilters" 
-                            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded h-[42px] w-full transition-colors">
+                            class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded h-[42px] w-full transition-colors">
                         Limpiar Filtros
                     </button>
                 </div>
@@ -53,8 +53,8 @@
 
         {{-- Tabla --}}
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-gray-800 border border-gray-700 rounded">
-                <thead class="bg-gray-700 text-gray-300">
+            <table class="min-w-full bg-zinc-800 border border-zinc-700 rounded">
+                <thead class="bg-zinc-700 text-gray-300">
                     <tr>
                         <th class="px-4 py-2 text-left">Código</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
@@ -68,7 +68,7 @@
                 </thead>
                 <tbody>
                     @forelse ($objetivos as $obj)
-                        <tr class="border-b border-gray-700 hover:bg-gray-750 transition-colors">
+                        <tr class="border-b border-zinc-700 hover:bg-zinc-750 transition-colors">
                             <td class="px-4 py-2 font-mono text-sm">{{ $obj->codobj }}</td>
                             <td class="px-4 py-2">{{ $obj->nombre }}</td>
                             <td class="px-4 py-2 font-mono text-sm">{{ $obj->codcli }}</td>

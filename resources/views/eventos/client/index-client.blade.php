@@ -2,7 +2,7 @@
 @section('content')
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
 
                     <!-- Mensajes de sesión -->
@@ -97,7 +97,7 @@
                         <div class="flex items-center gap-3">
                             <!-- Toggle Paginación -->
                             <a href="{{ route('client.eventos.index', array_merge(request()->except('paginate', 'page'), $isPaginated ? [] : ['paginate' => 1])) }}" 
-                               class="px-4 py-2 {{ $isPaginated ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white rounded-md transition-colors flex items-center"
+                               class="px-4 py-2 {{ $isPaginated ? 'bg-green-600 hover:bg-green-700' : 'bg-zinc-600 hover:bg-zinc-700' }} text-white rounded-md transition-colors flex items-center"
                                title="{{ $isPaginated ? 'Desactivar paginación (mostrar todos)' : 'Activar paginación (15 por página)' }}">
                                 <i class="bi {{ $isPaginated ? 'bi-list-check' : 'bi-list' }} mr-2"></i>
                                 {{ $isPaginated ? 'Paginado' : 'Sin paginar' }}
@@ -116,14 +116,14 @@
                             <div class="flex-1 min-w-[220px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Desde</label>
                                 <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                             </div>
                             
                             <!-- Filtro por fecha hasta -->
                             <div class="flex-1 min-w-[220px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Hasta</label>
                                 <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                             </div>
                             
                             <!-- Boton Filtrar -->
@@ -164,7 +164,7 @@
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full dark:divide-gray-700">
-                            <thead class="bg-gray-800 text-gray-300 dark:bg-gray-700">
+                            <thead class="bg-zinc-800 text-gray-300 dark:bg-zinc-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
@@ -175,9 +175,9 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="dark:bg-gray-800 ">
+                            <tbody class="dark:bg-zinc-800 ">
                                 @forelse($eventos as $evento)
-                                <tr class="hover:bg-gray-600 transition-colors">
+                                <tr class="hover:bg-zinc-600 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">{{ str_pad($evento->id, 4, '0', STR_PAD_LEFT) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 dark:text-gray-300">
                                         <a href="#" class="text-blue-400 hover:text-blue-300">{{ $evento->categoria?->nombre ?? 'Sin categoría' }}</a>
@@ -261,8 +261,8 @@
         </div>
         <!-- Modal para Notas Adicionales -->
         <div id="modalNotas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-            <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl">
-                <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+            <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                     <h3 class="text-xl font-semibold text-white">Agregar Notas Adicionales</h3>
                     <button type="button" 
                             class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -283,7 +283,7 @@
                                     Notas Adicionales
                                 </label>
                                 <textarea name="notas_adicionales" id="notas_adicionales" rows="6" required
-                                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                         placeholder="Ingrese las notas adicionales para este evento..."></textarea>
                                 <p class="text-xs text-gray-400 mt-1">Máximo 1000 caracteres</p>
                             </div>
@@ -291,7 +291,7 @@
 
                         <div class="flex justify-end space-x-3 mt-6">
                             <button type="button" 
-                                    class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                    class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white transition-colors"
                                     onclick="cerrarModalNotas()">
                                 Cancelar
                             </button>

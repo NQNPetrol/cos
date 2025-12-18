@@ -1,7 +1,7 @@
 <div>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
                     <!-- Header con botón volver -->
                     <div class="mb-6">
@@ -13,7 +13,7 @@
                             
                             <div>
                                 <button wire:click="backToList" 
-                                        class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
+                                        class="inline-flex items-center px-4 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:outline-none focus:border-zinc-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                     </svg>
@@ -24,14 +24,14 @@
                     </div>
 
                     <!-- Contenido Principal -->
-                    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <div class="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                         @if($record)
                             <!-- Imagen o Mensaje de No Disponible -->
                             <div class="text-center">
                                 @if($hasImage && $imageData)
                                     <div class="mb-6">
                                         <h3 class="text-lg font-medium text-gray-300 mb-4">Imagen Capturada</h3>
-                                        <div class="bg-black rounded-lg p-4 border border-gray-600 inline-block max-w-full">
+                                        <div class="bg-black rounded-lg p-4 border border-zinc-600 inline-block max-w-full">
                                             <img 
                                                 src="{{ $imageData }}" 
                                                 alt="Vehículo {{ $plateNo }}"

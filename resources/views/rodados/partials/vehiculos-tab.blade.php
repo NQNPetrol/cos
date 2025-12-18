@@ -24,7 +24,7 @@
     <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Marca</label>
-            <select id="filtro-marca" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+            <select id="filtro-marca" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                 <option value="">Todas</option>
                 @foreach($rodados->pluck('marca')->unique() as $marca)
                     <option value="{{ $marca }}">{{ $marca }}</option>
@@ -33,7 +33,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Cliente</label>
-            <select id="filtro-cliente" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+            <select id="filtro-cliente" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                 <option value="">Todos</option>
                 @foreach($clientes as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -42,7 +42,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
-            <select id="filtro-tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+            <select id="filtro-tipo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                 <option value="">Todos</option>
                 @foreach($rodados->pluck('tipo_vehiculo')->unique() as $tipo)
                     <option value="{{ $tipo }}">{{ $tipo }}</option>
@@ -51,7 +51,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Propiedad</label>
-            <select id="filtro-propiedad" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+            <select id="filtro-propiedad" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                 <option value="">Todos</option>
                 <option value="propio">Propio</option>
                 @foreach($proveedores as $proveedor)
@@ -62,9 +62,9 @@
     </div>
 
     <!-- Tabla de vehículos -->
-    <div class="overflow-x-auto rounded-lg border border-gray-700">
+    <div class="overflow-x-auto rounded-lg border border-zinc-700">
         <table class="min-w-full divide-y divide-gray-700">
-            <thead class="bg-gray-800">
+            <thead class="bg-zinc-800">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Marca/Modelo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
@@ -75,9 +75,9 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="bg-gray-800 divide-y divide-gray-700" id="vehiculos-table-body">
+            <tbody class="bg-zinc-800 divide-y divide-gray-700" id="vehiculos-table-body">
                 @forelse($rodados as $rodado)
-                <tr class="vehiculo-row hover:bg-gray-750 transition-colors" 
+                <tr class="vehiculo-row hover:bg-zinc-750 transition-colors" 
                     data-marca="{{ $rodado->marca }}"
                     data-tipo="{{ $rodado->tipo_vehiculo }}"
                     data-cliente="{{ $rodado->cliente_id }}"

@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
     @if (session()->has('approval-error'))
     <div x-data="{ show: true }" 
          x-show="show" 
@@ -59,11 +59,11 @@
     </div>
 
     <!-- Filtros -->
-    <div class="bg-gray-800 rounded-lg p-4 mb-6">
+    <div class="bg-zinc-800 rounded-lg p-4 mb-6">
         <div class="flex items-center space-x-4">
             <label class="text-sm text-gray-300">Filtrar por estado:</label>
             <select wire:model="filtroEstado" 
-                    class="bg-gray-700 border border-gray-600 rounded-md px-3 py-1 text-gray-100 text-sm">
+                    class="bg-zinc-700 border border-zinc-600 rounded-md px-3 py-1 text-gray-100 text-sm">
                 <option value="">Todos</option>
                 <option value="pendiente">Pendientes</option>
                 <option value="aprobada">Aprobadas</option>
@@ -75,7 +75,7 @@
     <!-- Tabla de Peticiones -->
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-3 text-left">Nombre</th>
                     <th class="px-4 py-3 text-left">Cliente</th>
@@ -91,7 +91,7 @@
             </thead>
             <tbody>
                 @forelse($peticiones as $peticion)
-                <tr class="border-b border-gray-700 hover:bg-gray-800 transition-colors">
+                <tr class="border-b border-zinc-700 hover:bg-zinc-800 transition-colors">
                     <td class="px-4 py-3">
                         <div class="font-medium text-gray-100">{{ $peticion->nombre }}</div>
                         <div class="text-xs text-gray-400 truncate max-w-xs">{{ $peticion->descripcion ?: 'Sin descripción' }}</div>
@@ -126,7 +126,7 @@
                                 'aprobada' => 'bg-green-100 text-green-800',
                                 'rechazada' => 'bg-red-100 text-red-800'
                             ];
-                            $color = $estadoColors[$peticion->estado] ?? 'bg-gray-100 text-gray-800';
+                            $color = $estadoColors[$peticion->estado] ?? 'bg-zinc-100 text-gray-800';
                         @endphp
                         <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $color }}">
                             {{ ucfirst($peticion->estado) }}
@@ -140,7 +140,7 @@
                     <td class="px-4 py-3">
                         <div class="flex space-x-2">
                             <button wire:click="verPeticion({{ $peticion->id }})" 
-                                    class="text-blue-400 hover:text-blue-300 transition-colors p-1 rounded hover:bg-gray-700"
+                                    class="text-blue-400 hover:text-blue-300 transition-colors p-1 rounded hover:bg-zinc-700"
                                     title="Ver detalles">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-up-right" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M6.364 13.5a.5.5 0 0 0 .5.5H13.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 13.5 1h-10A1.5 1.5 0 0 0 2 2.5v6.636a.5.5 0 1 0 1 0V2.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H6.864a.5.5 0 0 0-.5.5"/>
@@ -150,7 +150,7 @@
                             
                             <button wire:click="eliminarPeticion({{ $peticion->id }})" 
                                     wire:confirm="¿Estás seguro de que quieres eliminar esta petición?"
-                                    class="text-red-400 hover:text-red-300 transition-colors p-1 rounded hover:bg-gray-700"
+                                    class="text-red-400 hover:text-red-300 transition-colors p-1 rounded hover:bg-zinc-700"
                                     title="Eliminar petición">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
@@ -240,13 +240,13 @@
                 background: #9CA3AF; /* gray-400 */
             }
         </style>
-        <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-scroll"
+        <div class="bg-zinc-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-scroll"
              wire:click.stop>
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-semibold text-gray-100">Detalles de la Petición</h3>
                     <button wire:click="closeModal" 
-                            class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 transition-colors lg:hidden">
+                            class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-zinc-700 transition-colors lg:hidden">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
@@ -330,7 +330,7 @@
                         
                         @if(!empty($waypointsData) && is_array($waypointsData))
                             @foreach($waypointsData as $index => $waypoint)
-                            <div class="bg-gray-700 rounded p-3">
+                            <div class="bg-zinc-700 rounded p-3">
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="font-medium text-gray-200">Waypoint {{ $index + 1 }}</span>
                                 </div>
@@ -359,7 +359,7 @@
                             </div>
                             @endforeach
                         @else
-                            <div class="bg-gray-700 rounded p-4 text-center text-gray-400">
+                            <div class="bg-zinc-700 rounded p-4 text-center text-gray-400">
                                 <i class="fas fa-map-marker-alt text-xl mb-2 block"></i>
                                 No hay waypoints definidos
                             </div>
@@ -374,13 +374,13 @@
                     <textarea wire:model="comentariosRevisor" 
                               rows="3"
                               placeholder="Agregar comentarios sobre la revisión de esta petición..."
-                              class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                              class="w-full bg-zinc-700 border border-zinc-600 rounded-md px-3 py-2 text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
                 @endif
 
                 <!-- Información de Revisión -->
                 @if($selectedPeticion->revisado_por)
-                <div class="border-t border-gray-700 pt-4">
+                <div class="border-t border-zinc-700 pt-4">
                     <h4 class="text-lg font-medium text-gray-200 mb-4">Información de Revisión</h4>
                     <div class="space-y-3">
                         <div>
@@ -399,7 +399,7 @@
 
                 <!-- Botones de acción -->
                 @if($selectedPeticion->estado === 'pendiente')
-                <div class="border-t border-gray-700 pt-6 mt-6">
+                <div class="border-t border-zinc-700 pt-6 mt-6">
                     <div class="flex justify-end space-x-3">
                         <button wire:click="rechazarMision" 
                                 wire:confirm="¿Estás seguro de que quieres rechazar esta petición?"

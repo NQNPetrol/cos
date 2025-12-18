@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <div class="space-y-8">
                         <!-- Header -->
@@ -13,7 +13,7 @@
                         </div>
 
                         <!-- Filtros -->
-                        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                             <h3 class="text-lg font-medium text-gray-100 mb-4">Filtros</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <!-- Filtro por Drone -->
@@ -22,7 +22,7 @@
                                         Drone
                                     </label>
                                     <select id="droneFilter" name="drone" 
-                                            class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                         <option value="">Todos los drones</option>
                                         @foreach($galleryData['drones'] as $drone)
                                             <option value="{{ $drone['name'] }}" 
@@ -39,7 +39,7 @@
                                         Cliente
                                     </label>
                                     <select id="clientFilter" name="client" 
-                                            class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                         <option value="">Todos los clientes</option>
                                         @php
                                             $allClients = [];
@@ -64,7 +64,7 @@
                                         Misión
                                     </label>
                                     <select id="missionFilter" name="mission" 
-                                            class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                         <option value="">Todas las misiones</option>
                                         @php
                                             $allMissions = [];
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="flex space-x-3">
                                     <button type="button" id="clearFilters" 
-                                            class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
+                                            class="inline-flex items-center px-4 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:outline-none focus:border-zinc-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
                                         Limpiar Filtros
                                     </button>
                                     <button type="button" id="applyFilters" 
@@ -108,7 +108,7 @@
                         </div>
 
                         <!-- Grid de Imágenes -->
-                        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-lg font-medium text-gray-100">Media</h3>
                                 <div class="flex items-center space-x-4">
@@ -116,12 +116,12 @@
                                         {{ $galleryData['stats']['total_images'] + $galleryData['stats']['total_videos'] }} elementos
                                     </span>
                                     <div class="flex items-center space-x-2">
-                                        <button id="gridView" class="p-2 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition">
+                                        <button id="gridView" class="p-2 rounded bg-zinc-700 text-gray-300 hover:bg-zinc-600 transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                             </svg>
                                         </button>
-                                        <button id="listView" class="p-2 rounded text-gray-500 hover:bg-gray-600 hover:text-gray-300 transition">
+                                        <button id="listView" class="p-2 rounded text-gray-500 hover:bg-zinc-600 hover:text-gray-300 transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                                             </svg>
@@ -158,7 +158,7 @@
                                         
                                         Log::info("VISTA GALLERY: Tipo: {$media['type']}");
                                     @endphp
-                                    <div class="media-item bg-gray-700 rounded-lg overflow-hidden border border-gray-600 hover:border-blue-500 transition-all duration-300" 
+                                    <div class="media-item bg-zinc-700 rounded-lg overflow-hidden border border-zinc-600 hover:border-blue-500 transition-all duration-300" 
                                          data-drone="{{ $media['patterns']['prefix'] }}"
                                          data-client="{{ $galleryService->extractClientFromMission($media['patterns']['mission']) }}"
                                          data-mission="{{ $media['patterns']['mission'] }}"
@@ -201,7 +201,7 @@
                                         @else
                                             <!-- Tarjeta de Video -->
                                             <div class="relative group">
-                                                <div class="w-full h-48 bg-gray-600 flex items-center justify-center cursor-pointer"
+                                                <div class="w-full h-48 bg-zinc-600 flex items-center justify-center cursor-pointer"
                                                      onclick="openModal('{{ $media['url'] }}', '{{ $media['filename'] }}', 'video')">
                                                     <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
@@ -257,9 +257,9 @@
     <!-- Modal para visualización -->
     <div id="galleryModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
         <div class="relative max-w-6xl max-h-full w-full mx-4">
-            <div class="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+            <div class="bg-zinc-900 rounded-lg overflow-hidden shadow-2xl">
                 <!-- Header con título y botón cerrar -->
-                <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <div class="flex justify-between items-center p-4 border-b border-zinc-700">
                     <h3 id="modalTitle" class="text-lg font-semibold text-white truncate max-w-2xl">
                         <!-- Título dinámico se insertará aquí -->
                     </h3>
@@ -501,15 +501,15 @@
         document.getElementById('gridView').addEventListener('click', function() {
             document.getElementById('mediaGrid').classList.remove('grid-cols-1');
             document.getElementById('mediaGrid').classList.add('grid-cols-1', 'sm:grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-4', 'xl:grid-cols-5');
-            this.classList.add('bg-gray-700', 'text-gray-300');
-            document.getElementById('listView').classList.remove('bg-gray-700', 'text-gray-300');
+            this.classList.add('bg-zinc-700', 'text-gray-300');
+            document.getElementById('listView').classList.remove('bg-zinc-700', 'text-gray-300');
         });
 
         document.getElementById('listView').addEventListener('click', function() {
             document.getElementById('mediaGrid').classList.remove('sm:grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-4', 'xl:grid-cols-5');
             document.getElementById('mediaGrid').classList.add('grid-cols-1');
-            this.classList.add('bg-gray-700', 'text-gray-300');
-            document.getElementById('gridView').classList.remove('bg-gray-700', 'text-gray-300');
+            this.classList.add('bg-zinc-700', 'text-gray-300');
+            document.getElementById('gridView').classList.remove('bg-zinc-700', 'text-gray-300');
         });
     </script>
 

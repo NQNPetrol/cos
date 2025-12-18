@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
 
     <h2 class="text-2xl font-bold mb-6">Listado de Personal</h2>
 
@@ -10,13 +10,13 @@
             <input type="text"
                 wire:model.live="search"
                 placeholder="Nombre o apellido"
-                class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-gray-200 text-sm">
         </div>
 
         <!-- Filtro por Cliente -->
         <div class="flex-1 min-w-[180px]">
             <label class="block text-sm mb-1">Cliente</label>
-            <select wire:model="cliente_id" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+            <select wire:model="cliente_id" class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-gray-200 text-sm">
                 <option value="">Todos los clientes</option>
                 @foreach($clientes as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -27,7 +27,7 @@
         <!-- Filtro por Convenio -->
         <div class="flex-1 min-w-[150px]">
             <label class="block text-sm mb-1">Convenio</label>
-            <select wire:model="convenio" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 text-sm">
+            <select wire:model="convenio" class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-gray-200 text-sm">
                 <option value="">Todos</option>
                 @foreach($convenios as $convenioItem)
                     <option value="{{ $convenioItem }}">{{ $convenioItem }}</option>
@@ -42,7 +42,7 @@
                 Aplicar
             </button>
             <button wire:click="limpiarFiltros" 
-                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors text-sm whitespace-nowrap">
+                    class="bg-zinc-600 hover:bg-zinc-700 text-white px-4 py-2 rounded transition-colors text-sm whitespace-nowrap">
                 Limpiar
             </button>
         </div>
@@ -51,7 +51,7 @@
     
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2">Nombre</th>
                     <th class="px-4 py-2">Apellido</th>
@@ -66,7 +66,7 @@
             </thead>
             <tbody>
                 @forelse ($personal as $p)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                         <td class="px-4 py-2 text-center">{{ $p->nombre ?? '-' }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->apellido ?? '-' }}</td>
                         <td class="px-4 py-2 text-center">{{ $p->nro_doc ?? '-' }}</td>

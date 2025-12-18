@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <!-- Header -->
                     <div class="flex justify-between items-center mb-6">
@@ -34,18 +34,18 @@
                     @endif
 
                     <!-- Tabs Navigation -->
-                    <div class="border-b border-gray-700 mb-6">
+                    <div class="border-b border-zinc-700 mb-6">
                         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                             <button onclick="switchTab('vehiculos')" id="tab-vehiculos" 
                                 class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-blue-400 border-blue-500">
                                 Vehículos
                             </button>
                             <button onclick="switchTab('servicios')" id="tab-servicios" 
-                                class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300">
+                                class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 border-transparent hover:text-gray-300 hover:border-zinc-300">
                                 Servicios
                             </button>
                             <button onclick="switchTab('pagos')" id="tab-pagos" 
-                                class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300">
+                                class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 border-transparent hover:text-gray-300 hover:border-zinc-300">
                                 Pagos
                             </button>
                         </nav>

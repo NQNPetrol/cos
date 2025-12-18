@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto p-6 bg-gray-900 text-gray-50 rounded-lg shadow">
+<div class="max-w-4xl mx-auto p-6 bg-zinc-900 text-gray-50 rounded-lg shadow">
     <h2 class="text-2xl font-bold mb-6 text-gray-200">Administrar Permisos</h2>
 
     @if (session()->has('success'))
@@ -13,12 +13,12 @@
     @endif
 
     <!-- Formulario para crear permiso -->
-    <form wire:submit.prevent="createPermission" class="mb-8 bg-gray-800 rounded-lg p-6 shadow">
+    <form wire:submit.prevent="createPermission" class="mb-8 bg-zinc-800 rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold mb-4 text-gray-200">Crear Nuevo Permiso</h3>
         
         <div class="flex items-center gap-3">
             <input type="text" wire:model="name" placeholder="Ingrese el nombre del permiso" 
-                   class="flex-1 bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 
+                   class="flex-1 bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-3 
                           focus:ring-2 focus:ring-emerald-500 focus:border-transparent 
                           placeholder-gray-400 transition duration-200">
             
@@ -44,7 +44,7 @@
     </form>
 
     <!-- Lista de permisos existentes -->
-    <div class="bg-gray-800 rounded-lg p-6 shadow">
+    <div class="bg-zinc-800 rounded-lg p-6 shadow">
         <h3 class="text-lg font-semibold mb-4 text-gray-200 flex items-center">
             <svg class="w-5 h-5 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -55,9 +55,9 @@
         @if($permissions->count() > 0)
             <div class="space-y-3">
                 @foreach ($permissions as $permission)
-                    <div class="flex justify-between items-center bg-gray-700 p-4 rounded-lg 
-                                hover:bg-gray-600 transition duration-200 group">
-                        <span class="font-mono text-sm text-gray-200 bg-gray-600 px-3 py-1 rounded">
+                    <div class="flex justify-between items-center bg-zinc-700 p-4 rounded-lg 
+                                hover:bg-zinc-600 transition duration-200 group">
+                        <span class="font-mono text-sm text-gray-200 bg-zinc-600 px-3 py-1 rounded">
                             {{ $permission->name }}
                         </span>
                         
@@ -84,8 +84,8 @@
     </div>
 
     <!-- Loading indicator -->
-    <div wire:loading class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+    <div wire:loading class="fixed inset-0 bg-zinc-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-zinc-800 p-6 rounded-lg shadow-xl">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400 mx-auto"></div>
             <p class="text-gray-300 mt-4">Procesando...</p>
         </div>

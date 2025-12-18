@@ -1,6 +1,6 @@
 <!-- Modal para revisar y aprobar/rechazar cobertura -->
-<div id="revisar-cobertura-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 shadow-lg rounded-md bg-gray-800 border-gray-700 max-h-[90vh] overflow-y-auto">
+<div id="revisar-cobertura-modal" class="hidden fixed inset-0 bg-zinc-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 shadow-lg rounded-md bg-zinc-800 border-zinc-700 max-h-[90vh] overflow-y-auto">
         <div class="mt-3">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Revisar Cobertura de Servicio</h3>
@@ -18,7 +18,7 @@
 
             <div class="flex justify-end space-x-3 mt-6">
                 <button type="button" onclick="closeRevisarCoberturaModal()"
-                    class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition">
+                    class="px-4 py-2 bg-zinc-700 text-gray-300 rounded-md hover:bg-zinc-600 transition">
                     Cerrar
                 </button>
                 <button type="button" onclick="aprobarCobertura()" id="btn-aprobar-cobertura"

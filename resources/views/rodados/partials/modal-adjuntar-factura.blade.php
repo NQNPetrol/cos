@@ -1,6 +1,6 @@
 <!-- Modal reutilizable para adjuntar factura -->
-<div id="adjuntar-factura-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-gray-800 border-gray-700">
+<div id="adjuntar-factura-modal" class="hidden fixed inset-0 bg-zinc-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-zinc-800 border-zinc-700">
         <div class="mt-3">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="adjuntar-factura-modal-title" class="text-lg font-medium text-gray-100">Adjuntar Factura</h3>
@@ -21,7 +21,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Factura (PDF, JPG, PNG) *</label>
                         <input type="file" id="adjuntar-factura-file" name="factura" accept=".pdf,.jpg,.jpeg,.png" required
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
                             onchange="previewFile(this, 'factura-preview')">
                         <div id="factura-preview" class="mt-2"></div>
                     </div>
@@ -29,7 +29,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Comprobante de Pago (PDF, JPG, PNG) (opcional)</label>
                         <input type="file" id="adjuntar-comprobante-file" name="comprobante_pago" accept=".pdf,.jpg,.jpeg,.png"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
                             onchange="previewFile(this, 'comprobante-preview')">
                         <div id="comprobante-preview" class="mt-2"></div>
                     </div>
@@ -37,7 +37,7 @@
 
                 <div class="flex justify-end space-x-3 mt-6">
                     <button type="button" onclick="closeAdjuntarFacturaModal()"
-                        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition">
+                        class="px-4 py-2 bg-zinc-700 text-gray-300 rounded-md hover:bg-zinc-600 transition">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -118,11 +118,11 @@
                 if (file.type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.className = 'max-w-xs max-h-48 rounded-md border border-gray-600';
+                    img.className = 'max-w-xs max-h-48 rounded-md border border-zinc-600';
                     preview.appendChild(img);
                 } else {
                     const div = document.createElement('div');
-                    div.className = 'p-2 bg-gray-700 rounded-md text-sm text-gray-300';
+                    div.className = 'p-2 bg-zinc-700 rounded-md text-sm text-gray-300';
                     div.textContent = `Archivo: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
                     preview.appendChild(div);
                 }

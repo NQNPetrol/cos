@@ -11,13 +11,13 @@
                 <label class="block text-base font-semibold mb-1 text-gray-200">Buscar</label>
                 <input type="text" wire:model.live="search"
                        placeholder="Patente, marca, modelo..."
-                       class="w-full bg-transparent border-gray-300 rounded px-3 py-2 text-gray-200">
+                       class="w-full bg-transparent border-zinc-300 rounded px-3 py-2 text-gray-200">
             </div>
             
             <div>
                 <label class="block text-base font-semibold mb-1 text-gray-200">Estado</label>
                 <select wire:model.live="estadoFilter" 
-                        class="w-full bg-transparent border-gray-300 rounded px-3 py-2 text-gray-200">
+                        class="w-full bg-transparent border-zinc-300 rounded px-3 py-2 text-gray-200">
                     <option value="">Todos</option>
                     <option value="operativa">Operativa</option>
                     <option value="disponible">Disponible</option>
@@ -55,7 +55,7 @@
                                 <!-- Modo edición -->
                                 <div class="flex items-center space-x-2">
                                     <select wire:model="nuevoEstado" 
-                                            class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200">
+                                            class="bg-zinc-800 border border-zinc-600 rounded px-2 py-1 text-sm text-gray-200">
                                         <option value="operativa">Operativa</option>
                                         <option value="disponible">Disponible</option>
                                         <option value="en mantenimiento">En mantenimiento</option>
@@ -65,7 +65,7 @@
                                         Guardar
                                     </button>
                                     <button wire:click="cancelarEdicion"
-                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                            class="bg-zinc-600 hover:bg-zinc-700 text-white px-2 py-1 rounded text-xs">
                                         Cancelar
                                     </button>
                                 </div>
@@ -95,14 +95,14 @@
                                 <div class="flex items-center space-x-2">
                                     <input type="text" 
                                            wire:model="nuevoObjetivo"
-                                           class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
+                                           class="bg-zinc-800 border border-zinc-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
                                            placeholder="Objetivo/Servicio">
                                     <button wire:click="guardarObjetivo({{ $patrulla->id }})"
                                             class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
                                         Guardar
                                     </button>
                                     <button wire:click="cancelarEdicionObjetivo"
-                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                            class="bg-zinc-600 hover:bg-zinc-700 text-white px-2 py-1 rounded text-xs">
                                         Cancelar
                                     </button>
                                 </div>
@@ -127,14 +127,14 @@
                                 <div class="flex items-center space-x-2">
                                     <input type="text" 
                                            wire:model="nuevaObservacion"
-                                           class="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
+                                           class="bg-zinc-800 border border-zinc-600 rounded px-2 py-1 text-sm text-gray-200 w-32"
                                            placeholder="Observación">
                                     <button wire:click="guardarObservacion({{ $patrulla->id }})"
                                             class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
                                         Guardar
                                     </button>
                                     <button wire:click="cancelarEdicionObservacion"
-                                            class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs">
+                                            class="bg-zinc-600 hover:bg-zinc-700 text-white px-2 py-1 rounded text-xs">
                                         Cancelar
                                     </button>
                                 </div>
@@ -228,7 +228,7 @@
         <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
             <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 <!-- Header del Modal -->
-                <div class="bg-[#1a1d1f] px-6 py-4 border-b border-gray-200">
+                <div class="bg-[#1a1d1f] px-6 py-4 border-b border-zinc-200">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-bold text-gray-200">
                             PATRULLA {{ $patrullaSeleccionada->patente }}

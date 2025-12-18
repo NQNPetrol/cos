@@ -82,7 +82,7 @@
 
                 <!-- Contenedor del Mapa -->
                 <div class="bg-[#252728] rounded-lg p-4">
-                    <div class="h-[600px] bg-gray-700 rounded-lg" id="map-container">
+                    <div class="h-[600px] bg-zinc-700 rounded-lg" id="map-container">
                         <div id="map" style="height: 100%; width: 100%;"></div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         </thead>
                         <tbody class="bg-[#232527] divide-y divide-gray-600" id="vehicles-table-body">
                             @forelse($mobileVehicles as $vehicle)
-                                <tr class="hover:bg-gray-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
+                                <tr class="hover:bg-zinc-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-white">{{ $vehicle->mobile_vehicle_index_code }}</div>
                                     </td>
@@ -121,16 +121,16 @@
                                         <div class="text-sm text-gray-300">
                                             @switch($vehicle->region_index_code)
                                                 @case('6')
-                                                    <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">TECHINT</span>
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">TECHINT</span>
                                                     @break
                                                 @case('11')
-                                                    <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">PECOM</span>
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">PECOM</span>
                                                     @break
                                                 @case('23')
-                                                    <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">VARIOS</span>
                                                     @break
                                                 @default
-                                                    <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">VARIOS</span>
                                             @endswitch
                                         </div>
                                     </td>

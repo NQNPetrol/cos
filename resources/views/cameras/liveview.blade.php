@@ -21,7 +21,7 @@
                                     Ir a HikCentral
                                 </a>
                                 <a href="{{ route('cameras.index') }}" 
-                                   class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center">
+                                   class="bg-zinc-700 hover:bg-zinc-600 text-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                     </svg>
@@ -32,7 +32,7 @@
                     </div>
 
                     <!-- Contenedor del video -->
-                    <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                    <div class="bg-zinc-800 rounded-lg p-4 mb-6">
                         <div class="flex justify-center items-center min-h-96">
                             @if($camera->stream && $camera->stream->url && $camera->status == 1)
                                 <!-- Video en vivo -->
@@ -89,7 +89,7 @@
 
                     <!-- Información de la cámara -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="bg-zinc-700 rounded-lg p-4">
                             <h3 class="text-lg font-semibold text-white mb-3">Información de la Cámara</h3>
                             <div class="space-y-2">
                                 <p><span class="text-gray-400">Nombre:</span> {{ $camera->camera_name }}</p>
@@ -107,7 +107,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="bg-zinc-700 rounded-lg p-4">
                             <h3 class="text-lg font-semibold text-white mb-3">Información de Streaming</h3>
                             <div class="space-y-2">
                                 @if($camera->stream && $camera->stream->url)

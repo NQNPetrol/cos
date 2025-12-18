@@ -33,13 +33,13 @@
                 <label class="block text-base font-semibold mb-2 text-gray-200">Buscar</label>
                 <input type="text" wire:model.live="search"
                        placeholder="Patente, marca, modelo..."
-                       class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                       class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
             </div>
             
             <div>
                 <label class="block text-base font-semibold mb-2 text-gray-200">Estado</label>
                 <select wire:model.live="estadoFilter" 
-                        class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                        class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                     <option value="">Todos</option>
                     <option value="operativa">Operativa</option>
                     <option value="mantenimiento">En mantenimiento</option>
@@ -154,7 +154,7 @@
      @if($showModal)
         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
             <div class="bg-[#252728] rounded-lg p-6 w-full max-w-2xl" @click.stop>
-                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
+                <div class="flex justify-between items-center mb-4 border-b border-zinc-200 pb-4">
                     <h3 class="text-xl font-bold text-gray-200">
                         {{ $editingId ? 'Editar Patrulla' : 'Nueva Patrulla' }}
                     </h3>
@@ -170,42 +170,42 @@
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Patente <span class="text-red-500">*</span></label>
                             <input type="text" wire:model="patente" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('patente') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Marca</label>
                             <input type="text" wire:model="marca" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('marca') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Modelo</label>
                             <input type="text" wire:model="modelo" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('modelo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Color</label>
                             <input type="text" wire:model="color" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('color') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Año</label>
                             <input type="text" wire:model="año" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('año') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Estado</label>
                             <select wire:model="estado" 
-                                    class="w-full bg-[#232527] border-gray-300 rounded px-3 py-2 text-gray-200">
+                                    class="w-full bg-[#232527] border-zinc-300 rounded px-3 py-2 text-gray-200">
                                 <option value="operativa">Operativa</option>
                                 <option value="mantenimiento">En mantenimiento</option>
                                 <option value="baja">Dada de baja</option>
@@ -216,7 +216,7 @@
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Cliente Asignado <span class="text-red-500">*</span></label>
                             <select wire:model="cliente_id" 
-                                    class="w-full bg-[#232527] border-gray-300 rounded px-3 py-2 text-gray-200">
+                                    class="w-full bg-[#232527] border-zinc-300 rounded px-3 py-2 text-gray-200">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -228,12 +228,12 @@
                         <div>
                             <label class="block text-sm font-semibold mb-2 text-gray-200">Observaciones</label>
                             <input type="text" wire:model="observaciones" 
-                                   class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200">
                             @error('observaciones') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-zinc-200">
                         <button type="button" wire:click="closeModal"
                                 class="px-4 py-2 text-gray-300 hover:text-gray-100 transition-colors">
                             Cancelar

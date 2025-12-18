@@ -1,8 +1,8 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Registros de Vuelo - Administración</h2>
         <button wire:click="limpiarFiltros" 
-                class="px-4 py-2 text-sm font-medium text-gray-200 bg-gray-800 border border-gray-700 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                class="px-4 py-2 text-sm font-medium text-gray-200 bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
             Limpiar Filtros
         </button>
     </div>
@@ -13,20 +13,20 @@
             <label class="block text-sm mb-1">Fecha Desde</label>
             <input type="date" 
                    wire:model.live="fechaDesde"
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
         </div>
         
         <div>
             <label class="block text-sm mb-1">Fecha Hasta</label>
             <input type="date" 
                    wire:model.live="fechaHasta"
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
         </div>
 
         <div>
             <label class="block text-sm mb-1">Cliente</label>
             <select wire:model.live="clienteId"
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 <option value="">Todos los clientes</option>
                 @foreach($clientes as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -37,7 +37,7 @@
         <div>
             <label class="block text-sm mb-1">Nombre del Drone</label>
             <select wire:model.live="droneName"
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 <option value="">Todos los drones</option>
                 @foreach($drones as $drone)
                     <option value="{{ $drone }}">{{ $drone }}</option>
@@ -48,7 +48,7 @@
         <div>
             <label class="block text-sm mb-1">Nombre de Misión</label>
             <select wire:model.live="misionNombre"
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 <option value="">Todas las misiones</option>
                 @foreach($misiones as $mision)
                     <option value="{{ $mision->nombre }}">{{ $mision->nombre }}</option>
@@ -60,7 +60,7 @@
     <!-- Tabla -->
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                         <a href="#" wire:click.prevent="sortBy('id')" class="hover:text-blue-400 transition-colors">
@@ -175,7 +175,7 @@
             </thead>
             <tbody>
                 @forelse($flightLogs as $log)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800 transition-colors">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800 transition-colors">
                         <!-- ID -->
                         <td class="px-4 py-3">
                             <div class="text-gray-200 font-medium">
@@ -249,7 +249,7 @@
                                     'en_proceso' => 'bg-blue-100 text-blue-800', 
                                     'interrumpido' => 'bg-red-100 text-red-800',
                                 ];
-                                $color = $estadoColors[$log->estado] ?? 'bg-gray-100 text-gray-800';
+                                $color = $estadoColors[$log->estado] ?? 'bg-zinc-100 text-gray-800';
                             @endphp
                             <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $color }}">
                                 {{ ucfirst(str_replace('_', ' ', $log->estado)) }}
@@ -260,7 +260,7 @@
                         <td class="px-4 py-3">
                             @if($log->drone_battery)
                                 <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-gray-700 rounded-full h-2">
+                                    <div class="w-16 bg-zinc-700 rounded-full h-2">
                                         @php
                                             $batteryPercent = intval(str_replace('%', '', $log->drone_battery));
                                             $batteryColor = $batteryPercent > 50 ? 'bg-green-500' : 
@@ -304,7 +304,7 @@
 @push('styles')
 <style>
     /* Personalización de la paginación para tema oscuro */
-    .bg-gray-900 .pagination {
+    .bg-zinc-900 .pagination {
         display: flex;
         justify-content: center;
         list-style: none;
@@ -312,12 +312,12 @@
         margin: 0;
     }
     
-    .bg-gray-900 .pagination li {
+    .bg-zinc-900 .pagination li {
         margin: 0 2px;
     }
     
-    .bg-gray-900 .pagination a,
-    .bg-gray-900 .pagination span {
+    .bg-zinc-900 .pagination a,
+    .bg-zinc-900 .pagination span {
         display: block;
         padding: 8px 12px;
         border: 1px solid #374151;
@@ -327,18 +327,18 @@
         transition: all 0.2s;
     }
     
-    .bg-gray-900 .pagination a:hover {
+    .bg-zinc-900 .pagination a:hover {
         background-color: #374151;
         border-color: #4b5563;
     }
     
-    .bg-gray-900 .pagination .active span {
+    .bg-zinc-900 .pagination .active span {
         background-color: #3b82f6;
         border-color: #3b82f6;
         color: white;
     }
     
-    .bg-gray-900 .pagination .disabled span {
+    .bg-zinc-900 .pagination .disabled span {
         background-color: #1f2937;
         border-color: #374151;
         color: #6b7280;

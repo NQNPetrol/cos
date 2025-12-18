@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto p-6 bg-gray-900 text-gray-50 rounded-lg shadow">
+    <div class="max-w-4xl mx-auto p-6 bg-zinc-900 text-gray-50 rounded-lg shadow">
         <h2 class="text-2xl font-bold mb-6">Crear Contrato</h2>
 
         @if ($errors->any())

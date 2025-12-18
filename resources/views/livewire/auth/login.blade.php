@@ -59,7 +59,7 @@
             <label class="flex items-center">
                 <input type="checkbox" 
                        wire:model="remember"
-                       class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                       class="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500">
                 <span class="ml-2 block text-sm text-gray-700">Recordarme</span>
             </label>
             

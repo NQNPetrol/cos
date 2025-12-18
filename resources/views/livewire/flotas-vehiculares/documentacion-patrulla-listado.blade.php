@@ -35,7 +35,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-200 mb-2">Nombre *</label>
                     <select wire:model="nuevoNombre"
-                            class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200 text-sm modal-select">
+                            class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200 text-sm modal-select">
                         <option value="">Seleccionar tipo</option>
                         @foreach($opcionesDocumentacion as $opcion)
                             <option value="{{ $opcion }}">{{ $opcion }}</option>
@@ -51,7 +51,7 @@
                     <label class="block text-sm font-semibold text-gray-200 mb-2">Fecha Inicio *</label>
                     <input type="date" 
                            wire:model="nuevaFechaInicio"
-                           class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200 text-sm">
+                           class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200 text-sm">
                     @error('nuevaFechaInicio')
                         <span class="text-red-400 text-xs">{{ $message }}</span>
                     @enderror
@@ -62,7 +62,7 @@
                     <label class="block text-sm font-semibold text-gray-200 mb-2">Fecha Vto.</label>
                     <input type="date" 
                            wire:model="nuevaFechaVto"
-                           class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200 text-sm"
+                           class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200 text-sm"
                            placeholder="Opcional">
                     @error('nuevaFechaVto')
                         <span class="text-red-400 text-xs">{{ $message }}</span>
@@ -74,7 +74,7 @@
                     <label class="block text-sm font-semibold text-gray-200 mb-2">Detalles</label>
                     <input type="text" 
                            wire:model="nuevosDetalles"
-                           class="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-gray-200 text-sm"
+                           class="w-full bg-transparent border border-zinc-300 rounded px-3 py-2 text-gray-200 text-sm"
                            placeholder="Detalles opcionales">
                     @error('nuevosDetalles')
                         <span class="text-red-400 text-xs">{{ $message }}</span>
@@ -92,7 +92,7 @@
                     </button>
                     <button wire:click="cancelarAgregar"
                             title="Cancelar"
-                            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition-colors h-10">
+                            class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded text-sm transition-colors h-10">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>

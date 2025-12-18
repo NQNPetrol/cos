@@ -35,7 +35,7 @@
                                 <p class="text-sm text-gray-300">Gestión de notificaciones globales del sistema</p>
                             </div>
                             <a href="{{ route('admin.nueva-notif') }}" 
-                               class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-4 py-2 hover:border-bg-blue-700 rounded-lg transition-colors flex items-center">
+                               class="bg-zinc-700 hover:bg-zinc-600 text-gray-200 px-4 py-2 hover:border-bg-blue-700 rounded-lg transition-colors flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -45,12 +45,12 @@
                     </div>
 
                     <!-- Filtros y Estadísticas -->
-                    <div class="bg-gray-700 rounded-lg p-4 mb-6">
+                    <div class="bg-zinc-700 rounded-lg p-4 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                             <!-- Filtro por tipo -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
-                                <select name="filter_type" id="filterType" class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                <select name="filter_type" id="filterType" class="w-full bg-zinc-600 border border-zinc-500 text-white rounded-lg px-3 py-2 filter-select">
                                     <option value="">Todos los tipos</option>
                                     <option value="global" {{ request('filter_type') == 'global' ? 'selected' : '' }}>GLOBAL</option>
                                     <option value="user" {{ request('filter_type') == 'user' ? 'selected' : '' }}>DE USUARIO</option>
@@ -61,7 +61,7 @@
                             <!-- Filtro por prioridad -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
-                                <select name="filter_priority" id="filterPriority" class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                <select name="filter_priority" id="filterPriority" class="w-full bg-zinc-600 border border-zinc-500 text-white rounded-lg px-3 py-2 filter-select">
                                     <option value="">Todas las prioridades</option>
                                     <option value="BAJA" {{ request('filter_priority') == 'BAJA' ? 'selected' : '' }}>BAJA</option>
                                     <option value="NORMAL" {{ request('filter_priority') == 'NORMAL' ? 'selected' : '' }}>MEDIA</option>
@@ -74,7 +74,7 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Desde</label>
                                 <input type="date" name="filter_date_from" id="filterDateFrom" 
                                     value="{{ request('filter_date_from') }}"
-                                    class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                    class="w-full bg-zinc-600 border border-zinc-500 text-white rounded-lg px-3 py-2 filter-select">
                             </div>
 
                             <!-- Filtro por fecha hasta -->
@@ -82,13 +82,13 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Hasta</label>
                                 <input type="date" name="filter_date_to" id="filterDateTo" 
                                     value="{{ request('filter_date_to') }}"
-                                    class="w-full bg-gray-600 border border-gray-500 text-white rounded-lg px-3 py-2 filter-select">
+                                    class="w-full bg-zinc-600 border border-zinc-500 text-white rounded-lg px-3 py-2 filter-select">
                             </div>
 
                             <!-- Botón limpiar - OCUPA EL ESPACIO DEL FILTRO ELIMINADO -->
                             <div class="md:col-span-1">
                                 <button id="clearFilters" 
-                                        class="w-full bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center mt-2 md:mt-0">
+                                        class="w-full bg-zinc-600 hover:bg-zinc-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center mt-2 md:mt-0">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
@@ -99,10 +99,10 @@
                     </div>
 
                     <!-- Tabla de Notificaciones -->
-                    <div class="bg-gray-700 rounded-lg overflow-hidden">
+                    <div class="bg-zinc-700 rounded-lg overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full">
-                                <thead class="bg-gray-600">
+                                <thead class="bg-zinc-600">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Título
@@ -124,9 +124,9 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600">
+                                <tbody class="bg-zinc-800 divide-y divide-gray-600">
                                     @forelse($notifications as $notification)
-                                        <tr class="hover:bg-gray-750 transition-colors">
+                                        <tr class="hover:bg-zinc-750 transition-colors">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-white">{{ $notification->title }}</div>
                                                 <div class="text-sm text-gray-300 truncate max-w-xs">{{ $notification->message }}</div>
@@ -241,8 +241,8 @@
         </div>
     </div>
     <!-- Modal de Edición -->
-    <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center hidden z-50">
-        <div class="bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-90vh overflow-y-auto">
+    <div id="editModal" class="fixed inset-0 bg-zinc-900 bg-opacity-90 flex items-center justify-center hidden z-50">
+        <div class="bg-zinc-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-90vh overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">Editar Notificación</h3>
@@ -261,7 +261,7 @@
                         <!-- Tipo de Notificación -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Notificación</label>
-                            <select name="type" id="editType" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <select name="type" id="editType" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                                 <option value="global">Notificación Global (Todos los usuarios)</option>
                                 <option value="user">Notificación Específica para Usuario</option>
                                 <option value="client">Notificación para Cliente</option>
@@ -271,7 +271,7 @@
                         <!-- Campos condicionales -->
                         <div id="editUserField" class="hidden">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Usuario</label>
-                            <select name="user_id" id="editUserId" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="user_id" id="editUserId" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="">Seleccione un usuario</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
@@ -281,7 +281,7 @@
 
                         <div id="editClientField" class="hidden">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Cliente</label>
-                            <select name="client_id" id=editClientId class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="client_id" id=editClientId class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -293,7 +293,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Título</label>
                             <input type="text" name="title" id="editTitle" required 
-                                   class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                   class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                                    placeholder="Ingrese el título de la notificación">
                         </div>
 
@@ -301,14 +301,14 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Mensaje</label>
                             <textarea name="message" id="editMessage" rows="4" required
-                                      class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                      class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                                       placeholder="Escriba el mensaje de la notificación"></textarea>
                         </div>
 
                         <!-- Prioridad -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
-                            <select name="priority" id="editPriority" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="priority" id="editPriority" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="BAJA">BAJA</option>
                                 <option value="NORMAL">MEDIA</option>
                                 <option value="ALTA">ALTA</option>
@@ -318,7 +318,7 @@
                         <!-- Estado -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Estado Actual</label>
-                            <div id="editStatusDisplay" class="px-3 py-2 bg-gray-700 rounded-lg border border-gray-600">
+                            <div id="editStatusDisplay" class="px-3 py-2 bg-zinc-700 rounded-lg border border-zinc-600">
                                 <span id="statusText" class="text-sm font-medium"></span>
                             </div>
                             <p class="mt-1 text-xs text-gray-400">
@@ -329,7 +329,7 @@
 
                     <div class="flex justify-end space-x-4 pt-6">
                         <button type="button" onclick="closeEditModal()" 
-                                class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition-colors">
+                                class="bg-zinc-600 hover:bg-zinc-500 text-white px-6 py-2 rounded-lg transition-colors">
                             Cancelar
                         </button>
                         <button type="submit" 

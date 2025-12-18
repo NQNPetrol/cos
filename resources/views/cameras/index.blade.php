@@ -34,7 +34,7 @@
                                 <p class="text-sm text-gray-300">Gestión de cámaras del sistema HikCentral</p>
                             </div>
                             <button onclick="importCameras()" 
-                                   class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-4 py-2 hover:border-bg-blue-700 rounded-lg transition-colors flex items-center">
+                                   class="bg-zinc-700 hover:bg-zinc-600 text-gray-200 px-4 py-2 hover:border-bg-blue-700 rounded-lg transition-colors flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -44,10 +44,10 @@
                     </div>
 
                     <!-- Tabla de Cámaras -->
-                    <div class="bg-gray-700 rounded-lg overflow-hidden">
+                    <div class="bg-zinc-700 rounded-lg overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full">
-                                <thead class="bg-gray-600">
+                                <thead class="bg-zinc-600">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Nombre
@@ -69,9 +69,9 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600">
+                                <tbody class="bg-zinc-800 divide-y divide-gray-600">
                                     @forelse($cameras as $camera)
-                                        <tr class="hover:bg-gray-750 transition-colors">
+                                        <tr class="hover:bg-zinc-750 transition-colors">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-white">{{ $camera->camera_name }}</div>
                                             </td>

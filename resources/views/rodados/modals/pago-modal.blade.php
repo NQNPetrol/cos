@@ -1,6 +1,6 @@
 <!-- Modal para crear/editar pago -->
-<div id="pago-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-gray-800 border-gray-700">
+<div id="pago-modal" class="hidden fixed inset-0 bg-zinc-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-zinc-800 border-zinc-700">
         <div class="mt-3">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="pago-modal-title" class="text-lg font-medium text-gray-100">Nuevo Pago</h3>
@@ -21,7 +21,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Vehículo *</label>
                         <select id="pago-rodado" name="rodado_id" required onchange="togglePagoFields()"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             <option value="">Seleccione un vehículo</option>
                             @foreach($rodados as $rodado)
                                 <option value="{{ $rodado->id }}" data-es-propio="{{ $rodado->es_propio ? '1' : '0' }}">
@@ -34,7 +34,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Pago *</label>
                         <select id="pago-tipo" name="tipo" required onchange="togglePagoFields()"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             <option value="pago_patente">Pago patente</option>
                             <option value="pago_alquiler">Pago alquiler</option>
                             <option value="pago_a_proveedor">Pago a proveedor</option>
@@ -48,7 +48,7 @@
                     <div id="pago-proveedor-field" style="display: none;">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Proveedor *</label>
                         <select id="pago-proveedor" name="proveedor_id"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             <option value="">Seleccione un proveedor</option>
                             @foreach($proveedores as $proveedor)
                                 <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
@@ -60,14 +60,14 @@
                         <label class="block text-sm font-medium text-gray-300 mb-2">Fecha de Pago *</label>
                         <input type="date" id="pago-fecha" name="fecha_pago" required
                             value="{{ date('Y-m-d') }}"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Moneda *</label>
                             <select id="pago-moneda" name="moneda" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                                 <option value="ARS">Pesos argentinos ($)</option>
                                 <option value="USD">Dólares (USD$)</option>
                             </select>
@@ -75,7 +75,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Monto *</label>
                             <input type="number" id="pago-monto" name="monto" step="0.01" min="0" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
                                 placeholder="0.00">
                         </div>
                     </div>
@@ -83,13 +83,13 @@
                     <div id="pago-monto-service-field" style="display: none;">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Monto Service (incluido en alquiler)</label>
                         <input type="number" id="pago-monto-service" name="monto_service" step="0.01" min="0"
-                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                     </div>
                 </div>
 
                 <div class="flex justify-end space-x-3 mt-6">
                     <button type="button" onclick="closePagoModal()"
-                        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition">
+                        class="px-4 py-2 bg-zinc-700 text-gray-300 rounded-md hover:bg-zinc-600 transition">
                         Cancelar
                     </button>
                     <button type="submit"

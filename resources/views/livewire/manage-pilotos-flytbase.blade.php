@@ -13,8 +13,8 @@
     @endif
 
     <!-- Listado de Pilotos -->
-    <div class="bg-gray-800 rounded-lg border border-gray-700">
-        <div class="flex justify-between items-center p-6 border-b border-gray-700">
+    <div class="bg-zinc-800 rounded-lg border border-zinc-700">
+        <div class="flex justify-between items-center p-6 border-b border-zinc-700">
             <h3 class="text-lg font-semibold text-gray-100">Pilotos</h3>
             <button wire:click="openModal"
                     class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 transition ease-in-out duration-150">
@@ -28,7 +28,7 @@
         @if($pilotosPaginados->count() > 0)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-750">
+                    <thead class="bg-zinc-750">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
@@ -38,9 +38,9 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                    <tbody class="bg-zinc-800 divide-y divide-gray-700">
                         @foreach($pilotosPaginados as $piloto)
-                        <tr class="hover:bg-gray-750 transition-colors duration-150">
+                        <tr class="hover:bg-zinc-750 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#{{ $piloto->id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ $piloto->nombre }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -52,7 +52,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                 @if($piloto->token)
-                                    <span class="font-mono text-xs bg-gray-700 px-2 py-1 rounded" title="{{ $piloto->token }}">
+                                    <span class="font-mono text-xs bg-zinc-700 px-2 py-1 rounded" title="{{ $piloto->token }}">
                                         {{ Str::limit($piloto->token, 20) }}
                                     </span>
                                 @else
@@ -60,14 +60,14 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $piloto->clientes->count() > 0 ? 'bg-green-900/30 text-green-400' : 'bg-gray-700 text-gray-400' }}">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $piloto->clientes->count() > 0 ? 'bg-green-900/30 text-green-400' : 'bg-zinc-700 text-gray-400' }}">
                                     {{ $piloto->clientes->count() }} cliente(s)
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex items-center space-x-2">
                                     <button wire:click="editarPiloto({{ $piloto->id }})"
-                                            class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-gray-900/30"
+                                            class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-zinc-900/30"
                                             title="Editar piloto">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -91,7 +91,7 @@
 
             <!-- Paginación -->
             @if($pilotosPaginados->hasPages())
-            <div class="px-6 py-4 border-t border-gray-700">
+            <div class="px-6 py-4 border-t border-zinc-700">
                 {{ $pilotosPaginados->links() }}
             </div>
             @endif
@@ -109,7 +109,7 @@
     <!-- Modal para Crear/Editar Piloto -->
     @if($showModal)
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">
                     {{ $editing ? 'Editar Piloto' : 'Crear Nuevo Piloto' }}
@@ -128,7 +128,7 @@
                         <input type="text" 
                                wire:model="nombre" 
                                required 
-                               class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                               class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                placeholder="Ej: Juan Pérez">
                         @error('nombre') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -137,7 +137,7 @@
                         <label class="block text-sm font-medium text-gray-300 mb-2">Token</label>
                         <textarea wire:model="token" 
                                   rows="3"
-                                  class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                  class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                   placeholder="Token de autenticación del piloto..."></textarea>
                         <p class="text-xs text-gray-400 mt-1">Token de autenticación para el piloto (opcional)</p>
                     </div>
@@ -145,7 +145,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Usuario Asociado</label>
                         <select wire:model="user_id"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             <option value="">Seleccione un usuario</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
@@ -155,10 +155,10 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                     <button type="button" 
                             wire:click="closeModal"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" 

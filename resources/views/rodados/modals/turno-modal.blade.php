@@ -1,6 +1,6 @@
 <!-- Modal para crear/editar turno -->
-<div id="turno-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-3/4 shadow-lg rounded-md bg-gray-800 border-gray-700 max-h-[90vh] overflow-y-auto">
+<div id="turno-modal" class="hidden fixed inset-0 bg-zinc-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-3/4 shadow-lg rounded-md bg-zinc-800 border-zinc-700 max-h-[90vh] overflow-y-auto">
         <div class="mt-3">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="turno-modal-title" class="text-lg font-medium text-gray-100">Nuevo Turno</h3>
@@ -22,7 +22,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Vehículo *</label>
                             <select id="turno-rodado" name="rodado_id" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                                 <option value="">Seleccione un vehículo</option>
                                 @foreach($rodados as $rodado)
                                     <option value="{{ $rodado->id }}">{{ $rodado->patente ?? 'Sin patente' }} - Cliente: {{ $rodado->cliente->nombre ?? 'N/A' }} - Proveedor: {{ $rodado->proveedor->nombre ?? '-' }}</option>
@@ -32,7 +32,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Taller *</label>
                             <select id="turno-taller" name="taller_id" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                                 <option value="">Seleccione un taller</option>
                                 @foreach($talleres as $taller)
                                     <option value="{{ $taller->id }}">{{ $taller->nombre }}</option>
@@ -45,7 +45,7 @@
                         <div id="turno-tipo-field-container">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Turno *</label>
                             <select id="turno-tipo" name="tipo" required onchange="toggleTurnoFields()"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                                 <option value="turno_service">Turno Service</option>
                                 <option value="turno_taller">Turno al Taller</option>
                             </select>
@@ -53,7 +53,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Fecha y Hora *</label>
                             <input type="datetime-local" id="turno-fecha-hora" name="fecha_hora" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                         </div>
                     </div>
                     <!-- Input hidden para tipo cuando se establece automáticamente -->
@@ -64,7 +64,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Motivo del turno *</label>
                             <textarea id="turno-descripcion-taller" name="descripcion" rows="3" required
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
                                 placeholder="Describe el motivo del turno..."></textarea>
                         </div>
 
@@ -78,8 +78,8 @@
                                 </button>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-700 border border-gray-600 rounded-lg">
-                                    <thead class="bg-gray-700">
+                                <table class="min-w-full divide-y divide-gray-700 border border-zinc-600 rounded-lg">
+                                    <thead class="bg-zinc-700">
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">Item</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">Cantidad</th>
@@ -87,7 +87,7 @@
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">Acción</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="partes-afectadas-body" class="bg-gray-800 divide-y divide-gray-700">
+                                    <tbody id="partes-afectadas-body" class="bg-zinc-800 divide-y divide-gray-700">
                                         <!-- Las filas se agregarán dinámicamente -->
                                     </tbody>
                                 </table>
@@ -98,12 +98,12 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Encargado de Dejar</label>
                                 <input type="text" id="turno-encargado-dejar-taller" name="encargado_dejar"
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Encargado de Retirar</label>
                                 <input type="text" id="turno-encargado-retirar-taller" name="encargado_retirar"
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             </div>
                         </div>
                     </div>
@@ -114,18 +114,18 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Encargado de Dejar</label>
                                 <input type="text" id="turno-encargado-dejar-service" name="encargado_dejar"
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Encargado de Retirar</label>
                                 <input type="text" id="turno-encargado-retirar-service" name="encargado_retirar"
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500">
                             </div>
                         </div>
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Anotaciones</label>
                             <textarea id="turno-descripcion-service" name="descripcion" rows="3"
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500"
                                 placeholder="Anotaciones sobre el servicio..."></textarea>
                         </div>
                     </div>
@@ -133,7 +133,7 @@
 
                 <div class="flex justify-end space-x-3 mt-6">
                     <button type="button" onclick="closeTurnoModal()"
-                        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition">
+                        class="px-4 py-2 bg-zinc-700 text-gray-300 rounded-md hover:bg-zinc-600 transition">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -172,15 +172,15 @@
         tr.innerHTML = `
             <td class="px-4 py-2">
                 <input type="text" name="partes_afectadas[${filaParteCounter}][item]" required
-                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
             </td>
             <td class="px-4 py-2">
                 <input type="number" name="partes_afectadas[${filaParteCounter}][cantidad]" required min="1"
-                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
             </td>
             <td class="px-4 py-2">
                 <input type="text" name="partes_afectadas[${filaParteCounter}][descripcion]" required
-                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
             </td>
             <td class="px-4 py-2">
                 <button type="button" onclick="eliminarFilaParte(this)" 

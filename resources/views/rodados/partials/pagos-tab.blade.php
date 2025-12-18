@@ -15,7 +15,7 @@
     <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Vehículo</label>
-            <select id="filtro-pago-vehiculo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-pago-vehiculo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 @foreach($rodados as $rodado)
                     <option value="{{ $rodado->id }}">{{ $rodado->patente ?? 'Sin patente' }} - Cliente: {{ $rodado->cliente->nombre ?? 'N/A' }} - Proveedor: {{ $rodado->proveedor->nombre ?? '-' }}</option>
@@ -24,7 +24,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Pago</label>
-            <select id="filtro-pago-tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-pago-tipo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 <option value="pago_patente">Pago Patente</option>
                 <option value="pago_alquiler">Pago Alquiler</option>
@@ -37,7 +37,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-            <select id="filtro-pago-estado" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-pago-estado" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 <option value="pendiente">Pendiente</option>
                 <option value="pagado">Pagado</option>
@@ -46,7 +46,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Proveedor</label>
-            <select id="filtro-pago-proveedor" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-pago-proveedor" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 @foreach($proveedores as $proveedor)
                     <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
@@ -56,9 +56,9 @@
     </div>
 
     <!-- Tabla de pagos -->
-    <div class="overflow-x-auto rounded-lg border border-gray-700">
+    <div class="overflow-x-auto rounded-lg border border-zinc-700">
         <table class="min-w-full divide-y divide-gray-700">
-            <thead class="bg-gray-800">
+            <thead class="bg-zinc-800">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Vehículo</th>
@@ -69,9 +69,9 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <tbody class="bg-zinc-800 divide-y divide-gray-700">
                 @forelse($pagos as $pago)
-                <tr class="pago-row hover:bg-gray-750 transition-colors"
+                <tr class="pago-row hover:bg-zinc-750 transition-colors"
                     data-vehiculo="{{ $pago->rodado_id }}"
                     data-tipo="{{ $pago->tipo }}"
                     data-proveedor="{{ $pago->proveedor_id ?? '' }}"

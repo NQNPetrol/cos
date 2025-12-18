@@ -25,7 +25,7 @@
     <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Vehículo</label>
-            <select id="filtro-servicio-vehiculo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-servicio-vehiculo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 @foreach($rodados as $rodado)
                     <option value="{{ $rodado->id }}">{{ $rodado->patente ?? 'Sin patente' }} - Cliente: {{ $rodado->cliente->nombre ?? 'N/A' }} - Proveedor: {{ $rodado->proveedor->nombre ?? '-' }}</option>
@@ -34,7 +34,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
-            <select id="filtro-servicio-tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-servicio-tipo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 <option value="turno_service">Turno Service</option>
                 <option value="turno_mecanico">Turno Mecánico</option>
@@ -44,7 +44,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Taller</label>
-            <select id="filtro-servicio-taller" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-servicio-taller" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 @foreach($talleres as $taller)
                     <option value="{{ $taller->id }}">{{ $taller->nombre }}</option>
@@ -53,7 +53,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-            <select id="filtro-servicio-estado" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+            <select id="filtro-servicio-estado" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                 <option value="">Todos</option>
                 <option value="pendiente">Pendiente</option>
                 <option value="atendido">Atendido</option>
@@ -64,9 +64,9 @@
     </div>
 
     <!-- Tabla de servicios -->
-    <div class="overflow-x-auto rounded-lg border border-gray-700">
+    <div class="overflow-x-auto rounded-lg border border-zinc-700">
         <table class="min-w-full divide-y divide-gray-700">
-            <thead class="bg-gray-800">
+            <thead class="bg-zinc-800">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Vehículo</th>
@@ -77,14 +77,14 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <tbody class="bg-zinc-800 divide-y divide-gray-700">
                 @forelse($todosLosServicios ?? $turnos as $servicio)
                 @php
                     $turno = $servicio['tipo_servicio'] === 'turno' ? $servicio['model'] : null;
                     $cambio = $servicio['tipo_servicio'] === 'cambio_equipo' ? $servicio['model'] : null;
                     $item = $turno ?? $cambio;
                 @endphp
-                <tr class="servicio-row hover:bg-gray-750 transition-colors"
+                <tr class="servicio-row hover:bg-zinc-750 transition-colors"
                     data-vehiculo="{{ $servicio['rodado']->id }}"
                     data-tipo="{{ $servicio['tipo'] }}"
                     data-taller="{{ $servicio['taller']->id ?? '' }}"
@@ -111,7 +111,7 @@
                                 <div class="text-xs text-gray-400 mt-1">{{ ucfirst(str_replace('_', ' ', $cambio->tipo)) }}</div>
                             @endif
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300 border border-gray-600">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-700 text-gray-300 border border-zinc-600">
                                 Taller
                             </span>
                         @endif

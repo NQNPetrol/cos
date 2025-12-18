@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto p-6 bg-gray-900 text-gray-50 rounded-lg shadow">
+    <div class="max-w-4xl mx-auto p-6 bg-zinc-900 text-gray-50 rounded-lg shadow">
         @if ($errors->any())
             <div class="bg-red-600 text-white p-4 mb-4 rounded">
                 <strong>¡Error!</strong> Corrige los campos indicados.<br>

@@ -1,7 +1,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <h2 class="text-2xl font-semibold mb-6">{{ $header }}</h2>
                     
@@ -12,7 +12,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
                                 <select wire:model.live="estadoFilter" 
-                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                                     <option value="">Todos</option>
                                     <option value="ABIERTO">Abierto</option>
                                     <option value="EN REVISION">En Revisión</option>
@@ -26,7 +26,7 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Evento</label>
                                 <input type="text" wire:model.live.debounce.500ms="tipoFilter"
                                        placeholder="Filtrar por tipo..."
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                             </div>
                             
                             <!-- filtro de búsqueda -->
@@ -34,13 +34,13 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Buscar</label>
                                 <input type="text" wire:model.live.debounce.500ms="search"
                                        placeholder="#ID, estado, tipo ..."
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                             </div>
 
                             <!-- Botones -->
                             <div class="flex items-end space-x-2">
                                 <button wire:click="clearFilters" 
-                                        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors duration-200">
+                                        class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-gray-300 rounded-md transition-colors duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
@@ -60,7 +60,7 @@
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="g-gray-800 text-gray-300 dark:bg-gray-700">
+                            <thead class="g-gray-800 text-gray-300 dark:bg-zinc-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('fecha')">
                                         Fecha
@@ -111,7 +111,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="dark:bg-gray-800">
+                            <tbody class="dark:bg-zinc-800">
                                 @forelse ($seguimientos as $seguimiento)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">
@@ -182,7 +182,7 @@
                     <!-- Modal de Nuevo seguimiento/editar -->
                     @if($showModal)
                         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto" @click.stop>
+                            <div class="bg-zinc-900 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto" @click.stop>
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-xl font-bold text-gray-100">
                                         @if($editingId)
@@ -203,7 +203,7 @@
                                 <form wire:submit.prevent="save">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="col-span-full">
-                                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2">
+                                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-zinc-700 pb-2">
                                                 Información del Seguimiento
                                             </h4>
                                         </div>
@@ -212,13 +212,13 @@
                                         <div>
                                             <label class="block text-sm mb-1 text-gray-300">Fecha <span class="text-red-500">*</span></label>
                                             <input type="date" wire:model="fecha"
-                                                class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                                class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                             @error('fecha') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                         </div>
 
                                         <div>
                                             <label class="block text-sm mb-1 text-gray-300">Estado <span class="text-red-500">*</span></label>
-                                            <select wire:model="estado" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                            <select wire:model="estado" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                                 <option value="ABIERTO">Abierto</option>
                                                 <option value="EN REVISION">En Revisión</option>
                                                 <option value="CERRADO">Cerrado</option>
@@ -229,13 +229,13 @@
                                         <div class="col-span-full">
                                             <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
                                             <textarea wire:model="observaciones" rows="2"
-                                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                                     placeholder="Observaciones adicionales..."></textarea>
                                         </div>
                                     </div>
 
                                     <!-- Botones -->
-                                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
+                                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-zinc-700">
                                         <button type="button" wire:click="closeModal"
                                                 class="px-4 py-2 text-gray-300 hover:text-gray-100">
                                             Cancelar
@@ -257,12 +257,12 @@
                                             </label>
 
                                             @if($eventosDisponibles->isEmpty())
-                                                <div class="bg-gray-700 border border-gray-600 rounded-md p-3 text-yellow-400">
+                                                <div class="bg-zinc-700 border border-zinc-600 rounded-md p-3 text-yellow-400">
                                                     No hay eventos disponibles para seguimiento. Todos los eventos están cerrados o no hay eventos creados.
                                                 </div>
                                             @else
                                             <select wire:model="evento_id" id="evento_id" 
-                                                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                                    class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                                         focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white">
                                                 <option value="">Seleccione un evento</option>
                                                 @foreach($eventosDisponibles as $evento)
@@ -279,7 +279,7 @@
                                                 Estado <span class="text-red-500">*</span>
                                             </label>
                                             <select wire:model="estado" id="estado" 
-                                                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                                    class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                                         focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white">
                                                 <option value="ABIERTO">ABIERTO</option>
                                                 <option value="EN REVISION">EN REVISIÓN</option>
@@ -293,7 +293,7 @@
                                             <label class="block text-sm font-medium text-gray-300 mb-2">
                                                 Registra
                                             </label>
-                                            <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
+                                            <div class="px-3 py-2 bg-zinc-700 rounded-md text-gray-300">
                                                 {{ auth()->user()->name }}
                                             </div>
                                         </div>
@@ -303,7 +303,7 @@
                                             <label class="block text-sm font-medium text-gray-300 mb-2">
                                                 Fecha de Registro
                                             </label>
-                                            <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
+                                            <div class="px-3 py-2 bg-zinc-700 rounded-md text-gray-300">
                                                 {{ now()->format('d/m/Y') }}
                                             </div>
                                         </div>
@@ -314,7 +314,7 @@
                                                 Detalles y observaciones <span class="text-red-500">*</span>
                                             </label>
                                             <textarea wire:model="observaciones" id="observaciones" rows="5"
-                                                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                                    class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                                             focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white"
                                                     placeholder="Describa los detalles del seguimiento..."></textarea>
                                             @error('observaciones') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
@@ -322,9 +322,9 @@
                                     </div>
 
                                     <!-- Botones -->
-                                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
+                                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-zinc-700">
                                         <button type="button" wire:click="closeModal"
-                                                class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600">
+                                                class="px-4 py-2 border border-zinc-600 rounded-md text-gray-300 bg-zinc-700 hover:bg-zinc-600">
                                             Cancelar
                                         </button>
                                         <button type="submit"

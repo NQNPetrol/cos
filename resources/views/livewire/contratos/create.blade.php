@@ -2,7 +2,7 @@
         <form wire:submit.prevent="save">
             <div class="mb-4">
                 <label class="block mb-1">Cliente <span class="text-red-500">*</span></label>
-                <select wire:model="cliente_id" wire:change="cargarEmpresas($event.target.value)" class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <select wire:model="cliente_id" wire:change="cargarEmpresas($event.target.value)" class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">
                     <option value="">Seleccione un cliente</option>
                     @foreach ($clientes as $cliente)
                         <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -14,7 +14,7 @@
             <div class="mb-4">
                 <label class="block mb-1">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
                 <select wire:model="empresa_asociada_id"
-                        class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2"
+                        class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2"
                         @if(!$cliente_id) disabled @endif>
                     <option value="">Seleccione una empresa asociada</option>
                     @foreach ($empresasFiltradas as $empresa)
@@ -28,7 +28,7 @@
             <div class="mb-4">
                 <label class="block mb-1">Nombre del Proyecto <span class="text-red-500">*</span></label>
                 <input type="text" wire:model="nombre_proyecto"
-                       class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                       class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">
             </div>
 
             <!-- Localidad y Provincia -->
@@ -36,12 +36,12 @@
                 <div>
                     <label class="block mb-1">Localidad</label>
                     <input type="text" wire:model="localidad" 
-                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                           class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 </div>
                 <div>
                     <label class="block mb-1">Provincia</label>
                     <input type="text" wire:model="provincia" 
-                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                           class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
             <div class="mb-4">
                 <label class="block mb-1">Observaciones</label>
                 <textarea wire:model="observaciones"
-                          class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">{{ old('observaciones') }}</textarea>
+                          class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">{{ old('observaciones') }}</textarea>
             </div>
 
             <!-- Fechas -->
@@ -57,7 +57,7 @@
                 <div>
                     <label class="block mb-1">Fecha Inicio</label>
                     <input type="date" wire:model="fecha_inicio" 
-                           class="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2">
+                           class="w-full bg-zinc-800 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 </div>
 
             </div>
