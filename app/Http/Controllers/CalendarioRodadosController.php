@@ -14,6 +14,9 @@ class CalendarioRodadosController extends Controller
     {
         return view('rodados.calendario');
     }
+    
+    // Este método ya no se usa, pero se mantiene por compatibilidad con el componente Livewire
+    // El componente Livewire ahora obtiene los datos directamente
 
     public function getEventos(Request $request)
     {
