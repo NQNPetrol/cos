@@ -716,6 +716,7 @@ Route::middleware([
         Route::delete('/{rodado}', [\App\Http\Controllers\RodadoController::class, 'destroy'])->name('destroy');
         
         // Turnos Rodados (unificado: service y mecánicos)
+        Route::get('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'show'])->name('turnos.show');
         Route::post('/turnos', [\App\Http\Controllers\TurnoRodadoController::class, 'store'])->name('turnos.store');
         Route::put('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'update'])->name('turnos.update');
         Route::delete('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'destroy'])->name('turnos.destroy');

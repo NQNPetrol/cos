@@ -290,18 +290,236 @@
         document.getElementById('cambio-equipo-modal').classList.remove('hidden');
     }
 
-    function openEditTurnoModal(id) {
-        // Cargar datos del turno vía AJAX o pasar datos desde el servidor
-        // Por ahora, solo abrir el modal
-        document.getElementById('turno-id').value = id;
-        document.getElementById('turno-form').action = '{{ route("rodados.turnos.update", ":id") }}'.replace(':id', id);
-        document.getElementById('turno-modal-title').textContent = 'Editar Turno';
-        document.getElementById('turno-modal').classList.remove('hidden');
+    async function openEditTurnoModal(id) {
+        try {
+            // Cargar datos del turno vía AJAX
+            // Construir la URL manualmente para evitar problemas con Blade
+            const baseUrl = '{{ url("/rodados/turnos") }}';
+            const url = baseUrl + '/' + id;
+            console.log('Cargando turno desde:', url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar los datos del turno');
+            }
+
+            const turno = await response.json();
+            
+            // Logging para depurar
+            console.log('Turno cargado:', turno);
+            console.log('Partes afectadas:', turno.partes_afectadas);
+            console.log('Tipo de partes_afectadas:', typeof turno.partes_afectadas);
+            console.log('Es array?', Array.isArray(turno.partes_afectadas));
+            console.log('Descripción del turno:', turno.descripcion);
+
+            // Establecer ID y acción del formulario
+            document.getElementById('turno-id').value = turno.id;
+            const updateBaseUrl = '{{ url("/rodados/turnos") }}';
+            document.getElementById('turno-form').action = updateBaseUrl + '/' + id;
+            document.getElementById('turno-modal-title').textContent = 'Editar Turno';
+
+            // Prellenar campos básicos (estos siempre están visibles)
+            document.getElementById('turno-rodado').value = turno.rodado_id || '';
+            document.getElementById('turno-taller').value = turno.taller_id || '';
+            document.getElementById('turno-fecha-hora').value = turno.fecha_hora || '';
+
+            // Manejar tipo de turno
+            const tipoFieldContainer = document.getElementById('turno-tipo-field-container');
+            const tipoSelect = document.getElementById('turno-tipo');
+            const tipoHidden = document.getElementById('turno-tipo-hidden');
+            
+            // Mostrar el campo de tipo
+            if (tipoFieldContainer) {
+                tipoFieldContainer.style.display = 'block';
+            }
+            
+            // Establecer el tipo correcto
+            let tipoDisplay = turno.tipo;
+            if (turno.tipo === 'turno_mecanico') {
+                tipoDisplay = 'turno_taller'; // Mostrar como "turno_taller" en el select
+            }
+            
+            if (tipoSelect) {
+                tipoSelect.value = tipoDisplay;
+            }
+            if (tipoHidden) {
+                tipoHidden.value = turno.tipo;
+            }
+
+            // Toggle campos según el tipo
+            toggleTurnoFields();
+
+            // Prellenar campos según el tipo de turno
+            // Usar setTimeout para asegurar que los campos estén visibles después del toggle
+            setTimeout(() => {
+                if (turno.tipo === 'turno_service') {
+                    // Campos de turno service
+                    const encargadoDejarService = document.getElementById('turno-encargado-dejar-service');
+                    const encargadoRetirarService = document.getElementById('turno-encargado-retirar-service');
+                    const descripcionService = document.getElementById('turno-descripcion-service');
+                    
+                    if (encargadoDejarService) encargadoDejarService.value = turno.encargado_dejar || '';
+                    if (encargadoRetirarService) encargadoRetirarService.value = turno.encargado_retirar || '';
+                    if (descripcionService) descripcionService.value = turno.descripcion || '';
+                } else if (turno.tipo === 'turno_mecanico') {
+                    // Campos de turno mecánico/taller
+                    const descripcionTaller = document.getElementById('turno-descripcion-taller');
+                    const encargadoDejarTaller = document.getElementById('turno-encargado-dejar-taller');
+                    const encargadoRetirarTaller = document.getElementById('turno-encargado-retirar-taller');
+                    
+                    console.log('=== PRELLENANDO CAMPOS DE TURNO MECÁNICO ===');
+                    console.log('Descripción recibida del servidor:', turno.descripcion);
+                    console.log('Tipo de descripción:', typeof turno.descripcion);
+                    console.log('Descripción es null?', turno.descripcion === null);
+                    console.log('Descripción es undefined?', turno.descripcion === undefined);
+                    console.log('Descripción es string vacío?', turno.descripcion === '');
+                    
+                    if (descripcionTaller) {
+                        const descripcionValue = (turno.descripcion !== null && turno.descripcion !== undefined) ? String(turno.descripcion) : '';
+                        descripcionTaller.value = descripcionValue;
+                        // Asegurar que el campo tenga el name correcto y esté habilitado
+                        descripcionTaller.name = 'descripcion';
+                        descripcionTaller.disabled = false;
+                        descripcionTaller.required = true;
+                        console.log('✓ Campo descripción encontrado');
+                        console.log('  Valor establecido:', descripcionValue);
+                        console.log('  Valor actual del campo:', descripcionTaller.value);
+                        console.log('  Campo visible?', descripcionTaller.offsetParent !== null);
+                        console.log('  Campo name:', descripcionTaller.name);
+                        console.log('  Campo disabled:', descripcionTaller.disabled);
+                        console.log('  Campo required:', descripcionTaller.required);
+                        
+                        // Forzar el valor nuevamente después de un pequeño delay adicional
+                        setTimeout(() => {
+                            if (descripcionTaller.value !== descripcionValue) {
+                                console.log('⚠ Valor no se estableció correctamente, reintentando...');
+                                descripcionTaller.value = descripcionValue;
+                                descripcionTaller.name = 'descripcion';
+                                descripcionTaller.disabled = false;
+                                console.log('  Valor después del reintento:', descripcionTaller.value);
+                                console.log('  Name después del reintento:', descripcionTaller.name);
+                            }
+                        }, 100);
+                    } else {
+                        console.error('✗ ERROR: No se encontró el campo turno-descripcion-taller');
+                    }
+                    
+                    if (encargadoDejarTaller) {
+                        encargadoDejarTaller.value = turno.encargado_dejar || '';
+                        console.log('✓ Encargado dejar prellenado:', encargadoDejarTaller.value);
+                    } else {
+                        console.error('✗ ERROR: No se encontró el campo turno-encargado-dejar-taller');
+                    }
+                    
+                    if (encargadoRetirarTaller) {
+                        encargadoRetirarTaller.value = turno.encargado_retirar || '';
+                        console.log('✓ Encargado retirar prellenado:', encargadoRetirarTaller.value);
+                    } else {
+                        console.error('✗ ERROR: No se encontró el campo turno-encargado-retirar-taller');
+                    }
+                    
+                    // Cargar partes afectadas si existen (solo para turno mecánico)
+                    let partesAfectadas = turno.partes_afectadas || [];
+                    console.log('Partes afectadas antes de procesar:', partesAfectadas);
+                    
+                    // Si es un objeto (no array), convertirlo a array
+                    if (partesAfectadas && typeof partesAfectadas === 'object' && !Array.isArray(partesAfectadas)) {
+                        console.log('Convirtiendo objeto a array');
+                        partesAfectadas = Object.values(partesAfectadas);
+                    }
+                    
+                    // Asegurar que sea un array
+                    if (!Array.isArray(partesAfectadas)) {
+                        console.log('No es array, convirtiendo a array vacío');
+                        partesAfectadas = [];
+                    }
+                    
+                    console.log('Partes afectadas después de procesar:', partesAfectadas);
+                    console.log('Cantidad de items:', partesAfectadas.length);
+                    
+                    const tbody = document.getElementById('partes-afectadas-body');
+                    tbody.innerHTML = ''; // Limpiar tabla
+                    
+                    // Función helper para escapar HTML
+                    const escapeHtml = (text) => {
+                        if (text === null || text === undefined) return '';
+                        const map = {
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#039;'
+                        };
+                        return String(text).replace(/[&<>"']/g, m => map[m]);
+                    };
+                    
+                    // Resetear contador antes de cargar items existentes
+                    filaParteCounter = 0;
+                    
+                    if (partesAfectadas.length > 0) {
+                        console.log('Cargando', partesAfectadas.length, 'items en la tabla');
+                        partesAfectadas.forEach((parte) => {
+                            console.log('Procesando item:', parte);
+                            filaParteCounter++;
+                            const tr = document.createElement('tr');
+                            tr.setAttribute('data-parte-index', filaParteCounter);
+                            
+                            tr.innerHTML = `
+                                <td class="px-4 py-2">
+                                    <input type="text" name="partes_afectadas[${filaParteCounter}][item]" required
+                                        value="${escapeHtml(parte.item || '')}"
+                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" name="partes_afectadas[${filaParteCounter}][cantidad]" required min="1"
+                                        value="${escapeHtml(parte.cantidad || '')}"
+                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="text" name="partes_afectadas[${filaParteCounter}][descripcion]" required
+                                        value="${escapeHtml(parte.descripcion || '')}"
+                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <button type="button" onclick="eliminarFilaParte(this)" 
+                                        class="text-red-400 hover:text-red-300 transition-colors"
+                                        title="Eliminar item">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        console.log('Items cargados en la tabla. Total filas:', tbody.children.length);
+                    } else {
+                        console.log('No hay items para cargar');
+                    }
+                    
+                    console.log('=== FIN PRELLENADO ===');
+                }
+
+                // Abrir el modal después de prellenar
+                document.getElementById('turno-modal').classList.remove('hidden');
+            }, 100);
+
+        } catch (error) {
+            console.error('Error al cargar el turno:', error);
+            alert('Error al cargar los datos del turno. Por favor, intenta nuevamente.');
+        }
     }
 
     function openEditCambioEquipoModal(id) {
         document.getElementById('cambio-equipo-id').value = id;
-        document.getElementById('cambio-equipo-form').action = '{{ route("rodados.cambios-equipos.update", ":id") }}'.replace(':id', id);
+        const updateBaseUrl = '{{ url("/rodados/cambios-equipos") }}';
+        document.getElementById('cambio-equipo-form').action = updateBaseUrl + '/' + id;
         document.getElementById('cambio-equipo-modal-title').textContent = 'Editar Cambio de Equipo';
         document.getElementById('cambio-equipo-modal').classList.remove('hidden');
         toggleCambioEquipoFields();

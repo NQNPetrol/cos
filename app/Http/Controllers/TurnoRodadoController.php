@@ -10,8 +10,72 @@ use Illuminate\Support\Facades\Storage;
 
 class TurnoRodadoController extends Controller
 {
+    public function show(TurnoRodado $turno)
+    {
+        // Cargar relaciones necesarias
+        $turno->load(['rodado', 'taller']);
+        
+        // Obtener partes afectadas directamente del atributo raw para evitar el accessor
+        $partesAfectadasRaw = $turno->getAttributes()['partes_afectadas'] ?? null;
+        
+        // Logging para depurar
+        \Log::info('Turno ID: ' . $turno->id);
+        \Log::info('Partes afectadas raw: ' . ($partesAfectadasRaw ?? 'null'));
+        
+        $partesAfectadas = [];
+        
+        if ($partesAfectadasRaw) {
+            if (is_string($partesAfectadasRaw)) {
+                $decoded = json_decode($partesAfectadasRaw, true);
+                \Log::info('Partes afectadas decoded: ', ['decoded' => $decoded]);
+                
+                if (is_array($decoded)) {
+                    // Si es un array asociativo con claves numéricas como strings, convertirlo a array indexado
+                    if (array_keys($decoded) !== range(0, count($decoded) - 1)) {
+                        // Es un objeto asociativo, convertir a array indexado
+                        $partesAfectadas = array_values($decoded);
+                    } else {
+                        // Ya es un array indexado
+                        $partesAfectadas = $decoded;
+                    }
+                } elseif (is_object($decoded)) {
+                    // Si es un objeto, convertirlo a array
+                    $partesAfectadas = array_values((array) $decoded);
+                }
+            } elseif (is_array($partesAfectadasRaw)) {
+                $partesAfectadas = $partesAfectadasRaw;
+            }
+        }
+        
+        \Log::info('Partes afectadas final: ', ['partes' => $partesAfectadas]);
+        
+        // Preparar datos para el formulario
+        $data = [
+            'id' => $turno->id,
+            'rodado_id' => $turno->rodado_id,
+            'taller_id' => $turno->taller_id,
+            'tipo' => $turno->tipo,
+            'fecha_hora' => $turno->fecha_hora->format('Y-m-d\TH:i'),
+            'encargado_dejar' => $turno->encargado_dejar ?? '',
+            'encargado_retirar' => $turno->encargado_retirar ?? '',
+            'descripcion' => $turno->descripcion ?? '',
+            'partes_afectadas' => $partesAfectadas,
+            'estado' => $turno->estado,
+        ];
+        
+        \Log::info('Datos enviados al frontend: ', ['data' => $data]);
+        \Log::info('Descripción del turno: ', ['descripcion' => $turno->descripcion, 'descripcion_raw' => $turno->getAttributes()['descripcion'] ?? 'null']);
+        
+        return response()->json($data);
+    }
+
     public function store(Request $request)
     {
+        // Logging para depurar
+        \Log::info('Store turno - Request data:', $request->all());
+        \Log::info('Store turno - Descripcion recibida:', ['descripcion' => $request->input('descripcion')]);
+        \Log::info('Store turno - Tipo recibido:', ['tipo' => $request->input('tipo')]);
+
         // Validación base
         $validated = $request->validate([
             'rodado_id' => 'required|exists:rodados,id',
@@ -21,7 +85,6 @@ class TurnoRodadoController extends Controller
             'encargado_dejar' => 'nullable|string|max:255',
             'encargado_retirar' => 'nullable|string|max:255',
             'descripcion' => 'nullable|string',
-            'motivo_turno' => 'nullable|string',
             'partes_afectadas' => 'nullable|array',
             'partes_afectadas.*.item' => 'required_with:partes_afectadas|string|max:255',
             'partes_afectadas.*.cantidad' => 'required_with:partes_afectadas|integer|min:1',
@@ -32,6 +95,24 @@ class TurnoRodadoController extends Controller
         if ($validated['tipo'] === 'turno_taller') {
             $validated['tipo'] = TurnoRodado::TIPO_TURNO_MECANICO;
         }
+
+        // Validación condicional: descripcion es requerida para turno_mecanico
+        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO) {
+            $request->validate([
+                'descripcion' => 'required|string|min:1',
+            ], [
+                'descripcion.required' => 'El motivo del turno es obligatorio para turnos mecánicos.',
+                'descripcion.min' => 'El motivo del turno no puede estar vacío.',
+            ]);
+            // Asegurar que descripcion esté en validated
+            $validated['descripcion'] = $request->input('descripcion', '');
+        } else {
+            // Para turno_service, descripcion es opcional
+            $validated['descripcion'] = $request->input('descripcion', null);
+        }
+
+        // Logging después de validación
+        \Log::info('Store turno - Descripcion validada:', ['descripcion' => $validated['descripcion'] ?? 'null']);
 
         // Estado predeterminado
         if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_SERVICE || 
@@ -48,10 +129,15 @@ class TurnoRodadoController extends Controller
 
         // No guardar factura_path, comprobante_pago_path, fecha_factura, dias_vencimiento, cubre_servicio para turno_taller/turno_mecanico
         // Estos se adjuntarán después
-            $validated['cubre_servicio'] = false;
-            $validated['tipo_reparacion'] = null;
+        $validated['cubre_servicio'] = false;
+        $validated['tipo_reparacion'] = null;
+
+        // Logging antes de crear
+        \Log::info('Store turno - Datos finales para crear:', $validated);
 
         $turno = TurnoRodado::create($validated);
+
+        \Log::info('Store turno - Turno creado:', ['id' => $turno->id, 'descripcion' => $turno->descripcion]);
 
         return redirect()->route('rodados.index')
             ->with('success', 'Turno creado exitosamente.');
@@ -59,6 +145,12 @@ class TurnoRodadoController extends Controller
 
     public function update(Request $request, TurnoRodado $turno)
     {
+        // Logging para depurar
+        \Log::info('Update turno - Turno ID:', ['id' => $turno->id]);
+        \Log::info('Update turno - Request data:', $request->all());
+        \Log::info('Update turno - Descripcion recibida:', ['descripcion' => $request->input('descripcion')]);
+        \Log::info('Update turno - Tipo recibido:', ['tipo' => $request->input('tipo')]);
+
         // Validación base
         $validated = $request->validate([
             'rodado_id' => 'required|exists:rodados,id',
@@ -68,7 +160,6 @@ class TurnoRodadoController extends Controller
             'encargado_dejar' => 'nullable|string|max:255',
             'encargado_retirar' => 'nullable|string|max:255',
             'descripcion' => 'nullable|string',
-            'motivo_turno' => 'nullable|string',
             'partes_afectadas' => 'nullable|array',
             'partes_afectadas.*.item' => 'required_with:partes_afectadas|string|max:255',
             'partes_afectadas.*.cantidad' => 'required_with:partes_afectadas|integer|min:1',
@@ -81,17 +172,48 @@ class TurnoRodadoController extends Controller
             $validated['tipo'] = TurnoRodado::TIPO_TURNO_MECANICO;
         }
 
+        // Validación condicional: descripcion es requerida para turno_mecanico
+        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO) {
+            $request->validate([
+                'descripcion' => 'required|string|min:1',
+            ], [
+                'descripcion.required' => 'El motivo del turno es obligatorio para turnos mecánicos.',
+                'descripcion.min' => 'El motivo del turno no puede estar vacío.',
+            ]);
+            // Asegurar que descripcion esté en validated
+            $validated['descripcion'] = $request->input('descripcion', '');
+        } else {
+            // Para turno_service, descripcion es opcional
+            $validated['descripcion'] = $request->input('descripcion', null);
+        }
+
+        // Logging después de validación
+        \Log::info('Update turno - Descripcion validada:', ['descripcion' => $validated['descripcion'] ?? 'null']);
+
         // Procesar partes afectadas (solo para turno_mecanico)
-        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO && isset($validated['partes_afectadas'])) {
-            $validated['partes_afectadas'] = json_encode($validated['partes_afectadas']);
+        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO) {
+            if (isset($validated['partes_afectadas']) && is_array($validated['partes_afectadas']) && count($validated['partes_afectadas']) > 0) {
+                // Filtrar items vacíos antes de guardar
+                $partesFiltradas = array_filter($validated['partes_afectadas'], function($parte) {
+                    return !empty($parte['item']) || !empty($parte['cantidad']) || !empty($parte['descripcion']);
+                });
+                $validated['partes_afectadas'] = !empty($partesFiltradas) ? json_encode(array_values($partesFiltradas)) : null;
+            } else {
+                $validated['partes_afectadas'] = null;
+            }
         } else {
             $validated['partes_afectadas'] = null;
         }
 
         // Limpiar campos no permitidos
-            $validated['tipo_reparacion'] = null;
+        $validated['tipo_reparacion'] = null;
+
+        // Logging antes de actualizar
+        \Log::info('Update turno - Datos finales para actualizar:', $validated);
 
         $turno->update($validated);
+
+        \Log::info('Update turno - Turno actualizado:', ['id' => $turno->id, 'descripcion' => $turno->descripcion]);
 
         return redirect()->route('rodados.index')
             ->with('success', 'Turno actualizado exitosamente.');
