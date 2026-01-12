@@ -1,7 +1,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <h2 class="text-2xl font-semibold mb-6">{{ $header }}</h2>
                     
@@ -12,7 +12,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
                                 <select wire:model.live="estadoFilter" 
-                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                                     <option value="">Todos</option>
                                     <option value="ABIERTO">Abierto</option>
                                     <option value="EN REVISION">En Revisión</option>
@@ -26,7 +26,7 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Evento</label>
                                 <input type="text" wire:model.live.debounce.500ms="tipoFilter"
                                        placeholder="Filtrar por tipo..."
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                             </div>
                             
                             <!-- filtro de búsqueda -->
@@ -34,13 +34,13 @@
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Buscar</label>
                                 <input type="text" wire:model.live.debounce.500ms="search"
                                        placeholder="#ID, estado, tipo ..."
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white">
                             </div>
 
                             <!-- Botones -->
                             <div class="flex items-end space-x-2">
                                 <button wire:click="clearFilters" 
-                                        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors duration-200">
+                                        class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-gray-300 rounded-md transition-colors duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
@@ -53,7 +53,7 @@
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="g-gray-800 text-gray-300 dark:bg-gray-700">
+                            <thead class="g-gray-800 text-gray-300 dark:bg-zinc-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer" wire:click="sortBy('fecha')">
                                         Fecha
@@ -105,7 +105,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="dark:bg-gray-800">
+                            <tbody class="dark:bg-zinc-800">
                                 @forelse ($seguimientos as $seguimiento)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">

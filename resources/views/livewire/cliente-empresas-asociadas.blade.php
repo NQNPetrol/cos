@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">
             Empresas Asociadas a {{ $cliente->nombre }}
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Información del cliente -->
-    <div class="bg-gray-800 p-4 rounded mb-6">
+    <div class="bg-zinc-800 p-4 rounded mb-6">
         <h3 class="text-lg font-medium mb-2">Información del Cliente</h3>
         <div class="grid grid-cols-2 gap-4 text-sm">
             <div><strong>Ciudad:</strong> {{ $cliente->ciudad ?? 'N/A' }}</div>
@@ -44,11 +44,11 @@
             <input type="text"
                    wire:model.live="search"
                    placeholder="Nombre de empresa..."
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
         </div>
         <div class="flex items-end">
             <button wire:click="clearFilters" 
-                    class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-white">
+                    class="bg-zinc-600 hover:bg-zinc-700 px-4 py-2 rounded text-white">
                 Limpiar Filtros
             </button>
         </div>
@@ -57,7 +57,7 @@
     <!-- Tabla contenido -->
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Nombre de la Empresa</th>
                     <th class="px-4 py-2 text-left">Fecha de Asociación</th>
@@ -66,7 +66,7 @@
             </thead>
             <tbody>
                 @forelse ($empresasAsociadas as $empresa)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                         <td class="px-4 py-2">
                             <div class="text-sm">{{ $empresa->nombre }}</div>
                         </td>
@@ -106,7 +106,7 @@
     <!-- Modal para asociar empresa -->
     @if($showModal)
         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-md" @click.stop>
+            <div class="bg-zinc-900 rounded-lg p-6 w-full max-w-md" @click.stop>
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-100">Asociar Empresas</h3>
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-200">
@@ -120,11 +120,11 @@
                     <div class="mb-4 max-h-96 overflow-y-auto">
                         <label class="block text-sm mb-1 text-gray-300">Seleccionar Empresas <span class="text-red-500">*</span></label>
                         @foreach($empresasDisponibles as $empresa)
-                        <label class="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded">
+                        <label class="flex items-center space-x-2 p-2 hover:bg-zinc-800 rounded">
                             <input type="checkbox" 
                                    wire:model="empresasSeleccionadas"
                                    value="{{ $empresa->id }}"
-                                   class="rounded border-gray-600 text-green-500 focus:ring-green-500">
+                                   class="rounded border-zinc-600 text-green-500 focus:ring-green-500">
                             <span>{{ $empresa->nombre }}</span>
                         </label>
                         @endforeach
@@ -150,7 +150,7 @@
                             </button>
                             <button type="submit"
                                     @if($empresasDisponibles->isEmpty()) disabled @endif
-                                    class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-6 py-2 rounded text-white font-medium">
+                                    class="bg-green-600 hover:bg-green-700 disabled:bg-zinc-600 px-6 py-2 rounded text-white font-medium">
                                 Asociar
                             </button>
                         </div>

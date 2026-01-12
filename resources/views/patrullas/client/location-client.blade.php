@@ -32,144 +32,144 @@
                 </div>
             </div>
 
-            <!-- Header -->
-            <div class="bg-slate-900 overflow-hidden shadow-xl sm:rounded-lg p-6 mb-6">
-                <div class="p-6 text-gray-100">
-                    <!-- Header -->
-                    <div class="mb-6">
-                        <a href="{{ route('client.patrullas.index') }}" 
-                        class="flex items-center text-blue-400 hover:text-blue-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                            </svg>
-                            Volver a Patrullas
-                        </a>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h2 class="text-3xl font-bold text-white mb-2">Mapa de Vehículos Móviles</h2>
-                                <p class="text-sm text-gray-300">Localización de tus patrullas conectadas</p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="refreshData()" 
-                                   class="bg-blue-700 hover:bg-blue-600 text-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                    </svg>
-                                    Actualizar ahora
-                                </button>
-                            </div>
+            <!-- Contenedor 1: Header (Título + Botón Volver + Subtítulo + Botón Actualizar) -->
+            <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
+                <div class="text-gray-100">
+                    <a href="{{ route('client.patrullas.index') }}" 
+                    class="flex items-center text-blue-400 hover:text-blue-300 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver a Patrullas
+                    </a>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-3xl font-bold text-white mb-2">Mapa de Vehículos Móviles</h2>
+                            <p class="text-sm text-gray-300">Localización de tus patrullas conectadas</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="refreshData()" 
+                               class="bg-blue-700 hover:bg-blue-600 text-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Actualizar ahora
+                            </button>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Mensaje cuando no hay ubicaciones -->
-                    @if(isset($locationsConCoordenadas) && empty($locationsConCoordenadas))
-                    <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-6 mb-6 text-center">
-                        <div class="flex items-center justify-center mb-4">
-                            <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Sin información de ubicación</h3>
-                        <p class="text-yellow-200">
-                            No hay información de ubicación disponible para ninguno de tus vehículos en este momento.
-                        </p>
-                        <p class="text-yellow-100 text-sm mt-2">
-                            Los dispositivos GPS pueden estar desconectados o sin señal.
-                        </p>
+            <!-- Contenedor 2: Mapa + Mensaje de "Sin información" -->
+            <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
+                <!-- Mensaje cuando no hay ubicaciones -->
+                @if(isset($locationsConCoordenadas) && empty($locationsConCoordenadas))
+                <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-6 mb-6 text-center">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
                     </div>
-                    @endif
+                    <h3 class="text-lg font-semibold text-yellow-300 mb-2">Sin información de ubicación</h3>
+                    <p class="text-yellow-200">
+                        No hay información de ubicación disponible para ninguno de tus vehículos en este momento.
+                    </p>
+                    <p class="text-yellow-100 text-sm mt-2">
+                        Los dispositivos GPS pueden estar desconectados o sin señal.
+                    </p>
+                </div>
+                @endif
 
-                    <!-- Contenedor del Mapa -->
-                    <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                        <div class="h-96 bg-gray-700 rounded-lg" id="map-container">
-                            <div id="map" style="height: 100%; width: 100%;"></div>
-                        </div>
+                <!-- Contenedor del Mapa -->
+                <div class="bg-[#252728] rounded-lg p-4">
+                    <div class="h-[600px] bg-zinc-700 rounded-lg" id="map-container">
+                        <div id="map" style="height: 100%; width: 100%;"></div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Tabla de Vehículos Móviles -->
-                    <div class="bg-gray-700 rounded-lg overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead class="bg-gray-600">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Código
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Dominio
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Región
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                            Última ubicación
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="vehicles-table-body">
-                                    @forelse($mobileVehicles as $vehicle)
-                                        <tr class="hover:bg-gray-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-white">{{ $vehicle->mobile_vehicle_index_code }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-blue-400 font-medium">{{ $vehicle->mobile_vehicle_name }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-300">
-                                                    @switch($vehicle->region_index_code)
-                                                        @case('6')
-                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">TECHINT</span>
-                                                            @break
-                                                        @case('11')
-                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">PECOM</span>
-                                                            @break
-                                                        @case('23')
-                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
-                                                            @break
-                                                        @default
-                                                            <span class="px-2 py-1 bg-gray-900/30 text-gray-300 rounded text-xs">VARIOS</span>
-                                                    @endswitch
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-green-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
-                                                    @if(isset($locations[$vehicle->mobile_vehicle_index_code]) && $locations[$vehicle->mobile_vehicle_index_code]['latitude'])
-                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['latitude'], 6) }}, 
-                                                        {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['longitude'], 6) }}
-                                                        <br>
-                                                        <small class="text-gray-400">
-                                                            {{ $locations[$vehicle->mobile_vehicle_index_code]['occurTime'] }}
-                                                        </small>
-                                                        <br>
-                                                        <small class="text-blue-400">
-                                                            Velocidad: {{ $locations[$vehicle->mobile_vehicle_index_code]['speed'] }} km/h
-                                                        </small>
-                                                    @else
-                                                        <span class="text-red-300">Sin datos de ubicación recientes</span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="px-6 py-4 text-center text-gray-400">
-                                                No hay vehículos móviles registrados.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <!-- Contenedor 3: Listado (Tabla de Vehículos Móviles) -->
+            <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-[#3b3d3f]">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Código
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Dominio
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Región
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Última ubicación
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-[#232527] divide-y divide-gray-600" id="vehicles-table-body">
+                            @forelse($mobileVehicles as $vehicle)
+                                <tr class="hover:bg-zinc-750 transition-colors" id="vehicle-{{ $vehicle->mobile_vehicle_index_code }}">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-white">{{ $vehicle->mobile_vehicle_index_code }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-blue-400 font-medium">{{ $vehicle->mobile_vehicle_name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-300">
+                                            @switch($vehicle->region_index_code)
+                                                @case('6')
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">TECHINT</span>
+                                                    @break
+                                                @case('11')
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">PECOM</span>
+                                                    @break
+                                                @case('23')
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                                    @break
+                                                @default
+                                                    <span class="px-2 py-1 bg-zinc-900/30 text-gray-300 rounded text-xs">VARIOS</span>
+                                            @endswitch
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-green-300 location-data" data-vehicle-id="{{ $vehicle->mobile_vehicle_index_code }}">
+                                            @if(isset($locations[$vehicle->mobile_vehicle_index_code]) && $locations[$vehicle->mobile_vehicle_index_code]['latitude'])
+                                                {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['latitude'], 6) }}, 
+                                                {{ number_format($locations[$vehicle->mobile_vehicle_index_code]['longitude'], 6) }}
+                                                <br>
+                                                <small class="text-gray-400">
+                                                    {{ $locations[$vehicle->mobile_vehicle_index_code]['occurTime'] }}
+                                                </small>
+                                                <br>
+                                                <small class="text-blue-400">
+                                                    Velocidad: {{ $locations[$vehicle->mobile_vehicle_index_code]['speed'] }} km/h
+                                                </small>
+                                            @else
+                                                <span class="text-red-300">Sin datos de ubicación recientes</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-400">
+                                        No hay vehículos móviles registrados.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                    <!-- Información del filtrado -->
-                    <div class="bg-gray-800 rounded-lg p-4 mt-4">
-                        <div class="text-sm text-gray-400">
-                            <p><strong>Vehículos mostrados:</strong> {{ $mobileVehicles->count() }} de {{ $mobileVehicles->total() }}</p>
-                            <p><strong>Con ubicación disponible:</strong> {{ isset($locationsConCoordenadas) ? count($locationsConCoordenadas) : 0 }}</p>
-                        </div>
-                    </div>
+            <!-- Contenedor 4: Carta de Recuento -->
+            <div class="bg-[#252728] rounded-lg p-6 border border-transparent">
+                <div class="text-sm text-gray-300">
+                    <p class="mb-2"><strong class="text-gray-200">Vehículos mostrados:</strong> {{ $mobileVehicles->count() }} de {{ $mobileVehicles->total() }}</p>
+                    <p><strong class="text-gray-200">Con ubicación disponible:</strong> {{ isset($locationsConCoordenadas) ? count($locationsConCoordenadas) : 0 }}</p>
                 </div>
             </div>
         </div>

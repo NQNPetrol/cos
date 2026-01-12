@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
                     <a href="{{ route('usuarios.index') }}" 
                         class="flex items-center text-blue-400 hover:text-blue-300">
@@ -73,14 +73,14 @@
                                 Limpiar Selección
                             </button>
                         </div>
-                        <div class="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                        <div class="border border-zinc-600 rounded-lg p-4 bg-zinc-700">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" id="clientesContainer">
                                 @foreach($clientes as $cliente)
-                                    <label class="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition-colors">
+                                    <label class="flex items-center p-2 hover:bg-zinc-600 rounded cursor-pointer transition-colors">
                                         <input type="checkbox" 
                                                name="clientes_seleccionados[]" 
                                                value="{{ $cliente->id }}" 
-                                               class="cliente-checkbox w-4 h-4 text-blue-500 bg-gray-600 border-gray-500 rounded focus:ring-blue-400 focus:ring-2">
+                                               class="cliente-checkbox w-4 h-4 text-blue-500 bg-zinc-600 border-zinc-500 rounded focus:ring-blue-400 focus:ring-2">
                                         <span class="ml-2 text-sm text-gray-100">
                                             {{ $cliente->nombre }}
                                             @if($cliente->esCOS())
@@ -100,14 +100,14 @@
                     </div>
 
                     <!-- Filtros de usuarios -->
-                    <div class="mb-6 bg-gray-700 p-4 rounded-lg">
+                    <div class="mb-6 bg-zinc-700 p-4 rounded-lg">
                         <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
                             <div class="flex-1">
                                 <label for="filtroNombre" class="block text-sm font-medium text-gray-200 mb-1">
                                     Buscar por nombre:
                                 </label>
                                 <input type="text" id="filtroNombre" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el nombre del usuario...">
                             </div>
                             <div class="flex-1">
@@ -115,12 +115,12 @@
                                     Buscar por email:
                                 </label>
                                 <input type="text" id="filtroEmail" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el email del usuario...">
                             </div>
                             <div class="flex-shrink-0 mt-6 md:mt-6">
                                 <button type="button" id="limpiarFiltros" 
-                                        class="bg-gray-600 hover:bg-gray-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                        class="bg-zinc-600 hover:bg-zinc-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
                                     Limpiar Filtros
                                 </button>
                             </div>
@@ -128,8 +128,8 @@
                     </div>
 
                     <!-- Tabla de usuarios -->
-                    <div class="bg-gray-800 rounded-lg border border-gray-600">
-                        <div class="px-6 py-4 border-b border-gray-600">
+                    <div class="bg-zinc-800 rounded-lg border border-zinc-600">
+                        <div class="px-6 py-4 border-b border-zinc-600">
                             <h3 class="text-lg font-medium text-gray-100">Usuarios del Sistema</h3>
                             <p class="text-sm text-gray-300 mt-1">
                                 Presione "Asignar" para asignar los clientes seleccionados al usuario correspondiente.
@@ -137,7 +137,7 @@
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-600">
-                                <thead class="bg-gray-700">
+                                <thead class="bg-zinc-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Usuario
@@ -153,9 +153,9 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="tablaUsuarios">
+                                <tbody class="bg-zinc-800 divide-y divide-gray-600" id="tablaUsuarios">
                                     @foreach($usuarios as $usuario)
-                                        <tr class="usuario-row hover:bg-gray-700" 
+                                        <tr class="usuario-row hover:bg-zinc-700" 
                                             data-nombre="{{ strtolower($usuario->name) }}" 
                                             data-email="{{ strtolower($usuario->email) }}">
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -184,7 +184,7 @@
                                                     <div class="flex flex-wrap gap-1">
                                                         @foreach($usuario->clientes as $cliente)
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
-                                                                         {{ $cliente->esCOS() ? 'bg-blue-800 text-blue-200' : 'bg-gray-600 text-gray-200' }}">
+                                                                         {{ $cliente->esCOS() ? 'bg-blue-800 text-blue-200' : 'bg-zinc-600 text-gray-200' }}">
                                                                 {{ $cliente->nombre }}
                                                             </span>
                                                         @endforeach
@@ -195,7 +195,7 @@
                                                 <div class="flex space-x-2">
                                                     <!-- Botón Asignar -->
                                                     <button type="button" 
-                                                            class="asignar-btn bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                                            class="asignar-btn bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-600 disabled:cursor-not-allowed text-white font-medium py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                                                             data-usuario-id="{{ $usuario->id }}"
                                                             data-usuario-nombre="{{ $usuario->name }}"
                                                             disabled>

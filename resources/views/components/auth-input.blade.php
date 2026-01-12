@@ -9,7 +9,7 @@
         <input 
             id="{{ $id }}"
             type="{{ $type }}"
-            {{ $attributes->merge(['class' => 'w-full px-4 py-2.5 border border-gray-300 rounded-lg input-focus transition duration-200 placeholder:text-gray-400 placeholder:text-sm text-sm pr-10']) }}
+            {{ $attributes->merge(['class' => 'w-full px-4 py-2.5 border border-zinc-300 rounded-lg input-focus transition duration-200 placeholder:text-gray-400 placeholder:text-sm text-sm pr-10']) }}
             @if($placeholder) placeholder="{{ $placeholder }}" @endif
             @if($required) required @endif
             @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif>

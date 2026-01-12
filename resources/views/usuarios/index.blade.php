@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
 
                     <!-- Header con título -->
@@ -79,14 +79,14 @@
                     @endif
 
                     <!-- Filtros de usuarios -->
-                    <div class="mb-6 bg-gray-700 p-4 rounded-lg">
+                    <div class="mb-6 bg-zinc-700 p-4 rounded-lg">
                         <div class="flex flex-col md:flex-row md:items-end md:space-x-4 space-y-2 md:space-y-0">
                             <div class="flex-1">
                                 <label for="filtroNombre" class="block text-sm font-medium text-gray-200 mb-1">
                                     Buscar por nombre:
                                 </label>
                                 <input type="text" id="filtroNombre" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el nombre del usuario...">
                             </div>
                             <div class="flex-1">
@@ -94,7 +94,7 @@
                                     Buscar por email:
                                 </label>
                                 <input type="text" id="filtroEmail" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el email del usuario...">
                             </div>
                             <div class="flex-1">
@@ -102,7 +102,7 @@
                                     Filtrar por rol:
                                 </label>
                                 <select id="filtroRol" 
-                                        class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
+                                        class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
                                     <option value="">Todos los roles</option>
                                     @foreach($roles as $rol)
                                         <option value="{{ strtolower($rol->name) }}">{{ $rol->name }}</option>
@@ -111,7 +111,7 @@
                             </div>
                             <div class="flex-shrink-0">
                                 <button type="button" id="limpiarFiltros" 
-                                        class="bg-gray-600 hover:bg-gray-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 h-[42px]">
+                                        class="bg-zinc-600 hover:bg-zinc-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 h-[42px]">
                                     Limpiar Filtros
                                 </button>
                             </div>
@@ -119,13 +119,13 @@
                     </div>
 
                     <!-- Tabla de usuarios -->
-                    <div class="bg-gray-800 rounded-lg border border-gray-600">
-                        <div class="px-6 py-4 border-b border-gray-600">
+                    <div class="bg-zinc-800 rounded-lg border border-zinc-600">
+                        <div class="px-6 py-4 border-b border-zinc-600">
                             <h3 class="text-lg font-medium text-gray-100">Listado de Usuarios</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-600">
-                                <thead class="bg-gray-700">
+                                <thead class="bg-zinc-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Usuario
@@ -141,16 +141,16 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="tablaUsuarios">
+                                <tbody class="bg-zinc-800 divide-y divide-gray-600" id="tablaUsuarios">
                                     @foreach($usuarios as $usuario)
-                                        <tr class="usuario-row hover:bg-gray-700" 
+                                        <tr class="usuario-row hover:bg-zinc-700" 
                                             data-nombre="{{ strtolower($usuario->name) }}" 
                                             data-email="{{ strtolower($usuario->email) }}"
                                             data-rol="{{ strtolower($usuario->getRoleNames()->implode(', ') ?: 'sin rol') }}">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-8 w-8">
-                                                        <div class="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                                        <div class="h-8 w-8 rounded-full bg-zinc-600 flex items-center justify-center">
                                                             <span class="text-sm font-medium text-white">
                                                                 {{ $usuario->initials() }}
                                                             </span>
@@ -181,7 +181,7 @@
                                                 <form action="{{ route('usuarios.roles', $usuario) }}" method="POST" class="flex items-center space-x-2">
                                                     @csrf
                                                     <select name="rol" 
-                                                            class="px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                                                            class="px-3 py-2 bg-zinc-700 border border-zinc-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
                                                         <option value="">Seleccionar rol...</option>
                                                         @foreach($roles as $rol)
                                                             <option value="{{ $rol->name }}" {{ $usuario->hasRole($rol->name) ? 'selected' : '' }}>

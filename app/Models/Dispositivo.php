@@ -23,6 +23,8 @@ class Dispositivo extends Model
         'estado_hikconnect',
         'cliente_id',
         'ubicacion',
+        'latitud',
+        'longitud',
         'observaciones',
         'necesita_mantenimiento',
         'necesita_actualizacion',
@@ -38,6 +40,8 @@ class Dispositivo extends Model
         'fecha_instalacion' => 'date',
         'ultimo_mantenimiento' => 'date',
         'proximo_mantenimiento' => 'date',
+        'latitud' => 'decimal:7',
+        'longitud' => 'decimal:7',
     ];
 
     protected $attributes = [
@@ -59,6 +63,16 @@ class Dispositivo extends Model
                     ->using(DispositivoPatrulla::class)
                     ->withPivot('fecha_asignacion')
                     ->withTimestamps();
+    }
+
+    public function cambiosEquipos()
+    {
+        return $this->hasMany(CambioEquipoRodado::class);
+    }
+
+    public function camera()
+    {
+        return $this->hasOne(Camera::class);
     }
 
     // Scopes
@@ -136,5 +150,80 @@ class Dispositivo extends Model
         return $this->proximo_mantenimiento && 
                Carbon::now()->addDays($dias)->gte($this->proximo_mantenimiento) &&
                Carbon::now()->lte($this->proximo_mantenimiento);
+    }
+
+    /**
+     * Obtener coordenadas desde los campos de ubicación
+     *
+     * Soporta:
+     * - Columnas `latitud` y `longitud` (preferidas)
+     * - Columna `ubicacion` (string o JSON)
+     * - Columna `coordenadas` (string o JSON), si existe en la tabla
+     */
+    public function getCoordenadasAttribute()
+    {
+        // 1) Si existen columnas numéricas latitud / longitud válidas, usarlas siempre
+        if (!is_null($this->latitud) && !is_null($this->longitud)) {
+            $lat = (float) $this->latitud;
+            $lng = (float) $this->longitud;
+
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return [
+                    'lat' => $lat,
+                    'lng' => $lng,
+                ];
+            }
+        }
+
+        // 2) Fallback: intentar campos de texto
+        // Tomar primero ubicacion; si está vacía, intentar columna coordenadas (si existe)
+        $rawUbicacion = $this->attributes['ubicacion'] ?? null;
+        $rawCoordenadas = $this->attributes['coordenadas'] ?? null;
+
+        $value = $rawUbicacion ?: $rawCoordenadas;
+
+        if (!$value) {
+            return null;
+        }
+        
+        // Intentar parsear como JSON primero
+        $json = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE && isset($json['lat']) && isset($json['lng'])) {
+            $lat = (float) $json['lat'];
+            $lng = (float) $json['lng'];
+            
+            // Validar rango de coordenadas
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return [
+                    'lat' => $lat,
+                    'lng' => $lng
+                ];
+            }
+        }
+        
+        // Buscar patrón de coordenadas: -XX.XXXX, -XX.XXXX
+        $pattern = '/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/';
+        if (preg_match($pattern, $value, $matches)) {
+            $lat = (float) trim($matches[1]);
+            $lng = (float) trim($matches[2]);
+            
+            // Validar rango de coordenadas
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return [
+                    'lat' => $lat,
+                    'lng' => $lng
+                ];
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Verificar si el dispositivo tiene coordenadas válidas
+     */
+    public function tieneCoordenadas()
+    {
+        return $this->coordenadas !== null;
     }
 }

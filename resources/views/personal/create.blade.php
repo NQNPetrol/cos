@@ -13,37 +13,37 @@
             </div>
         @endif
 
-        <form x-data="{mostrarPuesto: {{ old('cargo') == 'personal-seguridad' ? 'true' : 'false' }}}"  action="{{ route('personal.store') }}" method="POST" class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+        <form x-data="{mostrarPuesto: {{ old('cargo') == 'personal-seguridad' ? 'true' : 'false' }}}"  action="{{ route('personal.store') }}" method="POST" class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm mb-1">Nombre <span class="text-red-500">*</span></label>
                     <input type="text" name="nombre" value="{{ old('nombre') }}"
-                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" required>
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Apellido <span class="text-red-500">*</span></label>
                     <input type="text" name="apellido" value="{{ old('apellido') }}"
-                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" required>
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Documento</label>
                     <input type="text" name="nro_doc" value="{{ old('nro_doc') }}"
-                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
+                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2">
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Fecha de Inicio</label>
                     <input type="date" name="fecha_ing" value="{{ old('fecha_ing') }}"
-                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2">
+                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2">
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Cliente <span class="text-red-500">*</span></label>
-                    <select name="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                    <select name="cliente_id" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" required>
                         <option value="">Seleccione un cliente</option>
                         @foreach($clientes as $cliente)
                             <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : ''}}>
@@ -56,7 +56,7 @@
                 <div>
                     <label class="block text-sm mb-1">Cargo<span class="text-red-500">*</span></label>
                     <select name="cargo" @change="mostrarPuesto = ($event.target.value == 'personal-seguridad')" 
-                            class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" required>
+                            class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" required>
                         <option value="gerente" {{ old('cargo') == 'Gerente' ? 'selected' : '' }}>Gerente</option>
                         <option value="coordinador" {{ old('cargo') == 'Coordinador' ? 'selected' : '' }}>Coordinador</option>
                         <option value="supervisor" {{ old('cargo') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
@@ -68,7 +68,7 @@
                 <!-- Campos condicionales -->
                 <div x-show="mostrarPuesto">
                     <label class="block text-sm mb-1">Puesto <span class="text-red-500">*</span></label>
-                    <select name="puesto" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" x-bind:required="mostrarPuesto">
+                    <select name="puesto" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" x-bind:required="mostrarPuesto">
                         <option value="">Seleccione un puesto</option>
                         <option value="Chofer de transporte" {{ old('puesto') == 'Chofer de transporte' ? 'selected' : '' }}>Chofer de transporte</option>
                         <option value="Chofer de patrulla" {{ old('puesto') == 'Chofer de patrulla' ? 'selected' : '' }}>Chofer de patrulla</option>
@@ -78,7 +78,7 @@
 
                 <div x-show="mostrarPuesto">
                     <label class="block text-sm mb-1">Convenio <span class="text-red-500">*</span></label>
-                    <select name="convenio" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2" x-bind:required="mostrarPuesto">
+                    <select name="convenio" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2" x-bind:required="mostrarPuesto">
                         <option value="">Seleccione un convenio</option>
                         <option value="505" {{ old('convenio') == '505' ? 'selected' : '' }}>505</option>
                         <option value="507" {{ old('convenio') == '507' ? 'selected' : '' }}>507</option>

@@ -1,4 +1,4 @@
-<div class="bg-gray-900 rounded-lg">
+<div class="bg-zinc-900 rounded-lg">
     <div>
         <!-- Notificaciones -->
         @if (session()->has('success'))
@@ -20,7 +20,7 @@
         @endif
 
         <!-- Contenedor del Formulario de Asignación -->
-        <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-600">
+        <div class="bg-zinc-800 rounded-lg p-6 mb-6 border border-zinc-600">
             <!-- Formulario de Asignación -->
             <div class="rounded-lg">
                 <form wire:submit.prevent="asignarPiloto" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -28,7 +28,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Piloto</label>
                         <select wire:model="pilotoSeleccionado" 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             <option value="">Seleccionar Piloto</option>
                             @foreach($pilotos as $piloto)
                                 <option value="{{ $piloto->id }}">
@@ -49,7 +49,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Cliente</label>
                         <select wire:model="clienteSeleccionado" 
-                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             <option value="">Seleccionar Cliente</option>
                             @foreach($clientes as $cliente)
                                 <option value="{{ $cliente->id }}">
@@ -74,10 +74,10 @@
         </div>
 
         <!-- Contenedor de la Carta de Asignaciones Actuales -->
-         <div class="bg-gray-800 rounded-lg border border-gray-600">
+         <div class="bg-zinc-800 rounded-lg border border-zinc-600">
             <!-- Lista de Asignaciones -->
             <div class="rounded-lg">
-                <div class="flex items-center justify-between p-6 border-b border-gray-600">
+                <div class="flex items-center justify-between p-6 border-b border-zinc-600">
                     <h3 class="text-lg font-semibold text-gray-100">
                         Asignaciones Actuales
                     </h3>
@@ -87,7 +87,7 @@
                     <div class="flex items-center space-x-2">
                         <button wire:click="paginaAnterior" 
                                 wire:loading.attr="disabled"
-                                class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                class="p-2 rounded-md bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 {{ $paginaActual === 1 ? 'disabled' : '' }}>
                             <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -100,7 +100,7 @@
                         
                         <button wire:click="paginaSiguiente"
                                 wire:loading.attr="disabled"
-                                class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                class="p-2 rounded-md bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 {{ $paginaActual === $totalPaginas ? 'disabled' : '' }}>
                             <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -115,7 +115,7 @@
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             @foreach($pilotosPaginados as $piloto)
                                 @if(isset($asignaciones[$piloto->id]) && count($asignaciones[$piloto->id]) > 0)
-                                    <div class="bg-gray-750 rounded-lg border border-gray-600 p-4">
+                                    <div class="bg-zinc-750 rounded-lg border border-zinc-600 p-4">
                                         <div class="flex items-center justify-between mb-3">
                                             <div>
                                                 <h4 class="text-base font-medium text-gray-100">
@@ -137,7 +137,7 @@
                                                     $cliente = $clientes->firstWhere('id', $clienteId);
                                                 @endphp
                                                 @if($cliente)
-                                                    <div class="flex items-center justify-between bg-gray-700 rounded-lg p-2 border border-gray-600">
+                                                    <div class="flex items-center justify-between bg-zinc-700 rounded-lg p-2 border border-zinc-600">
                                                         <span class="text-sm text-gray-300 font-medium">{{ $cliente->nombre }}</span>
                                                         <button type="button" 
                                                                 wire:click="eliminarAsignacion({{ $piloto->id }}, {{ $clienteId }})"

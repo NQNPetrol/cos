@@ -16,12 +16,12 @@
             <div class="flex items-center gap-2">
                 <label for="fecha_desde" class="text-sm text-gray-300">Desde:</label>
                 <input type="date" id="fecha_desde" 
-                       class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                       class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <div class="flex items-center gap-2">
                 <label for="fecha_hasta" class="text-sm text-gray-300">Hasta:</label>
                 <input type="date" id="fecha_hasta" 
-                       class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                       class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <button id="btn_filtrar" 
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
@@ -31,14 +31,14 @@
                 Filtrar
             </button>
             <button id="btn_limpiar" 
-                    class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                    class="bg-zinc-600 hover:bg-zinc-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                 Limpiar
             </button>
         </div>
     </div>
 
     <!-- ==================== SECCIÓN EVENTOS ==================== -->
-    <div class="border-b border-gray-600 pb-2">
+    <div class="border-b border-zinc-600 pb-2">
         <h2 class="text-lg font-semibold text-blue-400 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -50,7 +50,7 @@
     <!-- Tarjetas de resumen de eventos -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Total de Eventos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Eventos</p>
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Clientes -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Clientes</p>
@@ -80,7 +80,7 @@
         </div>
 
         <!-- Eventos últimos 7 días -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Últimos 7 días</p>
@@ -98,7 +98,7 @@
     <!-- Grid de gráficos de eventos - 2 columnas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gráfico stacked de eventos por categoría y cliente -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-white">Eventos por Categoría y Cliente</h2>
@@ -114,7 +114,7 @@
                 <canvas id="chartEventosStacked"></canvas>
             </div>
             
-            <div id="loading-stacked" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+            <div id="loading-stacked" class="hidden absolute inset-0 bg-zinc-800/80 rounded-2xl flex items-center justify-center">
                 <div class="flex flex-col items-center gap-3">
                     <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
                     <span class="text-gray-300 text-sm">Cargando datos...</span>
@@ -123,7 +123,7 @@
         </div>
 
         <!-- Gráfico combinado de eventos por mes -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-white">Tendencia Mensual de Eventos</h2>
@@ -139,7 +139,7 @@
                 <canvas id="chartEventosMensual"></canvas>
             </div>
             
-            <div id="loading-mensual" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+            <div id="loading-mensual" class="hidden absolute inset-0 bg-zinc-800/80 rounded-2xl flex items-center justify-center">
                 <div class="flex flex-col items-center gap-3">
                     <div class="animate-spin rounded-full h-10 w-10 border-4 border-violet-500 border-t-transparent"></div>
                     <span class="text-gray-300 text-sm">Cargando datos...</span>
@@ -151,7 +151,7 @@
     <!--MAPA DE CALOR -->
 
     <!-- Contenedor del mapa de calor y panel lateral -->
-    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- Columna principal: mapa (ancho reducido) -->
             <div class="flex-1">
@@ -165,7 +165,7 @@
                         <div class="flex flex-col items-end gap-1">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-gray-400 font-medium">Baja</span>
-                                <div class="w-40 h-4 rounded-md overflow-hidden border border-gray-600 shadow-inner" 
+                                <div class="w-40 h-4 rounded-md overflow-hidden border border-zinc-600 shadow-inner" 
                                      style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
                                 </div>
                                 <span class="text-xs text-gray-400 font-medium">Alta</span>
@@ -194,7 +194,7 @@
             <!-- Panel lateral: filtros y menú desplegable -->
             <div id="heatmap-filters-panel" class="w-full lg:w-80 space-y-4">
                 <!-- Filtro por cliente -->
-                <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4">
+                <div class="bg-zinc-900/60 border border-zinc-700 rounded-xl p-4">
                     <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por cliente</h3>
 
                     <div class="space-y-2">
@@ -203,7 +203,7 @@
                             <input
                                 type="checkbox"
                                 id="heatmap_cliente_todos"
-                                class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                class="h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500"
                             >
                             <span>Seleccionar todos los clientes</span>
                         </label>
@@ -211,10 +211,10 @@
                         <!-- Lista de clientes -->
                         <div class="max-h-40 overflow-y-auto space-y-1 mt-1 custom-scrollbar">
                             @foreach($empresasAsociadas as $empresa)
-                                <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded">
+                                <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded">
                                     <input
                                         type="checkbox"
-                                        class="heatmap-cliente-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                        class="heatmap-cliente-item h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500"
                                         value="{{ $empresa->id }}"
                                     >
                                     <span>{{ $empresa->nombre }}</span>
@@ -225,7 +225,7 @@
                 </div>
 
                 <!-- Filtros por categoría y tipo de evento -->
-                <div class="bg-gray-900/60 border border-gray-700 rounded-xl p-4 space-y-3">
+                <div class="bg-zinc-900/60 border border-zinc-700 rounded-xl p-4 space-y-3">
                     <!-- Categorías como checkboxes -->
                     <div>
                         <h3 class="text-sm font-semibold text-gray-200 mb-2">Filtrar por Categoria</h3>
@@ -236,7 +236,7 @@
                                 <input
                                     type="checkbox"
                                     id="heatmap_categoria_todos"
-                                    class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                    class="h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500"
                                 >
                                 <span>Seleccionar todas las categorías</span>
                             </label>
@@ -245,10 +245,10 @@
                             <div class="max-h-40 overflow-y-auto space-y-1 mt-1 custom-scrollbar" id="heatmap_categorias_lista">
                                 @if(isset($categoriasTiposMapa))
                                     @foreach($categoriasTiposMapa as $cat)
-                                        <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded">
+                                        <label class="flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded">
                                             <input
                                                 type="checkbox"
-                                                class="heatmap-categoria-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                                class="heatmap-categoria-item h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500"
                                                 value="{{ $cat['id'] }}"
                                                 data-tipos="{{ json_encode($cat['tipos'] ?? []) }}"
                                             >
@@ -270,7 +270,7 @@
                                 <input
                                     type="checkbox"
                                     id="heatmap_tipo_todos"
-                                    class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500"
+                                    class="h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500"
                                     disabled
                                 >
                                 <span>Seleccionar todos los tipos</span>
@@ -289,7 +289,7 @@
                             Aplicar filtros del mapa
                         </button>
                         <button id="heatmap_limpiar_filtros"
-                                class="bg-gray-700 hover:bg-gray-600 text-gray-100 text-xs font-medium rounded-lg px-3 py-2 transition-colors">
+                                class="bg-zinc-700 hover:bg-zinc-600 text-gray-100 text-xs font-medium rounded-lg px-3 py-2 transition-colors">
                             Limpiar
                         </button>
                     </div>
@@ -299,7 +299,7 @@
     </div>
 
     <!-- ==================== SECCIÓN PATRULLAS ==================== -->
-    <div class="border-b border-gray-600 pb-2 mt-8">
+    <div class="border-b border-zinc-600 pb-2 mt-8">
         <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
@@ -311,7 +311,7 @@
     <!-- Tarjetas de resumen de patrullas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Total Patrullas -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Patrullas</p>
@@ -326,7 +326,7 @@
         </div>
 
         <!-- Patrullas con GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Con GPS</p>
@@ -342,7 +342,7 @@
         </div>
 
         <!-- Patrullas sin GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Sin GPS</p>
@@ -360,7 +360,7 @@
     <!-- Grid de gráficos de patrullas - 2 columnas en pantallas lg -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gráfico de patrullas por estado -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-white">Patrullas por Estado</h2>
@@ -378,7 +378,7 @@
         </div>
 
         <!-- Gráfico de patrullas por GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-white">Cobertura GPS</h2>
@@ -397,7 +397,7 @@
     </div>
 
     <!-- ==================== SECCIÓN DOCUMENTOS DE PATRULLAS ==================== -->
-    <div class="border-b border-gray-600 pb-2 mt-8">
+    <div class="border-b border-zinc-600 pb-2 mt-8">
         <h2 class="text-lg font-semibold text-orange-400 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -409,7 +409,7 @@
     <!-- Tarjetas de resumen de documentos -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Total Documentos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Documentos</p>
@@ -472,7 +472,7 @@
     <!-- Grid: Gráfico + Tabla de documentos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gráfico de estado de documentos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-white">Estado de Documentos</h2>
@@ -490,7 +490,7 @@
         </div>
 
         <!-- Tabla de documentos próximos a vencer -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h2 class="text-xl font-bold text-white">Alertas de Vencimiento</h2>
@@ -501,7 +501,7 @@
             <div class="overflow-x-auto max-h-72 overflow-y-auto">
                 @if(isset($documentosAlerta) && count($documentosAlerta) > 0)
                 <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-gray-400 uppercase bg-gray-800/50 sticky top-0">
+                    <thead class="text-xs text-gray-400 uppercase bg-zinc-800/50 sticky top-0">
                         <tr>
                             <th scope="col" class="px-4 py-3">Documento</th>
                             <th scope="col" class="px-4 py-3">Patrulla</th>
@@ -511,7 +511,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-700">
                         @foreach($documentosAlerta as $doc)
-                        <tr class="hover:bg-gray-700/50 transition-colors">
+                        <tr class="hover:bg-zinc-700/50 transition-colors">
                             <td class="px-4 py-3 font-medium text-white">{{ $doc['nombre'] }}</td>
                             <td class="px-4 py-3 text-gray-300">{{ $doc['patrulla'] }}</td>
                             <td class="px-4 py-3 text-center text-gray-300">{{ $doc['fecha_vto'] }}</td>
@@ -1629,11 +1629,11 @@ document.addEventListener('DOMContentLoaded', function () {
             Array.from(tiposSet).sort().forEach(tipo => {
                 console.log(`Creando checkbox para tipo: ${tipo}`);
                 const label = document.createElement('label');
-                label.className = 'flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-gray-800/60 px-2 py-1 rounded';
+                label.className = 'flex items-center gap-2 text-xs text-gray-200 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.className = 'heatmap-tipo-item h-4 w-4 rounded border-gray-500 bg-gray-800 text-blue-500 focus:ring-blue-500';
+                checkbox.className = 'heatmap-tipo-item h-4 w-4 rounded border-zinc-500 bg-zinc-800 text-blue-500 focus:ring-blue-500';
                 checkbox.value = tipo;
                 
                 const span = document.createElement('span');

@@ -12,7 +12,7 @@
         <div class="overflow-x-auto bg-white shadow rounded-md">
             <form method="POST">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
+                    <thead class="bg-zinc-100">
                         <tr>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                                 <input type="checkbox" id="checkAll" class="form-checkbox">

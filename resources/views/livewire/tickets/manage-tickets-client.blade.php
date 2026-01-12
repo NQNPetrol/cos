@@ -31,12 +31,12 @@
         </div>
     @endif
 
-    <div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+    <div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Gestion de Tickets</h2>
             <div class="flex items-center space-x-4">
                 <!-- Filtros -->
-                <select wire:model.live="statusFilter" class="form-select bg-gray-800 border-gray-700 text-gray-100">
+                <select wire:model.live="statusFilter" class="form-select bg-zinc-800 border-zinc-700 text-gray-100">
                     <option value="">Todos los estados</option>
                     <option value="abierto">Abiertos</option>
                     <option value="en_proceso">En proceso de Revision</option>
@@ -44,7 +44,7 @@
                     <option value="resuelto">Resueltos</option>
                 </select>
 
-                <select wire:model.live="categoryFilter" class="form-select bg-gray-800 border-gray-700 text-gray-100 text-sm">
+                <select wire:model.live="categoryFilter" class="form-select bg-zinc-800 border-zinc-700 text-gray-100 text-sm">
                     <option value="">Todas las categorías</option>
                     @foreach($categorias as $key => $categoria)
                         <option value="{{ $key }}">{{ $categoria }}</option>
@@ -53,14 +53,14 @@
 
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                     <div class="flex items-center space-x-2">
-                        <select wire:model.live="clientTypeFilter" class="form-select bg-gray-800 border-gray-700 text-gray-100 text-sm">
+                        <select wire:model.live="clientTypeFilter" class="form-select bg-zinc-800 border-zinc-700 text-gray-100 text-sm">
                             <option value="">Todos los tickets</option>
                             <option value="interno">Internos</option>
                             <option value="cliente">De clientes</option>
                         </select>
                         <!-- Botón para limpiar filtros -->
                         <button wire:click="clearFilters" 
-                                class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md text-gray-300 hover:text-white transition-colors"
+                                class="p-2 bg-zinc-700 hover:bg-zinc-600 rounded-md text-gray-300 hover:text-white transition-colors"
                                 title="Limpiar todos los filtros">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"/>
@@ -82,8 +82,8 @@
         <!-- Modal para crear/editar tickets -->
         @if ($showModal)
             <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" wire:click="closeModalOnClickAway">
-                <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl" wire:click.stop>
-                    <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+                <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-2xl" wire:click.stop>
+                    <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                         <h3 class="text-xl font-semibold text-white">
                             {{ $editMode ? 'Editar Ticket' : 'Crear Nuevo Ticket' }}
                         </h3>
@@ -103,19 +103,19 @@
                                 <!-- Título -->
                                  <div class="md:col-span-2">
                                     <label for="titulo" class="block text-sm font-medium text-gray-300 mb-2">Título</label>
-                                    <input type="text" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" id="titulo" wire:model="titulo">
+                                    <input type="text" class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" id="titulo" wire:model="titulo">
                                     @error('titulo') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <!-- Descripción -->
                                 <div class="md:col-span-2">
                                     <label for="descripcion" class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
-                                    <textarea class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" id="descripcion" rows="4" wire:model="descripcion"></textarea>
+                                    <textarea class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" id="descripcion" rows="4" wire:model="descripcion"></textarea>
                                     @error('descripcion') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <!-- Categoría -->
                                  <div>
                                     <label for="categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoría</label>
-                                    <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
+                                    <select class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
                                             id="categoria" 
                                             wire:model="categoria">
                                         <option value="">Seleccionar categoría</option>
@@ -128,7 +128,7 @@
                                 <!-- Prioridad -->
                                 <div>
                                     <label for="prioridad" class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
-                                    <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" id="prioridad" wire:model="prioridad">
+                                    <select class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" id="prioridad" wire:model="prioridad">
                                         <option value="baja">Baja</option>
                                         <option value="media">Media</option>
                                         <option value="alta">Alta</option>
@@ -144,7 +144,7 @@
                                         <div class="flex space-x-4">
                                             <label class="flex items-center">
                                                 <input type="radio" 
-                                                       class="form-radio text-green-600 bg-gray-700 border-gray-600" 
+                                                       class="form-radio text-green-600 bg-zinc-700 border-zinc-600" 
                                                        name="emitido_por" 
                                                        value="COS"
                                                        wire:model="emitido_por">
@@ -152,7 +152,7 @@
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="radio" 
-                                                       class="form-radio text-green-600 bg-gray-700 border-gray-600" 
+                                                       class="form-radio text-green-600 bg-zinc-700 border-zinc-600" 
                                                        name="emitido_por" 
                                                        value="CLIENTE"
                                                        wire:model="emitido_por">
@@ -164,7 +164,7 @@
                                     <!-- Cliente (solo si emitido por CLIENTE) -->
                                     <div class="md:col-span-2" id="cliente-field" style="display: none;">
                                         <label for="cliente_id" class="block text-sm font-medium text-gray-300 mb-2">Cliente</label>
-                                        <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
+                                        <select class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
                                                 id="cliente_id" 
                                                 wire:model="cliente_id">
                                             <option value="">Seleccionar cliente</option>
@@ -180,7 +180,7 @@
                                  
                                     <div class="md:col-span-2" id="asignado-field">
                                         <label for="asignado_a" class="block text-sm font-medium text-gray-300 mb-2">Asignado a (opcional)</label>
-                                        <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
+                                        <select class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
                                                 id="asignado_a" 
                                                 wire:model="asignado_a">
                                             <option value="">Sin asignar</option>
@@ -197,7 +197,7 @@
                                     <!-- Estado (solo en edición y para admin) -->
                                     <div>
                                         <label for="estado" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-                                        <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
+                                        <select class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
                                                 id="estado" 
                                                 wire:model="estado">
                                             @foreach($estados as $key => $estadoLabel)
@@ -211,7 +211,7 @@
 
                             <div class="flex justify-end space-x-3 mt-6">
                                 <button type="button" 
-                                        class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white" 
+                                        class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white" 
                                         wire:click="closeModal">
                                     Cancelar
                                 </button>
@@ -227,14 +227,14 @@
         @endif
 
         <!-- Lista de tickets -->
-        <div class="bg-gray-800 rounded-lg shadow">
+        <div class="bg-zinc-800 rounded-lg shadow">
             <div class="p-6">
                 @if ($tickets->count())
                     <div class="overflow-x-auto">
                         <div class="max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                             <table class="w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-700 text-gray-300">
+                                    <tr class="bg-zinc-700 text-gray-300">
                                         <th class="px-4 py-3 text-left">Título</th>
                                         <th class="px-4 py-3 text-left">Categoría</th>
                                         <th class="px-4 py-3 text-left">Prioridad</th>
@@ -250,7 +250,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-700">
                                     @foreach ($tickets as $ticket)
-                                        <tr class="hover:bg-gray-750">
+                                        <tr class="hover:bg-zinc-750">
                                             <td class="px-4 py-3">
                                                 <div>
                                                     <div class="text-white font-medium">{{ $ticket->titulo }}</div>
@@ -262,7 +262,7 @@
                                             </td>
                                             <td class="px-4 py-3">
                                                 <span class="px-2 py-1 rounded-full text-xs font-medium
-                                                    @if($ticket->prioridad == 'baja') bg-gray-600 text-gray-200
+                                                    @if($ticket->prioridad == 'baja') bg-zinc-600 text-gray-200
                                                     @elseif($ticket->prioridad == 'media') bg-blue-600 text-blue-100
                                                     @elseif($ticket->prioridad == 'alta') bg-yellow-600 text-yellow-100
                                                     @elseif($ticket->prioridad == 'urgente') bg-red-600 text-red-100
@@ -275,7 +275,7 @@
                                                     @if($ticket->estado == 'abierto') bg-green-600 text-green-100
                                                     @elseif($ticket->estado == 'en_proceso') bg-blue-600 text-blue-100
                                                     @elseif($ticket->estado == 'resuelto') bg-purple-600 text-purple-100
-                                                    @elseif($ticket->estado == 'cerrado') bg-gray-600 text-gray-100
+                                                    @elseif($ticket->estado == 'cerrado') bg-zinc-600 text-gray-100
                                                     @endif">
                                                     {{ $estados[$ticket->estado] ?? ucfirst(str_replace('_', ' ', $ticket->estado)) }}
                                                 </span>
@@ -305,35 +305,35 @@
                                                     
                                                     @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador'))
                                                         <div class="relative group">
-                                                            <button class="p-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white" title="Opciones">
+                                                            <button class="p-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white" title="Opciones">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
                                                                 </svg>
                                                             </button>
-                                                            <div class="absolute right-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg opacity-0 invisible transition-all duration-300 group-hover:opacity-100 group-hover:visible z-10">
+                                                            <div class="absolute right-0 mt-1 w-48 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg opacity-0 invisible transition-all duration-300 group-hover:opacity-100 group-hover:visible z-10">
                                                                 <div class="py-1">
                                                                     @if($ticket->estado !== 'cerrado' && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('operador')))
                                                                         <button wire:click="updateStatus({{ $ticket->id }}, 'abierto')" 
-                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">
+                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-700">
                                                                             Marcar como Abierto
                                                                         </button>
                                                                         <button wire:click="updateStatus({{ $ticket->id }}, 'en_proceso')" 
-                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">
+                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-700">
                                                                             Marcar como en Revision
                                                                         </button>
                                                                         <button wire:click="updateStatus({{ $ticket->id }}, 'resuelto')" 
-                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">
+                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-700">
                                                                             Marcar como Resuelto
                                                                         </button>
                                                                         <button wire:click="updateStatus({{ $ticket->id }}, 'cerrado')" 
-                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">
+                                                                                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-700">
                                                                             Marcar como Cerrado
                                                                         </button>
-                                                                        <hr class="border-gray-700">
+                                                                        <hr class="border-zinc-700">
                                                                     @endif
                                                                     <button onclick="confirm('¿Estás seguro?') || event.stopImmediatePropagation()" 
                                                                             wire:click="delete({{ $ticket->id }})"
-                                                                            class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700">
+                                                                            class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700">
                                                                         Eliminar
                                                                     </button>
                                                                 </div>
@@ -343,7 +343,7 @@
 
                                                     <!-- Botón para ver detalles (todos los usuarios) -->
                                                     <button onclick="alert('Detalles del ticket:\n\nTítulo: {{ $ticket->titulo }}\nDescripción: {{ $ticket->descripcion }}\nCategoría: {{ $categorias[$ticket->categoria] ?? $ticket->categoria }}\nPrioridad: {{ ucfirst($ticket->prioridad) }}\nEstado: {{ $estados[$ticket->estado] ?? $ticket->estado }}\nCreado: {{ $ticket->created_at->format('d/m/Y H:i') }}\nCreado por: {{ $ticket->user->name }}{{ $ticket->cliente ? '\nCliente: ' . $ticket->cliente->nombre : '' }}{{ $ticket->assignedTo ? '\nAsignado a: ' . $ticket->assignedTo->name : '' }}{{ $ticket->fecha_cierre ? '\nCerrado: ' . $ticket->fecha_cierre->format('d/m/Y H:i') : '' }}')"
-                                                            class="p-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white" 
+                                                            class="p-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white" 
                                                             title="Ver detalles">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

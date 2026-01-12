@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold">Listado de dispositivos</h2>
         <button wire:click="openModal"
@@ -13,7 +13,7 @@
     <!-- Tabla de dispositivos asignados -->
     <div class="overflow-x-auto mb-6">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Id</th>
                     <th class="px-4 py-2 text-left">Tipo</th>
@@ -24,7 +24,7 @@
             </thead>
             <tbody>
                 @forelse ($asignaciones as $asignacion)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                         <td class="px-4 py-2">
                             {{ $asignacion->dispositivo->id }}
                         </td>
@@ -65,7 +65,7 @@
              x-on:close-modal.window="$wire.showModal() = false"
              wire:click.self="closeModal" 
              class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto" @click.stop>
+            <div class="bg-zinc-900 rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto" @click.stop>
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold">Asignar Dispositivos a {{ $patrulla->patente }}</h3>
                     <button wire:click="showModal = false" class="text-gray-400 hover:text-gray-200">
@@ -79,7 +79,7 @@
                 <div class="mb-4 relative">
                 <input type="text" wire:model.live.debounce.300ms="search" 
                        placeholder="Buscar por ID, tipo o cliente..."
-                       class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-200 pl-10">
+                       class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-gray-200 pl-10">
                 <div class="absolute left-3 top-2.5 text-gray-500">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -96,11 +96,11 @@
                 <form wire:submit.prevent="asignarDispositivos">
                     <div class="space-y-2 max-h-96 overflow-y-auto mb-4">
                         @forelse($dispositivosDisponibles as $dispositivo)
-                            <label class="flex items-center p-2 hover:bg-gray-800 rounded cursor-pointer">
+                            <label class="flex items-center p-2 hover:bg-zinc-800 rounded cursor-pointer">
                                 <input type="checkbox" 
                                        wire:model="selectedDispositivos"
                                        value="{{ $dispositivo->id }}"
-                                       class="rounded bg-gray-800 border-gray-700 text-green-500">
+                                       class="rounded bg-zinc-800 border-zinc-700 text-green-500">
                                 <div class="ml-3 w-full">
                                     <span class="text-xs bg-green-600 px-2 py-1 rounded">{{ $dispositivo->id }}</span>
 
@@ -140,12 +140,12 @@
                         <div>
                             <label class="block text-sm mb-1">Fecha de Asignación</label>
                             <input type="date" wire:model="fechaAsignacion"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                         </div>
                     </div>
 
                     <!-- Botones -->
-                    <div class="flex justify-end space-x-4 pt-4 border-t border-gray-700">
+                    <div class="flex justify-end space-x-4 pt-4 border-t border-zinc-700">
                         <button type="button" wire:click="showModal = false"
                                 class="px-4 py-2 text-gray-300 hover:text-gray-100">
                             Cancelar

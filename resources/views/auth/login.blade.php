@@ -47,8 +47,8 @@
     </x-authentication-card>
 </x-guest-layout> --}}
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100">
-        <div class="w-full max-w-md p-8 rounded-xl shadow-lg bg-gray-800">
+    <div class="min-h-screen flex items-center justify-center bg-zinc-900 text-gray-100">
+        <div class="w-full max-w-md p-8 rounded-xl shadow-lg bg-zinc-800">
             <div class="flex justify-center mb-6">
                 {{-- Tu logo SVG --}}
                 <img src="{{ asset('images/logo-cos.svg') }}" alt="COS Logo" class="h-16">
@@ -67,19 +67,19 @@
 
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-300" for="email">Email</label>
-                    <input id="email" class="w-full px-4 py-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring focus:border-indigo-400" type="email" name="email" required autofocus>
+                    <input id="email" class="w-full px-4 py-2 rounded bg-zinc-700 text-gray-100 border border-zinc-600 focus:outline-none focus:ring focus:border-indigo-400" type="email" name="email" required autofocus>
                     @error('email') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-300" for="password">Password</label>
-                    <input id="password" class="w-full px-4 py-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring focus:border-indigo-400" type="password" name="password" required>
+                    <input id="password" class="w-full px-4 py-2 rounded bg-zinc-700 text-gray-100 border border-zinc-600 focus:outline-none focus:ring focus:border-indigo-400" type="password" name="password" required>
                     @error('password') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="flex items-center justify-between text-sm">
                     <label class="flex items-center">
-                        <input type="checkbox" class="rounded border-gray-600 bg-gray-700 focus:ring-indigo-500" name="remember">
+                        <input type="checkbox" class="rounded border-zinc-600 bg-zinc-700 focus:ring-indigo-500" name="remember">
                         <span class="ml-2">Recordarme</span>
                     </label>
 

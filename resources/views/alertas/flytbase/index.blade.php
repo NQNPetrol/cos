@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
@@ -19,13 +19,13 @@
 
                     <div class="space-y-8 mt-4">
                         <!-- Panel de Configuración de Alertas -->
-                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700">
                             <div class="p-6">
                                 <div class="space-y-6">
                                     <!-- Tipo de Alerta -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-3">Tipo de Alerta</label>
-                                        <select id="tipoAlerta" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                        <select id="tipoAlerta" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                                             <option value="" selected disabled>Seleccione un tipo de alerta...</option>
                                             <option value="trigger_mision">🚀 Trigger Misión</option>
                                             <option value="alerta_tecnica">⚠️ Alerta Técnica</option>
@@ -36,7 +36,7 @@
 
                                     <div id="misionContainer" class="hidden transition-all duration-300">
                                         <label class="block text-sm font-medium text-gray-300 mb-3">Misión a realizar</label>
-                                        <select id="misionSelect" name="mision_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                        <select id="misionSelect" name="mision_id" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-4 py-3 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
                                             <option value="">Seleccione una misión</option>
                                             @foreach($misiones as $mision)
                                                 <option value="{{ $mision->id }}">
@@ -48,7 +48,7 @@
                                     </div>
 
                                     <!-- Información de configuración -->
-                                    <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
+                                    <div class="bg-zinc-750 rounded-lg p-4 border border-zinc-600">
                                         <div class="flex items-start">
                                             <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -89,7 +89,7 @@
                                 </div>
 
                                 <!-- Botón Enviar -->
-                                <div class="flex justify-end mt-8 pt-6 border-t border-gray-700">
+                                <div class="flex justify-end mt-8 pt-6 border-t border-zinc-700">
                                     <button id="triggerAlarmBtn"
                                             class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 border border-transparent rounded-lg font-medium text-sm text-white uppercase tracking-widest hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-send-exclamation mr-3" viewBox="0 0 16 16">
@@ -104,7 +104,7 @@
 
                         <!-- El resto del código de Historial de Logs se mantiene igual -->
                         <!-- Historial de Logs -->
-                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 mt-8">
+                        <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700 mt-8">
                             <div class="p-6">
                                 <!-- Header con título y botones de filtro -->
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -119,7 +119,7 @@
                                             </svg>
                                             Filtrar
                                         </button>
-                                        <a href="{{ route('alertas.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm transition-colors">
+                                        <a href="{{ route('alertas.index') }}" class="inline-flex items-center px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 text-sm transition-colors">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                             </svg>
@@ -134,7 +134,7 @@
                                         <!-- Tipo -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
-                                            <select name="tipo" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                            <select name="tipo" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos los tipos</option>
                                                 <option value="trigger_mision" {{ request('tipo') == 'trigger_mision' ? 'selected' : '' }}>Trigger Misión</option>
                                                 <option value="alerta_tecnica" {{ request('tipo') == 'alerta_tecnica' ? 'selected' : '' }}>Alerta Técnica</option>
@@ -145,7 +145,7 @@
                                         <!-- Usuario -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">Usuario</label>
-                                            <select name="usuario" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                            <select name="usuario" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos los usuarios</option>
                                                 @foreach($usuarios as $usuario)
                                                     <option value="{{ $usuario->id }}" {{ request('usuario') == $usuario->id ? 'selected' : '' }}>
@@ -158,7 +158,7 @@
                                         <!-- Estado -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-                                            <select name="exitoso" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                            <select name="exitoso" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                 <option value="">Todos</option>
                                                 <option value="1" {{ request('exitoso') === '1' ? 'selected' : '' }}>Exitosas</option>
                                                 <option value="0" {{ request('exitoso') === '0' ? 'selected' : '' }}>Con Error</option>
@@ -169,22 +169,22 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">Desde</label>
                                             <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                         </div>
 
                                         <!-- Fecha Hasta -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-2">Hasta</label>
                                             <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                                                class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                                class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                         </div>
                                     </div>
                                 </form>
 
                                 <!-- Tabla de Logs -->
-                                <div class="overflow-x-auto rounded-lg border border-gray-700">
+                                <div class="overflow-x-auto rounded-lg border border-zinc-700">
                                     <table class="min-w-full divide-y divide-gray-700">
-                                        <thead class="bg-gray-750">
+                                        <thead class="bg-zinc-750">
                                             <tr>
                                                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
                                                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo</th>
@@ -194,9 +194,9 @@
                                                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Código</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                        <tbody class="bg-zinc-800 divide-y divide-gray-700">
                                             @forelse($logs as $log)
-                                            <tr class="hover:bg-gray-750 transition-colors duration-150">
+                                            <tr class="hover:bg-zinc-750 transition-colors duration-150">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#{{ $log->id }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                     @switch($log->tipo_alerta)

@@ -1,4 +1,4 @@
-<div class="max-w-5xl mx-auto p-6 bg-gray-900 text-gray-50 rounded-lg shadow">
+<div class="max-w-5xl mx-auto p-6 bg-zinc-900 text-gray-50 rounded-lg shadow">
     <h2 class="text-2xl font-bold mb-6">Administrar Clientes</h2>
 
     @if ($successMessage)
@@ -7,40 +7,40 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="save" class="bg-gray-800 rounded-lg p-4 mb-8">
+    <form wire:submit.prevent="save" class="bg-zinc-800 rounded-lg p-4 mb-8">
         <h3 class="text-lg font-semibold mb-4">Crear Nuevo Cliente</h3>
 
         <div class="grid md:grid-cols-2 gap-4 mb-4">
             <div>
                 <label class="block text-sm mb-1">Nombre</label>
-                <input type="text" wire:model.defer="nombre" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="nombre" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 @error('nombre') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block text-sm mb-1">CUIT</label>
-                <input type="text" wire:model.defer="cuit" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="cuit" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 @error('cuit') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block text-sm mb-1">Domicilio</label>
-                <input type="text" wire:model.defer="domicilio" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="domicilio" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
                 @error('domicilio') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block text-sm mb-1">Ciudad</label>
-                <input type="text" wire:model.defer="ciudad" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="ciudad" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
             </div>
             <div>
                 <label class="block text-sm mb-1">Provincia</label>
-                <input type="text" wire:model.defer="provincia" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="provincia" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
             </div>
             <div>
                 <label class="block text-sm mb-1">Categoría</label>
-                <input type="text" wire:model.defer="categoria" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="categoria" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
             </div>
             <div>
                 <label class="block text-sm mb-1">Convenio</label>
-                <input type="text" wire:model.defer="convenio" class="w-full bg-gray-900 border-gray-700 text-gray-200 rounded px-3 py-2">
+                <input type="text" wire:model.defer="convenio" class="w-full bg-zinc-900 border-zinc-700 text-gray-200 rounded px-3 py-2">
             </div>
             <div class="md:col-span-2">
                 <label class="block text-sm mb-2 font-medium text-gray-300">Logo (PNG)</label>
@@ -48,7 +48,7 @@
                 <!-- Input file con diseño consistente -->
                 <div class="relative">
                     <input type="file" wire:model.defer="logo" accept=".png" 
-                           class="w-full bg-gray-900 border border-gray-700 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-600 cursor-pointer">
+                           class="w-full bg-zinc-900 border border-zinc-700 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-zinc-700 file:text-gray-300 hover:file:bg-zinc-600 cursor-pointer">
                 </div>
                 
                 @error('logo') 
@@ -56,7 +56,7 @@
                 @enderror
                 
                 @if ($logo)
-                    <div class="mt-4 p-3 bg-gray-900 rounded-lg border border-gray-700">
+                    <div class="mt-4 p-3 bg-zinc-900 rounded-lg border border-zinc-700">
                         <p class="text-sm text-gray-400 mb-2">Vista previa:</p>
                         <img src="{{ $logo->temporaryUrl() }}" class="h-24 object-contain bg-white rounded-lg p-2">
                     </div>
@@ -71,12 +71,12 @@
         </button>
     </form>
 
-    <div class="bg-gray-800 rounded-lg p-4">
+    <div class="bg-zinc-800 rounded-lg p-4">
         <h3 class="text-lg font-semibold mb-4">Listado de Clientes</h3>
 
         @if($clientes->count())
             <table class="min-w-full text-sm">
-                <thead class="bg-gray-700 text-gray-300">
+                <thead class="bg-zinc-700 text-gray-300">
                     <tr>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">CUIT</th>
@@ -86,7 +86,7 @@
                 </thead>
                 <tbody>
                     @foreach ($clientes as $cliente)
-                        <tr class="border-b border-gray-700 hover:bg-gray-800">
+                        <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                             <td class="px-4 py-2">{{ $cliente->nombre }}</td>
                             <td class="px-4 py-2">{{ $cliente->cuit }}</td>
                             <td class="px-4 py-2">{{ $cliente->domicilio }}</td>

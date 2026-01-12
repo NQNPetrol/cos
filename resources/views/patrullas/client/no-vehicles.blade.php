@@ -5,7 +5,7 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-8 text-center">
                 <!-- Icono -->
                 <div class="mb-6">
@@ -20,7 +20,7 @@
                 <p class="text-gray-400 mb-8 text-lg">{{ $message }}</p>
 
                 <!-- Información adicional -->
-                <div class="bg-gray-800 rounded-lg p-6 mb-8 max-w-md mx-auto">
+                <div class="bg-zinc-800 rounded-lg p-6 mb-8 max-w-md mx-auto">
                     <h3 class="text-lg font-semibold text-gray-300 mb-3">¿Por qué no veo vehículos?</h3>
                     <ul class="text-gray-400 text-left space-y-2 text-sm">
                         <li class="flex items-start">
