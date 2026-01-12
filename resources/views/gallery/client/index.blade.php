@@ -2,7 +2,7 @@
 @section('content')
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <div class="space-y-8">
                         <!-- Header -->
@@ -14,7 +14,7 @@
                         </div>
 
                         <!-- Carrusel de Imágenes -->
-                        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-lg font-medium text-gray-100">Imágenes</h3>
                                 <span class="text-sm text-gray-400" id="imagesCount">
@@ -24,13 +24,13 @@
 
                             <div class="relative">
                                 <!-- Botones de navegación -->
-                                <button id="prevImages" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
+                                <button id="prevImages" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
                                 </button>
                                 
-                                <button id="nextImages" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
+                                <button id="nextImages" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                     </svg>
@@ -56,7 +56,7 @@
                         </div>
 
                         <!-- Carrusel de Videos -->
-                        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-lg font-medium text-gray-100">Videos</h3>
                                 <span class="text-sm text-gray-400" id="videosCount">
@@ -66,13 +66,13 @@
 
                             <div class="relative">
                                 <!-- Botones de navegación -->
-                                <button id="prevVideos" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
+                                <button id="prevVideos" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
                                 </button>
                                 
-                                <button id="nextVideos" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-gray-700 hover:bg-gray-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
+                                <button id="nextVideos" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full p-3 z-10 transition-all duration-200 shadow-lg">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                     </svg>
@@ -98,7 +98,7 @@
                         </div>
 
                         <!-- Mensaje cuando no hay resultados -->
-                        <div id="noResults" class="hidden text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+                        <div id="noResults" class="hidden text-center py-12 bg-zinc-800 rounded-lg border border-zinc-700">
                             <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -114,9 +114,9 @@
     <!-- Modal para Imágenes -->
     <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
         <div class="relative max-w-6xl max-h-full w-full mx-4">
-            <div class="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+            <div class="bg-zinc-900 rounded-lg overflow-hidden shadow-2xl">
                 <!-- Header con título y botones -->
-                <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <div class="flex justify-between items-center p-4 border-b border-zinc-700">
                     <h3 id="imageModalTitle" class="text-lg font-semibold text-white truncate max-w-2xl"></h3>
                     <div class="flex items-center space-x-3">
                         <button id="downloadImageBtn" class="text-gray-400 hover:text-white transition-colors duration-200" title="Descargar">
@@ -143,9 +143,9 @@
     <!-- Modal para Videos -->
     <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
         <div class="relative max-w-4xl max-h-full w-full mx-4">
-            <div class="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+            <div class="bg-zinc-900 rounded-lg overflow-hidden shadow-2xl">
                 <!-- Header con título y botones -->
-                <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <div class="flex justify-between items-center p-4 border-b border-zinc-700">
                     <h3 id="videoModalTitle" class="text-lg font-semibold text-white truncate max-w-2xl"></h3>
                     <div class="flex items-center space-x-3">
                         <button id="downloadVideoBtn" class="text-gray-400 hover:text-white transition-colors duration-200" title="Descargar">
@@ -278,7 +278,7 @@
 
         function createMediaElement(media, index, type) {
             const div = document.createElement('div');
-            div.className = 'flex-shrink-0 w-64 bg-gray-700 rounded-lg overflow-hidden border border-gray-600 hover:border-blue-500 transition-all duration-300 snap-start';
+            div.className = 'flex-shrink-0 w-64 bg-zinc-700 rounded-lg overflow-hidden border border-zinc-600 hover:border-blue-500 transition-all duration-300 snap-start';
             div.style.scrollSnapAlign = 'start';
 
             if (type === 'images') {
@@ -311,7 +311,7 @@
             } else {
                 div.innerHTML = `
                     <div class="relative group cursor-pointer" data-index="${index}" onclick="openVideoModal(${index})">
-                        <div class="w-full h-48 bg-gray-600 flex items-center justify-center">
+                        <div class="w-full h-48 bg-zinc-600 flex items-center justify-center">
                             <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
                             </svg>

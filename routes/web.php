@@ -64,6 +64,11 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         return view('client.profile.show');
     })->name('profile.show');
 
+    // SETTINGS (CLIENT LAYOUT)
+    Route::get('/settings/user-profile', \App\Livewire\Client\Settings\UserProfile::class)->name('settings.user-profile');
+    Route::get('/settings/system', \App\Livewire\Client\Settings\SystemSettings::class)->name('settings.system');
+    Route::get('/activity-log', \App\Livewire\Client\ActivityLog\Index::class)->name('activity-log');
+
     //EVENTOS (USA CONTROLADOR DIFERENTE)
     Route::get('/eventos/nuevo', [\App\Http\Controllers\EventoClientController::class, 'create'])
         ->middleware('can:crear.eventos-cliente')
@@ -176,10 +181,13 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+    Route::redirect('settings', 'settings/user-profile');
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+    Route::get('settings/user-profile', \App\Livewire\Settings\UserProfile::class)->name('settings.user-profile');
+    Route::get('settings/system', \App\Livewire\Settings\SystemSettings::class)->name('settings.system');
+    Route::get('activity-log', \App\Livewire\ActivityLog\Index::class)->name('activity-log.index');
 });
 
 require __DIR__.'/auth.php';
@@ -333,11 +341,11 @@ Route::middleware([
         ->middleware('can:editar.eventos')
         ->name('eventos.edit');
 
-    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])
+    Route::put('/eventos/{evento}/update', [\App\Http\Controllers\EventoController::class, 'update'])
         ->middleware('can:editar.eventos')
         ->name('eventos.update');
 
-    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])
+    Route::delete('/eventos/{evento}/destroy', [\App\Http\Controllers\EventoController::class, 'destroy'])
         ->middleware('can:eliminar.eventos')
         ->name('eventos.destroy');
     
@@ -474,8 +482,22 @@ Route::middleware([
     });
 
     // CAMARAS LIST Y LIVEVIEW
-    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])->name('cameras.index')->middleware('can:ver.camaras');
-    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])->name('cameras.stream')->middleware('can:ver.camaras');
+    Route::get('/cameras', [App\Http\Controllers\CameraController::class, 'index'])
+        ->name('cameras.index')
+        ->middleware('can:ver.camaras');
+
+    Route::get('/cameras/stream/{cameraIndexCode}', [App\Http\Controllers\CameraController::class, 'showStream'])
+        ->name('cameras.stream')
+        ->middleware('can:ver.camaras');
+
+    // API para vincular cámaras con dispositivos
+    Route::get('/api/dispositivos/camaras', [App\Http\Controllers\CameraController::class, 'availableDevices'])
+        ->name('api.dispositivos.camaras')
+        ->middleware('can:ver.camaras');
+
+    Route::post('/cameras/{camera}/link-device', [App\Http\Controllers\CameraController::class, 'linkDevice'])
+        ->name('cameras.link-device')
+        ->middleware('can:ver.camaras');
     
     Route::get('/test-env', function () {
         return [
@@ -683,6 +705,53 @@ Route::middleware([
     Route::get('/anpr/event-image/{recordId}', \App\Livewire\HikCentralImages\ViewEventImage::class)
         ->name('anpr.view-image')->middleware('can:ver.registros-anpr');
 
+    // RODADOS
+    Route::prefix('rodados')->name('rodados.')->group(function () {
+        // Vista principal (solo middleware en la ruta principal)
+        Route::get('/', [\App\Http\Controllers\RodadoController::class, 'index'])->name('index');
+        
+        // CRUD Rodados
+        Route::post('/', [\App\Http\Controllers\RodadoController::class, 'store'])->name('store');
+        Route::put('/{rodado}', [\App\Http\Controllers\RodadoController::class, 'update'])->name('update');
+        Route::delete('/{rodado}', [\App\Http\Controllers\RodadoController::class, 'destroy'])->name('destroy');
+        
+        // Turnos Rodados (unificado: service y mecánicos)
+        Route::get('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'show'])->name('turnos.show');
+        Route::post('/turnos', [\App\Http\Controllers\TurnoRodadoController::class, 'store'])->name('turnos.store');
+        Route::put('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'update'])->name('turnos.update');
+        Route::delete('/turnos/{turno}', [\App\Http\Controllers\TurnoRodadoController::class, 'destroy'])->name('turnos.destroy');
+        Route::post('/turnos/{turno}/adjuntar-factura', [\App\Http\Controllers\TurnoRodadoController::class, 'adjuntarFactura'])->name('turnos.adjuntar-factura');
+        Route::post('/turnos/{turno}/aprobar-cobertura', [\App\Http\Controllers\TurnoRodadoController::class, 'aprobarCobertura'])->name('turnos.aprobar-cobertura');
+        Route::post('/turnos/{turno}/rechazar-cobertura', [\App\Http\Controllers\TurnoRodadoController::class, 'rechazarCobertura'])->name('turnos.rechazar-cobertura');
+        Route::post('/turnos/{turno}/cancelar', [\App\Http\Controllers\TurnoRodadoController::class, 'cancelarTurno'])->name('turnos.cancelar');
+        Route::post('/turnos/{turno}/reprogramar', [\App\Http\Controllers\TurnoRodadoController::class, 'reprogramarTurno'])->name('turnos.reprogramar');
+        
+        // Cambios de Equipos
+        Route::post('/cambios-equipos', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'store'])->name('cambios-equipos.store');
+        Route::put('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'update'])->name('cambios-equipos.update');
+        Route::delete('/cambios-equipos/{cambio}', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'destroy'])->name('cambios-equipos.destroy');
+        Route::post('/cambios-equipos/{cambio}/adjuntar-factura', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'adjuntarFactura'])->name('cambios-equipos.adjuntar-factura');
+        
+        // Kilometraje
+        Route::post('/kilometraje', [\App\Http\Controllers\RegistroKilometrajeController::class, 'store'])->name('kilometraje.store');
+        Route::delete('/kilometraje/{registro}', [\App\Http\Controllers\RegistroKilometrajeController::class, 'destroy'])->name('kilometraje.destroy');
+        
+        // Pagos Servicios (unificado: patente, alquiler, proveedor, etc.)
+        Route::post('/pagos', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'store'])->name('pagos.store');
+        Route::put('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'update'])->name('pagos.update');
+        Route::delete('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'destroy'])->name('pagos.destroy');
+        Route::post('/pagos/{pago}/adjuntar-factura', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'adjuntarFactura'])->name('pagos.adjuntar-factura');
+        
+        // Calendario
+        Route::get('/calendario', [\App\Http\Controllers\CalendarioRodadosController::class, 'index'])->name('calendario.index');
+        Route::get('/calendario/eventos', [\App\Http\Controllers\CalendarioRodadosController::class, 'getEventos'])->name('calendario.eventos');
+        Route::get('/calendario/evento/{tipo}/{id}', [\App\Http\Controllers\CalendarioRodadosController::class, 'getDetalleEvento'])->name('calendario.evento');
+        
+        // Proveedores y Talleres (CRUD auxiliar)
+        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);
+        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class);
+    });
+
 });
 
 
@@ -694,6 +763,27 @@ Route::middleware(['auth'])->group(function () {
     ->middleware('role:admin')
     ->name('asignar.permisos');
     
+    // Dashboard Operacional - Principal (layout admin)
+    Route::get('/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'index'])
+        ->middleware('can:ver.operaciones')
+        ->name('operaciones.dashboard');
+
+    // Dashboard Operacional - Cliente (layout clientes)
+    Route::get('/client/operaciones/dashboard', [App\Http\Controllers\OperacionesDashboardController::class, 'indexClient'])
+        ->middleware('can:ver.operaciones-cliente')
+        ->name('client.operaciones.dashboard');
+
+    // APIs del Dashboard Operacional
+    Route::prefix('api/operaciones')->group(function () {
+        Route::get('/kpis', [App\Http\Controllers\OperacionesDashboardController::class, 'getKPIs'])
+            ->name('api.operaciones.kpis');
+        
+        Route::get('/map-data', [App\Http\Controllers\OperacionesDashboardController::class, 'getMapData'])
+            ->name('api.operaciones.map-data');
+        
+        Route::get('/eventos', [App\Http\Controllers\OperacionesDashboardController::class, 'getEventos'])
+            ->name('api.operaciones.eventos');
+    });
 });
 
 

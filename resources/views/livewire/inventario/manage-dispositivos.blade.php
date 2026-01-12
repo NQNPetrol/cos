@@ -1,4 +1,4 @@
-<div class="bg-gray-900 text-gray-100 p-6 rounded-lg shadow">
+<div class="bg-zinc-900 text-gray-100 p-6 rounded-lg shadow">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Inventario</h2>
         <button wire:click="openModal" 
@@ -17,13 +17,13 @@
             <input type="text"
                    wire:model.live="search"
                    placeholder="Tipo, Serial, IP, Ubicación, Cliente..."
-                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
         </div>
         <!-- Filtro cliente -->
         <div>
             <label class="block text-sm mb-1">Cliente</label>
             <select wire:model.live="clienteFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos los clientes</option>
                 @foreach($clientes as $cliente)
                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -34,7 +34,7 @@
         <div>
             <label class="block text-sm mb-1">Estado Inventario</label>
             <select wire:model.live="estadoInventarioFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="En stock">En stock</option>
                 <option value="Instalado">Instalado</option>
@@ -46,7 +46,7 @@
         <div>
             <label class="block text-sm mb-1">Conectado a Hik</label>
             <select wire:model.live="hikConnectFilter"
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="Conectado">Conectado</option>
                 <option value="Por Conectar">Por Conectar</option>
@@ -56,7 +56,7 @@
         <div>
             <label class="block text-sm mb-1">Necesita Mantenimiento</label>
             <select wire:model.live="mantenimientoFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
@@ -66,7 +66,7 @@
         <div>
             <label class="block text-sm mb-1">Necesita Actualización</label>
             <select wire:model.live="actualizacionFilter" 
-                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                 <option value="">Todos</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
@@ -75,7 +75,7 @@
 
         <div class="flex items-end">
             <button wire:click="clearFilters" 
-                    class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-white">
+                    class="bg-zinc-600 hover:bg-zinc-700 px-4 py-2 rounded text-white">
                 Limpiar Filtros
             </button>
         </div>
@@ -84,7 +84,7 @@
     <!-- Tabla -->
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-zinc-800 text-gray-300">
                 <tr>
                     <th class="px-4 py-2 text-left">Tipo</th>
                     <th class="px-4 py-2 text-left">IP</th>
@@ -100,7 +100,7 @@
             </thead>
             <tbody>
                 @forelse ($dispositivos as $dispositivo)
-                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                    <tr class="border-b border-zinc-700 hover:bg-zinc-800">
                         <td class="px-4 py-2">
                             <div class="font-medium">{{ $dispositivo->tipo }}</div>
                         </td>
@@ -199,7 +199,7 @@
     <!-- Modal -->
     @if($showModal)
         <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto scrollbar-custom" @click.stop>
+            <div class="bg-zinc-900 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto scrollbar-custom" @click.stop>
                 <style>
                     .scrollbar-custom {
                         scrollbar-width: thin;
@@ -211,17 +211,17 @@
                     }
                     
                     .scrollbar-custom::-webkit-scrollbar-track {
-                        background: #1F2937; /* bg-gray-800 */
+                        background: #1F2937; /* bg-zinc-800 */
                         border-radius: 4px;
                     }
                     
                     .scrollbar-custom::-webkit-scrollbar-thumb {
-                        background: #4B5563; /* bg-gray-600 */
+                        background: #4B5563; /* bg-zinc-600 */
                         border-radius: 4px;
                     }
                     
                     .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-                        background: #6B7280; /* bg-gray-500 */
+                        background: #6B7280; /* bg-zinc-500 */
                     }
                 </style>
                 <div class="flex justify-between items-center mb-4">
@@ -240,7 +240,7 @@
                         
                         <!-- Información Básica -->
                         <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-zinc-700 pb-2">
                                 Información Básica
                             </h4>
                         </div>
@@ -248,7 +248,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 col-span-full">
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Tipo de Dispositivo <span class="text-red-500">*</span></label>
-                                <select wire:model="tipo" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <select wire:model="tipo" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                     <option value="">Seleccionar...</option>
                                     <option value="cámara_ip">Cámara IP</option>
                                     <option value="camara_ptz">Domo PTZ</option>
@@ -271,13 +271,13 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Fecha de Instalación</label>
                                 <input type="date" wire:model="fecha_instalacion"
-                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 @error('fecha_instalacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Cliente</label>
-                                <select wire:model="cliente_id" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                <select wire:model="cliente_id" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                     <option value="">Sin asignar</option>
                                     @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -287,17 +287,34 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm mb-1 text-gray-300">Ubicación</label>
+                                <label class="block text-sm mb-1 text-gray-300">Ubicación (descripción)</label>
                                 <input type="text" wire:model="ubicacion"
-                                    class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                    class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                     placeholder="Oficina Principal - Recepción">
                                 @error('ubicacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                                <div>
+                                    <label class="block text-sm mb-1 text-gray-300">Latitud</label>
+                                    <input type="text" wire:model="latitud"
+                                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
+                                        placeholder="-34.603700">
+                                    @error('latitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1 text-gray-300">Longitud</label>
+                                    <input type="text" wire:model="longitud"
+                                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
+                                        placeholder="-58.381600">
+                                    @error('longitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
                             </div>
 
                             <div class="md:col-span-2">
                                 <label class="block text-sm mb-1 text-gray-300">Observaciones</label>
                                 <textarea wire:model="observaciones" rows="3"
-                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                         placeholder="Notas adicionales sobre el dispositivo..."></textarea>
                             </div>
                         </div>
@@ -305,7 +322,7 @@
 
                         <!-- Configuración de Red -->
                         <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-zinc-700 pb-2 mt-4">
                                 Configuración de Red
                             </h4>
                         </div>
@@ -313,7 +330,7 @@
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Dirección IPv4</label>
                             <input type="text" wire:model="direccion_ip"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                    placeholder="192.168.0.61">
                             @error('direccion_ip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -321,7 +338,7 @@
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Puerto</label>
                             <input type="text" wire:model="puerto"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                    placeholder="8000">
                             @error('puerto') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -329,7 +346,7 @@
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Número de Serie</label>
                             <input type="text" wire:model="numero_serie"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                    placeholder="ABC123456789">
                             @error('numero_serie') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -337,7 +354,7 @@
 
                         <!-- Configuración Adicional -->
                         <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-zinc-700 pb-2 mt-4">
                                 Estado y Mantenimiento
                             </h4>
                         </div>
@@ -345,49 +362,49 @@
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Versión de Software</label>
                             <input type="text" wire:model="version_software"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                    placeholder="V1.2.0build 210616">
                         </div>
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Estado Hik-Connect</label>
-                            <select wire:model="estado_hikconnect" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            <select wire:model="estado_hikconnect" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 <option value="Conectado">Conectado</option>
                                 <option value="Por Conectar">Por Conectar</option>
                             </select>
                         </div>
                         <div class="flex items-center space-x-2">
                             <input type="checkbox" wire:model="necesita_actualizacion" id="necesita_actualizacion"
-                                   class="bg-gray-800 border-gray-700 rounded">
+                                   class="bg-zinc-800 border-zinc-700 rounded">
                             <label for="necesita_actualizacion" class="text-sm text-gray-300">Necesita Actualización</label>
                         </div>
                         <div class="flex items-center space-x-2">
                             <input type="checkbox" wire:model="necesita_mantenimiento" id="necesita_mantenimiento"
-                                   class="bg-gray-800 border-gray-700 rounded">
+                                   class="bg-zinc-800 border-zinc-700 rounded">
                             <label for="necesita_mantenimiento" class="text-sm text-gray-300">Necesita Mantenimiento</label>
                         </div>
                          <div>
                             <label class="block text-sm mb-1 text-gray-300">Último Mantenimiento</label>
                             <input type="date" wire:model="ultimo_mantenimiento"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                             @error('ultimo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Próximo Mantenimiento</label>
                             <input type="date" wire:model="proximo_mantenimiento"
-                                   class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                   class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                             @error('proximo_mantenimiento') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Información de Inventario -->
                         <div class="col-span-full">
-                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2 mt-4">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-3 border-b border-zinc-700 pb-2 mt-4">
                                 Información de Inventario
                             </h4>
                         </div>
 
                         <div>
                             <label class="block text-sm mb-1 text-gray-300">Estado de Inventario <span class="text-red-500">*</span></label>
-                            <select wire:model="estado_inventario" class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                            <select wire:model="estado_inventario" class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 <option value="En stock">En stock</option>
                                 <option value="Instalado">Instalado</option>
                                 <option value="En mantenimiento">En mantenimiento</option>
@@ -401,7 +418,7 @@
                     </div>
 
                     <!-- Botones -->
-                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
+                    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-zinc-700">
                         <button type="button" wire:click="closeModal"
                                 class="px-4 py-2 text-gray-300 hover:text-gray-100">
                             Cancelar

@@ -1,5 +1,5 @@
 <div>
-    <div class="max-w-7xl mx-auto p-6 bg-gray-900 text-gray-100 rounded shadow-lg">
+    <div class="max-w-7xl mx-auto p-6 bg-zinc-900 text-gray-100 rounded shadow-lg">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold mb-6">Administrar Objetivos</h2>
             <buttton wire:click="openModal"
@@ -23,11 +23,11 @@
                     <div>
                         <label class="block mb-1 text-sm">Buscar</label>
                         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Nombre, localidad..." 
-                            class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                            class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                     </div>
                     <div>
                         <label class="block mb-1 text-sm">Cliente</label>
-                        <select wire:model.live="cliente_id" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                        <select wire:model.live="cliente_id" class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                             <option value="">Todos</option>
                             @foreach ($clientes as $cliente)
                                 <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -36,7 +36,7 @@
                     </div>
                     <div>
                         <label class="block mb-1 text-sm">Contrato</label>
-                        <select wire:model.live="contrato_id" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full text-gray-100">
+                        <select wire:model.live="contrato_id" class="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 w-full text-gray-100">
                             <option value="">Todos</option>
                             @foreach ($contratos as $contrato)
                                 <option value="{{ $contrato->id }}">{{ $contrato->nombre_proyecto }}</option>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex items-end">
                         <button wire:click="resetFilters" 
-                                class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded h-[42px] w-full">
+                                class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded h-[42px] w-full">
                             Limpiar Filtros
                         </button>
                     </div>
@@ -54,8 +54,8 @@
 
             {{-- Tabla --}}
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-gray-800 border border-gray-700 rounded">
-                    <thead class="bg-gray-700 text-gray-300">
+                <table class="min-w-full bg-zinc-800 border border-zinc-700 rounded">
+                    <thead class="bg-zinc-700 text-gray-300">
                         <tr>
                             <th class="px-4 py-2 text-left">Nombre</th>
                             <th class="px-4 py-2 text-left">Ubicación</th>
@@ -68,7 +68,7 @@
                     </thead>
                     <tbody>
                         @forelse ($objetivos as $obj)
-                            <tr class="border-b border-gray-700">
+                            <tr class="border-b border-zinc-700">
                                 <td class="px-4 py-2"> {{ $obj->nombre }}</td>
                                 <td class="pl-8 py-2 text-center gap-2">
                                     <a href="https://www.google.com/maps?q={{ $obj->latitud }},{{ $obj->longitud }}"
@@ -120,7 +120,7 @@
         <!-- Modal para formulario -->
         @if($showModal)
             <div wire:click.self="closeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-gray-900 rounded-lg p-6 w-full max-w-2xl" @click.stop>
+                <div class="bg-zinc-900 rounded-lg p-6 w-full max-w-2xl" @click.stop>
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-gray-100">
                             {{ $editingId ? 'Editar Objetivo' : 'Nuevo Objetivo' }}
@@ -137,14 +137,14 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Nombre <span class="text-red-500">*</span></label>
                                 <input type="text" wire:model.defer="form.nombre" 
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 @error('form.nombre') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Seleccione un Cliente <span class="text-red-500">*</span></label>
                                 <select wire:model="form.cliente_id" wire:change="cargarEmpresas($event.target.value)"
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                     <option value="">Seleccione un cliente</option>
                                     @foreach ($clientes as $cliente)
                                         <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -157,7 +157,7 @@
                                 <label class="block text-sm mb-1 text-gray-300">Empresa Asociada al cliente <span class="text-red-500">*</span></label>
                                 <select wire:model="form.empresa_asociada_id"
                                         wire:change="cargarContratos($event.target.value)"
-                                        class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                        class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                         @if(!$form['cliente_id']) disabled @endif>
                                     <option value="">Seleccione una empresa asociada</option>
                                     @foreach ($empresasFiltradas as $empresa)
@@ -173,7 +173,7 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Contrato <span class="text-red-500">*</span></label>
                                 <select wire:model="form.contrato_id"
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200"
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200"
                                        @if(!$form['empresa_asociada_id']) disabled @endif>
                                     <option value="">Seleccione un contrato</option>
                                     @foreach ($contratosFiltrados as $contrato)
@@ -188,26 +188,26 @@
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Latitud <span class="text-red-500">*</span></label>
                                 <input type="text" wire:model.defer="form.latitud" 
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 @error('form.latitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Longitud <span class="text-red-500">*</span></label>
                                 <input type="text" wire:model.defer="form.longitud" 
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 @error('form.longitud') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1 text-gray-300">Localidad</label>
                                 <input type="text" wire:model.defer="form.localidad" 
-                                       class="w-full bg-gray-800 border-gray-700 rounded px-3 py-2 text-gray-200">
+                                       class="w-full bg-zinc-800 border-zinc-700 rounded px-3 py-2 text-gray-200">
                                 @error('form.localidad') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
-                        <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
+                        <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-zinc-700">
                             <button type="button" wire:click="closeModal"
                                     class="px-4 py-2 text-gray-300 hover:text-gray-100">
                                 Cancelar

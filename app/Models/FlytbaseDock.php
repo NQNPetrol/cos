@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\FlytbaseDrone;
 
 class FlytbaseDock extends Model
 {
@@ -43,6 +44,11 @@ class FlytbaseDock extends Model
     public function peticionesMisiones(): HasMany
     {
         return $this->hasMany(PeticionMisionFlytbase::class, 'dock_id');
+    }
+
+    public function drones(): HasMany
+    {
+        return $this->hasMany(FlytbaseDrone::class, 'dock_id');
     }
 
     public function scopeActivos($query)

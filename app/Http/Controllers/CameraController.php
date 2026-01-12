@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Camera;
 use App\Models\EncodingDevice;
+use App\Models\Dispositivo;
 use App\Services\HikCentralService;
 
 class CameraController extends Controller
@@ -165,6 +166,55 @@ class CameraController extends Controller
         return response()->json([
             'encode_dev_index_code' => $encodeDevIndexCode,
             'cameras' => $cameras
+        ]);
+    }
+
+    /**
+     * Listado de dispositivos disponibles para vincular con cámaras
+     * Filtrados por tipo: camara_ip y camara_ptz
+     */
+    public function availableDevices(Request $request)
+    {
+        $query = Dispositivo::query()
+            ->whereIn('tipo', ['camara_ip', 'camara_ptz'])
+            ->orderBy('nombre');
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('modelo', 'like', "%{$search}%")
+                  ->orWhere('direccion_ip', 'like', "%{$search}%");
+            });
+        }
+
+        $dispositivos = $query->limit(100)->get([
+            'id',
+            'nombre',
+            'tipo',
+            'modelo',
+            'direccion_ip',
+            'estado_inventario',
+            'observaciones',
+        ]);
+
+        return response()->json($dispositivos);
+    }
+
+    /**
+     * Vincular un dispositivo a una cámara
+     */
+    public function linkDevice(Request $request, Camera $camera)
+    {
+        $validated = $request->validate([
+            'dispositivo_id' => 'required|exists:dispositivos,id',
+        ]);
+
+        $camera->dispositivo_id = $validated['dispositivo_id'];
+        $camera->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Dispositivo vinculado correctamente a la cámara.',
         ]);
     }
 }

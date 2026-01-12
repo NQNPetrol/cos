@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
 
                     <!-- Título más pequeño y sin icono -->
@@ -16,7 +16,7 @@
                         </div>
                         <button type="button" 
                                 onclick="abrirModalCrear()"
-                                class="bg-gray-600 hover:bg-gray-500 px-3 py-2 rounded text-white font-medium">
+                                class="bg-zinc-600 hover:bg-zinc-500 px-3 py-2 rounded text-white font-medium">
                             <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -101,14 +101,14 @@
                     </div>
 
                     <!-- Filtros de usuarios -->
-                    <div class="mb-6 bg-gray-700 p-4 rounded-lg">
+                    <div class="mb-6 bg-zinc-700 p-4 rounded-lg">
                         <div class="flex flex-col md:flex-row md:items-end md:space-x-4 space-y-2 md:space-y-0">
                             <div class="flex-1">
                                 <label for="filtroNombre" class="block text-sm font-medium text-gray-200 mb-1">
                                     Buscar por nombre:
                                 </label>
                                 <input type="text" id="filtroNombre" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el nombre del usuario...">
                             </div>
                             <div class="flex-1">
@@ -116,12 +116,12 @@
                                     Buscar por email:
                                 </label>
                                 <input type="text" id="filtroEmail" 
-                                       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
+                                       class="w-full px-3 py-2 bg-zinc-600 border border-zinc-500 text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm placeholder-gray-400"
                                        placeholder="Escriba el email del usuario...">
                             </div>
                             <div class="flex-shrink-0">
                                 <button type="button" id="limpiarFiltros" 
-                                        class="bg-gray-600 hover:bg-gray-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 h-[42px]">
+                                        class="bg-zinc-600 hover:bg-zinc-500 text-gray-100 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 h-[42px]">
                                     Limpiar Filtros
                                 </button>
                             </div>
@@ -129,13 +129,13 @@
                     </div>
 
                     <!-- Tabla de usuarios -->
-                    <div class="bg-gray-800 rounded-lg border border-gray-600">
-                        <div class="px-6 py-4 border-b border-gray-600">
+                    <div class="bg-zinc-800 rounded-lg border border-zinc-600">
+                        <div class="px-6 py-4 border-b border-zinc-600">
                             <h3 class="text-lg font-medium text-gray-100">Listado</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-600">
-                                <thead class="bg-gray-700">
+                                <thead class="bg-zinc-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                             Usuario
@@ -154,15 +154,15 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-gray-800 divide-y divide-gray-600" id="tablaUsuarios">
+                                <tbody class="bg-zinc-800 divide-y divide-gray-600" id="tablaUsuarios">
                                     @foreach($usuarios as $usuario)
-                                        <tr class="usuario-row hover:bg-gray-700" 
+                                        <tr class="usuario-row hover:bg-zinc-700" 
                                             data-nombre="{{ strtolower($usuario->name) }}" 
                                             data-email="{{ strtolower($usuario->email) }}">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-8 w-8">
-                                                        <div class="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                                        <div class="h-8 w-8 rounded-full bg-zinc-600 flex items-center justify-center">
                                                             <span class="text-sm font-medium text-white">
                                                                 {{ $usuario->initials() }}
                                                             </span>
@@ -257,8 +257,8 @@
 
     <!-- Modal Crear Usuario -->
     <div id="modalCrear" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-md">
+            <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xl font-semibold text-white">Crear Nuevo Usuario</h3>
                 <button type="button" 
                         class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -277,20 +277,20 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
                             <input type="text" name="name" id="name" required
-                                   class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
                             <input type="email" name="email" id="email" required
-                                   class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         
                         <div class="relative">
                             <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
                             <div class="relative">
                                 <input type="password" name="password" id="password" required
-                                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                                       class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                                 <button type="button" 
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 mt-2"
                                         onclick="togglePasswordVisibility('password', 'passwordEyeIcon', 'passwordEyeTooltip')"
@@ -300,7 +300,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
-                                <div id="passwordEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                                <div id="passwordEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg shadow-sm opacity-0 tooltip">
                                     Mostrar contraseña
                                 </div>
                             </div>
@@ -310,7 +310,7 @@
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-300 mb-2">Confirmar Contraseña</label>
                             <div class="relative">
                                 <input type="password" name="password_confirmation" id="password_confirmation" required
-                                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                                       class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                                 <button type="button" 
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 mt-2"
                                         onclick="togglePasswordVisibility('password_confirmation', 'passwordConfirmationEyeIcon', 'passwordConfirmationEyeTooltip')"
@@ -320,7 +320,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
-                                <div id="passwordConfirmationEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                                <div id="passwordConfirmationEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg shadow-sm opacity-0 tooltip">
                                     Mostrar contraseña
                                 </div>
                             </div>
@@ -329,7 +329,7 @@
 
                     <div class="flex justify-end space-x-3 mt-6">
                         <button type="button" 
-                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white transition-colors"
                                 onclick="cerrarModalCrear()">
                             Cancelar
                         </button>
@@ -345,8 +345,8 @@
 
     <!-- Modal Editar Usuario -->
     <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-md">
+            <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xl font-semibold text-white">Editar Usuario</h3>
                 <button type="button" 
                         class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -366,19 +366,19 @@
                         <div>
                             <label for="edit_name" class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
                             <input type="text" name="name" id="edit_name" required
-                                   class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         
                         <div>
                             <label for="edit_email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
                             <input type="email" name="email" id="edit_email" required
-                                   class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                     </div>
 
                     <div class="flex justify-end space-x-3 mt-6">
                         <button type="button" 
-                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white transition-colors"
                                 onclick="cerrarModalEditar()">
                             Cancelar
                         </button>
@@ -394,8 +394,8 @@
 
     <!-- Modal Resetear Contraseña -->
     <div id="modalResetPassword" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-md">
+            <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xl font-semibold text-white">Resetear Contraseña</h3>
                 <button type="button" 
                         class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -418,7 +418,7 @@
                             <label for="new_password" class="block text-sm font-medium text-gray-300 mb-2">Nueva Contraseña</label>
                             <div class="relative">
                                 <input type="password" name="new_password" id="new_password" required
-                                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                                       class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                                 <button type="button" 
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 mt-2"
                                         onclick="togglePasswordVisibility('new_password', 'newPasswordEyeIcon', 'newPasswordEyeTooltip')"
@@ -428,7 +428,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
-                                <div id="newPasswordEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                                <div id="newPasswordEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg shadow-sm opacity-0 tooltip">
                                     Mostrar contraseña
                                 </div>
                             </div>
@@ -438,7 +438,7 @@
                             <label for="new_password_confirmation" class="block text-sm font-medium text-gray-300 mb-2">Confirmar Nueva Contraseña</label>
                             <div class="relative">
                                 <input type="password" name="new_password_confirmation" id="new_password_confirmation" required
-                                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                                       class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                                 <button type="button" 
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 mt-2"
                                         onclick="togglePasswordVisibility('new_password_confirmation', 'newPasswordConfirmationEyeIcon', 'newPasswordConfirmationEyeTooltip')"
@@ -448,7 +448,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
-                                <div id="newPasswordConfirmationEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                                <div id="newPasswordConfirmationEyeTooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg shadow-sm opacity-0 tooltip">
                                     Mostrar contraseña
                                 </div>
                             </div>
@@ -457,7 +457,7 @@
 
                     <div class="flex justify-end space-x-3 mt-6">
                         <button type="button" 
-                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white transition-colors"
                                 onclick="cerrarModalResetPassword()">
                             Cancelar
                         </button>
@@ -473,8 +473,8 @@
 
     <!-- Modal Confirmar Eliminación -->
     <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="bg-zinc-800 rounded-lg shadow-xl w-full max-w-md">
+            <div class="border-b border-zinc-700 px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xl font-semibold text-white">Confirmar Eliminación</h3>
                 <button type="button" 
                         class="text-gray-400 hover:text-gray-200 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -494,7 +494,7 @@
                     @method('DELETE')
                     <div class="flex justify-end space-x-3">
                         <button type="button" 
-                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors"
+                                class="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded-md text-white transition-colors"
                                 onclick="cerrarModalEliminar()">
                             Cancelar
                         </button>

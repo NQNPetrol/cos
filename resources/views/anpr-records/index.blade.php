@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
@@ -74,13 +74,13 @@
                     </div>
 
                     <!-- Filtros -->
-                    <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+                    <div class="bg-zinc-800 rounded-lg p-6 mb-6 border border-zinc-700">
                         <form id="filterForm" class="grid grid-cols-1 md:grid-cols-6 gap-4">
                             <!-- Filtro de Patente (Dropdown) -->
                             <div>
                                 <label for="plate_no" class="block text-sm font-medium text-gray-300 mb-2">Patente</label>
                                 <select id="plate_no" name="plate_no" 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                     <option value="">Todas las patentes</option>
                                     @foreach($uniquePlatesList as $plate)
                                         <option value="{{ $plate }}" {{ request('plate_no') == $plate ? 'selected' : '' }}>
@@ -94,7 +94,7 @@
                             <div>
                                 <label for="camera_index_code" class="block text-sm font-medium text-gray-300 mb-2">Cámara</label>
                                 <select id="camera_index_code" name="camera_index_code"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                     <option value="">Todas las cámaras</option>
                                     @foreach($camerasList as $camera)
                                         <option value="{{ $camera }}" {{ request('camera_index_code') == $camera ? 'selected' : '' }}>
@@ -123,7 +123,7 @@
                             <!-- Botón Limpiar -->
                             <div class="flex items-end">
                                 <button type="button" id="clearFilters"
-                                        class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
+                                        class="w-full inline-flex items-center justify-center px-4 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:outline-none focus:border-zinc-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -145,18 +145,18 @@
                     </div>
 
                     <!-- Respuesta JSON -->
-                    <div id="jsonResponse" class="hidden bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+                    <div id="jsonResponse" class="hidden bg-zinc-800 rounded-lg p-4 mb-6 border border-zinc-700">
                         <h6 class="text-sm font-medium text-gray-300 mb-2">Respuesta de la API:</h6>
-                        <pre id="responseContent" class="text-xs text-gray-200 bg-gray-900 p-3 rounded border border-gray-700 overflow-x-auto max-h-64"></pre>
+                        <pre id="responseContent" class="text-xs text-gray-200 bg-zinc-900 p-3 rounded border border-zinc-700 overflow-x-auto max-h-64"></pre>
                     </div>
 
                     <!-- Panel de Registros -->
-                    <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                    <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700">
                         <div class="p-6">
                             <!-- Tabla de Registros -->
-                            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                            <div class="overflow-x-auto rounded-lg border border-zinc-700">
                                 <table class="min-w-full divide-y divide-gray-700">
-                                    <thead class="bg-gray-750">
+                                    <thead class="bg-zinc-750">
                                         <tr>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Patente</th>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Cámara</th>
@@ -167,9 +167,9 @@
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    <tbody class="bg-zinc-800 divide-y divide-gray-700">
                                         @forelse($records as $record)
-                                        <tr class="hover:bg-gray-750 transition-colors duration-150"
+                                        <tr class="hover:bg-zinc-750 transition-colors duration-150"
                                             data-patente="{{ strtolower($record->plate_no ?? '') }}"
                                             data-camara="{{ strtolower($record->camera_index_code == '101' ? 'anpr01-pin' : $record->camera_index_code) }}"
                                             data-fecha="{{ $record->cross_time->format('Y-m-d') }}">
@@ -220,7 +220,7 @@
                                                         Salida
                                                     </span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-400 border border-gray-600">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-700 text-gray-400 border border-zinc-600">
                                                         Desconocido
                                                     </span>
                                                 @endif
@@ -249,7 +249,7 @@
                             </div>
 
                             <!-- Paginación -->
-                            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
+                            <div class="flex justify-between items-center mt-4 pt-4 border-t border-zinc-700">
                                 <div class="text-sm text-gray-400">
                                     Mostrando {{ $records->firstItem() ?? 0 }} - {{ $records->lastItem() ?? 0 }} de {{ $records->total() }} registros
                                 </div>

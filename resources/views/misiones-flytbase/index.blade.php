@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <!-- Header -->
                     <div class="flex justify-between items-center mb-6">
@@ -44,9 +44,9 @@
                     @endif
 
                     <!-- Tabla de Misiones -->
-                    <div class="overflow-x-auto rounded-lg border border-gray-700">
+                    <div class="overflow-x-auto rounded-lg border border-zinc-700">
                         <table class="min-w-full divide-y divide-gray-700">
-                            <thead class="bg-gray-750">
+                            <thead class="bg-zinc-750">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Cliente</th>
@@ -55,9 +55,9 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-gray-800 divide-y divide-gray-700">
+                            <tbody class="bg-zinc-800 divide-y divide-gray-700">
                                 @forelse($misiones as $mision)
-                                <tr class="hover:bg-gray-750 transition-colors">
+                                <tr class="hover:bg-zinc-750 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-100">{{ $mision->nombre }}</div>
                                         @if($mision->descripcion)
@@ -128,7 +128,7 @@
     </div>
     <!-- Modal de Crear Misión -->
     <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Crear Nueva Misión</h3>
                 <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-300">
@@ -144,24 +144,24 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Columna 1: Información Básica -->
                     <div class="space-y-4">
-                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Información Básica</h4>
+                        <h4 class="text-md font-medium text-gray-200 border-b border-zinc-700 pb-2">Información Básica</h4>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
                             <input type="text" name="nombre" required 
-                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                   class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
                             <textarea name="descripcion" rows="3"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
+                                      class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
                             <select name="cliente_id" required 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -172,26 +172,26 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
                             <input type="url" name="url" required 
-                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                   class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                    placeholder="https://api.flytbase.com/rest/alarms/trigger">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Observaciones</label>
                             <textarea name="observaciones" rows="2"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                      class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                       placeholder="Observaciones adicionales sobre la misión..."></textarea>
                         </div>
                     </div>
 
                     <!-- Columna 2: Configuración de Vuelo -->
                     <div class="space-y-4">
-                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Configuración de Vuelo</h4>
+                        <h4 class="text-md font-medium text-gray-200 border-b border-zinc-700 pb-2">Configuración de Vuelo</h4>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Drone</label>
                             <select name="drone_id" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un drone</option>
                                 @foreach($drones as $drone)
                                     <option value="{{ $drone->id }}">{{ $drone->drone }}</option>
@@ -202,7 +202,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Dock</label>
                             <select name="dock_id" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un dock</option>
                                 @foreach($docks as $dock)
                                     <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
@@ -213,7 +213,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Site</label>
                             <select name="site_id" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un site</option>
                                 @foreach($sites as $site)
                                     <option value="{{ $site->id }}">{{ $site->nombre }}</option>
@@ -225,20 +225,20 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Altitud (m) *</label>
                                 <input type="number" name="route_altitude" step="0.01" value="35.00" required 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Velocidad (m/s) *</label>
                                 <input type="number" name="route_speed" step="0.01" value="5.33" required 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Ruta *</label>
                             <select name="route_waypoint_type" required 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="linear_route">Ruta Lineal</option>
                                 <option value="transits_waypoint">Vuela sobre waypoints</option>
                                 <option value="curved_route_drone_stops">Ruta Curva con Paradas</option>
@@ -250,14 +250,14 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Distancia Total Estimada (m)</label>
                                 <input type="number" name="est_total_distance" step="0.01" 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                        placeholder="0.00">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Duración Total Estimada (seg)</label>
                                 <input type="number" name="est_total_duration" 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                        placeholder="0">
                             </div>
                         </div>
@@ -268,7 +268,7 @@
                             <!-- Input para archivo KMZ -->
                             <div id="createKmzUploadContainer">
                                 <input type="file" name="kmz_file" id="createKmzFile" accept=".kmz"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
                                 <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
                                 
                                 <!-- Mensaje de carga -->
@@ -308,15 +308,15 @@
 
                         <div class="flex items-center">
                             <input type="checkbox" name="activo" id="createActivo" value="1" checked
-                                   class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                                   class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                             <label for="createActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                     <button type="button" onclick="closeCreateModal()" 
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" 
@@ -330,7 +330,7 @@
 
     <!-- Modal de Editar Misión -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Editar Misión</h3>
                 <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-300">
@@ -345,24 +345,24 @@
                 @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
-                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Información Básica</h4>
+                        <h4 class="text-md font-medium text-gray-200 border-b border-zinc-700 pb-2">Información Básica</h4>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
                             <input type="text" name="nombre" id="editNombre" required 
-                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                   class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
                             <textarea name="descripcion" id="editDescripcion" rows="3"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
+                                      class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Cliente *</label>
                             <select name="cliente_id" id="editClienteId" required 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
@@ -373,25 +373,25 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">URL del Webhook *</label>
                             <input type="url" name="url" id="editUrl" required 
-                                   class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                   class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                    placeholder="https://api.flytbase.com/rest/alarms/trigger">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Observaciones</label>
                             <textarea name="observaciones" id="editObservaciones" rows="2"
-                                      class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                      class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                       placeholder="Observaciones adicionales sobre la misión..."></textarea>
                         </div>
                     </div>
 
                     <div class="space-y-4">
-                        <h4 class="text-md font-medium text-gray-200 border-b border-gray-700 pb-2">Configuración de Vuelo</h4>
+                        <h4 class="text-md font-medium text-gray-200 border-b border-zinc-700 pb-2">Configuración de Vuelo</h4>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Drone</label>
                             <select name="drone_id" id="editDroneId" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un drone</option>
                                 @foreach($drones as $drone)
                                     <option value="{{ $drone->id }}">{{ $drone->drone }}</option>
@@ -402,7 +402,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Dock</label>
                             <select name="dock_id" id="editDockId" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un dock</option>
                                 @foreach($docks as $dock)
                                     <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
@@ -413,7 +413,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Site</label>
                             <select name="site_id" id="editSiteId" 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="">Seleccione un site</option>
                                 @foreach($sites as $site)
                                     <option value="{{ $site->id }}">{{ $site->nombre }}</option>
@@ -425,20 +425,20 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Altitud (m) *</label>
                                 <input type="number" name="route_altitude" id="editRouteAltitude" step="0.01" required 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Velocidad (m/s) *</label>
                                 <input type="number" name="route_speed" id="editRouteSpeed" step="0.01" required 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Ruta *</label>
                             <select name="route_waypoint_type" id="editRouteWaypointType" required 
-                                    class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                 <option value="linear_route">Ruta Lineal</option>
                                 <option value="transits_waypoint">Vuela sobre waypoints</option>
                                 <option value="curved_route_drone_stops">Ruta Curva con Paradas</option>
@@ -450,14 +450,14 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Distancia Total Estimada (m)</label>
                                 <input type="number" name="est_total_distance" id="editEstTotalDistance" step="0.01" 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                        placeholder="0.00">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Duración Total Estimada (seg)</label>
                                 <input type="number" name="est_total_duration" id="editEstTotalDuration" 
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                        placeholder="0">
                             </div>
                         </div>
@@ -468,7 +468,7 @@
                             <!-- Input para archivo KMZ -->
                             <div id="editKmzUploadContainer">
                                 <input type="file" name="kmz_file" id="editKmzFile" accept=".kmz"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
                                 <p class="text-xs text-gray-400 mt-1">Seleccione un archivo .kmz para importar los waypoints de la misión. El archivo debe contener coordenadas válidas.</p>
                                 
                                 <!-- Mensaje de carga -->
@@ -511,15 +511,15 @@
 
                         <div class="flex items-center">
                             <input type="checkbox" name="activo" id="editActivo" value="1"
-                                   class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                                   class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                             <label for="editActivo" class="ml-2 text-sm text-gray-300">Misión activa</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                     <button type="button" onclick="closeEditModal()" 
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" 
@@ -533,7 +533,7 @@
 
     <!-- Modal de Acciones para Waypoints -->
     <div id="actionsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Agregar Acciones</h3>
                 <button onclick="closeActionsModal()" class="text-gray-400 hover:text-gray-300">
@@ -551,7 +551,7 @@
 
     <!-- Modal para configurar Yaw del Drone -->
     <div id="yawModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+        <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-100">Configurar Yaw del Drone</h3>
                 <button onclick="closeYawModal()" class="text-gray-400 hover:text-gray-300">
@@ -565,13 +565,13 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Ángulo (-180° a 180°)</label>
                     <input type="number" id="yawAngle" min="-180" max="180" step="1" value="0"
-                           class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                           class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                     <p class="text-xs text-gray-400 mt-1">Ingrese el ángulo de rotación del yaw del drone</p>
                 </div>
                 
                 <div class="flex justify-end space-x-3">
                     <button onclick="closeYawModal()" 
-                            class="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors">
+                            class="px-4 py-2 bg-zinc-700 text-gray-300 rounded-md hover:bg-zinc-600 transition-colors">
                         Cancelar
                     </button>
                     <button onclick="confirmYaw()" 
@@ -638,29 +638,29 @@
         }
         
         /* Scrollbars para modales y otros contenedores */
-        .bg-gray-800::-webkit-scrollbar,
-        .bg-gray-900::-webkit-scrollbar,
-        .bg-gray-700::-webkit-scrollbar {
+        .bg-zinc-800::-webkit-scrollbar,
+        .bg-zinc-900::-webkit-scrollbar,
+        .bg-zinc-700::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         
-        .bg-gray-800::-webkit-scrollbar-track,
-        .bg-gray-900::-webkit-scrollbar-track,
-        .bg-gray-700::-webkit-scrollbar-track {
+        .bg-zinc-800::-webkit-scrollbar-track,
+        .bg-zinc-900::-webkit-scrollbar-track,
+        .bg-zinc-700::-webkit-scrollbar-track {
             background: transparent;
         }
         
-        .bg-gray-800::-webkit-scrollbar-thumb,
-        .bg-gray-900::-webkit-scrollbar-thumb,
-        .bg-gray-700::-webkit-scrollbar-thumb {
+        .bg-zinc-800::-webkit-scrollbar-thumb,
+        .bg-zinc-900::-webkit-scrollbar-thumb,
+        .bg-zinc-700::-webkit-scrollbar-thumb {
             background: rgba(55, 65, 81, 0.6);
             border-radius: 4px;
         }
         
-        .bg-gray-800::-webkit-scrollbar-thumb:hover,
-        .bg-gray-900::-webkit-scrollbar-thumb:hover,
-        .bg-gray-700::-webkit-scrollbar-thumb:hover {
+        .bg-zinc-800::-webkit-scrollbar-thumb:hover,
+        .bg-zinc-900::-webkit-scrollbar-thumb:hover,
+        .bg-zinc-700::-webkit-scrollbar-thumb:hover {
             background: rgba(55, 65, 81, 0.8);
         }
         
@@ -1013,7 +1013,7 @@
         // Función para crear tarjeta de waypoint
         function createWaypointCard(modal, waypoint, index) {
             const card = document.createElement('div');
-            card.className = 'bg-gray-700 rounded-lg p-4 border border-gray-600';
+            card.className = 'bg-zinc-700 rounded-lg p-4 border border-zinc-600';
             card.dataset.index = index;
             
             const acciones = waypoint.acciones || [];
@@ -1093,7 +1093,7 @@
             Object.keys(accionesDisponibles).forEach(accionKey => {
                 const button = document.createElement('button');
                 button.type = 'button';
-                button.className = 'w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors border border-gray-600 hover:border-gray-500';
+                button.className = 'w-full text-left bg-zinc-700 hover:bg-zinc-600 rounded-lg p-4 transition-colors border border-zinc-600 hover:border-zinc-500';
                 button.innerHTML = `
                     <div class="flex justify-between items-center">
                         <span class="text-gray-200 font-medium">${accionesDisponibles[accionKey]}</span>

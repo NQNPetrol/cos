@@ -23,7 +23,7 @@
                 </div>
             @endif
             
-            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100">
 
                     <!-- Header -->
@@ -38,7 +38,7 @@
                         <!-- Tipo de Notificación -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Notificación</label>
-                            <select name="type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <select name="type" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                                 <option value="global">Notificación Global (Todos los usuarios)</option>
                                 <option value="user">Notificación Específica para Usuario</option>
                                 <option value="client">Notificación para Cliente</option>
@@ -48,7 +48,7 @@
                         <!-- Campos condicionales -->
                         <div id="userField" class="hidden">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Usuario</label>
-                            <select name="user_id" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="user_id" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="">Seleccione un usuario</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
@@ -58,7 +58,7 @@
 
                         <div id="clientField" class="hidden">
                             <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Cliente</label>
-                            <select name="client_id" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="client_id" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clients as $client)
                                     <option value="{{ $client->id }}">{{ $client->nombre }}</option>
@@ -70,7 +70,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Título</label>
                             <input type="text" name="title" required 
-                                   class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                   class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                                    placeholder="Ingrese el título de la notificación">
                         </div>
 
@@ -78,14 +78,14 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Mensaje</label>
                             <textarea name="message" rows="4" required
-                                      class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                      class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                                       placeholder="Escriba el mensaje de la notificación"></textarea>
                         </div>
 
                         <!-- Prioridad -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Prioridad</label>
-                            <select name="priority" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2">
+                            <select name="priority" class="w-full bg-zinc-700 border border-zinc-600 text-white rounded-lg px-4 py-2">
                                 <option value="BAJA">BAJA</option>
                                 <option value="NORMAL" selected>MEDIA</option>
                                 <option value="ALTA">ALTA</option>
@@ -100,7 +100,7 @@
                                 <!-- Checkbox que sobrescribe el valor cuando está marcado -->
                                 <input type="checkbox" name="is_active" value="1" 
                                     {{ old('is_active', true) ? 'checked' : '' }}
-                                    class="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500">
+                                    class="rounded border-zinc-600 bg-zinc-700 text-blue-500 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-300">Notificación activa</span>
                             </label>
                         </div>
@@ -108,7 +108,7 @@
                         <!-- Botones -->
                         <div class="flex justify-end space-x-4 pt-6">
                             <a href="{{ route('notifications.admin') }}" 
-                               class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition-colors">
+                               class="bg-zinc-600 hover:bg-zinc-500 text-white px-6 py-2 rounded-lg transition-colors">
                                 Cancelar
                             </a>
                             <button type="submit" 

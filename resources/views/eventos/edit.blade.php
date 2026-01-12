@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Editar Evento #{{ str_pad($evento->id, 4, '0', STR_PAD_LEFT) }}</h2>
@@ -10,7 +10,7 @@
                         </a>
                     </div>
 
-                    <div id="debug-output" class="mb-4 p-3 bg-gray-800 text-sm text-gray-300 rounded-md"></div>
+                    <div id="debug-output" class="mb-4 p-3 bg-zinc-800 text-sm text-gray-300 rounded-md"></div>
 
                     <form id="evento-edit-form" action="{{ route('eventos.update', $evento) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
@@ -28,7 +28,7 @@
                         @endif
                         
                         <!-- 1. Categoria -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">1. ¿A qué categoría pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($categorias as $categoria)
@@ -36,7 +36,7 @@
                                     <input id="categoria-{{ Str::slug($categoria->nombre) }}" name="categoria_id" type="radio"
                                         data-nombre="{{ $categoria->nombre }}"
                                         value="{{ $categoria->id }}" 
-                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600" required
+                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600" required
                                         @if($evento->categoria_id == $categoria->id) checked @endif>
                                     <label for="categoria-{{ Str::slug($categoria->nombre) }}" class="ml-3 block text-sm font-medium text-gray-300">
                                         {{ $categoria->nombre }}
@@ -50,7 +50,7 @@
                         </div>
 
                         <!-- Sección 2: Tipo de Evento (dinámico) -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">2. ¿A qué tipo pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div id="tipos-container">
                                 @if($evento->categoria)
@@ -58,7 +58,7 @@
                                     <div class="flex items-center mb-2">
                                         <input type="radio" id="tipo-{{ Str::slug($tipo) }}" name="tipo" 
                                                value="{{ $tipo }}"
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600" required
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600" required
                                                @if($evento->tipo == $tipo) checked @endif>
                                         <label for="tipo-{{ Str::slug($tipo) }}" class="ml-3 block text-sm font-medium text-gray-300">
                                             {{ $tipo }}
@@ -75,10 +75,10 @@
                         </div>
 
                         <!-- Sección 3: Fecha y Hora -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">3. Fecha y hora del incidente <span class="text-red-500">*</span></h3>
                             <input type="datetime-local" name="fecha_hora" id="fecha_hora"
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ \Carbon\Carbon::parse($evento->fecha_hora)->format('Y-m-d\TH:i') }}" required>
                             @error('fecha_hora')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
@@ -86,9 +86,9 @@
                         </div>
 
                         <!-- Sección 4: Coordenadas -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">4. Ubicación <span class="text-red-500">*</span></h3>
-                            <div class="mb-4 bg-gray-800 p-3 rounded-md">
+                            <div class="mb-4 bg-zinc-800 p-3 rounded-md">
                                 <p class="text-sm text-gray-300 mb-2">Cómo obtener las coordenadas:</p>
                                 <ol class="list-decimal list-inside text-sm text-gray-400 space-y-1">
                                     <li>Entrar a <a href="https://www.google.com/maps" target="_blank" class="text-blue-400 hover:underline">Google Maps</a></li>
@@ -100,7 +100,7 @@
                                 <p class="text-sm text-yellow-400 mt-2">Ejemplo: -38.88266056726054, -68.0446703200311</p>
                             </div>
                             <input type="text" name="coordenadas" id="coordenadas" placeholder="Pegue las coordenadas aquí"
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ $evento->latitud }}, {{ $evento->longitud }}" required
                                    pattern="^-?\d{1,3}\.\d+,\s-?\d{1,3}\.\d+$"
                                    title="Formato requerido: latitud, longitud (ejemplo: -38.88266056726054, -68.0446703200311)">
@@ -110,10 +110,10 @@
                         </div>
 
                         <!-- Sección 5: Cliente -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">5. Cliente <span class="text-red-500">*</span></h3>
                             <select name="cliente_id" id="cliente_id" required
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}" @if($evento->cliente_id == $cliente->id) selected @endif
@@ -128,10 +128,10 @@
                         </div>
 
                         <!-- Sección 5.1: Empresa Asociada -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada al Cliente</h3>
                             <select name="empresa_asociada_id" id="empresa_asociada_id"
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
                                     <option value="{{ $empresa->id }}" @if($evento->empresa_asociada_id == $empresa->id) selected @endif>
@@ -145,10 +145,10 @@
                         </div>
 
                         <!-- Sección 6: Supervisor -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">6. Supervisor <span class="text-red-500">*</span></h3>
                             <select name="supervisor_id" id="supervisor_id" required
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
                                     <option value="{{ $supervisor->id }}" @if($evento->supervisor_id == $supervisor->id) selected @endif>
@@ -161,14 +161,14 @@
                             @enderror
                         </div>
 
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
                             <textarea name="descripcion" id="descripcion"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('descripcion', $evento->descripcion) }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('descripcion', $evento->descripcion) }}</textarea>
                         </div>
 
-                        <div class="bg-gray-700 p-4 rounded-lg" id="elementos-sustraidos">
+                        <div class="bg-zinc-700 p-4 rounded-lg" id="elementos-sustraidos">
                             <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Sustraídos</h3>
                             <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos (opcional).</p>
                             
@@ -177,13 +177,13 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                                         <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                                         <div class="flex">
                                             <input type="number" name="cantidades[]" min="1" value="1"
-                                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                                class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                             <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -206,7 +206,7 @@
                         </div>
 
                         <!-- Personas evento  (A EDITAR) -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">7.2 Personas Involucradas en el Evento</h3>
                             <p class="text-sm text-gray-300 mb-4">Agregue o edite las personas involucradas en el evento según su tipo.</p>
                             
@@ -221,32 +221,32 @@
                         </div>
                         
                         <!-- Sección 7: Observaciones -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones', $evento->observaciones) }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones', $evento->observaciones) }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">9. Link del reporte</h3>
                             <input type="url" name="url_reporte" id="url_reporte" placeholder="https://drive.google.com/..."
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ $evento->url_reporte }}">
                         </div>
 
                         <!-- Sección 9: Multimedia -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">10. Multimedia</h3>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Agregar más imágenes (JPG, PNG - Máx. 2MB c/u)</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-600 border-dashed rounded-md">
                                     <div class="space-y-1 text-center">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                         <div class="text-sm text-gray-400 text-center">
-                                            <label for="media" class="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
+                                            <label for="media" class="relative cursor-pointer bg-zinc-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
                                                 <span>Subir archivos</span>
                                                 <input id="media" name="media[]" type="file" class="sr-only" multiple accept="image/jpeg,image/png">
                                             </label>
@@ -287,7 +287,7 @@
                         <div class="flex justify-end space-x-4 pt-4">
                             <a href="{{ route('eventos.index') }}" 
                                onclick="return confirm('¿Estás seguro de cancelar los cambios? Los cambios no guardados se perderán.')"
-                               class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600">
+                               class="px-4 py-2 border border-zinc-600 rounded-md text-gray-300 bg-zinc-700 hover:bg-zinc-600">
                                Cancelar
                             </a>
 
@@ -373,7 +373,7 @@
                     input.id = `tipo-${tipo.replace(/\s+/g, '-').toLowerCase()}`;
                     input.name = 'tipo';
                     input.value = tipo;
-                    input.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600';
+                    input.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600';
                     input.required = true;
 
                     input.addEventListener('change', toggleElementosSustraidos);
@@ -445,13 +445,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                             <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                             <div class="flex items-center">
                                 <input type="number" name="cantidades[]" min="1" value="1"
-                                    class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -481,13 +481,13 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                                     <input type="text" name="elementos[]" value="${elemento}" placeholder="Ej: rueda, batería, linterna..."
-                                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                        class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                                     <div class="flex items-center">
                                         <input type="number" name="cantidades[]" min="1" value="${cantidades[index]}"
-                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                         <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -532,13 +532,13 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                     <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                        class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                     <div class="flex items-center">
                         <input type="number" name="cantidades[]" min="1" value="1"
-                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                         <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -659,7 +659,7 @@
             const container = document.getElementById('personas-container');
             
             const newRow = document.createElement('div');
-            newRow.className = 'persona-row bg-gray-800 p-4 rounded-lg mb-4';
+            newRow.className = 'persona-row bg-zinc-800 p-4 rounded-lg mb-4';
             newRow.id = `persona-row-${personaCount}`;
             
             // Determinar valores por defecto
@@ -683,7 +683,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Persona <span class="text-red-500">*</span></label>
-                        <select name="personas_tipo[]" class="persona-tipo-select block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                        <select name="personas_tipo[]" class="persona-tipo-select block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
                             <option value="">Seleccione un tipo</option>
                             <option value="afectado/victima" ${tipo === 'afectado/victima' ? 'selected' : ''}>Afectado/Víctima</option>
                             <option value="sospechoso" ${tipo === 'sospechoso' ? 'selected' : ''}>Sospechoso</option>
@@ -696,11 +696,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
-                            <input type="text" name="personas_nombre[]" value="${nombre}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Nombre completo">
+                            <input type="text" name="personas_nombre[]" value="${nombre}" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Nombre completo">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Documento</label>
-                            <select name="personas_tipo_doc[]" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                            <select name="personas_tipo_doc[]" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione tipo</option>
                                 <option value="DNI" ${tipoDoc === 'DNI' ? 'selected' : ''}>DNI</option>
                                 <option value="Pasaporte" ${tipoDoc === 'Pasaporte' ? 'selected' : ''}>Pasaporte</option>
@@ -712,16 +712,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Número de Documento</label>
-                            <input type="number" name="personas_nro_doc[]" value="${nroDoc}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de documento">
+                            <input type="number" name="personas_nro_doc[]" value="${nroDoc}" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de documento">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Teléfono</label>
-                            <input type="text" name="personas_nro_telefono[]" value="${nroTelefono}" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de teléfono">
+                            <input type="text" name="personas_nro_telefono[]" value="${nroTelefono}" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Número de teléfono">
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Relación con el Evento</label>
-                        <textarea name="personas_relacion_evento[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa la relación de esta persona con el evento">${relacionEvento}</textarea>
+                        <textarea name="personas_relacion_evento[]" rows="2" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa la relación de esta persona con el evento">${relacionEvento}</textarea>
                     </div>
                 </div>
                 
@@ -729,11 +729,11 @@
                 <div class="campos-sospechoso ${tipo === 'sospechoso' ? '' : 'hidden'}">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Descripción Física</label>
-                        <textarea name="personas_descripcion_fisica[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa las características físicas del sospechoso">${descripcionFisica}</textarea>
+                        <textarea name="personas_descripcion_fisica[]" rows="2" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa las características físicas del sospechoso">${descripcionFisica}</textarea>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Comportamiento Observado</label>
-                        <textarea name="personas_comportamiento_observado[]" rows="2" class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa el comportamiento observado del sospechoso">${comportamientoObservado}</textarea>
+                        <textarea name="personas_comportamiento_observado[]" rows="2" class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" placeholder="Describa el comportamiento observado del sospechoso">${comportamientoObservado}</textarea>
                     </div>
                 </div>
             `;

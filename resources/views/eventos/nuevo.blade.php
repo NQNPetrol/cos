@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
                 <div class="p-6 text-gray-100 dark:text-gray-100">
 
                     <!-- Mensajes de sesión -->
@@ -85,7 +85,7 @@
                     <form action="{{ route('eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         <!-- 1. Categoria -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4"> 1. ¿A qué categoría pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($categorias as $categoria)
@@ -93,7 +93,7 @@
                                     <input id="categoria-{{ Str::slug($categoria->nombre) }}" name="categoria_id" type="radio"
                                         data-nombre="{{ $categoria->nombre }}"
                                         value="{{ $categoria->id }}" 
-                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600" required
+                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600" required
                                            @if(old('categoria') === $categoria->nombre) checked @endif>
                                     <label for="categoria-{{ Str::slug($categoria->nombre) }}" class="ml-3 block text-sm font-medium text-gray-300">
                                         {{ $categoria->nombre }}
@@ -107,7 +107,7 @@
                         </div>
 
                         <!-- Sección 2: Tipo de Evento (dinámico) -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">2. ¿A qué tipo pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div id="tipos-container">
                                 <!-- Opciones se cargarán dinámicamente con JavaScript -->
@@ -119,10 +119,10 @@
                         </div>
 
                         <!-- Sección 3: Fecha y Hora -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">3. Fecha y hora del incidente <span class="text-red-500">*</span></h3>
                             <input type="datetime-local" name="fecha_hora" id="fecha_hora"
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('fecha_hora') }}" required>
                             @error('fecha_hora')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
@@ -130,9 +130,9 @@
                         </div>
 
                         <!-- Sección 4: Coordenadas -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">4. Ubicación <span class="text-red-500">*</span></h3>
-                            <div class="mb-4 bg-gray-800 p-3 rounded-md">
+                            <div class="mb-4 bg-zinc-800 p-3 rounded-md">
                                 <p class="text-sm text-gray-300 mb-2">Cómo obtener las coordenadas:</p>
                                 <ol class="list-decimal list-inside text-sm text-gray-400 space-y-1">
                                     <li>Entrar a <a href="https://www.google.com/maps" target="_blank" class="text-blue-400 hover:underline">Google Maps</a></li>
@@ -144,7 +144,7 @@
                                 <p class="text-sm text-yellow-400 mt-2">Ejemplo: -38.88266056726054, -68.0446703200311</p>
                             </div>
                             <input type="text" name="coordenadas" id="coordenadas" placeholder="Pegue las coordenadas aquí"
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('coordenadas') }}" required
                                    pattern="^-?\d{1,3}\.\d+,\s-?\d{1,3}\.\d+$"
                                    title="Formato requerido: latitud, longitud (ejemplo: -38.88266056726054, -68.0446703200311)">
@@ -154,10 +154,10 @@
                         </div>
 
                         <!-- Sección 5: Cliente -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">5. Cliente <span class="text-red-500">*</span></h3>
                             <select name="cliente_id" id="cliente_id" required
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}" @if(old('cliente_id') == $cliente->id) selected @endif
@@ -172,10 +172,10 @@
                         </div>
 
                         <!-- Sección 5.1: Empresa Asociada -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada</h3>
                             <select name="empresa_asociada_id" id="empresa_asociada_id"
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
                                     <option value="{{ $empresa->id }}" @if(old('empresa_asociada_id') == $empresa->id) selected @endif>
@@ -189,10 +189,10 @@
                         </div>
 
                         <!-- Sección 6: Supervisor -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">6. Supervisor <span class="text-red-500">*</span></h3>
                             <select name="supervisor_id" id="supervisor_id" required
-                                    class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
                                     <option value="{{ $supervisor->id }}" @if(old('supervisor_id') == $supervisor->id) selected @endif>
@@ -205,14 +205,14 @@
                             @enderror
                         </div>
 
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
                             <textarea name="descripcion" id="descripcion"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
                         </div>
                         <!-- Elementos Evento -->
-                        <div class="bg-gray-700 p-4 rounded-lg" id="elementos-sustraidos" >
+                        <div class="bg-zinc-700 p-4 rounded-lg" id="elementos-sustraidos" >
                             <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Involucrados en el evento</h3>
                             <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos, encontrados o dañados.</p>
                             
@@ -221,13 +221,13 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                                         <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                                         <div class="flex">
                                             <input type="number" name="cantidades[]" min="1" value="1"
-                                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                                class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                             <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -250,32 +250,32 @@
                         </div>
 
                         <!-- Sección 7: Observaciones -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
-                                      class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="bg-zinc-700 p-4 rounded-lg">
                             <h3 class="text-lg font-medium text-white mb-4">9. Link del reporte</h3>
                             <input type="url" name="reporte_url" id="url_reporte" placeholder="https://drive.google.com/..."
-                                   class="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                                    value="{{ old('reporte_url') }}">
                         </div>
 
                         <!-- Sección 9: Multimedia -->
-                         <div class="bg-gray-700 p-4 rounded-lg">
+                         <div class="bg-zinc-700 p-4 rounded-lg">
                              <h3 class="text-lg font-medium text-white mb-4">10. Multimedia</h3>
                              <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Imágenes (JPG, PNG - Máx. 2MB c/u)</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-600 border-dashed rounded-md">
                                     <div class="space-y-1 text-center">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                         <div class="text-sm text-gray-400 text-center">
-                                            <label for="media" class="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
+                                            <label for="media" class="relative cursor-pointer bg-zinc-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
                                                 <span>Subir archivos</span>
                                                 <input id="media" name="media[]" type="file" class="sr-only" multiple accept="image/jpeg,image/png">
                                             </label>
@@ -292,7 +292,7 @@
 
                         <!-- Botones de acción -->
                         <div class="flex justify-end space-x-4 pt-4">
-                            <button type="reset" class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600">
+                            <button type="reset" class="px-4 py-2 border border-zinc-600 rounded-md text-gray-300 bg-zinc-700 hover:bg-zinc-600">
                                 Limpiar formulario
                             </button>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
@@ -369,7 +369,7 @@
             input.id = `tipo-${tipo.replace(/\s+/g, '-').toLowerCase()}`;
             input.name = 'tipo';
             input.value = tipo;
-            input.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600';
+            input.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600';
             input.required = true;
 
             input.addEventListener('change', toggleElementosSustraidos);
@@ -418,13 +418,13 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                         <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                            class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                         <div class="flex">
                             <input type="number" name="cantidades[]" min="1" value="1"
-                                class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                             <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -470,13 +470,13 @@
             <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                 <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                       class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                       class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                 <div class="flex">
                     <input type="number" name="cantidades[]" min="1" value="1"
-                           class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                           class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                     <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -556,13 +556,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                             <input type="text" name="elementos[]" value="${elemento}" placeholder="Ej: rueda, batería, linterna..."
-                                   class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
+                                   class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                             <div class="flex">
                                 <input type="number" name="cantidades[]" min="1" value="${cantidadesOld[index] || 1}"
-                                       class="block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                       class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                 <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento">
                                     <i class="bi bi-trash"></i>
                                 </button>

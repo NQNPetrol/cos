@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
                     <!-- Header -->
                     <div class="mb-6">
@@ -19,7 +19,7 @@
                                     Crear Drone
                                 </button>
                                 <a href="https://console.flytbase.com" target="_blank" 
-                                class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
+                                class="inline-flex items-center px-4 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:outline-none focus:border-zinc-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
                                     Abrir Flytbase
                                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -30,13 +30,13 @@
                     </div>
 
                     <!-- Panel de Drones -->
-                    <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                    <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700">
                         <div class="p-6">
                            
                             <!-- Tabla de Drones -->
-                            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                            <div class="overflow-x-auto rounded-lg border border-zinc-700">
                                 <table class="min-w-full divide-y divide-gray-700">
-                                    <thead class="bg-gray-750">
+                                    <thead class="bg-zinc-750">
                                         <tr>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
@@ -47,9 +47,9 @@
                                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    <tbody class="bg-zinc-800 divide-y divide-gray-700">
                                         @forelse($drones as $drone)
-                                        <tr class="hover:bg-gray-750 transition-colors duration-150">
+                                        <tr class="hover:bg-zinc-750 transition-colors duration-150">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#{{ $drone->id }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
@@ -100,7 +100,7 @@
                                                         Disponible
                                                     </span>
                                                 @else
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-900/30 text-gray-400 border border-gray-700">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-900/30 text-gray-400 border border-zinc-700">
                                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                                         </svg>
@@ -112,14 +112,14 @@
                                                 @if($drone->share_url)
                                                     <div class="flex items-center space-x-2">
                                                         {{-- URL acortada con tooltip --}}
-                                                        <span class="text-xs font-mono bg-gray-700 px-2 py-1 rounded border border-gray-600" 
+                                                        <span class="text-xs font-mono bg-zinc-700 px-2 py-1 rounded border border-zinc-600" 
                                                             title="{{ $drone->share_url }}"> {{-- Tooltip con URL completa --}}
                                                             {{ Str::limit($drone->share_url, 25, '...') }} {{-- URL limitada a 25 chars --}}
                                                         </span>
                                                         {{-- Botón para copiar URL --}}
                                                         <button type="button" 
                                                                 onclick="copyUrl('{{ $drone->share_url }}', this)" {{-- Función para copiar --}}
-                                                                class="inline-flex items-center p-1 bg-gray-600 border border-gray-500 rounded text-xs text-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200"
+                                                                class="inline-flex items-center p-1 bg-zinc-600 border border-zinc-500 rounded text-xs text-gray-300 hover:bg-zinc-500 hover:text-white transition-colors duration-200"
                                                                 title="Copiar URL">
                                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -130,7 +130,7 @@
                                                     {{-- Estado cuando no hay URL --}}
                                                     <div class="flex items-center space-x-2">
                                                         <span class="text-red-400 text-xs">✗</span>
-                                                        <span class="text-xs bg-gray-700 px-2 py-1 rounded">No configurada</span>
+                                                        <span class="text-xs bg-zinc-700 px-2 py-1 rounded">No configurada</span>
                                                     </div>
                                                 @endif
                                             </td>
@@ -138,7 +138,7 @@
                                                 <div class="flex items-center space-x-2">
                                                     {{-- Botón Editar --}}
                                                     <button onclick="openEditModal({{ $drone->id }}, '{{ $drone->drone }}', '{{ $drone->share_url }}', {{ $drone->activo ? 'true' : 'false' }}, {{ $drone->dock_id ?? 'null' }})"
-                                                    class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-gray-900/30"
+                                                    class="text-gray-400 hover:text-gray-300 transition-colors p-1 rounded hover:bg-zinc-900/30"
                                                     title="Editar dron">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -184,7 +184,7 @@
 
                                 <!-- Modal de Crear Drone -->
                                 <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-                                    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                                    <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                                         <div class="flex justify-between items-center mb-4">
                                             <h3 class="text-lg font-medium text-gray-100">Crear Nuevo Drone</h3>
                                             <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-300">
@@ -201,7 +201,7 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">Nombre del Drone *</label>
                                                     <input type="text" name="drone" required 
-                                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                                         placeholder="Ej: drone_001">
                                                 </div>
 
@@ -209,7 +209,7 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">Dock Asociado</label>
                                                     <select name="dock_id" 
-                                                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                         <option value="">Seleccione un dock</option>
                                                         @foreach($docks as $dock)
                                                             <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
@@ -222,21 +222,21 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">URL de Compartir *</label>
                                                     <input type="url" name="share_url" required 
-                                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                                         placeholder="https://flytbase.com/guest/...">
                                                     <p class="text-xs text-gray-400 mt-1">URL de compartir de Flytbase para el liveview</p>
                                                 </div>
 
                                                 <div class="flex items-center">
                                                     <input type="checkbox" name="activo" id="createActivo" value="1" checked
-                                                        class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                                                        class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                                                     <label for="createActivo" class="ml-2 text-sm text-gray-300">Drone activo</label>
                                                 </div>
                                             </div>
 
-                                            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                                            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                                                 <button type="button" onclick="closeCreateModal()" 
-                                                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                                                        class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                                                     Cancelar
                                                 </button>
                                                 <button type="submit" 
@@ -249,7 +249,7 @@
                                 </div>
 
                                 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-                                    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                                    <div class="bg-zinc-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                                         <div class="flex justify-between items-center mb-4">
                                             <h3 class="text-lg font-medium text-gray-100">Editar Drone</h3>
                                             <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-300">
@@ -267,7 +267,7 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">Nombre del Drone *</label>
                                                     <input type="text" name="drone" id="editDrone" required 
-                                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                                         placeholder="Ej: drone_001">
                                                 </div>
 
@@ -275,7 +275,7 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">Dock Asociado</label>
                                                     <select name="dock_id" id="editDockId"
-                                                            class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                                            class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                                                         <option value="">Seleccione un dock</option>
                                                         @foreach($docks as $dock)
                                                             <option value="{{ $dock->id }}">{{ $dock->nombre }}</option>
@@ -288,21 +288,21 @@
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-2">URL de Compartir *</label>
                                                     <input type="url" name="share_url" id="editShareUrl" required 
-                                                        class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                                        class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                                                         placeholder="https://flytbase.com/guest/...">
                                                     <p class="text-xs text-gray-400 mt-1">URL de compartir de Flytbase para el liveview</p>
                                                 </div>
 
                                                 <div class="flex items-center">
                                                     <input type="checkbox" name="activo" id="editActivo" value="1"
-                                                        class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                                                        class="rounded bg-zinc-700 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
                                                     <label for="editActivo" class="ml-2 text-sm text-gray-300">Drone activo</label>
                                                 </div>
                                             </div>
 
-                                            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                                            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
                                                 <button type="button" onclick="closeEditModal()" 
-                                                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                                                        class="px-4 py-2 bg-zinc-600 text-white rounded-md hover:bg-zinc-700 transition-colors">
                                                     Cancelar
                                                 </button>
                                                 <button type="submit" 
@@ -386,7 +386,7 @@
             
             // Cambiar a estado de éxito
             button.innerHTML = `<svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
-            button.classList.remove('bg-gray-600', 'text-gray-300');
+            button.classList.remove('bg-zinc-600', 'text-gray-300');
             button.classList.add('bg-green-600', 'text-white');
             button.title = '¡Copiado!';
             
@@ -394,7 +394,7 @@
             setTimeout(() => {
                 button.innerHTML = originalHTML;
                 button.classList.remove('bg-green-600', 'text-white');
-                button.classList.add('bg-gray-600', 'text-gray-300');
+                button.classList.add('bg-zinc-600', 'text-gray-300');
                 button.title = originalTitle;
             }, 2000);
         }

@@ -35,6 +35,8 @@ class ManageDispositivos extends Component
     public $estado_hikconnect = 'Conectado';
     public $cliente_id = '';
     public $ubicacion = '';
+    public $latitud = '';
+    public $longitud = '';
     public $observaciones = '';
     public $necesita_mantenimiento = false;
     public $necesita_actualizacion = false;
@@ -50,6 +52,8 @@ class ManageDispositivos extends Component
         'version_software' => 'nullable|string|max:255',
         'cliente_id' => 'nullable|exists:clientes,id',
         'ubicacion' => 'nullable|string|max:255',
+        'latitud' => 'nullable|numeric|between:-90,90',
+        'longitud' => 'nullable|numeric|between:-180,180',
         'observaciones' => 'nullable|string',
         'fecha_instalacion' => 'nullable|date',
         'ultimo_mantenimiento' => 'nullable|date',
@@ -122,6 +126,8 @@ class ManageDispositivos extends Component
             'estado_hikconnect' => $this->estado_hikconnect,
             'cliente_id' => $this->cliente_id ?: null,
             'ubicacion' => $this->ubicacion,
+            'latitud' => $this->latitud !== '' ? $this->latitud : null,
+            'longitud' => $this->longitud !== '' ? $this->longitud : null,
             'observaciones' => $this->observaciones,
             'necesita_mantenimiento' => $this->necesita_mantenimiento,
             'necesita_actualizacion' => $this->necesita_actualizacion,
@@ -158,6 +164,8 @@ class ManageDispositivos extends Component
         $this->estado_hikconnect = $dispositivo->estado_hikconnect;
         $this->cliente_id = $dispositivo->cliente_id;
         $this->ubicacion = $dispositivo->ubicacion;
+        $this->latitud = $dispositivo->latitud;
+        $this->longitud = $dispositivo->longitud;
         $this->observaciones = $dispositivo->observaciones;
         $this->necesita_mantenimiento = $dispositivo->necesita_mantenimiento;
         $this->necesita_actualizacion = $dispositivo->necesita_actualizacion;
@@ -178,7 +186,7 @@ class ManageDispositivos extends Component
     public function resetForm()
     {
         $this->reset([
-            'tipo', 'cliente_id', 'ubicacion', 'fecha_instalacion', 
+            'tipo', 'cliente_id', 'ubicacion', 'latitud', 'longitud', 'fecha_instalacion', 
             'observaciones', 'direccion_ip', 'puerto', 'numero_serie', 'version_software',
             'estado_hikconnect', 'necesita_actualizacion', 'necesita_mantenimiento',
             'ultimo_mantenimiento', 'proximo_mantenimiento', 'estado_inventario'

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-2">
         <div class="max-w-full mx-auto px-2">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
 
                     <!-- Mensajes de sesión -->
@@ -93,9 +93,18 @@
 
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Listado de Eventos</h2>
-                        <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                            <i class="bi bi-plus-circle mr-2"></i>Nuevo Evento
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <!-- Toggle Paginación -->
+                            <a href="{{ route('eventos.index', array_merge(request()->except('paginate', 'page'), $isPaginated ? [] : ['paginate' => 1])) }}" 
+                               class="px-4 py-2 {{ $isPaginated ? 'bg-green-600 hover:bg-green-700' : 'bg-zinc-600 hover:bg-zinc-700' }} text-white rounded-md transition-colors flex items-center"
+                               title="{{ $isPaginated ? 'Desactivar paginación (mostrar todos)' : 'Activar paginación (15 por página)' }}">
+                                <i class="bi {{ $isPaginated ? 'bi-list-check' : 'bi-list' }} mr-2"></i>
+                                {{ $isPaginated ? 'Paginado' : 'Sin paginar' }}
+                            </a>
+                            <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="bi bi-plus-circle mr-2"></i>Nuevo Evento
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Filtros -->
@@ -104,7 +113,7 @@
                             <!-- Filtro por cliente -->
                             <div class="flex-1 min-w-[180px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Cliente</label>
-                                <select name="cliente_id" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2">
+                                <select name="cliente_id" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-4 py-2">
                                     <option value="">Todos los clientes</option>
                                      @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->id }}" 
@@ -118,7 +127,7 @@
                             <!-- Filtro por estado -->
                             <div class="flex-1 min-w-[180px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
-                                <select name="estado" class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                <select name="estado" class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                                     <option value="">Todos los estados</option>
                                     <option value="VIGENTE" {{ request('estado') === 'VIGENTE' ? 'selected' : '' }}>Vigente</option>
                                     <option value="ANULADO" {{ request('estado') === 'ANULADO' ? 'selected' : '' }}>Anulado</option>
@@ -129,14 +138,14 @@
                             <div class="flex-1 min-w-[180px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Desde</label>
                                 <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                             </div>
                             
                             <!-- Filtro por fecha hasta -->
                             <div class="flex-1 min-w-[180px]">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Hasta</label>
                                 <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                                       class="w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2">
+                                       class="w-full rounded-md bg-zinc-700 border-zinc-600 text-white px-3 py-2">
                             </div>
                             
                             <!-- Boton Filtrar -->
@@ -180,7 +189,7 @@
                     <!-- Tabla de resultados -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full dark:divide-gray-700">
-                            <thead class="bg-gray-800 text-gray-300 dark:bg-gray-700">
+                            <thead class="bg-zinc-800 text-gray-300 dark:bg-zinc-700">
                                 <tr>
                                     <th class="px-5 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">ID</th>
                                     <th class="px-5 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Categoría</th>
@@ -195,9 +204,9 @@
                                     <th class="px-5 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="dark:bg-gray-800 ">
+                            <tbody class="dark:bg-zinc-800 ">
                                 @forelse($eventos as $evento)
-                                <tr class="hover:bg-gray-600 transition-colors">
+                                <tr class="hover:bg-zinc-600 transition-colors">
                                     <td class="px-5 py-3 whitespace-nowrap text-sm text-gray-300 dark:text-gray-300">{{ str_pad($evento->id, 4, '0', STR_PAD_LEFT) }}</td>
                                     <td class="px-5 py-3 whitespace-nowrap text-sm font-medium text-gray-300 dark:text-gray-300">
                                         <a href="#" class="text-blue-400 hover:text-blue-300">{{ $evento->categoria?->nombre ?? 'Sin categoría' }}</a>
@@ -284,12 +293,18 @@
                     @if($eventos->count() > 0)
                         <div class="mt-4 flex items-center justify-between">
                             <div class="text-sm text-gray-400">
-                                Mostrando {{ $eventos->firstItem() }} a {{ $eventos->lastItem() }} 
-                                de {{ $eventos->total() }} resultados
+                                @if($isPaginated)
+                                    Mostrando {{ $eventos->firstItem() }} a {{ $eventos->lastItem() }} 
+                                    de {{ $eventos->total() }} resultados
+                                @else
+                                    Mostrando todos los {{ $eventos->total() }} resultados
+                                @endif
                             </div>
+                            @if($isPaginated && $eventos->hasPages())
                             <div>
                                 {{ $eventos->links() }}
                             </div>
+                            @endif
                         </div>
                     @endif
                 </div>

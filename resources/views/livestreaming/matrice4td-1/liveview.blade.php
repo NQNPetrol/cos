@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-5 text-gray-100 dark:text-gray-100">
                     <div class="space-y-8">
                         <!-- Header -->
@@ -19,7 +19,7 @@
                                 <p class="text-sm text-gray-400 mt-1">Transmisión en vivo de la misión desplegada</p>
                             </div>
                             <a href="{{ route('drones-flytbase.index') }}" 
-                               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
+                               class="inline-flex items-center px-4 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:outline-none focus:border-zinc-800 focus:ring ring-gray-300 transition ease-in-out duration-150">
                             
                                 todos los drones
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
@@ -29,7 +29,7 @@
                         </div>
 
                         <!-- Contenedor del Liveview -->
-                        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+                        <div class="bg-zinc-800 rounded-lg shadow-sm border border-zinc-700">
                             <div class="p-6">
                                 <div class="flex justify-between items-center mb-4">
                                     <div>
@@ -59,7 +59,7 @@
                                     </div>
 
                                     <!-- Contenedor del iframe -->
-                                    <div class="bg-black rounded-lg overflow-hidden border border-gray-600">
+                                    <div class="bg-black rounded-lg overflow-hidden border border-zinc-600">
                                         <iframe 
                                             src="{{ $flytbaseGuestUrl ?? $drone->share_url ?? 'https://console.flytbase.com/guest-sharing/your-stream-url' }}"
                                             width="100%" 
@@ -100,16 +100,16 @@
         </div>
     </div>
     <!-- Modal para vista expandida -->
-    <div id="expandedModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
+    <div id="expandedModal" class="fixed inset-0 bg-black bg-opacity-90 hidden" style="z-index: 10000;">
         <div class="flex flex-col h-full">
             <!-- Header del modal -->
-            <div class="flex justify-between items-center p-4 bg-gray-900">
+            <div class="flex justify-between items-center p-4 bg-zinc-900">
                 <h3 class="text-lg font-medium text-white">
                     Stream en Vivo - {{ $drone->drone}}
                 </h3>
                 <div class="flex space-x-2">
                     <button onclick="toggleFullscreenModal()" 
-                            class="inline-flex items-center px-3 py-2 bg-gray-600 border border-transparent rounded-md font-medium text-xs text-white hover:bg-gray-700 transition">
+                            class="inline-flex items-center px-3 py-2 bg-zinc-600 border border-transparent rounded-md font-medium text-xs text-white hover:bg-zinc-700 transition">
                         <i class="bi bi-arrows-fullscreen"></i>
                           
                     </button>
@@ -137,10 +137,13 @@
     </div>
 
     <script>
-        // Timer para la sesión de liveview
+        // Timer para la sesión de liveview (solo si existe el elemento)
         let startTime = Date.now();
+        const sessionTimerEl = document.getElementById('sessionTimer');
         
         function updateTimer() {
+            if (!sessionTimerEl) return;
+
             const currentTime = Date.now();
             const elapsedTime = currentTime - startTime;
             const seconds = Math.floor((elapsedTime / 1000) % 60);
@@ -148,11 +151,13 @@
             const hours = Math.floor((elapsedTime / (1000 * 60 * 60)) % 24);
             
             const timerDisplay = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('sessionTimer').textContent = timerDisplay;
+            sessionTimerEl.textContent = timerDisplay;
         }
         
-        // Actualizar el timer cada segundo
-        setInterval(updateTimer, 1000);
+        // Actualizar el timer cada segundo solo si existe el elemento
+        if (sessionTimerEl) {
+            setInterval(updateTimer, 1000);
+        }
         
         // Manejar errores del iframe
         document.getElementById('liveviewFrame').addEventListener('load', function() {
@@ -169,6 +174,18 @@
             const modal = document.getElementById('expandedModal');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+
+            // Ocultar sidebar y top bar mientras el modal está abierto (layout moderno)
+            const sidebar = document.getElementById('modernSidebar');
+            const topNav = document.querySelector('.modern-top-nav');
+            if (sidebar) {
+                sidebar.dataset.originalDisplay = sidebar.style.display || '';
+                sidebar.style.display = 'none';
+            }
+            if (topNav) {
+                topNav.dataset.originalDisplay = topNav.style.display || '';
+                topNav.style.display = 'none';
+            }
         }
         
         function closeExpandedModal() {
@@ -179,6 +196,16 @@
             // Salir de pantalla completa si está activa
             if (document.fullscreenElement) {
                 document.exitFullscreen();
+            }
+
+            // Restaurar visibilidad del sidebar y top bar
+            const sidebar = document.getElementById('modernSidebar');
+            const topNav = document.querySelector('.modern-top-nav');
+            if (sidebar) {
+                sidebar.style.display = sidebar.dataset.originalDisplay || '';
+            }
+            if (topNav) {
+                topNav.style.display = topNav.dataset.originalDisplay || '';
             }
         }
         

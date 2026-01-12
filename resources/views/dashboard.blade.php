@@ -20,12 +20,12 @@
                     <div class="flex items-center gap-2">
                         <label for="fecha_desde" class="text-sm text-gray-300">Desde:</label>
                         <input type="date" id="fecha_desde" 
-                               class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                               class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div class="flex items-center gap-2">
                         <label for="fecha_hasta" class="text-sm text-gray-300">Hasta:</label>
                         <input type="date" id="fecha_hasta" 
-                               class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                               class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <button id="btn_filtrar" 
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
@@ -35,7 +35,7 @@
                         Filtrar
                     </button>
                     <button id="btn_limpiar" 
-                            class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                            class="bg-zinc-600 hover:bg-zinc-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                         Limpiar
                     </button>
                 </div>
@@ -44,7 +44,7 @@
             <!-- Tarjetas de resumen -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Total de Eventos -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Eventos</p>
@@ -59,7 +59,7 @@
                 </div>
 
                 <!-- Total Clientes -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Clientes</p>
@@ -74,7 +74,7 @@
                 </div>
 
                 <!-- Eventos sin cliente -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Sin Cliente Asignado</p>
@@ -92,7 +92,7 @@
             <!-- Grid de gráficos - 2 columnas en pantallas lg -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Gráfico de eventos por cliente -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h2 class="text-xl font-bold text-white">Eventos por Cliente</h2>
@@ -108,7 +108,7 @@
                         <canvas id="chartEventosPorCliente"></canvas>
                     </div>
                     
-                    <div id="loading-clientes" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+                    <div id="loading-clientes" class="hidden absolute inset-0 bg-zinc-800/80 rounded-2xl flex items-center justify-center">
                         <div class="flex flex-col items-center gap-3">
                             <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
                             <span class="text-gray-300 text-sm">Cargando datos...</span>
@@ -117,7 +117,7 @@
                 </div>
 
                 <!-- Gráfico de eventos por categoría -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700 shadow-xl relative">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h2 class="text-xl font-bold text-white">Eventos por Categoría</h2>
@@ -133,7 +133,7 @@
                         <canvas id="chartEventosPorCategoria"></canvas>
                     </div>
                     
-                    <div id="loading-categorias" class="hidden absolute inset-0 bg-gray-800/80 rounded-2xl flex items-center justify-center">
+                    <div id="loading-categorias" class="hidden absolute inset-0 bg-zinc-800/80 rounded-2xl flex items-center justify-center">
                         <div class="flex flex-col items-center gap-3">
                             <div class="animate-spin rounded-full h-10 w-10 border-4 border-violet-500 border-t-transparent"></div>
                             <span class="text-gray-300 text-sm">Cargando datos...</span>

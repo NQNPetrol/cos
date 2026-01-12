@@ -1,5 +1,5 @@
 
-    <div class="max-w-7xl py-8 sm:px-6 lg:px-8 bg-gray-800 rounded-lg shadow">
+    <div class="max-w-7xl py-8 sm:px-6 lg:px-8 bg-zinc-800 rounded-lg shadow">
         <h2 class="text-2xl font-semibold text-gray-50 mb-6">{{ $header }}</h2>
         
         @if (session()->has('success'))
@@ -8,8 +8,8 @@
             </div>
         @endif
 
-        <div class="overflow-x-auto bg-gray-800 shadow rounded-lg">
-            <div class="px-6 py-6 bg-gray-800">
+        <div class="overflow-x-auto bg-zinc-800 shadow rounded-lg">
+            <div class="px-6 py-6 bg-zinc-800">
                 <form wire:submit.prevent="save">
                     <!-- Campo Evento -->
                     <div class="mb-6">
@@ -18,12 +18,12 @@
                         </label>
 
                         @if($eventos->isEmpty())
-                            <div class="bg-gray-700 border border-gray-600 rounded-md p-3 text-yellow-400">
+                            <div class="bg-zinc-700 border border-zinc-600 rounded-md p-3 text-yellow-400">
                                 No hay eventos disponibles para seguimiento. Todos los eventos están cerrados o no hay eventos creados.
                             </div>
                         @else
                         <select wire:model="id_evento" id="id_evento" 
-                                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                     focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white">
                             <option value="">Seleccione un evento</option>
                             @foreach($eventos as $evento)
@@ -40,7 +40,7 @@
                             Estado <span class="text-red-500">*</span>
                         </label>
                         <select wire:model="estado" id="estado" 
-                                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                     focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white">
                             <option value="ABIERTO">ABIERTO</option>
                             <option value="EN REVISION">EN REVISIÓN</option>
@@ -54,7 +54,7 @@
                         <label class="block text-sm font-medium text-gray-300 mb-2">
                             Registra
                         </label>
-                        <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
+                        <div class="px-3 py-2 bg-zinc-700 rounded-md text-gray-300">
                             {{ auth()->user()->name }}
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                         <label class="block text-sm font-medium text-gray-300 mb-2">
                             Fecha de Registro
                         </label>
-                        <div class="px-3 py-2 bg-gray-700 rounded-md text-gray-300">
+                        <div class="px-3 py-2 bg-zinc-700 rounded-md text-gray-300">
                             {{ now()->format('d/m/Y') }}
                         </div>
                     </div>
@@ -75,7 +75,7 @@
                             Detalles y observaciones <span class="text-red-500">*</span>
                         </label>
                         <textarea wire:model="observaciones" id="observaciones" rows="5"
-                                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm 
+                                class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md shadow-sm 
                                         focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-white"
                                 placeholder="Describa los detalles del seguimiento..."></textarea>
                         @error('observaciones') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
@@ -85,8 +85,8 @@
                     <!-- Botones -->
                     <div class="flex justify-end space-x-4 mt-8">
                         <a href="{{ route('seguimientos.index') }}" 
-                        class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 bg-gray-700 
-                                hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="px-4 py-2 border border-zinc-600 rounded-md text-gray-300 bg-zinc-700 
+                                hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Cancelar
                         </a>
                         <button type="submit" 
