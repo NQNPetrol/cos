@@ -8,7 +8,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-bY6vUgVc.css",
+    "file": "assets/app-BNRkXuhC.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -20,5 +20,17 @@
     "css": [
       "assets/app-B8hH5JRU.css"
     ]
+  },
+  "resources/js/modern-navigation.js": {
+    "file": "assets/modern-navigation-h4zOHgIf.js",
+    "name": "modern-navigation",
+    "src": "resources/js/modern-navigation.js",
+    "isEntry": true
+  },
+  "resources/js/modern-search.js": {
+    "file": "assets/modern-search-mCnm1wwh.js",
+    "name": "modern-search",
+    "src": "resources/js/modern-search.js",
+    "isEntry": true
   }
 }

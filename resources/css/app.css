@@ -1,4 +1,9 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
+
+/*Layout moderno */
+@import "./modern-ui.css";
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

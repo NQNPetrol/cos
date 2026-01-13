@@ -6,7 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Centro de Operaciones')</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/css/modern-ui.css', 'resources/js/app.js', 'resources/js/modern-navigation.js', 'resources/js/modern-search.js'])
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js',
+        'resources/js/modern-navigation.js',
+        'resources/js/modern-search.js'
+        ])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     @livewireStyles
 </head>

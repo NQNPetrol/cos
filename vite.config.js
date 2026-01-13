@@ -7,7 +7,6 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', 
-                'resources/css/modern-ui.css', 
                 'resources/js/app.js', 
                 'resources/js/modern-navigation.js', 
                 'resources/js/modern-search.js'
