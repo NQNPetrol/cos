@@ -2,7 +2,6 @@
  * Dashboard Operacional
  * Maneja la funcionalidad completa del dashboard operacional
  */
-
 class OperacionesDashboard {
     constructor() {
         this.map = null;
@@ -33,20 +32,16 @@ class OperacionesDashboard {
         this.currentEventosPage = 1;
         this.currentEventosPagination = null;
         
-        this.init();
     }
     
     init() {
-        // Esperar a que Google Maps esté disponible
-        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
-            this.setup();
-        } else {
-            // Si no está disponible, esperar al callback
-            window.initOperacionesMap = () => this.setup();
-        }
+        console.log('[OperacionesDashboard] init - método de instancia');
+        // Este método se mantiene por compatibilidad pero setup() se llama directamente
+        // desde el callback de Google Maps o desde el módulo exportado
     }
     
     setup() {
+        console.log('[OperacionesDashboard] setup - inicializando mapa');
         this.initMap();
         // Solo cargar KPIs y eventos si no están en la vista inicial
         const kpisIniciales = document.querySelector('[data-kpis-loaded]');
@@ -1430,10 +1425,44 @@ class OperacionesDashboard {
     }
 }
 
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('operaciones-map')) {
-        window.operacionesDashboard = new OperacionesDashboard();
-    }
-});
+// Función de inicialización exportada
+export default {
+    async init() {
+        const mapElement = document.getElementById('operaciones-map');
+        if (!mapElement) {
+            console.log('[OperacionesDashboard] No se encontró el elemento del mapa');
+            return;
+        }
 
+        console.log('[OperacionesDashboard] Creando instancia del dashboard');
+        // Siempre crear la instancia, independientemente de si Google Maps está cargado
+        // El callback initOperacionesMap se encargará de llamar a setup() cuando Google Maps esté listo
+        const dashboard = new OperacionesDashboard();
+        window.operacionesDashboard = dashboard;
+        
+        // Si Google Maps ya está cargado, inicializar inmediatamente
+        if (typeof google !== 'undefined' && google.maps) {
+            console.log('[OperacionesDashboard] Google Maps ya está cargado, inicializando inmediatamente...');
+            dashboard.setup();
+        } else {
+            console.log('[OperacionesDashboard] Esperando a que Google Maps se cargue vía callback...');
+            // El callback initOperacionesMap llamará a setup() cuando Google Maps esté listo
+        }
+    }
+};
+
+// Callback global para cuando Google Maps se carga
+// Este se ejecuta cuando el script de Google Maps termina de cargar
+window.initOperacionesMap = function () {
+    console.log('[OperacionesDashboard] Callback de Google Maps ejecutado');
+    
+    if (window.operacionesDashboard) {
+        console.log('[OperacionesDashboard] Inicializando dashboard con Google Maps listo');
+        window.operacionesDashboard.setup();
+    } else {
+        console.warn('[OperacionesDashboard] Dashboard no inicializado, creando nueva instancia');
+        const dashboard = new OperacionesDashboard();
+        window.operacionesDashboard = dashboard;
+        dashboard.setup();
+    }
+};

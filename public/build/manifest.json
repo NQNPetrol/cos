@@ -13,7 +13,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Ci2kakka.js",
+    "file": "assets/app-DeU1Hgev.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -31,6 +31,12 @@
     "file": "assets/modern-search-mCnm1wwh.js",
     "name": "modern-search",
     "src": "resources/js/modern-search.js",
+    "isEntry": true
+  },
+  "resources/js/operaciones-dashboard.js": {
+    "file": "assets/operaciones-dashboard-WpKjCJBx.js",
+    "name": "operaciones-dashboard",
+    "src": "resources/js/operaciones-dashboard.js",
     "isEntry": true
   }
 }

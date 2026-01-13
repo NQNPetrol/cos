@@ -9,7 +9,8 @@ export default defineConfig({
                 'resources/css/app.css', 
                 'resources/js/app.js', 
                 'resources/js/modern-navigation.js', 
-                'resources/js/modern-search.js'
+                'resources/js/modern-search.js',
+                'resources/js/operaciones-dashboard.js'
             ],
             refresh: true,
         }),

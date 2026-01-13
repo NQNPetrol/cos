@@ -35,13 +35,35 @@
 @endsection
 
 @push('scripts')
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initOperacionesMap" async defer></script>
-@vite(['resources/js/operaciones-dashboard.js'])
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&loading=async&callback=initOperacionesMap"
+    async
+    defer>
+</script>
+
 <script>
-    // Variable global para el callback de Google Maps
-    window.initOperacionesMap = function() {
+    // Callback global para Google Maps
+    window.initOperacionesMap = function () {
+        console.log('[Google Maps] callback ejecutado');
+        
+        // Si ya existe una instancia, usar setup directamente
         if (window.operacionesDashboard) {
+            console.log('[Google Maps] Usando instancia existente de dashboard');
             window.operacionesDashboard.setup();
+        } 
+        // Si no existe, crear nueva instancia (fallback)
+        else if (window.operacionesDashboardInstance) {
+            console.log('[Google Maps] Usando instancia alternativa');
+            window.operacionesDashboardInstance.setup();
+        }
+        // Si el módulo aún no se ha cargado, esperar un momento
+        else {
+            console.warn('[Google Maps] Dashboard no inicializado aún, reintentando...');
+            setTimeout(() => {
+                if (window.operacionesDashboard) {
+                    window.operacionesDashboard.setup();
+                }
+            }, 500);
         }
     };
 </script>
