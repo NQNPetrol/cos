@@ -850,7 +850,7 @@ class OperacionesDashboard {
                     </div>
                 </div>
                 <div class="tooltip-footer">
-                    <a href="/eventos/${evento.id}/reporte" class="tooltip-btn" target="_blank">
+                    <a href="${this.isClient ? `/client/eventos/${evento.id}/reporte` : `/eventos/${evento.id}/reporte`}" class="tooltip-btn" target="_blank">
                         Ver Detalles
                     </a>
                 </div>
@@ -1172,7 +1172,7 @@ class OperacionesDashboard {
                         ` : ''}
                     </div>
                     <div class="evento-footer">
-                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('/eventos/${evento.id}/reporte', '_blank')">
+                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('${this.isClient ? `/client/eventos/${evento.id}/reporte` : `/eventos/${evento.id}/reporte`}', '_blank')">
                             Ver Detalles
                         </button>
                     </div>

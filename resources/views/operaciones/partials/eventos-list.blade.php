@@ -37,7 +37,7 @@
                         @endif
                     </div>
                     <div class="evento-footer">
-                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('/eventos/{{ $evento['id'] }}/reporte', '_blank')">
+                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('{{ ($isClient ?? false) ? route('client.eventos.reporte.preview', $evento['id']) : route('eventos.reporte.preview', $evento['id']) }}', '_blank')">
                             Ver Detalles
                         </button>
                     </div>
