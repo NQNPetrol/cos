@@ -1,7 +1,16 @@
 <div>
     <!-- Contenedor 1: Título -->
     <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
-        <h2 class="text-2xl font-bold text-gray-100">Flotas Vehiculares</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-100">Flotas Vehiculares</h2>
+            @if(auth()->user()->hasAnyRole(['clientadmin', 'clientsupervisor']))
+                <button wire:click="abrirModalCrear" 
+                        class="bg-[#1877f2] hover:bg-[#0866ff] text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Crear Patrulla</span>
+                </button>
+            @endif
+        </div>
     </div>
 
     <!-- Contenedor 2: Filtros -->
@@ -157,7 +166,16 @@
 
                        
                         <td class="px-4 py-2">
-                            <div class="flex space-x-6">
+                            <div class="flex space-x-4">
+                                @if(auth()->user()->hasAnyRole(['clientadmin', 'clientsupervisor']))
+                                    <button wire:click="abrirModalEditar({{ $patrulla->id }})" 
+                                            class="action-button relative"
+                                            data-tooltip="Editar">
+                                        <div class="w-9 h-9 rounded-full bg-amber-600 flex items-center justify-center transition-all hover:bg-amber-700">
+                                            <i class="bi bi-pencil text-white" style="font-size: 16px;"></i>
+                                        </div>
+                                    </button>
+                                @endif
                                 <button wire:click="abrirModal({{ $patrulla->id }})" 
                                         class="action-button relative"
                                         data-tooltip="Documentación">
@@ -225,28 +243,28 @@
 
     <!-- Modal -->
     @if($mostrarModal && $patrullaSeleccionada)
-        <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-            <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+            <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-[95vw] lg:max-w-5xl max-h-[85vh] overflow-hidden flex flex-col my-auto">
                 <!-- Header del Modal -->
-                <div class="bg-[#1a1d1f] px-6 py-4 border-b border-zinc-200">
+                <div class="bg-[#1a1d1f] px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-700 flex-shrink-0">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-200">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-200">
                             PATRULLA {{ $patrullaSeleccionada->patente }}
                         </h2>
                         <button wire:click="cerrarModal" 
-                                class="text-gray-400 hover:text-gray-200 transition-colors">
+                                class="text-gray-400 hover:text-gray-200 transition-colors p-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
                             </svg>
                         </button>
                     </div>
-                    <p class="text-sm text-gray-300 mt-1">
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">
                         {{ $patrullaSeleccionada->marca }} {{ $patrullaSeleccionada->modelo }} - {{ $patrullaSeleccionada->año }}
                     </p>
                 </div>
 
                 <!-- Contenido del Modal -->
-                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)] custom-scrollbar">
+                <div class="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
                     <div class="mb-6">
                         @livewire('flotas-vehiculares.sistema-patrulla-listado', ['patrullaId' => $patrullaSeleccionada->id])
                     </div>
@@ -284,6 +302,253 @@
                 scrollbar-color: #3a3b3c #252728;
             }
         </style>
+    @endif
+
+    <!-- Modal Crear Patrulla -->
+    @if($mostrarModalCrear)
+        <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+            <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col my-auto">
+                <!-- Header del Modal -->
+                <div class="bg-[#1a1d1f] px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-700 flex-shrink-0">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-200">
+                            <i class="bi bi-plus-circle mr-2"></i> Crear Nueva Patrulla
+                        </h2>
+                        <button wire:click="cerrarModalCrear" 
+                                class="text-gray-400 hover:text-gray-200 transition-colors p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contenido del Modal -->
+                <div class="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
+                    <form wire:submit.prevent="crearPatrulla">
+                        <div class="space-y-4">
+                            <!-- Patente -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Patente/Dominio *</label>
+                                <input type="text" wire:model="patente"
+                                       class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm uppercase"
+                                       placeholder="Ej: ABC123">
+                                @error('patente')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Marca y Modelo -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Marca *</label>
+                                    <input type="text" wire:model="marca"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Toyota">
+                                    @error('marca')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Modelo *</label>
+                                    <input type="text" wire:model="modelo"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Hilux">
+                                    @error('modelo')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Color y Año -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Color</label>
+                                    <input type="text" wire:model="color"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Blanco">
+                                    @error('color')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Año</label>
+                                    <input type="number" wire:model="año"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: 2023" min="1900" max="2100">
+                                    @error('año')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Estado -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Estado *</label>
+                                <select wire:model="estado"
+                                        class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm modal-select">
+                                    <option value="disponible">Disponible</option>
+                                    <option value="operativa">Operativa</option>
+                                    <option value="en mantenimiento">En Mantenimiento</option>
+                                </select>
+                                @error('estado')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Observaciones</label>
+                                <textarea wire:model="observaciones"
+                                          class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                          rows="3"
+                                          placeholder="Observaciones adicionales..."></textarea>
+                                @error('observaciones')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
+                            <button type="button" wire:click="cerrarModalCrear"
+                                    class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="bg-[#1877f2] hover:bg-[#0866ff] text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Crear Patrulla</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Editar Patrulla -->
+    @if($mostrarModalEditar && $patrullaEditar)
+        <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+            <div class="bg-[#252728] rounded-lg shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col my-auto">
+                <!-- Header del Modal -->
+                <div class="bg-[#1a1d1f] px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-700 flex-shrink-0">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-200">
+                            <i class="bi bi-pencil mr-2"></i> Editar Patrulla
+                        </h2>
+                        <button wire:click="cerrarModalEditar" 
+                                class="text-gray-400 hover:text-gray-200 transition-colors p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-1">{{ $patrullaEditar->patente }}</p>
+                </div>
+
+                <!-- Contenido del Modal -->
+                <div class="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
+                    <form wire:submit.prevent="actualizarPatrulla">
+                        <div class="space-y-4">
+                            <!-- Patente -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Patente/Dominio *</label>
+                                <input type="text" wire:model="patente"
+                                       class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm uppercase"
+                                       placeholder="Ej: ABC123">
+                                @error('patente')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Marca y Modelo -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Marca *</label>
+                                    <input type="text" wire:model="marca"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Toyota">
+                                    @error('marca')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Modelo *</label>
+                                    <input type="text" wire:model="modelo"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Hilux">
+                                    @error('modelo')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Color y Año -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Color</label>
+                                    <input type="text" wire:model="color"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: Blanco">
+                                    @error('color')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-200 mb-2">Año</label>
+                                    <input type="number" wire:model="año"
+                                           class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                           placeholder="Ej: 2023" min="1900" max="2100">
+                                    @error('año')
+                                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Estado -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Estado *</label>
+                                <select wire:model="estado"
+                                        class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm modal-select">
+                                    <option value="disponible">Disponible</option>
+                                    <option value="operativa">Operativa</option>
+                                    <option value="en mantenimiento">En Mantenimiento</option>
+                                </select>
+                                @error('estado')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-200 mb-2">Observaciones</label>
+                                <textarea wire:model="observaciones"
+                                          class="w-full bg-transparent border border-zinc-500 rounded px-3 py-2 text-gray-200 text-sm"
+                                          rows="3"
+                                          placeholder="Observaciones adicionales..."></textarea>
+                                @error('observaciones')
+                                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-zinc-700">
+                            <button type="button" wire:click="cerrarModalEditar"
+                                    class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Guardar Cambios</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     @endif
 
     <!-- Estilos para botones de acción y scrollbar -->

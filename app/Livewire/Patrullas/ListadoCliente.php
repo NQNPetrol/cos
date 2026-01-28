@@ -24,6 +24,30 @@ class ListadoCliente extends Component
     public $mostrarModal = false;
     public $patrullaSeleccionada = null;
 
+    // Propiedades para crear/editar patrulla
+    public $mostrarModalCrear = false;
+    public $mostrarModalEditar = false;
+    public $patrullaEditar = null;
+    
+    // Campos del formulario
+    public $patente = '';
+    public $marca = '';
+    public $modelo = '';
+    public $color = '';
+    public $año = '';
+    public $estado = 'disponible';
+    public $observaciones = '';
+
+    protected $rules = [
+        'patente' => 'required|string|max:20',
+        'marca' => 'required|string|max:100',
+        'modelo' => 'required|string|max:100',
+        'color' => 'nullable|string|max:50',
+        'año' => 'nullable|integer|min:1900|max:2100',
+        'estado' => 'required|in:operativa,disponible,en mantenimiento',
+        'observaciones' => 'nullable|string|max:500',
+    ];
+
     /**
      * Obtener los IDs de clientes asociados al usuario autenticado
      */
@@ -202,5 +226,184 @@ class ListadoCliente extends Component
     {
         $this->reset(['search', 'estadoFilter']);
         $this->resetPage();
+    }
+
+    /**
+     * Verificar si el usuario puede crear/editar patrullas
+     */
+    public function puedeGestionarPatrullas()
+    {
+        $user = Auth::user();
+        return $user && $user->hasAnyRole(['clientadmin', 'clientsupervisor']);
+    }
+
+    /**
+     * Abrir modal para crear patrulla
+     */
+    public function abrirModalCrear()
+    {
+        if (!$this->puedeGestionarPatrullas()) {
+            session()->flash('error', 'No tienes permisos para crear patrullas');
+            return;
+        }
+
+        $this->resetFormularioPatrulla();
+        $this->mostrarModalCrear = true;
+    }
+
+    /**
+     * Cerrar modal de crear patrulla
+     */
+    public function cerrarModalCrear()
+    {
+        $this->mostrarModalCrear = false;
+        $this->resetFormularioPatrulla();
+    }
+
+    /**
+     * Crear nueva patrulla
+     */
+    public function crearPatrulla()
+    {
+        if (!$this->puedeGestionarPatrullas()) {
+            session()->flash('error', 'No tienes permisos para crear patrullas');
+            return;
+        }
+
+        $this->validate();
+
+        $clienteIds = $this->getClienteIds();
+        
+        if ($clienteIds->isEmpty()) {
+            session()->flash('error', 'No tienes un cliente asignado');
+            return;
+        }
+
+        $patrulla = Patrulla::create([
+            'patente' => strtoupper($this->patente),
+            'marca' => $this->marca,
+            'modelo' => $this->modelo,
+            'color' => $this->color,
+            'año' => $this->año ?: null,
+            'estado' => $this->estado,
+            'cliente_id' => $clienteIds->first(),
+        ]);
+
+        // Crear registro inicial de flota si hay observaciones
+        if ($this->observaciones) {
+            PatrullaRegistroFlota::create([
+                'fecha_registro' => now(),
+                'patrulla_id' => $patrulla->id,
+                'observacion' => $this->observaciones,
+                'user_id' => Auth::id()
+            ]);
+        }
+
+        session()->flash('success', 'Patrulla creada correctamente');
+        $this->cerrarModalCrear();
+    }
+
+    /**
+     * Abrir modal para editar patrulla
+     */
+    public function abrirModalEditar($patrullaId)
+    {
+        if (!$this->puedeGestionarPatrullas()) {
+            session()->flash('error', 'No tienes permisos para editar patrullas');
+            return;
+        }
+
+        $patrulla = Patrulla::with('ultimoRegistroFlota')->find($patrullaId);
+        
+        if (!$patrulla) {
+            session()->flash('error', 'Patrulla no encontrada');
+            return;
+        }
+
+        // Verificar que la patrulla pertenece al cliente del usuario
+        $clienteIds = $this->getClienteIds();
+        if (!$clienteIds->contains($patrulla->cliente_id)) {
+            session()->flash('error', 'No tienes acceso a esta patrulla');
+            return;
+        }
+
+        $this->patrullaEditar = $patrulla;
+        $this->patente = $patrulla->patente;
+        $this->marca = $patrulla->marca;
+        $this->modelo = $patrulla->modelo;
+        $this->color = $patrulla->color;
+        $this->año = $patrulla->año;
+        $this->estado = $patrulla->estado;
+        $this->observaciones = $patrulla->ultimoRegistroFlota->observacion ?? '';
+        
+        $this->mostrarModalEditar = true;
+    }
+
+    /**
+     * Cerrar modal de editar patrulla
+     */
+    public function cerrarModalEditar()
+    {
+        $this->mostrarModalEditar = false;
+        $this->patrullaEditar = null;
+        $this->resetFormularioPatrulla();
+    }
+
+    /**
+     * Actualizar patrulla
+     */
+    public function actualizarPatrulla()
+    {
+        if (!$this->puedeGestionarPatrullas()) {
+            session()->flash('error', 'No tienes permisos para editar patrullas');
+            return;
+        }
+
+        if (!$this->patrullaEditar) {
+            session()->flash('error', 'Patrulla no encontrada');
+            return;
+        }
+
+        $this->validate();
+
+        $this->patrullaEditar->update([
+            'patente' => strtoupper($this->patente),
+            'marca' => $this->marca,
+            'modelo' => $this->modelo,
+            'color' => $this->color,
+            'año' => $this->año ?: null,
+            'estado' => $this->estado,
+        ]);
+
+        // Actualizar o crear registro de flota con observaciones
+        $ultimoRegistro = $this->patrullaEditar->ultimoRegistroFlota;
+        $objetivoExistente = $ultimoRegistro->objetivo_servicio ?? null;
+
+        PatrullaRegistroFlota::create([
+            'fecha_registro' => now(),
+            'patrulla_id' => $this->patrullaEditar->id,
+            'objetivo_servicio' => $objetivoExistente,
+            'observacion' => $this->observaciones,
+            'user_id' => Auth::id()
+        ]);
+
+        session()->flash('success', 'Patrulla actualizada correctamente');
+        $this->cerrarModalEditar();
+    }
+
+    /**
+     * Resetear formulario de patrulla
+     */
+    private function resetFormularioPatrulla()
+    {
+        $this->patente = '';
+        $this->marca = '';
+        $this->modelo = '';
+        $this->color = '';
+        $this->año = '';
+        $this->estado = 'disponible';
+        $this->observaciones = '';
+        $this->patrullaEditar = null;
+        $this->resetErrorBag();
     }
 }

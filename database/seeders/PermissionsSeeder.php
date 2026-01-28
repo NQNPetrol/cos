@@ -30,6 +30,27 @@ class PermissionsSeeder extends Seeder
         
         // Patrullas cliente
         Permission::firstOrCreate(['name' => 'ver.patrullas-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.patrullas-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.patrullas-cliente']);
+        
+        // Empresas asociadas cliente
+        Permission::firstOrCreate(['name' => 'ver.empresas-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.empresas-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.empresas-cliente']);
+        
+        // Usuarios cliente (para clientadmin)
+        Permission::firstOrCreate(['name' => 'ver.usuarios-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar-rol.usuarios-cliente']);
+        
+        // Dashboard PDF cliente
+        Permission::firstOrCreate(['name' => 'generar.pdf-dashboard-cliente']);
+        
+        // Anular eventos cliente
+        Permission::firstOrCreate(['name' => 'anular.eventos-cliente']);
+        Permission::firstOrCreate(['name' => 'agregar-notas.eventos-cliente']);
+        
+        // Operaciones cliente
+        Permission::firstOrCreate(['name' => 'ver.operaciones-cliente']);
         
         // Location cliente
         Permission::firstOrCreate(['name' => 'ver.location-cliente']);
@@ -180,6 +201,8 @@ class PermissionsSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $operadorRole = Role::firstOrCreate(['name' => 'operador']);
         $clienteRole = Role::firstOrCreate(['name' => 'cliente']);
+        $clientAdminRole = Role::firstOrCreate(['name' => 'clientadmin']);
+        $clientSupervisorRole = Role::firstOrCreate(['name' => 'clientsupervisor']);
 
         // Asignar todos los permisos al rol admin
         $adminRole->syncPermissions(Permission::all());
@@ -261,11 +284,45 @@ class PermissionsSeeder extends Seeder
         ];
 
         $clienteRole->syncPermissions($clientePermissions);
+
+        // Permisos para clientadmin (todos los de cliente + gestión de usuarios y empresas)
+        $clientAdminPermissions = array_merge($clientePermissions, [
+            // Empresas asociadas
+            'ver.empresas-cliente', 'crear.empresas-cliente', 'editar.empresas-cliente',
+            // Usuarios cliente
+            'ver.usuarios-cliente', 'asignar-rol.usuarios-cliente',
+            // Patrullas crear/editar
+            'crear.patrullas-cliente', 'editar.patrullas-cliente',
+            // Dashboard PDF
+            'generar.pdf-dashboard-cliente',
+            // Anular eventos
+            'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
+            // Operaciones
+            'ver.operaciones-cliente',
+        ]);
+
+        $clientAdminRole->syncPermissions($clientAdminPermissions);
+
+        // Permisos para clientsupervisor (todos los de cliente + crear/editar patrullas)
+        $clientSupervisorPermissions = array_merge($clientePermissions, [
+            // Patrullas crear/editar
+            'crear.patrullas-cliente', 'editar.patrullas-cliente',
+            // Dashboard PDF
+            'generar.pdf-dashboard-cliente',
+            // Anular eventos
+            'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
+            // Operaciones
+            'ver.operaciones-cliente',
+        ]);
+
+        $clientSupervisorRole->syncPermissions($clientSupervisorPermissions);
         
         $this->command->info('Todos los permisos han sido creados y asignados a sus roles.');
         $this->command->info('Total de permisos creados: ' . Permission::count());
         $this->command->info('- Admin: ' . $adminRole->permissions->count() . ' permisos');
         $this->command->info('- Operador: ' . count($operadorPermissions) . ' permisos');
         $this->command->info('- Cliente: ' . count($clientePermissions) . ' permisos');
+        $this->command->info('- ClientAdmin: ' . count($clientAdminPermissions) . ' permisos');
+        $this->command->info('- ClientSupervisor: ' . count($clientSupervisorPermissions) . ' permisos');
     }
 }

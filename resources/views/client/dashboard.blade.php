@@ -13,6 +13,17 @@
         
         <!-- Filtros de fecha -->
         <div class="flex flex-wrap gap-3 items-center">
+            <!-- Filtro por Cliente (Empresa Asociada) -->
+            <div class="flex items-center gap-2">
+                <label for="empresa_asociada_filter" class="text-sm text-gray-300">Cliente:</label>
+                <select id="empresa_asociada_filter" 
+                        class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-w-[150px]">
+                    <option value="">Todos</option>
+                    @foreach($empresasAsociadas as $empresa)
+                        <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="flex items-center gap-2">
                 <label for="fecha_desde" class="text-sm text-gray-300">Desde:</label>
                 <input type="date" id="fecha_desde" 
@@ -33,6 +44,13 @@
             <button id="btn_limpiar" 
                     class="bg-zinc-600 hover:bg-zinc-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                 Limpiar
+            </button>
+            <button id="btn_generar_pdf" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Generar PDF
             </button>
         </div>
     </div>
@@ -1167,6 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function updateCharts() {
         const fechaDesde = document.getElementById('fecha_desde').value;
         const fechaHasta = document.getElementById('fecha_hasta').value;
+        const empresaAsociada = document.getElementById('empresa_asociada_filter').value;
         
         document.getElementById('loading-stacked').classList.remove('hidden');
         document.getElementById('loading-mensual').classList.remove('hidden');
@@ -1175,6 +1194,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams();
             if (fechaDesde) params.append('fecha_desde', fechaDesde);
             if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            if (empresaAsociada) params.append('empresa_asociada_id', empresaAsociada);
             const queryString = params.toString() ? `?${params.toString()}` : '';
 
             const [resStacked, resMensual] = await Promise.all([
@@ -1204,6 +1224,11 @@ document.addEventListener('DOMContentLoaded', function() {
             promedioActual = dataMensual.promedio || 0;
             chartMensual.update('active');
 
+            // Actualizar también el mapa de calor si existe
+            if (typeof window.heatmapReload === 'function') {
+                window.heatmapReload();
+            }
+
         } catch (error) {
             console.error('Error al cargar datos:', error);
         } finally {
@@ -1217,8 +1242,27 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_limpiar').addEventListener('click', function() {
         document.getElementById('fecha_desde').value = '';
         document.getElementById('fecha_hasta').value = '';
+        document.getElementById('empresa_asociada_filter').value = '';
         updateCharts();
     });
+    
+    // Event listener para generar PDF
+    const btnGenerarPdf = document.getElementById('btn_generar_pdf');
+    if (btnGenerarPdf) {
+        btnGenerarPdf.addEventListener('click', function() {
+            const fechaDesde = document.getElementById('fecha_desde').value;
+            const fechaHasta = document.getElementById('fecha_hasta').value;
+            const empresaAsociada = document.getElementById('empresa_asociada_filter').value;
+            
+            const params = new URLSearchParams();
+            if (fechaDesde) params.append('fecha_desde', fechaDesde);
+            if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            if (empresaAsociada) params.append('empresa_asociada_id', empresaAsociada);
+            
+            const url = '{{ route("client.dashboard.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
+            window.open(url, '_blank');
+        });
+    }
 });
 
 // ========== INTERACCIÓN FILTROS MAPA DE CALOR ==========

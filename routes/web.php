@@ -58,6 +58,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('dashboard.eventos-mapa-calor');
     Route::get('/dashboard/eventos-por-ubicacion', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorUbicacion'])
         ->name('dashboard.eventos-por-ubicacion');
+    
+    Route::get('/dashboard/pdf', [\App\Http\Controllers\ClientDashboardController::class, 'generatePdf'])
+        ->name('dashboard.pdf');
 
     // PROFILE
     Route::get('/profile', function () {
@@ -177,6 +180,20 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/planificar-misiones', function () {
         return view('misiones-flytbase.client.index');
     })->name('misiones')->middleware('can:crear.peticion-misiones');
+
+    // EMPRESAS ASOCIADAS (CLIENT ADMIN)
+    Route::get('/empresas-asociadas', \App\Livewire\Client\EmpresasAsociadas\Index::class)
+        ->name('empresas-asociadas.index');
+
+    // ADMINISTRACIÓN DE USUARIOS (CLIENT ADMIN)
+    Route::get('/usuarios', \App\Livewire\Client\UsuariosCliente\Index::class)
+        ->name('usuarios.index')
+        ->middleware('role:clientadmin');
+
+    // DASHBOARD OPERACIONES
+    Route::get('/operaciones/dashboard', [\App\Http\Controllers\ClientOperacionesDashboardController::class, 'index'])
+        ->name('operaciones.dashboard')
+        ->middleware('can:ver.operaciones-cliente');
 
 });
 

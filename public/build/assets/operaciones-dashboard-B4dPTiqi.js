@@ -81,7 +81,7 @@ class y{constructor(){this.map=null,this.markers={eventos:[],vehiculos:[],docks:
                     </div>
                 </div>
                 <div class="tooltip-footer">
-                    <a href="/eventos/${e.id}/reporte" class="tooltip-btn" target="_blank">
+                    <a href="${this.isClient?`/client/eventos/${e.id}/reporte`:`/eventos/${e.id}/reporte`}" class="tooltip-btn" target="_blank">
                         Ver Detalles
                     </a>
                 </div>
@@ -235,7 +235,7 @@ class y{constructor(){this.map=null,this.markers={eventos:[],vehiculos:[],docks:
                         `:""}
                     </div>
                     <div class="evento-footer">
-                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('/eventos/${a.id}/reporte', '_blank')">
+                        <button class="evento-footer-btn" onclick="event.stopPropagation(); window.open('${this.isClient?`/client/eventos/${a.id}/reporte`:`/eventos/${a.id}/reporte`}', '_blank')">
                             Ver Detalles
                         </button>
                     </div>

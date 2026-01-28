@@ -110,10 +110,6 @@
                 </div>
                 <span>Logs</span>
             </a>
-        </template>
-
-        <template id="sidebar-galeria">
-            <div class="modern-sidebar-section-title">Galería</div>
             <a href="{{ route('client.gallery.index') }}" class="modern-sidebar-item" data-route="{{ route('client.gallery.index') }}">
                 <div class="modern-sidebar-item-icon-container">
                     <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,6 +129,28 @@
                 </div>
                 <span>Tickets</span>
             </a>
+        </template>
+
+        <template id="sidebar-administracion-cliente">
+            <div class="modern-sidebar-section-title">Administración</div>
+            <a href="{{ route('client.empresas-asociadas.index') }}" class="modern-sidebar-item" data-route="{{ route('client.empresas-asociadas.index') }}">
+                <div class="modern-sidebar-item-icon-container">
+                    <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <span>Clientes</span>
+            </a>
+            @if(auth()->user()->hasRole('clientadmin'))
+            <a href="{{ route('client.usuarios.index') }}" class="modern-sidebar-item" data-route="{{ route('client.usuarios.index') }}">
+                <div class="modern-sidebar-item-icon-container">
+                    <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <span>Administrar Usuarios</span>
+            </a>
+            @endif
         </template>
     @else
         <!-- Admin Sidebar Templates -->

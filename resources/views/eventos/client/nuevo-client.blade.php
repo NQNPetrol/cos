@@ -375,7 +375,8 @@
             'Agresion fisica por parte de terceros',
             'Traumatismos o lesiones graves durante servicio',
             'Pérdidas de personal durante servicio'
-        ]
+        ],
+        'Otros': [] // Categoría especial: permite texto libre
     };
 
     // Función para cargar tipos basados en categoría seleccionada
@@ -385,6 +386,34 @@
         tiposContainer.innerHTML = '';
         
         const tipos = tiposPorCategoria[categoria];
+        
+        // Si la categoría es "Otros" o no tiene tipos predefinidos, mostrar input de texto
+        if (categoria === 'Otros' || !tipos || tipos.length === 0) {
+            const div = document.createElement('div');
+            div.className = 'mb-2';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'tipo-otros-input';
+            input.name = 'tipo';
+            input.placeholder = 'Escriba el tipo de evento...';
+            input.className = 'block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2';
+            input.required = true;
+            
+            const helpText = document.createElement('p');
+            helpText.className = 'text-sm text-gray-400 mt-2';
+            helpText.textContent = 'Ingrese una descripción breve del tipo de evento.';
+            
+            div.appendChild(input);
+            div.appendChild(helpText);
+            tiposContainer.appendChild(div);
+            
+            // Para categoría Otros, ocultar la sección de elementos sustraídos
+            document.getElementById('elementos-sustraidos').classList.add('hidden');
+            return;
+        }
+        
+        // Para otras categorías, mostrar radio buttons
         tipos.forEach(tipo => {
             const div = document.createElement('div');
             div.className = 'flex items-center mb-2';
