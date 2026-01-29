@@ -279,25 +279,17 @@ class ListadoCliente extends Component
             return;
         }
 
-        $patrulla = Patrulla::create([
+        // Crear patrulla con observaciones en la tabla patrullas (no en la tabla puente)
+        Patrulla::create([
             'patente' => strtoupper($this->patente),
             'marca' => $this->marca,
             'modelo' => $this->modelo,
             'color' => $this->color,
             'año' => $this->año ?: null,
             'estado' => $this->estado,
+            'observaciones' => $this->observaciones ?: null,
             'cliente_id' => $clienteIds->first(),
         ]);
-
-        // Crear registro inicial de flota si hay observaciones
-        if ($this->observaciones) {
-            PatrullaRegistroFlota::create([
-                'fecha_registro' => now(),
-                'patrulla_id' => $patrulla->id,
-                'observacion' => $this->observaciones,
-                'user_id' => Auth::id()
-            ]);
-        }
 
         session()->flash('success', 'Patrulla creada correctamente');
         $this->cerrarModalCrear();
@@ -313,7 +305,7 @@ class ListadoCliente extends Component
             return;
         }
 
-        $patrulla = Patrulla::with('ultimoRegistroFlota')->find($patrullaId);
+        $patrulla = Patrulla::find($patrullaId);
         
         if (!$patrulla) {
             session()->flash('error', 'Patrulla no encontrada');
@@ -334,7 +326,8 @@ class ListadoCliente extends Component
         $this->color = $patrulla->color;
         $this->año = $patrulla->año;
         $this->estado = $patrulla->estado;
-        $this->observaciones = $patrulla->ultimoRegistroFlota->observacion ?? '';
+        // Observaciones de la tabla patrullas (NO de la tabla puente)
+        $this->observaciones = $patrulla->observaciones ?? '';
         
         $this->mostrarModalEditar = true;
     }
@@ -366,6 +359,7 @@ class ListadoCliente extends Component
 
         $this->validate();
 
+        // Actualizar patrulla con observaciones en la tabla patrullas (NO en la tabla puente)
         $this->patrullaEditar->update([
             'patente' => strtoupper($this->patente),
             'marca' => $this->marca,
@@ -373,18 +367,7 @@ class ListadoCliente extends Component
             'color' => $this->color,
             'año' => $this->año ?: null,
             'estado' => $this->estado,
-        ]);
-
-        // Actualizar o crear registro de flota con observaciones
-        $ultimoRegistro = $this->patrullaEditar->ultimoRegistroFlota;
-        $objetivoExistente = $ultimoRegistro->objetivo_servicio ?? null;
-
-        PatrullaRegistroFlota::create([
-            'fecha_registro' => now(),
-            'patrulla_id' => $this->patrullaEditar->id,
-            'objetivo_servicio' => $objetivoExistente,
-            'observacion' => $this->observaciones,
-            'user_id' => Auth::id()
+            'observaciones' => $this->observaciones ?: null,
         ]);
 
         session()->flash('success', 'Patrulla actualizada correctamente');

@@ -441,29 +441,36 @@
                     <div class="chart-container">
                         <div class="chart-title">Distribución de eventos por categoría</div>
                         
-                        <!-- Gráfico de barras horizontales usando tabla HTML -->
-                        <table style="width: 100%; border-collapse: collapse;">
-                            @foreach($chartDataCategorias as $cat)
-                                @php
-                                    $color = $coloresCategorias[$cat['nombre']] ?? $defaultColors[$colorIndex % count($defaultColors)];
-                                    $colorIndex++;
-                                    $percentage = $maxCategoria > 0 ? round(($cat['total'] / $maxCategoria) * 100) : 0;
-                                @endphp
-                                <tr>
-                                    <td style="width: 35%; padding: 6px 10px 6px 0; font-size: 11px; color: #334155; font-weight: 500; vertical-align: middle;">
-                                        {{ $cat['nombre'] }}
-                                    </td>
-                                    <td style="width: 50%; padding: 6px 0; vertical-align: middle;">
-                                        <div style="width: 100%; height: 20px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                                            <div style="width: {{ $percentage }}%; height: 100%; background: {{ $color }}; border-radius: 4px;"></div>
-                                        </div>
-                                    </td>
-                                    <td style="width: 15%; padding: 6px 0 6px 10px; font-size: 11px; color: #2563eb; font-weight: bold; text-align: right; vertical-align: middle;">
-                                        {{ $cat['total'] }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </table>
+                        <!-- Gráfico de barras horizontales - Estructura compatible con dompdf -->
+                        @foreach($chartDataCategorias as $cat)
+                            @php
+                                $color = $coloresCategorias[$cat['nombre']] ?? $defaultColors[$colorIndex % count($defaultColors)];
+                                $colorIndex++;
+                                $percentage = $maxCategoria > 0 ? round(($cat['total'] / $maxCategoria) * 100) : 0;
+                                $percentage = max($percentage, 3); // mínimo visible
+                            @endphp
+                            <div style="margin-bottom: 8px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 35%; font-size: 10px; color: #334155; font-weight: 500; padding-right: 8px; vertical-align: middle;">
+                                            {{ $cat['nombre'] }}
+                                        </td>
+                                        <td style="width: 50%; vertical-align: middle; padding: 2px 0;">
+                                            <!-- Barra usando tabla anidada con td coloreado -->
+                                            <table style="width: 100%; border-collapse: collapse; background-color: #e2e8f0;">
+                                                <tr>
+                                                    <td style="width: {{ $percentage }}%; height: 16px; background-color: {{ $color }};"></td>
+                                                    <td style="width: {{ 100 - $percentage }}%; height: 16px;"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style="width: 15%; font-size: 11px; color: #2563eb; font-weight: bold; padding-left: 8px; text-align: right; vertical-align: middle;">
+                                            {{ $cat['total'] }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        @endforeach
                         
                         <!-- Leyenda -->
                         <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
@@ -474,10 +481,12 @@
                                     $colorIndex++;
                                     $nombreCorto = strlen($cat['nombre']) > 25 ? substr($cat['nombre'], 0, 22) . '...' : $cat['nombre'];
                                 @endphp
-                                <span style="display: inline-block; margin-right: 12px; margin-bottom: 5px; font-size: 9px; color: #64748b;">
-                                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: {{ $color }}; margin-right: 4px; vertical-align: middle;"></span>
-                                    {{ $nombreCorto }}
-                                </span>
+                                <table style="display: inline-table; margin-right: 10px; margin-bottom: 5px;">
+                                    <tr>
+                                        <td style="width: 10px; height: 10px; background-color: {{ $color }};"></td>
+                                        <td style="font-size: 9px; color: #64748b; padding-left: 4px;">{{ $nombreCorto }}</td>
+                                    </tr>
+                                </table>
                             @endforeach
                         </div>
                     </div>
@@ -497,58 +506,50 @@
                         $totalMeses = count($datosMensuales);
                         $sumaMensual = array_sum(array_column($datosMensuales, 'total'));
                         $promedio = $totalMeses > 0 ? round($sumaMensual / $totalMeses, 1) : 0;
-                        $maxBarHeight = 100; // altura máxima en píxeles
+                        $maxBarHeight = 80; // altura máxima en píxeles
                     @endphp
                     
                     <div class="chart-container">
                         <div class="chart-title">Evolución de eventos por mes con promedio</div>
                         
-                        <!-- Gráfico de barras usando tabla HTML -->
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
-                            <!-- Fila de valores -->
-                            <tr>
-                                @foreach($datosMensuales as $mes)
-                                    <td style="text-align: center; vertical-align: bottom; padding: 0 3px;">
-                                        <div style="font-size: 10px; font-weight: bold; color: #1e293b; margin-bottom: 3px;">{{ $mes['total'] }}</div>
-                                    </td>
-                                @endforeach
-                            </tr>
-                            <!-- Fila de barras -->
-                            <tr>
-                                @foreach($datosMensuales as $mes)
-                                    @php
-                                        $barHeight = $maxMensual > 0 ? round(($mes['total'] / $maxMensual) * $maxBarHeight) : 5;
-                                        $barHeight = max($barHeight, 5); // mínimo 5px
-                                    @endphp
-                                    <td style="text-align: center; vertical-align: bottom; padding: 0 3px; height: {{ $maxBarHeight }}px;">
-                                        <div style="width: 70%; height: {{ $barHeight }}px; background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); border-radius: 3px 3px 0 0; margin: 0 auto;"></div>
-                                    </td>
-                                @endforeach
-                            </tr>
-                            <!-- Fila de etiquetas -->
-                            <tr>
-                                @foreach($datosMensuales as $mes)
-                                    <td style="text-align: center; padding: 8px 2px 0 2px; border-top: 1px solid #e2e8f0;">
-                                        <div style="font-size: 8px; color: #64748b;">{{ $mes['mes'] }}</div>
-                                    </td>
-                                @endforeach
-                            </tr>
-                        </table>
+                        <!-- Gráfico de barras - Estructura compatible con dompdf -->
+                        @foreach($datosMensuales as $index => $mes)
+                            @php
+                                $barWidth = $maxMensual > 0 ? round(($mes['total'] / $maxMensual) * 100) : 5;
+                                $barWidth = max($barWidth, 5);
+                            @endphp
+                            <div style="margin-bottom: 8px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 80px; font-size: 9px; color: #64748b; padding-right: 8px; text-align: right; vertical-align: middle;">
+                                            {{ $mes['mes'] }}
+                                        </td>
+                                        <td style="vertical-align: middle; padding: 2px 0;">
+                                            <table style="width: 100%; border-collapse: collapse;">
+                                                <tr>
+                                                    <td style="width: {{ $barWidth }}%; height: 18px; background-color: #3b82f6;"></td>
+                                                    <td style="width: {{ 100 - $barWidth }}%;"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style="width: 40px; font-size: 11px; color: #1e293b; font-weight: bold; padding-left: 8px; text-align: left; vertical-align: middle;">
+                                            {{ $mes['total'] }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        @endforeach
                         
                         <!-- Indicador de promedio -->
-                        <div style="text-align: right; font-size: 12px; color: #64748b; margin-top: 10px;">
-                            Promedio: <strong style="color: #2563eb; font-size: 14px;">{{ $promedio }}</strong>
+                        <div style="text-align: right; font-size: 12px; color: #64748b; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                            Promedio mensual: <strong style="color: #2563eb; font-size: 14px;">{{ $promedio }}</strong>
                         </div>
                         
                         <!-- Leyenda -->
-                        <div class="legend">
-                            <span class="legend-item">
-                                <span class="legend-color" style="background: #3b82f6;"></span>
-                                Eventos
-                            </span>
-                            <span class="legend-item">
-                                <span style="display: inline-block; width: 15px; height: 2px; background: #64748b; margin-right: 4px; vertical-align: middle;"></span>
-                                Promedio
+                        <div style="margin-top: 10px;">
+                            <span style="display: inline-block; margin-right: 15px; font-size: 9px; color: #64748b;">
+                                <span style="display: inline-block; width: 12px; height: 12px; background-color: #3b82f6; margin-right: 4px; vertical-align: middle;"></span>
+                                Eventos por mes
                             </span>
                         </div>
                     </div>

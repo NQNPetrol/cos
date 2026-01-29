@@ -21,6 +21,11 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// Página de sin acceso para usuarios sin rol asignado
+Route::get('/no-access', function () {
+    return view('auth.no-access');
+})->middleware(['auth'])->name('no-access');
+
 // DASHBOARD LAYOUT PRINCIPAL (ADMIN)
 Route::get('/main-dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
