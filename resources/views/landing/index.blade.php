@@ -200,7 +200,7 @@
     @include('landing.partials.cos-features')
     
     {{-- Product Tour Section --}}
-    @include('landing.partials.product-tour')
+    {{-- @include('landing.partials.product-tour') --}}
     
     {{-- Trusted Companies Section --}}
     @include('landing.partials.trusted-companies')

@@ -5,20 +5,8 @@
         <div class="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {{-- Brand Column --}}
             <div class="lg:col-span-1">
-                <a href="{{ route('landing') }}" class="inline-block mb-2">
-                    <!-- Logo CYH con CSS - Doble borde y efecto 3D -->
-                    <div class="relative p-1" style="filter: drop-shadow(2px 2px 1px rgba(100, 100, 120, 0.5));">
-                        <!-- Borde exterior -->
-                        <div class="border-2 border-white/90 p-0.5">
-                            <!-- Borde interior -->
-                            <div class="border-2 border-white/90 px-6 py-2">
-                                <!-- Texto CYH -->
-                                <span class="text-white font-bold text-3xl tracking-[0.25em]" style="font-family: 'Arial Black', 'Helvetica Bold', sans-serif; text-shadow: 2px 2px 1px rgba(100, 100, 120, 0.4);">
-                                    CYH
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                <a href="{{ route('landing') }}" class="inline-block mb-4">
+                    <img src="{{ asset('cyh-white.png') }}" alt="CYH Logo" class="h-24 w-auto">
                 </a>
                 <p class="text-gray-400 text-sm mb-6">
                     Soluciones integrales de seguridad y tecnología. 
@@ -76,7 +64,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                         <a href="mailto:ventas@cyhsur.com" class="text-gray-400 hover:text-blue-400 transition-colors text-sm">
-                            ventas@cyhsur.com
+                            cos@cyhsur.com
                         </a>
                     </li>
                     <li class="flex items-start gap-3">
@@ -84,7 +72,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                         </svg>
                         <a href="tel:+5491112345678" class="text-gray-400 hover:text-blue-400 transition-colors text-sm">
-                            +54 9 11 1234-5678
+                            +54 9 299 6019755
                         </a>
                     </li>
                     <li class="flex items-start gap-3">
@@ -93,7 +81,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                         <span class="text-gray-400 text-sm">
-                            Buenos Aires, Argentina
+                            Neuquen Capital, Argentina
                         </span>
                     </li>
                 </ul>

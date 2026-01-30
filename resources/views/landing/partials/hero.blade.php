@@ -16,20 +16,20 @@
     {{-- Content --}}
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
         {{-- Logo animado --}}
-        <div class="mb-8 flex justify-center" data-aos="fade-down">
-            <img src="{{ asset('COS.png') }}" alt="COS Logo" class="h-20 sm:h-24 w-auto floating">
+        <div class="mb-0 flex justify-center" data-aos="fade-down">
+            <img src="{{ asset('cyh-white.png') }}" alt="CYH Logo" class="h-48 sm:h-64 lg:h-80 xl:h-96 w-auto floating">
         </div>
         
         {{-- Main Title --}}
         <h1 class="hero-title text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white mb-6 leading-tight">
-            Centro de Operaciones<br>
-            <span class="text-gradient">de Seguridad Integrado</span>
+            SOLUCIONES DE TECNOLOGIA<br>
+            <span class="text-gradient">Y DE SEGURIDAD</span>
         </h1>
         
         {{-- Subtitle --}}
         <p class="hero-subtitle text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-            Una sola plataforma que integra todos tus sistemas de seguridad: 
-            <span class="text-blue-400 font-semibold">drones</span>, 
+            Tenemos lo que necesitas para mejorar la seguridad de tu empresa con tecnología. 
+            <span class="text-blue-400 font-semibold">Drones</span>, 
             <span class="text-blue-400 font-semibold">cámaras</span>, 
             <span class="text-blue-400 font-semibold">patrullas</span> y 
             <span class="text-blue-400 font-semibold">eventos</span> 

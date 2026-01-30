@@ -1,20 +1,22 @@
 {{-- Navigation Bar --}}
 <nav id="landing-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20">
+        <div class="flex items-center h-28 gap-6">
             {{-- Logo --}}
-            <a href="{{ route('landing') }}" class="flex items-center space-x-3">
-                <img src="{{ asset('cyh-white.png') }}" alt="CYHSUR" class="h-10 w-auto">
-                <span class="text-xl font-bold text-white hidden sm:block">CYHSUR</span>
+            <a href="{{ route('landing') }}" class="flex items-center flex-shrink-0">
+                <img src="{{ asset('cyh-white.png') }}" alt="CYH" class="h-24 w-auto">
             </a>
             
             {{-- Desktop Navigation --}}
-            <div class="hidden md:flex items-center space-x-8">
+            <div class="hidden md:flex items-center space-x-6">
                 <a href="#servicios" class="text-gray-300 hover:text-white transition-colors font-medium">Servicios</a>
                 <a href="#cos-software" class="text-gray-300 hover:text-white transition-colors font-medium">COS Software</a>
                 <a href="#tour" class="text-gray-300 hover:text-white transition-colors font-medium">Tour del Producto</a>
                 <a href="#contacto" class="text-gray-300 hover:text-white transition-colors font-medium">Contacto</a>
             </div>
+            
+            {{-- Spacer --}}
+            <div class="flex-grow"></div>
             
             {{-- CTA Buttons --}}
             <div class="hidden md:flex items-center space-x-4">
