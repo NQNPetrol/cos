@@ -5,16 +5,26 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LandingController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
 
+// Landing Page Routes (públicas)
+Route::get('/landing', [LandingController::class, 'index'])->name('landing');
+Route::get('/landing-alt', [LandingController::class, 'indexAlt'])->name('landing.alt');
+Route::post('/landing/contact', [LandingController::class, 'submitContact'])->name('landing.contact');
 
+// Home - Redirige al landing para no autenticados, dashboard para autenticados
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('landing');
 })->name('home');
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])

@@ -8,7 +8,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-D8qnpgxJ.css",
+    "file": "assets/app-CnkdefVv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -20,6 +20,12 @@
     "css": [
       "assets/app-B8hH5JRU.css"
     ]
+  },
+  "resources/js/landing.js": {
+    "file": "assets/landing-qT7NM-jd.js",
+    "name": "landing",
+    "src": "resources/js/landing.js",
+    "isEntry": true
   },
   "resources/js/modern-navigation.js": {
     "file": "assets/modern-navigation-BQrHODD9.js",
