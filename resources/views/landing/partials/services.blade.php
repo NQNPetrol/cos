@@ -48,10 +48,10 @@
             <div class="card-hover bg-[#16262e] rounded-2xl overflow-hidden group cursor-pointer" 
                  data-aos="fade-up" data-aos-delay="100"
                  onclick="openServiceModal('flota')">
-                <div class="h-48 overflow-hidden bg-[#1b3761] flex items-center justify-center">
-                    <svg class="w-24 h-24 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                    </svg>
+                <div class="h-48 overflow-hidden">
+                    <img src="{{ asset('camioneta.png') }}" 
+                         alt="Flota Vehicular" 
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                 </div>
                 <div class="p-6">
                     <div class="flex items-start justify-between gap-3">

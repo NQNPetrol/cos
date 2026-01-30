@@ -38,12 +38,30 @@
             <div class="swiper-wrapper items-center">
                 {{-- Company Logos - Dinámico desde /public/brands --}}
                 @forelse($repeatedLogos as $logo)
+                    @php
+                        // Logos que necesitan menos filtro (más visibles)
+                        $logosSinFiltro = ['inca'];
+                        $nombreLogo = strtolower(pathinfo($logo, PATHINFO_FILENAME));
+                        $necesitaMenosFiltro = false;
+                        foreach ($logosSinFiltro as $logoEspecial) {
+                            if (str_contains($nombreLogo, $logoEspecial)) {
+                                $necesitaMenosFiltro = true;
+                                break;
+                            }
+                        }
+                    @endphp
                     <div class="swiper-slide !w-auto">
                         <div class="px-10 py-6">
                             <div class="h-28 w-52 flex items-center justify-center">
-                                <img src="{{ asset('brands/' . $logo) }}" 
-                                     alt="{{ pathinfo($logo, PATHINFO_FILENAME) }}" 
-                                     class="max-h-28 max-w-full object-contain filter brightness-0 invert opacity-60 hover:opacity-100 transition-opacity">
+                                @if($necesitaMenosFiltro)
+                                    <img src="{{ asset('brands/' . $logo) }}" 
+                                         alt="{{ pathinfo($logo, PATHINFO_FILENAME) }}" 
+                                         class="max-h-28 max-w-full object-contain filter grayscale brightness-150 opacity-70 hover:opacity-100 transition-opacity">
+                                @else
+                                    <img src="{{ asset('brands/' . $logo) }}" 
+                                         alt="{{ pathinfo($logo, PATHINFO_FILENAME) }}" 
+                                         class="max-h-28 max-w-full object-contain filter brightness-0 invert opacity-60 hover:opacity-100 transition-opacity">
+                                @endif
                             </div>
                         </div>
                     </div>
