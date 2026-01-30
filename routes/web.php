@@ -5,21 +5,36 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LandingController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
 
+// Landing Page Routes (públicas)
+Route::get('/landing', [LandingController::class, 'index'])->name('landing');
+Route::get('/landing-alt', [LandingController::class, 'indexAlt'])->name('landing.alt');
+Route::post('/landing/contact', [LandingController::class, 'submitContact'])->name('landing.contact');
 
+// Home - Redirige al landing para no autenticados, dashboard para autenticados
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('landing');
 })->name('home');
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Página de sin acceso para usuarios sin rol asignado
+Route::get('/no-access', function () {
+    return view('auth.no-access');
+})->middleware(['auth'])->name('no-access');
 
 // DASHBOARD LAYOUT PRINCIPAL (ADMIN)
 Route::get('/main-dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
@@ -58,6 +73,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('dashboard.eventos-mapa-calor');
     Route::get('/dashboard/eventos-por-ubicacion', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorUbicacion'])
         ->name('dashboard.eventos-por-ubicacion');
+    
+    Route::get('/dashboard/pdf', [\App\Http\Controllers\ClientDashboardController::class, 'generatePdf'])
+        ->name('dashboard.pdf');
 
     // PROFILE
     Route::get('/profile', function () {
@@ -177,6 +195,20 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/planificar-misiones', function () {
         return view('misiones-flytbase.client.index');
     })->name('misiones')->middleware('can:crear.peticion-misiones');
+
+    // EMPRESAS ASOCIADAS (CLIENT ADMIN)
+    Route::get('/empresas-asociadas', \App\Livewire\Client\EmpresasAsociadas\Index::class)
+        ->name('empresas-asociadas.index');
+
+    // ADMINISTRACIÓN DE USUARIOS (CLIENT ADMIN)
+    Route::get('/usuarios', \App\Livewire\Client\UsuariosCliente\Index::class)
+        ->name('usuarios.index')
+        ->middleware('role:clientadmin');
+
+    // DASHBOARD OPERACIONES
+    Route::get('/operaciones/dashboard', [\App\Http\Controllers\ClientOperacionesDashboardController::class, 'index'])
+        ->name('operaciones.dashboard')
+        ->middleware('can:ver.operaciones-cliente');
 
 });
 

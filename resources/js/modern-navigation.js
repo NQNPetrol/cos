@@ -55,9 +55,9 @@ class ModernNavigation {
         if (path.includes('/client/')) {
             if (path.includes('/eventos')) return 'eventos';
             if (path.includes('/patrullas')) return 'patrullas';
-            if (path.includes('/alertas') || path.includes('/misiones') || path.includes('/flight-logs')) return 'drones';
-            if (path.includes('/gallery')) return 'galeria';
+            if (path.includes('/alertas') || path.includes('/misiones') || path.includes('/flight-logs') || path.includes('/gallery')) return 'drones';
             if (path.includes('/tickets')) return 'tickets';
+            if (path.includes('/empresas-asociadas') || path.includes('/usuarios')) return 'administracion-cliente';
             return 'home';
         } else {
             if (path.includes('/clientes') || path.includes('/personal') || path.includes('/empresas-asociadas') || path.includes('/contratos')) return 'administracion';

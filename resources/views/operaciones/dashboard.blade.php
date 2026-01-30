@@ -26,7 +26,7 @@
         <!-- Fila 2: Mapa (5 columnas) + Eventos (1 columna) -->
         @include('operaciones.partials.map-container')
         
-        @include('operaciones.partials.eventos-list', ['eventos' => $eventosIniciales ?? null])
+        @include('operaciones.partials.eventos-list', ['eventos' => $eventosIniciales ?? null, 'isClient' => $isClient ?? false])
     </div>
 
     <!-- KPIs Secundarios: Vuelos y Triggers -->
@@ -35,13 +35,23 @@
 @endsection
 
 @push('scripts')
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initOperacionesMap" async defer></script>
-@vite(['resources/js/operaciones-dashboard.js'])
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&loading=async&callback=initOperacionesMap" async defer></script>
+
 <script>
     // Variable global para el callback de Google Maps
     window.initOperacionesMap = function() {
+        console.log('[Google Maps] callback ejecutado (admin)');
+        
         if (window.operacionesDashboard) {
+            console.log('[Google Maps] Usando instancia existente de dashboard');
             window.operacionesDashboard.setup();
+        } else {
+            console.warn('[Google Maps] Dashboard no inicializado, reintentando...');
+            setTimeout(() => {
+                if (window.operacionesDashboard) {
+                    window.operacionesDashboard.setup();
+                }
+            }, 500);
         }
     };
 </script>

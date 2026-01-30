@@ -11,6 +11,7 @@ use App\Models\Patrulla;
 use App\Models\PatrullaDocumental;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientDashboardController extends Controller
 {
@@ -528,6 +529,11 @@ class ClientDashboardController extends Controller
             $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
         }
 
+        // Filtro opcional por empresa asociada
+        if ($request->filled('empresa_asociada_id')) {
+            $query->where('empresa_asociada_id', $request->empresa_asociada_id);
+        }
+
         // Obtener IDs de categorías que tienen eventos (con filtros aplicados)
         $queryCategorias = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
@@ -539,6 +545,9 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $queryCategorias->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('empresa_asociada_id')) {
+            $queryCategorias->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
         
         $categoriaIds = $queryCategorias->distinct()->pluck('categoria_id');
@@ -555,6 +564,9 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $queryEmpresas->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('empresa_asociada_id')) {
+            $queryEmpresas->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
         
         $empresaIds = $queryEmpresas->distinct()->pluck('empresa_asociada_id');
@@ -663,6 +675,11 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+
+        // Filtro opcional por empresa asociada
+        if ($request->filled('empresa_asociada_id')) {
+            $query->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
 
         // Obtener eventos agrupados por mes
@@ -941,6 +958,160 @@ class ClientDashboardController extends Controller
                 'message' => 'Error interno del servidor'
             ], 500);
         }
+    }
+
+    /**
+     * Genera PDF de estadísticas del dashboard
+     */
+    public function generatePdf(Request $request)
+    {
+        $clienteIds = $this->getClienteIds();
+
+        if ($clienteIds->isEmpty()) {
+            abort(404, 'No hay clientes asignados');
+        }
+
+        // Obtener información del cliente principal
+        $user = Auth::user();
+        $clientePrincipal = $user->clientes()->first();
+        
+        // Obtener logo del cliente y convertir a base64 para el PDF
+        $logoBase64 = null;
+        if ($clientePrincipal && $clientePrincipal->logo) {
+            $logoPath = storage_path('app/public/' . $clientePrincipal->logo);
+            if (file_exists($logoPath)) {
+                $logoData = file_get_contents($logoPath);
+                $logoMime = mime_content_type($logoPath);
+                $logoBase64 = 'data:' . $logoMime . ';base64,' . base64_encode($logoData);
+            }
+        }
+
+        // Obtener empresa asociada seleccionada (si existe)
+        $empresaAsociadaSeleccionada = null;
+        $empresaAsociadaId = $request->input('empresa_asociada_id');
+        if ($empresaAsociadaId) {
+            $empresaAsociadaSeleccionada = EmpresaAsociada::find($empresaAsociadaId);
+        }
+
+        // Fechas del filtro
+        $fechaDesde = $request->input('fecha_desde');
+        $fechaHasta = $request->input('fecha_hasta');
+
+        // Construir query base
+        $query = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false);
+
+        if ($fechaDesde) {
+            $query->whereDate('fecha_hora', '>=', $fechaDesde);
+        }
+        if ($fechaHasta) {
+            $query->whereDate('fecha_hora', '<=', $fechaHasta);
+        }
+        if ($empresaAsociadaId) {
+            $query->where('empresa_asociada_id', $empresaAsociadaId);
+        }
+
+        // Total de eventos
+        $totalEventos = (clone $query)->count();
+
+        // Eventos últimos 7 días
+        $fechaHace7Dias = Carbon::today()->subDays(7);
+        $queryUltimos7 = (clone $query)
+            ->whereDate('fecha_hora', '>=', $fechaHace7Dias)
+            ->whereDate('fecha_hora', '<=', Carbon::today());
+        $eventosUltimos7Dias = $queryUltimos7->count();
+
+        // Eventos por categoría
+        $eventosPorCategoria = (clone $query)
+            ->whereNotNull('categoria_id')
+            ->select('categoria_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('categoria_id')
+            ->get();
+
+        $categorias = Categoria::whereIn('id', $eventosPorCategoria->pluck('categoria_id'))->get()->keyBy('id');
+        
+        $chartDataCategorias = [];
+        foreach ($eventosPorCategoria as $item) {
+            $categoria = $categorias->get($item->categoria_id);
+            if ($categoria) {
+                $chartDataCategorias[] = [
+                    'nombre' => $categoria->nombre,
+                    'total' => $item->total
+                ];
+            }
+        }
+        usort($chartDataCategorias, function($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+
+        // Eventos por mes
+        $eventosMensuales = (clone $query)
+            ->select(
+                DB::raw('YEAR(fecha_hora) as año'),
+                DB::raw('MONTH(fecha_hora) as mes'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('año', 'mes')
+            ->orderBy('año', 'asc')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        $mesesCortos = [
+            1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+        ];
+
+        $datosMensuales = [];
+        foreach ($eventosMensuales as $evento) {
+            $datosMensuales[] = [
+                'mes' => $mesesCortos[$evento->mes] . ' ' . $evento->año,
+                'total' => $evento->total
+            ];
+        }
+
+        // Promedio mensual
+        $promedioMensual = count($datosMensuales) > 0 
+            ? round(array_sum(array_column($datosMensuales, 'total')) / count($datosMensuales))
+            : 0;
+
+        // Eventos por ubicación (para estadísticas geográficas)
+        $eventosPorUbicacion = (clone $query)
+            ->whereNotNull('latitud')
+            ->whereNotNull('longitud')
+            ->where('latitud', '!=', 0)
+            ->where('longitud', '!=', 0)
+            ->select(
+                DB::raw('ROUND(latitud, 2) as lat'),
+                DB::raw('ROUND(longitud, 2) as lng'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy(DB::raw('ROUND(latitud, 2)'), DB::raw('ROUND(longitud, 2)'))
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Preparar datos para el PDF
+        $data = [
+            'clienteNombre' => $clientePrincipal->nombre ?? 'Cliente',
+            'logoBase64' => $logoBase64,
+            'empresaAsociadaNombre' => $empresaAsociadaSeleccionada ? $empresaAsociadaSeleccionada->nombre : 'Todas las empresas',
+            'fechaDesde' => $fechaDesde ? Carbon::parse($fechaDesde)->format('d/m/Y') : 'Inicio',
+            'fechaHasta' => $fechaHasta ? Carbon::parse($fechaHasta)->format('d/m/Y') : 'Hoy',
+            'fechaGeneracion' => Carbon::now()->format('d/m/Y H:i'),
+            'totalEventos' => $totalEventos,
+            'eventosUltimos7Dias' => $eventosUltimos7Dias,
+            'promedioMensual' => $promedioMensual,
+            'chartDataCategorias' => $chartDataCategorias,
+            'datosMensuales' => $datosMensuales,
+            'eventosPorUbicacion' => $eventosPorUbicacion,
+        ];
+
+        $pdf = PDF::loadView('client.dashboard-pdf', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = 'estadisticas_' . ($empresaAsociadaSeleccionada ? str_replace(' ', '_', $empresaAsociadaSeleccionada->nombre) : 'general') . '_' . date('Y-m-d') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }
 
