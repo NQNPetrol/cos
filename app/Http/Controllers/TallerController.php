@@ -9,7 +9,7 @@ class TallerController extends Controller
 {
     public function index()
     {
-        return Taller::orderBy('nombre')->get();
+        return Taller::with('proveedor')->orderBy('nombre')->get();
     }
 
     public function store(Request $request)
@@ -20,14 +20,17 @@ class TallerController extends Controller
             'telefono' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'direccion' => 'nullable|string|max:255',
+            'proveedor_id' => 'nullable|exists:proveedores,id',
+            'whatsapp' => 'nullable|string|max:50',
         ]);
 
-        return Taller::create($validated);
+        $taller = Taller::create($validated);
+        return $taller->load('proveedor');
     }
 
     public function show(Taller $taller)
     {
-        return $taller;
+        return $taller->load('proveedor');
     }
 
     public function update(Request $request, Taller $taller)
@@ -38,10 +41,12 @@ class TallerController extends Controller
             'telefono' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'direccion' => 'nullable|string|max:255',
+            'proveedor_id' => 'nullable|exists:proveedores,id',
+            'whatsapp' => 'nullable|string|max:50',
         ]);
 
         $taller->update($validated);
-        return $taller;
+        return $taller->load('proveedor');
     }
 
     public function destroy(Taller $taller)

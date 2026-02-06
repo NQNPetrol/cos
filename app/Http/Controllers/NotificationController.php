@@ -276,6 +276,21 @@ class NotificationController extends Controller
             }
     }
 
+    /**
+     * Create a notification from an admin alert
+     */
+    public static function createFromAlert(\App\Models\AlertaAdmin $alerta): Notification
+    {
+        return Notification::create([
+            'title' => 'Alerta: ' . $alerta->titulo,
+            'message' => $alerta->descripcion ?? $alerta->titulo,
+            'type' => 'global',
+            'priority' => 'NORMAL',
+            'is_active' => true,
+            'user_id' => $alerta->user_id,
+        ]);
+    }
+
     //obtener notificaciones visibles p un usuario
     private function getUserVisibleNotifications(User $user)
     {

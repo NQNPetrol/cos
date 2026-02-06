@@ -32,6 +32,8 @@ class TurnoRodado extends Model
         'fecha_vencimiento_pago',
         'estado',
         'partes_afectadas',
+        'cobertura_estado',
+        'informe_path',
     ];
 
     protected $casts = [
@@ -53,6 +55,10 @@ class TurnoRodado extends Model
     const ESTADO_COMPLETADO = 'completado';
     const ESTADO_CANCELADO = 'cancelado';
     const ESTADO_ATENDIDO = 'atendido';
+
+    const COBERTURA_PENDIENTE = 'pendiente';
+    const COBERTURA_APROBADA = 'aprobada';
+    const COBERTURA_RECHAZADA = 'rechazada';
 
     public function getPartesAfectadasAttribute($value)
     {

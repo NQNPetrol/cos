@@ -6,7 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\TurnoRodado;
 use App\Models\Rodado;
 use App\Models\Taller;
+use App\Models\PagoServiciosRodado;
+use App\Models\Notification;
+use App\Models\UserCliente;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CoberturaRechazadaMail;
+use Carbon\Carbon;
 
 class TurnoRodadoController extends Controller
 {
@@ -18,36 +24,25 @@ class TurnoRodadoController extends Controller
         // Obtener partes afectadas directamente del atributo raw para evitar el accessor
         $partesAfectadasRaw = $turno->getAttributes()['partes_afectadas'] ?? null;
         
-        // Logging para depurar
-        \Log::info('Turno ID: ' . $turno->id);
-        \Log::info('Partes afectadas raw: ' . ($partesAfectadasRaw ?? 'null'));
-        
         $partesAfectadas = [];
         
         if ($partesAfectadasRaw) {
             if (is_string($partesAfectadasRaw)) {
                 $decoded = json_decode($partesAfectadasRaw, true);
-                \Log::info('Partes afectadas decoded: ', ['decoded' => $decoded]);
                 
                 if (is_array($decoded)) {
-                    // Si es un array asociativo con claves numéricas como strings, convertirlo a array indexado
                     if (array_keys($decoded) !== range(0, count($decoded) - 1)) {
-                        // Es un objeto asociativo, convertir a array indexado
                         $partesAfectadas = array_values($decoded);
                     } else {
-                        // Ya es un array indexado
                         $partesAfectadas = $decoded;
                     }
                 } elseif (is_object($decoded)) {
-                    // Si es un objeto, convertirlo a array
                     $partesAfectadas = array_values((array) $decoded);
                 }
             } elseif (is_array($partesAfectadasRaw)) {
                 $partesAfectadas = $partesAfectadasRaw;
             }
         }
-        
-        \Log::info('Partes afectadas final: ', ['partes' => $partesAfectadas]);
         
         // Preparar datos para el formulario
         $data = [
@@ -61,10 +56,25 @@ class TurnoRodadoController extends Controller
             'descripcion' => $turno->descripcion ?? '',
             'partes_afectadas' => $partesAfectadas,
             'estado' => $turno->estado,
+            'cobertura_estado' => $turno->cobertura_estado ?? 'pendiente',
+            'cubre_servicio' => $turno->cubre_servicio ?? false,
+            'informe_path' => $turno->informe_path,
+            'factura_path' => $turno->factura_path,
+            'comprobante_pago_path' => $turno->comprobante_pago_path,
+            'rodado' => $turno->rodado ? [
+                'id' => $turno->rodado->id,
+                'patente' => $turno->rodado->patente,
+                'marca' => $turno->rodado->marca,
+                'modelo' => $turno->rodado->modelo,
+                'tipo_vehiculo' => $turno->rodado->tipo_vehiculo,
+            ] : null,
+            'taller' => $turno->taller ? [
+                'id' => $turno->taller->id,
+                'nombre' => $turno->taller->nombre,
+                'whatsapp' => $turno->taller->whatsapp,
+                'email' => $turno->taller->email ?? null,
+            ] : null,
         ];
-        
-        \Log::info('Datos enviados al frontend: ', ['data' => $data]);
-        \Log::info('Descripción del turno: ', ['descripcion' => $turno->descripcion, 'descripcion_raw' => $turno->getAttributes()['descripcion'] ?? 'null']);
         
         return response()->json($data);
     }
@@ -244,22 +254,46 @@ class TurnoRodadoController extends Controller
 
         // Manejar factura
         if ($request->hasFile('factura')) {
-            // Eliminar factura anterior si existe
             if ($turno->factura_path) {
                 Storage::disk('public')->delete($turno->factura_path);
             }
             $factura = $request->file('factura');
             $validated['factura_path'] = $factura->store('rodados/' . $turno->rodado_id . '/facturas', 'public');
+
+            // Auto-set fecha vencimiento a 30 dias si rodado tiene proveedor
+            $rodado = $turno->rodado;
+            if ($rodado && $rodado->proveedor_id) {
+                $validated['fecha_factura'] = now()->toDateString();
+                $validated['fecha_vencimiento_pago'] = now()->addDays(30)->toDateString();
+                $validated['dias_vencimiento'] = 30;
+            }
         }
 
         // Manejar comprobante de pago
         if ($request->hasFile('comprobante_pago')) {
-            // Eliminar comprobante anterior si existe
             if ($turno->comprobante_pago_path) {
                 Storage::disk('public')->delete($turno->comprobante_pago_path);
             }
             $comprobante = $request->file('comprobante_pago');
             $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $turno->rodado_id . '/comprobantes', 'public');
+
+            // Auto-create pago when comprobante uploaded on turno with cobertura aprobada
+            if ($turno->cobertura_estado === TurnoRodado::COBERTURA_APROBADA && $turno->cubre_servicio) {
+                $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
+                    ? PagoServiciosRodado::TIPO_PAGO_SERVICE
+                    : PagoServiciosRodado::TIPO_PAGO_TALLER;
+
+                PagoServiciosRodado::create([
+                    'rodado_id' => $turno->rodado_id,
+                    'turno_rodado_id' => $turno->id,
+                    'tipo' => $tipoPago,
+                    'monto' => $turno->pago_mano_obra ?? 0,
+                    'fecha_pago' => now()->toDateString(),
+                    'moneda' => 'ARS',
+                    'estado' => PagoServiciosRodado::ESTADO_PAGADO,
+                    'comprobante_pago_path' => $validated['comprobante_pago_path'],
+                ]);
+            }
         }
 
         $turno->update($validated);
@@ -268,20 +302,106 @@ class TurnoRodadoController extends Controller
             ->with('success', 'Factura adjuntada exitosamente.');
     }
 
+    /**
+     * Unified documentation upload for turnos with proveedor (informe + factura + comprobante)
+     */
+    public function adjuntarDocumentacion(Request $request, TurnoRodado $turno)
+    {
+        $request->validate([
+            'informe' => 'nullable|file|mimes:pdf|max:10240',
+            'factura' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        $updateData = [];
+
+        // Handle informe
+        if ($request->hasFile('informe')) {
+            if ($turno->informe_path) {
+                Storage::disk('public')->delete($turno->informe_path);
+            }
+            $updateData['informe_path'] = $request->file('informe')
+                ->store('rodados/' . $turno->rodado_id . '/informes', 'public');
+        }
+
+        // Handle factura
+        if ($request->hasFile('factura')) {
+            if ($turno->factura_path) {
+                Storage::disk('public')->delete($turno->factura_path);
+            }
+            $updateData['factura_path'] = $request->file('factura')
+                ->store('rodados/' . $turno->rodado_id . '/facturas', 'public');
+
+            // Auto-set fecha vencimiento if proveedor
+            $rodado = $turno->rodado;
+            if ($rodado && $rodado->proveedor_id) {
+                $updateData['fecha_factura'] = now()->toDateString();
+                $updateData['fecha_vencimiento_pago'] = now()->addDays(30)->toDateString();
+                $updateData['dias_vencimiento'] = 30;
+            }
+        }
+
+        // Handle comprobante
+        if ($request->hasFile('comprobante_pago')) {
+            if ($turno->comprobante_pago_path) {
+                Storage::disk('public')->delete($turno->comprobante_pago_path);
+            }
+            $updateData['comprobante_pago_path'] = $request->file('comprobante_pago')
+                ->store('rodados/' . $turno->rodado_id . '/comprobantes', 'public');
+
+            // Auto-create pago if cobertura aprobada
+            if ($turno->cobertura_estado === TurnoRodado::COBERTURA_APROBADA && $turno->cubre_servicio) {
+                $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
+                    ? PagoServiciosRodado::TIPO_PAGO_SERVICE
+                    : PagoServiciosRodado::TIPO_PAGO_TALLER;
+
+                PagoServiciosRodado::create([
+                    'rodado_id' => $turno->rodado_id,
+                    'turno_rodado_id' => $turno->id,
+                    'tipo' => $tipoPago,
+                    'monto' => $turno->pago_mano_obra ?? 0,
+                    'fecha_pago' => now()->toDateString(),
+                    'moneda' => 'ARS',
+                    'estado' => PagoServiciosRodado::ESTADO_PAGADO,
+                    'comprobante_pago_path' => $updateData['comprobante_pago_path'],
+                ]);
+            }
+        }
+
+        if (!empty($updateData)) {
+            $turno->update($updateData);
+        }
+
+        return redirect()->route('rodados.index')
+            ->with('success', 'Documentación adjuntada exitosamente.');
+    }
+
     public function aprobarCobertura(TurnoRodado $turno)
     {
         if ($turno->tipo !== TurnoRodado::TIPO_TURNO_MECANICO) {
-            if ($turno->request()->expectsJson()) {
+            if (request()->expectsJson()) {
                 return response()->json(['error' => 'Solo se puede aprobar cobertura para turnos mecánicos.'], 400);
             }
             return redirect()->route('rodados.index')
                 ->with('error', 'Solo se puede aprobar cobertura para turnos mecánicos.');
         }
 
-        $turno->update(['cubre_servicio' => true]);
+        $turno->update([
+            'cubre_servicio' => true,
+            'cobertura_estado' => TurnoRodado::COBERTURA_APROBADA,
+        ]);
+
+        $taller = $turno->taller;
+        $responseData = [
+            'success' => true,
+            'message' => 'Cobertura aprobada exitosamente. La empresa cubrirá los gastos del reparo.',
+            'taller_whatsapp' => $taller->whatsapp_link ?? null,
+            'taller_email' => $taller->mailto_link ?? null,
+            'taller_nombre' => $taller->nombre ?? 'N/A',
+        ];
 
         if (request()->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Cobertura aprobada exitosamente.']);
+            return response()->json($responseData);
         }
 
         return redirect()->route('rodados.index')
@@ -298,14 +418,52 @@ class TurnoRodadoController extends Controller
                 ->with('error', 'Solo se puede rechazar cobertura para turnos mecánicos.');
         }
 
-        $turno->update(['cubre_servicio' => false]);
+        $turno->update([
+            'cubre_servicio' => false,
+            'cobertura_estado' => TurnoRodado::COBERTURA_RECHAZADA,
+        ]);
+
+        // Send notification and email to client user
+        $rodado = $turno->rodado;
+        if ($rodado && $rodado->cliente_id) {
+            $userClientes = UserCliente::where('cliente_id', $rodado->cliente_id)->get();
+            foreach ($userClientes as $userCliente) {
+                Notification::create([
+                    'title' => 'Cobertura Rechazada',
+                    'message' => 'La cobertura para el vehículo ' . ($rodado->patente ?? 'Sin patente') . ' ha sido rechazada. Turno del ' . $turno->fecha_hora->format('d/m/Y H:i'),
+                    'type' => 'user',
+                    'user_id' => $userCliente->user_id,
+                    'priority' => 'ALTA',
+                    'is_active' => true,
+                ]);
+
+                // Send email notification
+                try {
+                    $user = \App\Models\User::find($userCliente->user_id);
+                    if ($user && $user->email) {
+                        Mail::to($user->email)->send(new CoberturaRechazadaMail($turno, $user->name));
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error enviando email de cobertura rechazada: ' . $e->getMessage());
+                }
+            }
+        }
+
+        $taller = $turno->taller;
+        $responseData = [
+            'success' => true,
+            'message' => 'Cobertura rechazada. Se ha notificado al cliente.',
+            'taller_whatsapp' => $taller->whatsapp_link ?? null,
+            'taller_email' => $taller->mailto_link ?? null,
+            'taller_nombre' => $taller->nombre ?? 'N/A',
+        ];
 
         if (request()->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Cobertura rechazada exitosamente.']);
+            return response()->json($responseData);
         }
 
         return redirect()->route('rodados.index')
-            ->with('success', 'Cobertura rechazada exitosamente.');
+            ->with('success', 'Cobertura rechazada. Se ha notificado al cliente.');
     }
 
     public function cancelarTurno(TurnoRodado $turno)

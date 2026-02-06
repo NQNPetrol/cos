@@ -210,6 +210,14 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('operaciones.dashboard')
         ->middleware('can:ver.operaciones-cliente');
 
+    // Checklist (clientsupervisor)
+    Route::get('/checklist', [\App\Http\Controllers\ChecklistPatrullaController::class, 'index'])->name('checklist.index');
+    Route::post('/checklist', [\App\Http\Controllers\ChecklistPatrullaController::class, 'store'])->name('checklist.store');
+
+    // Calendario (clientsupervisor, solo lectura)
+    Route::get('/calendario', [\App\Http\Controllers\CalendarioClienteController::class, 'index'])->name('calendario.index');
+    Route::get('/calendario/eventos', [\App\Http\Controllers\CalendarioClienteController::class, 'getEventos'])->name('calendario.eventos');
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -782,6 +790,54 @@ Route::middleware([
         // Proveedores y Talleres (CRUD auxiliar)
         Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);
         Route::apiResource('talleres', \App\Http\Controllers\TallerController::class);
+
+        // Dashboard Admin Rodados
+        Route::get('/admin-dashboard', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'index'])->name('admin-dashboard');
+        Route::get('/admin-dashboard/pagos-mensuales', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getPagosMensuales'])->name('admin-dashboard.pagos-mensuales');
+        Route::get('/admin-dashboard/turnos-por-estado', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTurnosPorEstado'])->name('admin-dashboard.turnos-por-estado');
+        Route::get('/admin-dashboard/cobros-vs-pagos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getCobrosVsPagos'])->name('admin-dashboard.cobros-vs-pagos');
+
+        // Proveedores y Talleres (vista unificada)
+        Route::get('/proveedores-talleres', function () {
+            $proveedores = \App\Models\Proveedor::with('talleres')->orderBy('nombre')->get();
+            $talleres = \App\Models\Taller::with('proveedor')->orderBy('nombre')->get();
+            return view('rodados.proveedores-talleres', compact('proveedores', 'talleres'));
+        })->name('proveedores-talleres.index');
+
+        // Pagos de Servicios (vista independiente)
+        Route::get('/pagos-servicios', function () {
+            $pagos = \App\Models\PagoServiciosRodado::with(['rodado', 'proveedor', 'servicioUsuario', 'turnoRodado'])->latest('fecha_pago')->get();
+            $rodados = \App\Models\Rodado::with(['cliente', 'proveedor'])->get();
+            $proveedores = \App\Models\Proveedor::orderBy('nombre')->get();
+            $servicios = \App\Models\ServicioUsuario::activos()->orderBy('nombre')->get();
+            $pagosRealizados = $pagos->where('estado', 'pagado');
+            $pagosPendientes = $pagos->where('estado', '!=', 'pagado');
+            return view('rodados.pagos', compact('pagos', 'rodados', 'proveedores', 'servicios', 'pagosRealizados', 'pagosPendientes'));
+        })->name('pagos-servicios.index');
+
+        // Servicios del usuario (CRUD modal)
+        Route::apiResource('servicios-usuario', \App\Http\Controllers\ServicioUsuarioController::class);
+
+        // Cobranzas
+        Route::prefix('cobranzas')->name('cobranzas.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\CobranzaController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\CobranzaController::class, 'store'])->name('store');
+            Route::put('/{cobranza}', [\App\Http\Controllers\CobranzaController::class, 'update'])->name('update');
+            Route::delete('/{cobranza}', [\App\Http\Controllers\CobranzaController::class, 'destroy'])->name('destroy');
+            Route::post('/{cobranza}/adjuntar', [\App\Http\Controllers\CobranzaController::class, 'adjuntar'])->name('adjuntar');
+        });
+
+        // Alertas Admin
+        Route::prefix('alertas-admin')->name('alertas-admin.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\AlertaAdminController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\AlertaAdminController::class, 'store'])->name('store');
+            Route::put('/{alerta}', [\App\Http\Controllers\AlertaAdminController::class, 'update'])->name('update');
+            Route::delete('/{alerta}', [\App\Http\Controllers\AlertaAdminController::class, 'destroy'])->name('destroy');
+            Route::post('/{alerta}/toggle', [\App\Http\Controllers\AlertaAdminController::class, 'toggle'])->name('toggle');
+        });
+
+        // Documentacion unificada para turnos
+        Route::post('/turnos/{turno}/documentacion', [\App\Http\Controllers\TurnoRodadoController::class, 'adjuntarDocumentacion'])->name('turnos.documentacion');
     });
 
 });

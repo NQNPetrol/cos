@@ -11,6 +11,8 @@ use App\Models\TurnoRodado;
 use App\Models\CambioEquipoRodado;
 use App\Models\PagoServiciosRodado;
 use App\Models\RegistroKilometraje;
+use App\Models\Patrulla;
+use App\Models\ChecklistPatrulla;
 use Illuminate\Support\Facades\Storage;
 
 class RodadoController extends Controller
@@ -98,6 +100,21 @@ class RodadoController extends Controller
             ->latest('fecha_pago')
             ->get();
 
+        // Cross-reference patrullas with rodados to get auxilios data
+        $auxiliosMap = [];
+        $rodadoPatentes = $rodados->pluck('patente')->filter()->toArray();
+        if (!empty($rodadoPatentes)) {
+            $patrullasConChecklist = Patrulla::whereIn('patente', $rodadoPatentes)
+                ->with('ultimoChecklist')
+                ->get();
+
+            foreach ($patrullasConChecklist as $patrulla) {
+                if ($patrulla->ultimoChecklist) {
+                    $auxiliosMap[$patrulla->patente] = $patrulla->ultimoChecklist->ruedas_auxilio;
+                }
+            }
+        }
+
         return view('rodados.index', compact(
             'rodados',
             'clientes',
@@ -107,7 +124,8 @@ class RodadoController extends Controller
             'cambiosEquipos',
             'pagos',
             'todosLosServicios',
-            'dispositivos'
+            'dispositivos',
+            'auxiliosMap'
         ));
     }
 
