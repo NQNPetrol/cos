@@ -163,6 +163,23 @@
         .then(r => r.json())
         .then(turno => {
             const estadoColor = turno.cobertura_estado === 'aprobada' ? 'emerald' : turno.cobertura_estado === 'rechazada' ? 'red' : 'amber';
+
+            // Ocultar botones de aprobar/rechazar si la cobertura ya fue decidida
+            const btnAprobar = document.getElementById('btn-aprobar-cobertura');
+            const btnRechazar = document.getElementById('btn-rechazar-cobertura');
+            if (turno.cobertura_estado === 'aprobada' || turno.cobertura_estado === 'rechazada') {
+                if (btnAprobar) btnAprobar.style.display = 'none';
+                if (btnRechazar) btnRechazar.style.display = 'none';
+            } else {
+                if (btnAprobar) btnAprobar.style.display = '';
+                if (btnRechazar) btnRechazar.style.display = '';
+            }
+
+            // Mostrar acciones de contacto al taller si cobertura aprobada
+            if (turno.cobertura_estado === 'aprobada' && turno.taller) {
+                showTallerActions(turno.taller.whatsapp, turno.taller.email);
+            }
+
             content.innerHTML = `
                 <div class="grid grid-cols-2 gap-3">
                     <div class="p-3 bg-zinc-800/50 rounded-xl border border-zinc-700/30">

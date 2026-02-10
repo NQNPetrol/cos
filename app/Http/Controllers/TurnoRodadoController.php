@@ -250,7 +250,13 @@ class TurnoRodadoController extends Controller
         $validated = $request->validate([
             'factura' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'fecha_vencimiento_pago' => 'nullable|date',
+            'monto_factura' => 'nullable|numeric|min:0',
         ]);
+
+        // Extraer monto_factura antes de update (no es columna de turnos)
+        $montoFactura = $request->input('monto_factura');
+        unset($validated['monto_factura']);
 
         // Manejar factura
         if ($request->hasFile('factura')) {
@@ -260,25 +266,34 @@ class TurnoRodadoController extends Controller
             $factura = $request->file('factura');
             $validated['factura_path'] = $factura->store('rodados/' . $turno->rodado_id . '/facturas', 'public');
 
-            // Auto-set fecha vencimiento a 30 dias si rodado tiene proveedor
-            $rodado = $turno->rodado;
-            if ($rodado && $rodado->proveedor_id) {
-                $validated['fecha_factura'] = now()->toDateString();
-                $validated['fecha_vencimiento_pago'] = now()->addDays(30)->toDateString();
-                $validated['dias_vencimiento'] = 30;
+            // Establecer fecha de factura
+            $validated['fecha_factura'] = now()->toDateString();
+
+            // Si se envió fecha de vencimiento desde el formulario (turno mecánico con cobertura aprobada)
+            if ($request->filled('fecha_vencimiento_pago')) {
+                $fechaVencimiento = \Carbon\Carbon::parse($request->fecha_vencimiento_pago);
+                $validated['fecha_vencimiento_pago'] = $fechaVencimiento->toDateString();
+                $validated['dias_vencimiento'] = now()->diffInDays($fechaVencimiento);
+            } else {
+                // Auto-set fecha vencimiento a 30 dias si rodado tiene proveedor
+                $rodado = $turno->rodado;
+                if ($rodado && $rodado->proveedor_id) {
+                    $validated['fecha_vencimiento_pago'] = now()->addDays(30)->toDateString();
+                    $validated['dias_vencimiento'] = 30;
+                }
             }
         }
 
-        // Manejar comprobante de pago
-        if ($request->hasFile('comprobante_pago')) {
-            if ($turno->comprobante_pago_path) {
-                Storage::disk('public')->delete($turno->comprobante_pago_path);
-            }
-            $comprobante = $request->file('comprobante_pago');
-            $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $turno->rodado_id . '/comprobantes', 'public');
+        $turno->update($validated);
 
-            // Auto-create pago when comprobante uploaded on turno with cobertura aprobada
-            if ($turno->cobertura_estado === TurnoRodado::COBERTURA_APROBADA && $turno->cubre_servicio) {
+        // Auto-crear pago pendiente cuando se adjunta factura a un turno (si no existe ya)
+        if ($request->hasFile('factura')) {
+            $existingPago = PagoServiciosRodado::where('turno_rodado_id', $turno->id)->first();
+
+            // Usar el monto ingresado en el formulario, o fallback a pago_mano_obra, o 0
+            $montoPago = $montoFactura !== null ? (float) $montoFactura : ($turno->pago_mano_obra ?? 0);
+
+            if (!$existingPago) {
                 $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
                     ? PagoServiciosRodado::TIPO_PAGO_SERVICE
                     : PagoServiciosRodado::TIPO_PAGO_TALLER;
@@ -287,16 +302,24 @@ class TurnoRodadoController extends Controller
                     'rodado_id' => $turno->rodado_id,
                     'turno_rodado_id' => $turno->id,
                     'tipo' => $tipoPago,
-                    'monto' => $turno->pago_mano_obra ?? 0,
-                    'fecha_pago' => now()->toDateString(),
+                    'monto' => $montoPago,
+                    'factura_path' => $turno->factura_path,
                     'moneda' => 'ARS',
-                    'estado' => PagoServiciosRodado::ESTADO_PAGADO,
-                    'comprobante_pago_path' => $validated['comprobante_pago_path'],
+                    'estado' => PagoServiciosRodado::ESTADO_PENDIENTE,
+                    'fecha_vencimiento' => $turno->fecha_vencimiento_pago,
+                    'observaciones' => $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
+                        ? 'Service - ' . ($turno->rodado->patente ?? 'N/A')
+                        : 'Taller Mecánico - ' . ($turno->rodado->patente ?? 'N/A'),
+                ]);
+            } else {
+                // Actualizar factura en pago existente si cambió
+                $existingPago->update([
+                    'factura_path' => $turno->factura_path,
+                    'monto' => $montoPago,
+                    'fecha_vencimiento' => $turno->fecha_vencimiento_pago ?? $existingPago->fecha_vencimiento,
                 ]);
             }
         }
-
-        $turno->update($validated);
 
         return redirect()->route('rodados.index')
             ->with('success', 'Factura adjuntada exitosamente.');
@@ -311,7 +334,11 @@ class TurnoRodadoController extends Controller
             'informe' => 'nullable|file|mimes:pdf|max:10240',
             'factura' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'comprobante_pago' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'monto_factura' => 'nullable|numeric|min:0',
         ]);
+
+        // Extraer monto_factura (no es columna de turnos)
+        $montoFactura = $request->input('monto_factura');
 
         $updateData = [];
 
@@ -341,16 +368,19 @@ class TurnoRodadoController extends Controller
             }
         }
 
-        // Handle comprobante
-        if ($request->hasFile('comprobante_pago')) {
-            if ($turno->comprobante_pago_path) {
-                Storage::disk('public')->delete($turno->comprobante_pago_path);
-            }
-            $updateData['comprobante_pago_path'] = $request->file('comprobante_pago')
-                ->store('rodados/' . $turno->rodado_id . '/comprobantes', 'public');
+        if (!empty($updateData)) {
+            $turno->update($updateData);
+        }
 
-            // Auto-create pago if cobertura aprobada
-            if ($turno->cobertura_estado === TurnoRodado::COBERTURA_APROBADA && $turno->cubre_servicio) {
+        // Auto-crear pago pendiente cuando se adjunta factura a un turno (si no existe ya)
+        if ($request->hasFile('factura')) {
+            $turno->refresh();
+            $existingPago = PagoServiciosRodado::where('turno_rodado_id', $turno->id)->first();
+
+            // Usar el monto ingresado en el formulario, o fallback a pago_mano_obra, o 0
+            $montoPago = $montoFactura !== null ? (float) $montoFactura : ($turno->pago_mano_obra ?? 0);
+
+            if (!$existingPago) {
                 $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
                     ? PagoServiciosRodado::TIPO_PAGO_SERVICE
                     : PagoServiciosRodado::TIPO_PAGO_TALLER;
@@ -359,17 +389,22 @@ class TurnoRodadoController extends Controller
                     'rodado_id' => $turno->rodado_id,
                     'turno_rodado_id' => $turno->id,
                     'tipo' => $tipoPago,
-                    'monto' => $turno->pago_mano_obra ?? 0,
-                    'fecha_pago' => now()->toDateString(),
+                    'monto' => $montoPago,
+                    'factura_path' => $turno->factura_path,
                     'moneda' => 'ARS',
-                    'estado' => PagoServiciosRodado::ESTADO_PAGADO,
-                    'comprobante_pago_path' => $updateData['comprobante_pago_path'],
+                    'estado' => PagoServiciosRodado::ESTADO_PENDIENTE,
+                    'fecha_vencimiento' => $turno->fecha_vencimiento_pago,
+                    'observaciones' => $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
+                        ? 'Service - ' . ($turno->rodado->patente ?? 'N/A')
+                        : 'Taller Mecánico - ' . ($turno->rodado->patente ?? 'N/A'),
+                ]);
+            } else {
+                $existingPago->update([
+                    'factura_path' => $turno->factura_path,
+                    'monto' => $montoPago,
+                    'fecha_vencimiento' => $turno->fecha_vencimiento_pago ?? $existingPago->fecha_vencimiento,
                 ]);
             }
-        }
-
-        if (!empty($updateData)) {
-            $turno->update($updateData);
         }
 
         return redirect()->route('rodados.index')

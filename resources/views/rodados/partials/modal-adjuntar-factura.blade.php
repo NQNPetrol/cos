@@ -42,8 +42,28 @@
                         <div id="factura-preview" class="mt-2"></div>
                     </div>
 
+                    <!-- Monto de factura (solo visible para factura de turno mecánico) -->
+                    <div id="monto-factura-section" style="display: none;">
+                        <label class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Monto a pagar *</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">$</span>
+                            <input type="number" id="adjuntar-monto-factura" name="monto_factura" step="0.01" min="0"
+                                class="w-full pl-8 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-gray-200 text-sm focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 focus:outline-none transition-all"
+                                placeholder="0.00">
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-600">Ingrese el monto total que figura en la factura</p>
+                    </div>
+
+                    <!-- Fecha límite de pago (solo visible para factura de turno mecánico) -->
+                    <div id="fecha-vencimiento-section" style="display: none;">
+                        <label class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Fecha límite de pago *</label>
+                        <input type="date" id="adjuntar-fecha-vencimiento" name="fecha_vencimiento_pago"
+                            class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-gray-200 text-sm focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 focus:outline-none transition-all">
+                        <p class="mt-1.5 text-xs text-gray-600">Ingrese la fecha límite para el pago de esta factura</p>
+                    </div>
+
                     <!-- Comprobante de Pago -->
-                    <div>
+                    <div id="comprobante-section">
                         <label class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Comprobante de Pago <span class="text-gray-600 normal-case">(opcional)</span></label>
                         <label class="flex items-center gap-3 w-full px-4 py-3 bg-zinc-800 border border-zinc-700 border-dashed rounded-xl cursor-pointer hover:border-violet-500/50 hover:bg-zinc-800/80 transition-all group">
                             <div class="p-2 bg-zinc-700 rounded-lg group-hover:bg-violet-600/10 transition-colors">
@@ -114,15 +134,58 @@
         }
     }
 
-    function openAdjuntarFacturaModal(tipo, id) {
+    function openAdjuntarFacturaModal(tipo, id, soloFactura = false) {
         const modal = document.getElementById('adjuntar-factura-modal');
         const form = document.getElementById('adjuntar-factura-form');
+        const comprobanteSection = document.getElementById('comprobante-section');
+        const fechaVencimientoSection = document.getElementById('fecha-vencimiento-section');
+        const fechaVencimientoInput = document.getElementById('adjuntar-fecha-vencimiento');
+        const montoFacturaSection = document.getElementById('monto-factura-section');
+        const montoFacturaInput = document.getElementById('adjuntar-monto-factura');
         document.getElementById('adjuntar-factura-tipo').value = tipo;
         document.getElementById('adjuntar-factura-id').value = id;
 
         if (tipo === 'turno') form.action = '{{ route("rodados.turnos.adjuntar-factura", ":id") }}'.replace(':id', id);
         else if (tipo === 'cambio_equipo') form.action = '{{ route("rodados.cambios-equipos.adjuntar-factura", ":id") }}'.replace(':id', id);
         else if (tipo === 'pago') form.action = '{{ route("rodados.pagos.adjuntar-factura", ":id") }}'.replace(':id', id);
+
+        // Ocultar sección de comprobante si soloFactura es true
+        if (comprobanteSection) {
+            comprobanteSection.style.display = soloFactura ? 'none' : '';
+        }
+
+        // Mostrar monto de factura si soloFactura es true
+        if (montoFacturaSection) {
+            montoFacturaSection.style.display = soloFactura ? '' : 'none';
+        }
+        if (soloFactura && montoFacturaInput) {
+            montoFacturaInput.required = true;
+            montoFacturaInput.value = '';
+        } else if (montoFacturaInput) {
+            montoFacturaInput.required = false;
+            montoFacturaInput.value = '';
+        }
+
+        // Mostrar fecha de vencimiento de pago si soloFactura es true
+        if (fechaVencimientoSection) {
+            fechaVencimientoSection.style.display = soloFactura ? '' : 'none';
+        }
+        if (soloFactura && fechaVencimientoInput) {
+            // Predeterminar a 30 días desde hoy
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 30);
+            fechaVencimientoInput.value = defaultDate.toISOString().split('T')[0];
+            fechaVencimientoInput.required = true;
+        } else if (fechaVencimientoInput) {
+            fechaVencimientoInput.value = '';
+            fechaVencimientoInput.required = false;
+        }
+
+        // Actualizar título según contexto
+        const titleEl = document.getElementById('adjuntar-factura-modal-title');
+        if (titleEl) {
+            titleEl.textContent = soloFactura ? 'Adjuntar Factura' : 'Adjuntar Documentación';
+        }
 
         modal.classList.remove('hidden');
     }
@@ -134,6 +197,19 @@
         document.getElementById('comprobante-preview').innerHTML = '';
         document.getElementById('factura-file-label').textContent = 'Seleccionar archivo de factura';
         document.getElementById('comprobante-file-label').textContent = 'Seleccionar comprobante';
+        // Restaurar visibilidad de secciones
+        const comprobanteSection = document.getElementById('comprobante-section');
+        if (comprobanteSection) comprobanteSection.style.display = '';
+        const montoSection = document.getElementById('monto-factura-section');
+        if (montoSection) montoSection.style.display = 'none';
+        const montoInput = document.getElementById('adjuntar-monto-factura');
+        if (montoInput) { montoInput.value = ''; montoInput.required = false; }
+        const fechaSection = document.getElementById('fecha-vencimiento-section');
+        if (fechaSection) fechaSection.style.display = 'none';
+        const fechaInput = document.getElementById('adjuntar-fecha-vencimiento');
+        if (fechaInput) { fechaInput.value = ''; fechaInput.required = false; }
+        const titleEl = document.getElementById('adjuntar-factura-modal-title');
+        if (titleEl) titleEl.textContent = 'Adjuntar Documentación';
     }
 
     document.getElementById('adjuntar-factura-form')?.addEventListener('submit', function(e) {

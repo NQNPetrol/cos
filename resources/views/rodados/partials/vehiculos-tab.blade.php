@@ -110,8 +110,8 @@
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20 flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16,6H10.5v4H1v5H3a3,3,0,0,0,6,0h6a3,3,0,0,0,6,0h2V12a2,2,0,0,0-2-2H19L16,6M12,7.5h3.5l2,2.5H12V7.5m-6,6A1.5,1.5,0,1,1,4.5,15,1.5,1.5,0,0,1,6,13.5m12,0A1.5,1.5,0,1,1,16.5,15,1.5,1.5,0,0,1,18,13.5Z"/>
                                     </svg>
                                 </div>
                                 <div>

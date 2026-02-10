@@ -788,8 +788,8 @@ Route::middleware([
         Route::get('/calendario/evento/{tipo}/{id}', [\App\Http\Controllers\CalendarioRodadosController::class, 'getDetalleEvento'])->name('calendario.evento');
         
         // Proveedores y Talleres (CRUD auxiliar)
-        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);
-        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class);
+        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class)->parameters(['proveedores' => 'proveedor']);
+        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class)->parameters(['talleres' => 'taller']);
 
         // Dashboard Admin Rodados
         Route::get('/admin-dashboard', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'index'])->name('admin-dashboard');
@@ -806,12 +806,12 @@ Route::middleware([
 
         // Pagos de Servicios (vista independiente)
         Route::get('/pagos-servicios', function () {
-            $pagos = \App\Models\PagoServiciosRodado::with(['rodado', 'proveedor', 'servicioUsuario', 'turnoRodado'])->latest('fecha_pago')->get();
+            $pagos = \App\Models\PagoServiciosRodado::with(['rodado', 'proveedor', 'servicioUsuario', 'turnoRodado.taller'])->get();
             $rodados = \App\Models\Rodado::with(['cliente', 'proveedor'])->get();
             $proveedores = \App\Models\Proveedor::orderBy('nombre')->get();
             $servicios = \App\Models\ServicioUsuario::activos()->orderBy('nombre')->get();
-            $pagosRealizados = $pagos->where('estado', 'pagado');
-            $pagosPendientes = $pagos->where('estado', '!=', 'pagado');
+            $pagosRealizados = $pagos->where('estado', 'pagado')->sortByDesc('fecha_pago');
+            $pagosPendientes = $pagos->where('estado', '!=', 'pagado')->sortBy('fecha_vencimiento');
             return view('rodados.pagos', compact('pagos', 'rodados', 'proveedores', 'servicios', 'pagosRealizados', 'pagosPendientes'));
         })->name('pagos-servicios.index');
 

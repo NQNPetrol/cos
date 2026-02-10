@@ -25,7 +25,12 @@ class TallerController extends Controller
         ]);
 
         $taller = Taller::create($validated);
-        return $taller->load('proveedor');
+
+        if ($request->expectsJson()) {
+            return $taller->load('proveedor');
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Taller creado exitosamente.');
     }
 
     public function show(Taller $taller)
@@ -46,12 +51,22 @@ class TallerController extends Controller
         ]);
 
         $taller->update($validated);
-        return $taller->load('proveedor');
+
+        if ($request->expectsJson()) {
+            return $taller->load('proveedor');
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Taller actualizado exitosamente.');
     }
 
     public function destroy(Taller $taller)
     {
         $taller->delete();
-        return response()->json(['message' => 'Taller eliminado exitosamente']);
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Taller eliminado exitosamente']);
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Taller eliminado exitosamente.');
     }
 }
