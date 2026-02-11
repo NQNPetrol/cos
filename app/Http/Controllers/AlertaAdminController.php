@@ -4,25 +4,61 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AlertaAdmin;
-use App\Models\Notification;
 use App\Models\Rodado;
 use App\Models\Cliente;
 use App\Models\User;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\AlertaNotificationMail;
+use App\Models\ServicioUsuario;
+use App\Models\Taller;
 
 class AlertaAdminController extends Controller
 {
     public function index()
     {
-        $alertas = AlertaAdmin::with(['user', 'rodado', 'cliente'])
+        $alertas = AlertaAdmin::with(['user', 'rodado', 'cliente', 'servicioUsuario', 'taller', 'destinatarioUser'])
             ->latest()
             ->get();
 
-        $rodados = Rodado::with(['cliente', 'proveedor'])->get();
+        $rodados = Rodado::with(['cliente', 'proveedor.talleres'])->get();
         $clientes = Cliente::orderBy('nombre')->get();
+        $servicios = ServicioUsuario::where('activo', true)->orderBy('nombre')->get();
+        $talleres = Taller::with('proveedor')->orderBy('nombre')->get();
 
-        return view('rodados.alertas-admin', compact('alertas', 'rodados', 'clientes'));
+        // Get users with clientsupervisor role (using Spatie)
+        $usuariosClientes = User::role(['clientsupervisor', 'clientadmin'])
+            ->with('clientes')
+            ->orderBy('name')
+            ->get();
+
+        // Prepare rodados JSON data for JavaScript
+        $rodadosJson = $rodados->map(function ($r) {
+            return [
+                'id' => $r->id,
+                'patente' => $r->patente,
+                'display_name' => $r->display_name,
+                'proveedor_id' => $r->proveedor_id,
+                'proveedor_nombre' => $r->proveedor?->nombre,
+                'cliente_id' => $r->cliente_id,
+                'talleres' => $r->proveedor ? $r->proveedor->talleres->map(function ($t) {
+                    return [
+                        'id' => $t->id,
+                        'nombre' => $t->nombre,
+                        'whatsapp' => $t->whatsapp,
+                        'whatsapp_link' => $t->whatsapp_link,
+                        'telefono' => $t->telefono,
+                    ];
+                })->values()->toArray() : [],
+            ];
+        })->values();
+
+        return view('rodados.alertas-admin', compact(
+            'alertas',
+            'rodados',
+            'clientes',
+            'servicios',
+            'talleres',
+            'usuariosClientes',
+            'rodadosJson'
+        ));
     }
 
     public function store(Request $request)
@@ -30,9 +66,15 @@ class AlertaAdminController extends Controller
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'tipo' => 'required|in:vencimiento_pago,recordatorio_turno,agendar_turno_km,personalizada',
+            'tipo' => 'required|in:pago_servicio,cobro_cliente,km_vehiculo,vencimiento,personalizada,vencimiento_pago,recordatorio_turno,agendar_turno_km',
             'rodado_id' => 'nullable|exists:rodados,id',
             'cliente_id' => 'nullable|exists:clientes,id',
+            'servicio_usuario_id' => 'nullable|exists:servicios_usuario,id',
+            'taller_id' => 'nullable|exists:talleres,id',
+            'destinatario_tipo' => 'nullable|in:admin,cliente,ambos',
+            'destinatario_user_id' => 'nullable|exists:users,id',
+            'dia_mes' => 'nullable|integer|min:1|max:31',
+            'dias_anticipacion' => 'nullable|integer|min:1',
             'km_intervalo' => 'nullable|integer|min:1',
             'fecha_alerta' => 'nullable|date',
             'recurrente' => 'nullable|boolean',
@@ -44,41 +86,45 @@ class AlertaAdminController extends Controller
         $validated['user_id'] = auth()->id();
         $validated['accion_config'] = $validated['acciones'];
         $validated['activa'] = true;
+        $validated['destinatario_tipo'] = $validated['destinatario_tipo'] ?? 'admin';
         unset($validated['acciones']);
+
+        // Auto-set recurrence when a service is linked (monthly payment) or cobro_cliente
+        if (!empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
+            $validated['recurrente'] = true;
+            $validated['frecuencia_recurrencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
+        }
 
         // Build trigger config based on tipo
         $triggerConfig = [];
-        if ($validated['tipo'] === AlertaAdmin::TIPO_AGENDAR_TURNO_KM && $validated['km_intervalo']) {
+
+        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && !empty($validated['km_intervalo'])) {
             $triggerConfig['km_intervalo'] = $validated['km_intervalo'];
         }
-        if ($validated['fecha_alerta']) {
+        if (!empty($validated['dia_mes'])) {
+            $triggerConfig['dia_mes'] = $validated['dia_mes'];
+        }
+        if (!empty($validated['dias_anticipacion'])) {
+            $triggerConfig['dias_anticipacion'] = $validated['dias_anticipacion'];
+        }
+        if ($validated['fecha_alerta'] ?? null) {
             $triggerConfig['fecha'] = $validated['fecha_alerta'];
         }
         if (!empty($validated['recurrente'])) {
             $triggerConfig['recurrente'] = true;
             $triggerConfig['frecuencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
         }
+
         $validated['trigger_config'] = $triggerConfig;
 
         $alerta = AlertaAdmin::create($validated);
 
-        // If accion includes 'notificacion', create a notification
-        if ($alerta->tieneAccion(AlertaAdmin::ACCION_NOTIFICACION)) {
-            $this->crearNotificacionDesdeAlerta($alerta);
-        }
-
-        // If accion includes 'correo', send email to the alert creator
-        if ($alerta->tieneAccion(AlertaAdmin::ACCION_CORREO)) {
-            $user = auth()->user();
-            try {
-                Mail::to($user->email)->send(new AlertaNotificationMail($alerta, $user->name));
-            } catch (\Exception $e) {
-                \Log::error('Error enviando email de alerta: ' . $e->getMessage());
-            }
-        }
+        // Notifications, emails and dashboard visibility are handled by
+        // the scheduled command `alertas:procesar` when the date approaches.
+        // No instant dispatch here.
 
         return redirect()->route('rodados.alertas-admin.index')
-            ->with('success', 'Alerta creada exitosamente.');
+            ->with('success', 'Alerta creada exitosamente. Se activara al acercarse la fecha.');
     }
 
     public function update(Request $request, AlertaAdmin $alerta)
@@ -86,9 +132,15 @@ class AlertaAdminController extends Controller
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'tipo' => 'required|in:vencimiento_pago,recordatorio_turno,agendar_turno_km,personalizada',
+            'tipo' => 'required|in:pago_servicio,cobro_cliente,km_vehiculo,vencimiento,personalizada,vencimiento_pago,recordatorio_turno,agendar_turno_km',
             'rodado_id' => 'nullable|exists:rodados,id',
             'cliente_id' => 'nullable|exists:clientes,id',
+            'servicio_usuario_id' => 'nullable|exists:servicios_usuario,id',
+            'taller_id' => 'nullable|exists:talleres,id',
+            'destinatario_tipo' => 'nullable|in:admin,cliente,ambos',
+            'destinatario_user_id' => 'nullable|exists:users,id',
+            'dia_mes' => 'nullable|integer|min:1|max:31',
+            'dias_anticipacion' => 'nullable|integer|min:1',
             'km_intervalo' => 'nullable|integer|min:1',
             'fecha_alerta' => 'nullable|date',
             'recurrente' => 'nullable|boolean',
@@ -98,13 +150,26 @@ class AlertaAdminController extends Controller
         ]);
 
         $validated['accion_config'] = $validated['acciones'];
+        $validated['destinatario_tipo'] = $validated['destinatario_tipo'] ?? 'admin';
         unset($validated['acciones']);
 
+        // Auto-set recurrence when a service is linked or cobro_cliente
+        if (!empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
+            $validated['recurrente'] = true;
+            $validated['frecuencia_recurrencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
+        }
+
         $triggerConfig = [];
-        if ($validated['tipo'] === AlertaAdmin::TIPO_AGENDAR_TURNO_KM && $validated['km_intervalo']) {
+        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && !empty($validated['km_intervalo'])) {
             $triggerConfig['km_intervalo'] = $validated['km_intervalo'];
         }
-        if ($validated['fecha_alerta']) {
+        if (!empty($validated['dia_mes'])) {
+            $triggerConfig['dia_mes'] = $validated['dia_mes'];
+        }
+        if (!empty($validated['dias_anticipacion'])) {
+            $triggerConfig['dias_anticipacion'] = $validated['dias_anticipacion'];
+        }
+        if ($validated['fecha_alerta'] ?? null) {
             $triggerConfig['fecha'] = $validated['fecha_alerta'];
         }
         if (!empty($validated['recurrente'])) {
@@ -140,20 +205,4 @@ class AlertaAdminController extends Controller
         return redirect()->route('rodados.alertas-admin.index')->with('success', $message);
     }
 
-    /**
-     * Create a notification from an alert
-     */
-    public function crearNotificacionDesdeAlerta(AlertaAdmin $alerta)
-    {
-        $notification = Notification::create([
-            'title' => 'Alerta: ' . $alerta->titulo,
-            'message' => $alerta->descripcion ?? $alerta->titulo,
-            'type' => 'global',
-            'priority' => 'NORMAL',
-            'is_active' => true,
-            'user_id' => $alerta->user_id,
-        ]);
-
-        return $notification;
-    }
 }

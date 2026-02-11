@@ -136,20 +136,30 @@ class CalendarioRodados extends Component
             ]);
         }
 
-        // Obtener pagos
-        $pagos = PagoServiciosRodado::with(['rodado', 'proveedor'])
-            ->whereBetween('fecha_pago', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        // Obtener pagos PENDIENTES (solo los no pagados, mostrados en fecha de vencimiento)
+        $pagos = PagoServiciosRodado::with(['rodado', 'proveedor', 'servicioUsuario'])
+            ->where('estado', '!=', 'pagado')
+            ->whereNotNull('fecha_vencimiento')
+            ->whereBetween('fecha_vencimiento', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->get();
 
         foreach ($pagos as $pago) {
+            // Determinar titulo: si tiene servicio mensual usar nombre del servicio, si no usar patente
+            if ($pago->servicioUsuario) {
+                $title = 'Pago Pendiente: ' . $pago->servicioUsuario->nombre;
+            } else {
+                $title = 'Pago Pendiente: ' . ($pago->rodado?->patente ?? ucfirst(str_replace('_', ' ', $pago->tipo)));
+            }
+
             $events->push([
                 'id' => 'pago_' . $pago->id,
                 'tipo' => 'pago',
-                'title' => 'Pago: ' . ($pago->rodado->patente ?? 'Sin patente'),
-                'date' => Carbon::parse($pago->fecha_pago),
+                'title' => $title,
+                'date' => Carbon::parse($pago->fecha_vencimiento),
                 'color' => '#ef4444', // Rojo
-                'rodado' => $pago->rodado->display_name ?? 'N/A',
-                'estado' => $pago->factura_path ? 'pagado' : 'pendiente',
+                'rodado' => $pago->rodado?->display_name ?? null,
+                'servicio_nombre' => $pago->servicioUsuario?->nombre ?? null,
+                'estado' => 'pendiente',
             ]);
         }
 

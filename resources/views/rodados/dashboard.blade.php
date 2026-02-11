@@ -188,7 +188,7 @@
                                     @foreach($pagosProximosVencer as $pago)
                                     <div class="flex items-center justify-between p-3 bg-zinc-900 rounded-lg">
                                         <div>
-                                            <div class="font-medium text-gray-200">{{ $pago->rodado->patente ?? 'Sin patente' }}</div>
+                                            <div class="font-medium text-gray-200">{{ $pago->rodado?->patente ?? 'Sin patente' }}</div>
                                             <div class="text-sm text-gray-400">${{ number_format($pago->monto, 2, ',', '.') }} {{ $pago->moneda ?? 'ARS' }}</div>
                                         </div>
                                         <div class="text-sm text-red-400">{{ $pago->fecha_vencimiento->format('d/m/Y') }}</div>

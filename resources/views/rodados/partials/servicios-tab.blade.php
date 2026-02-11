@@ -251,12 +251,6 @@
                                         </svg>
                                     </button>
                                     @if($servicio['tipo'] === 'turno_mecanico')
-                                        <button onclick="openRevisarCoberturaModal({{ $item->id }})"
-                                            class="p-2 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all" title="Revisar cobertura">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
-                                            </svg>
-                                        </button>
                                         @if($turno && $turno->cobertura_estado === 'aprobada' && $turno->taller)
                                             @if($turno->taller->whatsapp_link)
                                             <a href="{{ $turno->taller->whatsapp_link }}" target="_blank"
@@ -293,6 +287,12 @@
                                         class="{{ $servicio['tipo'] === 'turno_service' ? '' : 'hidden' }} p-2 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all" title="Subir documentación">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="openRevisarCoberturaModal({{ $item->id }})"
+                                        class="{{ ($servicio['tipo'] === 'turno_mecanico' && $turno && $turno->cobertura_estado !== 'aprobada' && $turno->cobertura_estado !== 'rechazada') ? '' : 'hidden' }} p-2 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-all" title="Revisar cobertura">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
                                         </svg>
                                     </button>
                                 @else

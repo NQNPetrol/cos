@@ -308,17 +308,18 @@
                                     ];
                                 }
                             } elseif ($selectedEvent['tipo'] === 'pago') {
-                                $pago = \App\Models\PagoServiciosRodado::with(['rodado.cliente', 'rodado.proveedor', 'proveedor'])->find($selectedEvent['id']);
+                                $pago = \App\Models\PagoServiciosRodado::with(['rodado.cliente', 'rodado.proveedor', 'proveedor', 'servicioUsuario'])->find($selectedEvent['id']);
                                 if ($pago) {
                                     $eventData = [
                                         'tipo' => 'pago',
                                         'id' => $pago->id,
                                         'tipo_pago' => $pago->tipo,
-                                        'fecha_pago' => \Carbon\Carbon::parse($pago->fecha_pago)->format('Y-m-d'),
-                                        'rodado' => $pago->rodado->display_name,
+                                        'fecha_vencimiento' => $pago->fecha_vencimiento ? \Carbon\Carbon::parse($pago->fecha_vencimiento)->format('d/m/Y') : '-',
+                                        'rodado' => $pago->rodado?->display_name ?? null,
+                                        'servicio_nombre' => $pago->servicioUsuario?->nombre ?? null,
                                         'moneda' => $pago->moneda ?? 'ARS',
                                         'monto' => $pago->monto,
-                                        'estado' => $pago->factura_path ? 'pagado' : 'pendiente',
+                                        'estado' => $pago->estado ?? 'pendiente',
                                     ];
                                 }
                             }
@@ -387,19 +388,27 @@
                                 </div>
                             @elseif($eventData['tipo'] === 'pago')
                                 <div class="space-y-4">
+                                    @if($eventData['servicio_nombre'])
+                                    <div class="p-4 bg-zinc-900/50 rounded-lg border border-purple-700/50">
+                                        <label class="block text-xs font-medium text-purple-400 uppercase tracking-wide mb-1">Servicio</label>
+                                        <p class="text-gray-100 font-medium">{{ $eventData['servicio_nombre'] }}</p>
+                                    </div>
+                                    @endif
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        @if($eventData['rodado'])
                                         <div class="p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
-                                            <label class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Vehículo</label>
+                                            <label class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Vehiculo</label>
                                             <p class="text-gray-100 font-medium">{{ $eventData['rodado'] }}</p>
                                         </div>
+                                        @endif
                                         <div class="p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
                                             <label class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Tipo</label>
                                             <p class="text-gray-100 font-medium">{{ ucfirst(str_replace('_', ' ', $eventData['tipo_pago'])) }}</p>
                                         </div>
                                     </div>
                                     <div class="p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
-                                        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Fecha de Pago</label>
-                                        <p class="text-gray-100 font-medium">{{ $eventData['fecha_pago'] }}</p>
+                                        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Fecha de Vencimiento</label>
+                                        <p class="text-gray-100 font-medium">{{ $eventData['fecha_vencimiento'] }}</p>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
@@ -449,7 +458,7 @@
                             Reprogramar Turno
                         </button>
                     @elseif($eventData && $eventData['tipo'] === 'pago')
-                        <a href="{{ route('rodados.index') }}#pagos"
+                        <a href="{{ route('rodados.pagos-servicios.index') }}"
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
