@@ -35,6 +35,12 @@ class DashboardController extends Controller
             \Log::info('Redirigiendo a CLIENT DASHBOARD');
             return redirect()->route('client.dashboard');
         }
+
+        // Rol administrative → dashboard administrativo
+        if ($user->hasRole('administrative')) {
+            \Log::info('Redirigiendo a ADMINISTRATIVE DASHBOARD');
+            return redirect()->route('rodados.admin-dashboard');
+        }
         
         // Para admin, operador, otros
         \Log::info('Redirigiendo a DASHBOARD NORMAL');

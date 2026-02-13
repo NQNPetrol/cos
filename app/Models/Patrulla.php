@@ -74,4 +74,14 @@ class Patrulla extends Model
     {
         return $this->hasMany(PatrullaDocumental::class);
     }
+
+    public function checklists()
+    {
+        return $this->hasMany(ChecklistPatrulla::class);
+    }
+
+    public function ultimoChecklist()
+    {
+        return $this->hasOne(ChecklistPatrulla::class)->latestOfMany();
+    }
 }

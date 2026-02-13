@@ -18,10 +18,12 @@ class CambioEquipoRodadoController extends Controller
             'fecha_hora_estimada' => 'required|date',
             'tipo_cubierta' => 'nullable|string|max:255|required_if:tipo,cubiertas',
             'pago_mano_obra' => 'nullable|numeric|min:0',
+            'kilometraje_en_cambio' => 'nullable|integer|min:0',
             'motivo' => 'nullable|string',
             'dispositivo_id' => 'nullable|exists:dispositivos,id',
             'detalle_equipo_nuevo' => 'nullable|string',
             'detalle_equipo_viejo' => 'nullable|string',
+            'factura_mano_obra' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         // Validar que si tipo requiere dispositivo, se proporcione dispositivo_id o detalle_equipo_nuevo
@@ -63,6 +65,13 @@ class CambioEquipoRodadoController extends Controller
             // El detalle del nuevo equipo ya está en detalle_equipo_nuevo
             $validated['dispositivo_id'] = null;
         }
+
+        // Handle factura mano obra upload
+        if ($request->hasFile('factura_mano_obra')) {
+            $factura = $request->file('factura_mano_obra');
+            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
+        }
+        unset($validated['factura_mano_obra']);
 
         $cambio = CambioEquipoRodado::create($validated);
 
@@ -79,10 +88,12 @@ class CambioEquipoRodadoController extends Controller
             'fecha_hora_estimada' => 'required|date',
             'tipo_cubierta' => 'nullable|string|max:255|required_if:tipo,cubiertas',
             'pago_mano_obra' => 'nullable|numeric|min:0',
+            'kilometraje_en_cambio' => 'nullable|integer|min:0',
             'motivo' => 'nullable|string',
             'dispositivo_id' => 'nullable|exists:dispositivos,id',
             'detalle_equipo_nuevo' => 'nullable|string',
             'detalle_equipo_viejo' => 'nullable|string',
+            'factura_mano_obra' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         // Validar que si tipo requiere dispositivo, se proporcione dispositivo_id o detalle_equipo_nuevo
@@ -124,6 +135,16 @@ class CambioEquipoRodadoController extends Controller
             // El detalle del nuevo equipo ya está en detalle_equipo_nuevo
             $validated['dispositivo_id'] = null;
         }
+
+        // Handle factura mano obra upload
+        if ($request->hasFile('factura_mano_obra')) {
+            if ($cambio->factura_path) {
+                Storage::disk('public')->delete($cambio->factura_path);
+            }
+            $factura = $request->file('factura_mano_obra');
+            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
+        }
+        unset($validated['factura_mano_obra']);
 
         $cambio->update($validated);
 

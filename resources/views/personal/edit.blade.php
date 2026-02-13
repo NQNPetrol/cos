@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="container mx-auto p-6">
         <h2 class="text-gray-200 text-2xl font-bold mb-4">Editar Personal</h2>
 
@@ -96,4 +96,4 @@
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-</x-app-layout>
+</x-administrative-layout>
