@@ -7,12 +7,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-
 class TicketCreatedNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $ticket;
+
     public $userName;
 
     /**
@@ -29,12 +29,11 @@ class TicketCreatedNotification extends Mailable
      */
     public function build()
     {
-        return $this->subject('Ticket Creado Exitosamente - # ' . $this->ticket->id)
-                    ->view('emails.ticket-created')
-                    ->with([
-                        'ticket' => $this->ticket,
-                        'userName' => $this->userName,
-                    ]);
+        return $this->subject('Ticket Creado Exitosamente - # '.$this->ticket->id)
+            ->view('emails.ticket-created')
+            ->with([
+                'ticket' => $this->ticket,
+                'userName' => $this->userName,
+            ]);
     }
-
 }

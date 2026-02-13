@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\CambioEquipoRodado;
 use App\Models\Dispositivo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CambioEquipoRodadoController extends Controller
@@ -47,7 +47,7 @@ class CambioEquipoRodadoController extends Controller
         }
 
         // Limpiar campos de dispositivo si no aplican
-        if (!in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+        if (! in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
             $validated['dispositivo_id'] = null;
             $validated['detalle_equipo_nuevo'] = null;
         }
@@ -69,7 +69,7 @@ class CambioEquipoRodadoController extends Controller
         // Handle factura mano obra upload
         if ($request->hasFile('factura_mano_obra')) {
             $factura = $request->file('factura_mano_obra');
-            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
+            $validated['factura_path'] = $factura->store('rodados/'.$validated['rodado_id'].'/facturas', 'public');
         }
         unset($validated['factura_mano_obra']);
 
@@ -117,7 +117,7 @@ class CambioEquipoRodadoController extends Controller
         }
 
         // Limpiar campos de dispositivo si no aplican
-        if (!in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
+        if (! in_array($validated['tipo'], $tiposQueRequierenDispositivo)) {
             $validated['dispositivo_id'] = null;
             $validated['detalle_equipo_nuevo'] = null;
         }
@@ -142,7 +142,7 @@ class CambioEquipoRodadoController extends Controller
                 Storage::disk('public')->delete($cambio->factura_path);
             }
             $factura = $request->file('factura_mano_obra');
-            $validated['factura_path'] = $factura->store('rodados/' . $validated['rodado_id'] . '/facturas', 'public');
+            $validated['factura_path'] = $factura->store('rodados/'.$validated['rodado_id'].'/facturas', 'public');
         }
         unset($validated['factura_mano_obra']);
 
@@ -182,7 +182,7 @@ class CambioEquipoRodadoController extends Controller
                 Storage::disk('public')->delete($cambio->factura_path);
             }
             $factura = $request->file('factura');
-            $validated['factura_path'] = $factura->store('rodados/' . $cambio->rodado_id . '/facturas', 'public');
+            $validated['factura_path'] = $factura->store('rodados/'.$cambio->rodado_id.'/facturas', 'public');
         }
 
         // Manejar comprobante de pago
@@ -192,7 +192,7 @@ class CambioEquipoRodadoController extends Controller
                 Storage::disk('public')->delete($cambio->comprobante_pago_path);
             }
             $comprobante = $request->file('comprobante_pago');
-            $validated['comprobante_pago_path'] = $comprobante->store('rodados/' . $cambio->rodado_id . '/comprobantes', 'public');
+            $validated['comprobante_pago_path'] = $comprobante->store('rodados/'.$cambio->rodado_id.'/comprobantes', 'public');
         }
 
         $cambio->update($validated);

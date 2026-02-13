@@ -2,47 +2,72 @@
 
 namespace App\Livewire\Inventario;
 
+use App\Models\Cliente;
+use App\Models\Dispositivo;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Dispositivo;
-use App\Models\Cliente;
 
 class ManageDispositivos extends Component
 {
     use WithPagination;
 
-    //propiedades para el modal
+    // propiedades para el modal
     public $showModal = false;
+
     public $editingId = null;
 
     // Propiedades para filtros
     public $search = '';
+
     public $statusFilter = '';
+
     public $clienteFilter = '';
+
     public $estadoInventarioFilter = '';
+
     public $deviceTypeFilter = '';
+
     public $mantenimientoFilter = '';
+
     public $actualizacionFilter = '';
+
     public $hikConnectFilter = '';
 
     // Propiedades para el formulario
     public $tipo = '';
+
     public $puerto = '8000';
+
     public $numero_serie = '';
+
     public $version_software = '';
+
     public $direccion_ip = '';
+
     public $fecha_instalacion = '';
+
     public $estado_hikconnect = 'Conectado';
+
     public $cliente_id = '';
+
     public $ubicacion = '';
+
     public $latitud = '';
+
     public $longitud = '';
+
     public $observaciones = '';
+
     public $necesita_mantenimiento = false;
+
     public $necesita_actualizacion = false;
+
     public $ultimo_mantenimiento = '';
+
     public $proximo_mantenimiento = '';
+
     public $estado_inventario = 'En stock';
+
     public $clientes;
 
     protected $rules = [
@@ -59,7 +84,7 @@ class ManageDispositivos extends Component
         'ultimo_mantenimiento' => 'nullable|date',
         'proximo_mantenimiento' => 'nullable|date|after_or_equal:today',
         'estado_hikconnect' => 'nullable|in:Conectado,Por Conectar',
-        'estado_inventario' => 'required|in:En stock,Instalado,En mantenimiento,Dado de baja'
+        'estado_inventario' => 'required|in:En stock,Instalado,En mantenimiento,Dado de baja',
     ];
 
     public function mount()
@@ -154,7 +179,7 @@ class ManageDispositivos extends Component
     public function edit($id)
     {
         $dispositivo = Dispositivo::findOrFail($id);
-        
+
         $this->editingId = $dispositivo->id;
         $this->tipo = $dispositivo->tipo;
         $this->direccion_ip = $dispositivo->direccion_ip;
@@ -186,10 +211,10 @@ class ManageDispositivos extends Component
     public function resetForm()
     {
         $this->reset([
-            'tipo', 'cliente_id', 'ubicacion', 'latitud', 'longitud', 'fecha_instalacion', 
+            'tipo', 'cliente_id', 'ubicacion', 'latitud', 'longitud', 'fecha_instalacion',
             'observaciones', 'direccion_ip', 'puerto', 'numero_serie', 'version_software',
             'estado_hikconnect', 'necesita_actualizacion', 'necesita_mantenimiento',
-            'ultimo_mantenimiento', 'proximo_mantenimiento', 'estado_inventario'
+            'ultimo_mantenimiento', 'proximo_mantenimiento', 'estado_inventario',
         ]);
     }
 
@@ -199,17 +224,16 @@ class ManageDispositivos extends Component
 
         // Aplicar filtros
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('tipo', 'like', '%' . $this->search . '%')
-                  ->orWhere('tipo', 'like', '%' . $this->search . '%')
-                  ->orWhere('ubicacion', 'like', '%' . $this->search . '%')
-                   ->orWhere('modelo', 'like', '%' . $this->search . '%')
-                   ->orWhereHas('cliente', function($subQuery) {
-                        $subQuery->where('nombre', 'like', '%' . $this->search . '%');
-                  });
+            $query->where(function ($q) {
+                $q->where('tipo', 'like', '%'.$this->search.'%')
+                    ->orWhere('tipo', 'like', '%'.$this->search.'%')
+                    ->orWhere('ubicacion', 'like', '%'.$this->search.'%')
+                    ->orWhere('modelo', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('cliente', function ($subQuery) {
+                        $subQuery->where('nombre', 'like', '%'.$this->search.'%');
+                    });
             });
         }
-
 
         if ($this->clienteFilter) {
             $query->where('cliente_id', $this->clienteFilter);
@@ -220,7 +244,7 @@ class ManageDispositivos extends Component
         }
 
         if ($this->deviceTypeFilter) {
-            $query->where('tipo', 'like', '%' . $this->deviceTypeFilter . '%');
+            $query->where('tipo', 'like', '%'.$this->deviceTypeFilter.'%');
         }
 
         if ($this->mantenimientoFilter === 'si') {
@@ -236,14 +260,14 @@ class ManageDispositivos extends Component
         }
 
         if ($this->hikConnectFilter) {
-            $query->where('estado_hikconnect', 'like', '%' . $this->hikConnectFilter . '%');
+            $query->where('estado_hikconnect', 'like', '%'.$this->hikConnectFilter.'%');
         }
 
         $dispositivos = $query->orderBy('id', 'desc')->paginate(15);
 
         return view('livewire.inventario.manage-dispositivos', [
             'dispositivos' => $dispositivos,
-            'clientes' => Cliente::all()
+            'clientes' => Cliente::all(),
         ]);
     }
 }

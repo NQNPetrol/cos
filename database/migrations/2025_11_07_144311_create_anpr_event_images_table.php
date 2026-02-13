@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, processing, completed, failed
             $table->text('error_message')->nullable();
             $table->timestamps();
-            
+
             $table->index('anpr_record_id');
             $table->index('veh_pic_uri');
             $table->index('status');

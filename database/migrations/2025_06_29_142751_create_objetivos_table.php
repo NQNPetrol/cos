@@ -21,9 +21,8 @@ return new class extends Migration
             $table->string('localidad')->nullable();
             $table->timestamps();
 
-            });
+        });
     }
-
 
     public function down(): void
     {

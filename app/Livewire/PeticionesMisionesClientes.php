@@ -2,19 +2,20 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\PeticionMisionFlytbase;
-use App\Models\MisionFlytbase;
 use App\Models\FlytbaseDrone;
+use App\Models\MisionFlytbase;
+use App\Models\PeticionMisionFlytbase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class PeticionesMisionesClientes extends Component
 {
     use WithPagination;
 
     public $showViewModal = false;
+
     public $selectedPeticion;
 
     // Filtros
@@ -30,13 +31,13 @@ class PeticionesMisionesClientes extends Component
         if (empty($peticion->waypoints)) {
             return 'sin waypoints';
         }
-        
+
         $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
-        
-        if (empty($waypoints) || !is_array($waypoints)) {
+
+        if (empty($waypoints) || ! is_array($waypoints)) {
             return 'sin waypoints';
         }
-        
+
         return count($waypoints);
     }
 
@@ -45,33 +46,33 @@ class PeticionesMisionesClientes extends Component
         if (empty($peticion->waypoints)) {
             return 'sin acciones';
         }
-        
+
         $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
-        
-        if (empty($waypoints) || !is_array($waypoints)) {
+
+        if (empty($waypoints) || ! is_array($waypoints)) {
             return 'sin acciones';
         }
-        
+
         $accionesUnicas = [];
-        
+
         foreach ($waypoints as $waypoint) {
             if (isset($waypoint['acciones']) && is_array($waypoint['acciones'])) {
                 foreach ($waypoint['acciones'] as $accion) {
-                    if (!in_array($accion, $accionesUnicas)) {
+                    if (! in_array($accion, $accionesUnicas)) {
                         $accionesUnicas[] = $accion;
                     }
                 }
             }
         }
-        
+
         if (empty($accionesUnicas)) {
             return 'sin acciones';
         }
-        
-        $accionesLegibles = array_map(function($accion) {
+
+        $accionesLegibles = array_map(function ($accion) {
             return $this->getActionLabel($accion);
         }, $accionesUnicas);
-        
+
         return implode(', ', $accionesLegibles);
     }
 
@@ -87,7 +88,7 @@ class PeticionesMisionesClientes extends Component
             'set_gimbal_90' => 'Rotar Camara a 90°',
             'set_gimbal_45' => 'Rotar Camara 45°',
         ];
-        
+
         return $acciones[$action] ?? $action;
     }
 
@@ -116,22 +117,24 @@ class PeticionesMisionesClientes extends Component
 
     public function aprobarMision()
     {
-        if (!$this->selectedPeticion || $this->selectedPeticion->estado !== 'pendiente') {
+        if (! $this->selectedPeticion || $this->selectedPeticion->estado !== 'pendiente') {
             session()->flash('error', 'La petición no está disponible o ya fue procesada.');
+
             return;
         }
 
-
         try {
             $drone = FlytbaseDrone::with('dock')->find($this->selectedPeticion->drone_id);
-            if (!$drone) {
+            if (! $drone) {
                 Log::error('No hay drone asociado');
                 session()->flash('error', 'No se pudo encontrar el drone asociado a esta petición.');
+
                 return;
             }
-            if (!$drone->dock_id) {
+            if (! $drone->dock_id) {
                 Log::error('No hay dock asociado al dorne seleccionado');
                 session()->flash('error', 'El drone seleccionado no tiene un dock asignado.');
+
                 return;
             }
             // Crear la misión en la tabla misiones_flytbase
@@ -151,38 +154,39 @@ class PeticionesMisionesClientes extends Component
                 'observaciones' => $this->selectedPeticion->observaciones,
                 'user_id' => $this->selectedPeticion->user_id,
                 'url' => '', // Se completará manualmente por el admin
-                'activo' => true
+                'activo' => true,
             ]);
 
             // Actualizar la petición original
             $this->selectedPeticion->update([
                 'estado' => 'aprobada',
                 'revisado_por' => Auth::id(),
-                'mision_aprobada_id' => $mision->id
+                'mision_aprobada_id' => $mision->id,
             ]);
 
-            session()->flash('success', 'Misión aprobada correctamente. Se ha creado la misión #' . $mision->id);
+            session()->flash('success', 'Misión aprobada correctamente. Se ha creado la misión #'.$mision->id);
             Log::info('Mision aceptada.');
             $this->showViewModal = false;
 
         } catch (\Exception $e) {
-            Log::error('Error al aprobar misión: ' . $e->getMessage());
-            session()->flash('error', 'Error al aprobar la misión: ' . $e->getMessage());
+            Log::error('Error al aprobar misión: '.$e->getMessage());
+            session()->flash('error', 'Error al aprobar la misión: '.$e->getMessage());
         }
     }
 
     public function rechazarMision()
     {
-        if (!$this->selectedPeticion || $this->selectedPeticion->estado !== 'pendiente') {
+        if (! $this->selectedPeticion || $this->selectedPeticion->estado !== 'pendiente') {
             session()->flash('error', 'La petición no está disponible o ya fue procesada.');
             Log::info('Mision rechazada.');
+
             return;
         }
 
         // Actualizar la petición - SOLO CAMPOS QUE EXISTEN
         $this->selectedPeticion->update([
             'estado' => 'rechazada',
-            'revisado_por' => Auth::id()
+            'revisado_por' => Auth::id(),
         ]);
 
         session()->flash('success', 'Misión rechazada correctamente.');

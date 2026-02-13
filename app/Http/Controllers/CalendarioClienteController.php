@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\TurnoRodado;
 use App\Models\Patrulla;
 use App\Models\Rodado;
-use Carbon\Carbon;
+use App\Models\TurnoRodado;
+use Illuminate\Http\Request;
 
 class CalendarioClienteController extends Controller
 {
@@ -46,8 +45,8 @@ class CalendarioClienteController extends Controller
             }
 
             $eventos->push([
-                'id' => 'turno_' . $turno->id,
-                'title' => 'Turno: ' . ($turno->rodado->patente ?? 'Sin patente'),
+                'id' => 'turno_'.$turno->id,
+                'title' => 'Turno: '.($turno->rodado->patente ?? 'Sin patente'),
                 'start' => $turno->fecha_hora->toIso8601String(),
                 'color' => $color,
                 'tipo' => 'turno',

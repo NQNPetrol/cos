@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Evento extends Model
 {
-        protected $fillable = [
+    protected $fillable = [
         'fecha_hora',
         'cliente_id',
         'supervisor_id',
@@ -26,10 +24,10 @@ class Evento extends Model
         'es_anulado',
         'anulado_por',
         'fecha_anulado',
-        'notas_adicionales'
+        'notas_adicionales',
     ];
 
-        protected $casts = [
+    protected $casts = [
         'fecha_hora' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -38,7 +36,6 @@ class Evento extends Model
         'fecha_anulado' => 'datetime',
         'es_anulado' => 'boolean',
     ];
-
 
     public function seguimientos()
     {
@@ -100,7 +97,7 @@ class Evento extends Model
     public function ultimoSeguimiento()
     {
         return $this->hasOne(Seguimiento::class, 'evento_id')
-                    ->latestOfMany('fecha');
+            ->latestOfMany('fecha');
     }
 
     /**
@@ -109,6 +106,7 @@ class Evento extends Model
     public function getEstadoActualAttribute()
     {
         $ultimo = $this->ultimoSeguimiento;
+
         return $ultimo ? $ultimo->estado : 'ABIERTO';
     }
 }

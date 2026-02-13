@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('dispositivos', function (Blueprint $table) {
-            //haciendo nullable las columnas que pueden no usarse
+            // haciendo nullable las columnas que pueden no usarse
             $table->string('nombre')->nullable()->comment('Nombre descriptivo del dispositivo')->change();
             $table->string('modelo')->nullable()->change();
             $table->string('direccion_ip')->nullable()->change();

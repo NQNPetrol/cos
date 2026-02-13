@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use App\Models\Cliente;
-use App\Models\EmpresaAsociada;
 
 class ClienteEmpresaAsociada extends Pivot
 {
@@ -14,7 +12,7 @@ class ClienteEmpresaAsociada extends Pivot
         'cliente_id',
         'empresa_asociada_id',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     public function cliente()

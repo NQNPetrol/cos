@@ -10,14 +10,17 @@ class TurnoController extends Controller
     {
         return view('turnos.index');
     }
+
     public function edit()
     {
         return view('turnos.edit');
     }
+
     public function store(Request $request)
     {
         //
     }
+
     public function update(Request $request, string $id)
     {
         //

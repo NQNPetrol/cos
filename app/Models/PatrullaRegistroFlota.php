@@ -13,7 +13,7 @@ class PatrullaRegistroFlota extends Model
         'patrulla_id',
         'objetivo_servicio',
         'observacion',
-        'user_id'
+        'user_id',
     ];
 
     protected $casts = [

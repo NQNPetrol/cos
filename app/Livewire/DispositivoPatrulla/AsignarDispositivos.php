@@ -2,27 +2,30 @@
 
 namespace App\Livewire\DispositivoPatrulla;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\Patrulla;
 use App\Models\Dispositivo;
 use App\Models\DispositivoPatrulla;
+use App\Models\Patrulla;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class AsignarDispositivos extends Component
 {
-
     use WithPagination;
 
     public $patrulla;
+
     public $showModal = false;
+
     public $selectedDispositivos = [];
+
     public $search = '';
+
     public $fechaAsignacion;
 
     protected $rules = [
         'selectedDispositivos' => 'required|array|min:1',
         'selectedDispositivos.*' => 'exists:dispositivos,id',
-        'fechaAsignacion' => 'required|date'
+        'fechaAsignacion' => 'required|date',
     ];
 
     public function mount(Patrulla $patrulla)
@@ -39,22 +42,22 @@ class AsignarDispositivos extends Component
             ->paginate(10);
 
         $dispositivosDisponibles = Dispositivo::whereDoesntHave('patrullas')
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     $q->where('id', 'like', '%'.$this->search.'%')
-                      ->orWhere('tipo', 'like', '%'.$this->search.'%')
-                      ->orWhereHas('cliente', function($q) {
-                        $q->where('nombre', 'like', '%'.$this->search.'%');
-                    });
+                        ->orWhere('tipo', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('cliente', function ($q) {
+                            $q->where('nombre', 'like', '%'.$this->search.'%');
+                        });
                 });
             })
             ->where('estado_inventario', '!=', 'Dado de Baja')
             ->with('cliente')
             ->get();
-            
-            return view('livewire.patrullas.asignar-dispositivos', [
-                'asignaciones' => $asignaciones,
-                'dispositivosDisponibles' => $dispositivosDisponibles
+
+        return view('livewire.patrullas.asignar-dispositivos', [
+            'asignaciones' => $asignaciones,
+            'dispositivosDisponibles' => $dispositivosDisponibles,
         ]);
     }
 
@@ -84,15 +87,16 @@ class AsignarDispositivos extends Component
         if ($yaAsignados) {
             $this->dispatch('notify', [
                 'type' => 'error',
-                'message' => 'Uno o más dispositivos ya están asignados a otra patrulla'
+                'message' => 'Uno o más dispositivos ya están asignados a otra patrulla',
             ]);
+
             return;
         }
 
         $syncData = [];
         foreach ($this->selectedDispositivos as $dispositivoId) {
             $syncData[$dispositivoId] = [
-                'fecha_asignacion' => $this->fechaAsignacion
+                'fecha_asignacion' => $this->fechaAsignacion,
             ];
         }
 
@@ -101,17 +105,17 @@ class AsignarDispositivos extends Component
         $this->showModal = false;
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => 'Dispositivos asignados correctamente'
+            'message' => 'Dispositivos asignados correctamente',
         ]);
     }
 
     public function eliminarAsignacion($dispositivoId)
     {
         $this->patrulla->dispositivos()->detach($dispositivoId);
-        
+
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => 'Dispositivo desvinculado correctamente'
+            'message' => 'Dispositivo desvinculado correctamente',
         ]);
     }
 }

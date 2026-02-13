@@ -44,8 +44,11 @@ class MisionFlytbase extends Model
     ];
 
     const TIPO_RUTA_LINEAL = 'linear_route';
+
     const TIPO_RUTA_TRANSITO = 'transits_waypoint';
+
     const TIPO_RUTA_CURVA_PARADA = 'curved_route_drone_stops';
+
     const TIPO_RUTA_CURVA_CONTINUA = 'curved_route_drone_continues';
 
     public function cliente(): BelongsTo
@@ -104,6 +107,7 @@ class MisionFlytbase extends Model
 
         if ($user->hasRole('cliente')) {
             $clienteIds = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+
             return $query->whereIn('cliente_id', $clienteIds->toArray());
         }
 

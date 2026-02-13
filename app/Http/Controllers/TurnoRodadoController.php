@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\TurnoRodado;
-use App\Models\Rodado;
-use App\Models\Taller;
-use App\Models\PagoServiciosRodado;
-use App\Models\Notification;
-use App\Models\UserCliente;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\CoberturaRechazadaMail;
-use Carbon\Carbon;
+use App\Models\Notification;
+use App\Models\PagoServiciosRodado;
+use App\Models\Rodado;
+use App\Models\TurnoRodado;
+use App\Models\UserCliente;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class TurnoRodadoController extends Controller
 {
@@ -20,16 +18,16 @@ class TurnoRodadoController extends Controller
     {
         // Cargar relaciones necesarias
         $turno->load(['rodado', 'taller']);
-        
+
         // Obtener partes afectadas directamente del atributo raw para evitar el accessor
         $partesAfectadasRaw = $turno->getAttributes()['partes_afectadas'] ?? null;
-        
+
         $partesAfectadas = [];
-        
+
         if ($partesAfectadasRaw) {
             if (is_string($partesAfectadasRaw)) {
                 $decoded = json_decode($partesAfectadasRaw, true);
-                
+
                 if (is_array($decoded)) {
                     if (array_keys($decoded) !== range(0, count($decoded) - 1)) {
                         $partesAfectadas = array_values($decoded);
@@ -43,7 +41,7 @@ class TurnoRodadoController extends Controller
                 $partesAfectadas = $partesAfectadasRaw;
             }
         }
-        
+
         // Preparar datos para el formulario
         $data = [
             'id' => $turno->id,
@@ -75,7 +73,7 @@ class TurnoRodadoController extends Controller
                 'email' => $turno->taller->email ?? null,
             ] : null,
         ];
-        
+
         return response()->json($data);
     }
 
@@ -125,7 +123,7 @@ class TurnoRodadoController extends Controller
         \Log::info('Store turno - Descripcion validada:', ['descripcion' => $validated['descripcion'] ?? 'null']);
 
         // Estado predeterminado
-        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_SERVICE || 
+        if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_SERVICE ||
             $validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO) {
             $validated['estado'] = TurnoRodado::ESTADO_PENDIENTE;
         }
@@ -204,10 +202,10 @@ class TurnoRodadoController extends Controller
         if ($validated['tipo'] === TurnoRodado::TIPO_TURNO_MECANICO) {
             if (isset($validated['partes_afectadas']) && is_array($validated['partes_afectadas']) && count($validated['partes_afectadas']) > 0) {
                 // Filtrar items vacíos antes de guardar
-                $partesFiltradas = array_filter($validated['partes_afectadas'], function($parte) {
-                    return !empty($parte['item']) || !empty($parte['cantidad']) || !empty($parte['descripcion']);
+                $partesFiltradas = array_filter($validated['partes_afectadas'], function ($parte) {
+                    return ! empty($parte['item']) || ! empty($parte['cantidad']) || ! empty($parte['descripcion']);
                 });
-                $validated['partes_afectadas'] = !empty($partesFiltradas) ? json_encode(array_values($partesFiltradas)) : null;
+                $validated['partes_afectadas'] = ! empty($partesFiltradas) ? json_encode(array_values($partesFiltradas)) : null;
             } else {
                 $validated['partes_afectadas'] = null;
             }
@@ -264,7 +262,7 @@ class TurnoRodadoController extends Controller
                 Storage::disk('public')->delete($turno->factura_path);
             }
             $factura = $request->file('factura');
-            $validated['factura_path'] = $factura->store('rodados/' . $turno->rodado_id . '/facturas', 'public');
+            $validated['factura_path'] = $factura->store('rodados/'.$turno->rodado_id.'/facturas', 'public');
 
             // Establecer fecha de factura
             $validated['fecha_factura'] = now()->toDateString();
@@ -293,7 +291,7 @@ class TurnoRodadoController extends Controller
             // Usar el monto ingresado en el formulario, o fallback a pago_mano_obra, o 0
             $montoPago = $montoFactura !== null ? (float) $montoFactura : ($turno->pago_mano_obra ?? 0);
 
-            if (!$existingPago) {
+            if (! $existingPago) {
                 $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
                     ? PagoServiciosRodado::TIPO_PAGO_SERVICE
                     : PagoServiciosRodado::TIPO_PAGO_TALLER;
@@ -308,8 +306,8 @@ class TurnoRodadoController extends Controller
                     'estado' => PagoServiciosRodado::ESTADO_PENDIENTE,
                     'fecha_vencimiento' => $turno->fecha_vencimiento_pago,
                     'observaciones' => $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
-                        ? 'Service - ' . ($turno->rodado->patente ?? 'N/A')
-                        : 'Taller Mecánico - ' . ($turno->rodado->patente ?? 'N/A'),
+                        ? 'Service - '.($turno->rodado->patente ?? 'N/A')
+                        : 'Taller Mecánico - '.($turno->rodado->patente ?? 'N/A'),
                 ]);
             } else {
                 // Actualizar factura en pago existente si cambió
@@ -348,7 +346,7 @@ class TurnoRodadoController extends Controller
                 Storage::disk('public')->delete($turno->informe_path);
             }
             $updateData['informe_path'] = $request->file('informe')
-                ->store('rodados/' . $turno->rodado_id . '/informes', 'public');
+                ->store('rodados/'.$turno->rodado_id.'/informes', 'public');
         }
 
         // Handle factura
@@ -357,7 +355,7 @@ class TurnoRodadoController extends Controller
                 Storage::disk('public')->delete($turno->factura_path);
             }
             $updateData['factura_path'] = $request->file('factura')
-                ->store('rodados/' . $turno->rodado_id . '/facturas', 'public');
+                ->store('rodados/'.$turno->rodado_id.'/facturas', 'public');
 
             // Auto-set fecha vencimiento if proveedor
             $rodado = $turno->rodado;
@@ -368,7 +366,7 @@ class TurnoRodadoController extends Controller
             }
         }
 
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             $turno->update($updateData);
         }
 
@@ -380,7 +378,7 @@ class TurnoRodadoController extends Controller
             // Usar el monto ingresado en el formulario, o fallback a pago_mano_obra, o 0
             $montoPago = $montoFactura !== null ? (float) $montoFactura : ($turno->pago_mano_obra ?? 0);
 
-            if (!$existingPago) {
+            if (! $existingPago) {
                 $tipoPago = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
                     ? PagoServiciosRodado::TIPO_PAGO_SERVICE
                     : PagoServiciosRodado::TIPO_PAGO_TALLER;
@@ -395,8 +393,8 @@ class TurnoRodadoController extends Controller
                     'estado' => PagoServiciosRodado::ESTADO_PENDIENTE,
                     'fecha_vencimiento' => $turno->fecha_vencimiento_pago,
                     'observaciones' => $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
-                        ? 'Service - ' . ($turno->rodado->patente ?? 'N/A')
-                        : 'Taller Mecánico - ' . ($turno->rodado->patente ?? 'N/A'),
+                        ? 'Service - '.($turno->rodado->patente ?? 'N/A')
+                        : 'Taller Mecánico - '.($turno->rodado->patente ?? 'N/A'),
                 ]);
             } else {
                 $existingPago->update([
@@ -417,6 +415,7 @@ class TurnoRodadoController extends Controller
             if (request()->expectsJson()) {
                 return response()->json(['error' => 'Solo se puede aprobar cobertura para turnos mecánicos.'], 400);
             }
+
             return redirect()->route('rodados.index')
                 ->with('error', 'Solo se puede aprobar cobertura para turnos mecánicos.');
         }
@@ -449,6 +448,7 @@ class TurnoRodadoController extends Controller
             if (request()->expectsJson()) {
                 return response()->json(['error' => 'Solo se puede rechazar cobertura para turnos mecánicos.'], 400);
             }
+
             return redirect()->route('rodados.index')
                 ->with('error', 'Solo se puede rechazar cobertura para turnos mecánicos.');
         }
@@ -465,7 +465,7 @@ class TurnoRodadoController extends Controller
             foreach ($userClientes as $userCliente) {
                 Notification::create([
                     'title' => 'Cobertura Rechazada',
-                    'message' => 'La cobertura para el vehículo ' . ($rodado->patente ?? 'Sin patente') . ' ha sido rechazada. Turno del ' . $turno->fecha_hora->format('d/m/Y H:i'),
+                    'message' => 'La cobertura para el vehículo '.($rodado->patente ?? 'Sin patente').' ha sido rechazada. Turno del '.$turno->fecha_hora->format('d/m/Y H:i'),
                     'type' => 'user',
                     'user_id' => $userCliente->user_id,
                     'priority' => 'ALTA',
@@ -479,7 +479,7 @@ class TurnoRodadoController extends Controller
                         Mail::to($user->email)->send(new CoberturaRechazadaMail($turno, $user->name));
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Error enviando email de cobertura rechazada: ' . $e->getMessage());
+                    \Log::error('Error enviando email de cobertura rechazada: '.$e->getMessage());
                 }
             }
         }

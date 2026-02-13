@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ObjetivoAipem extends Model
 {
     protected $table = 'objetivos_aipem';
-    
+
     protected $fillable = [
         'codobj',
         'nombre',
@@ -46,5 +46,4 @@ class ObjetivoAipem extends Model
     {
         return $this->belongsTo(EmpresaAsociada::class, 'empresa_asociada_id');
     }
-
 }

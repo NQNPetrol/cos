@@ -16,7 +16,6 @@ class TicketController extends Controller
         return view('tickets.client.nuevo');
     }
 
-
     /**
      * Obtener tickets asignados al usuario actual
      */
@@ -37,7 +36,7 @@ class TicketController extends Controller
      */
     public function search(Request $request)
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->hasRole('admin')) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
@@ -45,9 +44,9 @@ class TicketController extends Controller
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('titulo', 'like', "%{$search}%")
-                  ->orWhere('descripcion', 'like', "%{$search}%");
+                    ->orWhere('descripcion', 'like', "%{$search}%");
             });
         }
 

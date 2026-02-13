@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Recorrido;
 use App\Models\RecorridoTimetable;
-use App\Models\SupervisorPatrulla;
 use App\Models\SupervisorEmpresaAsociada;
+use App\Models\SupervisorPatrulla;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class RecorridosHistorialController extends Controller
 {
@@ -19,7 +19,7 @@ class RecorridosHistorialController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             abort(403, 'No tiene un cliente asociado.');
         }
 
@@ -33,7 +33,7 @@ class RecorridosHistorialController extends Controller
 
         // Get recorridos available for this supervisor
         if ($user->hasRole('clientadmin')) {
-            $registros = RecorridoTimetable::whereHas('recorrido', fn($q) => $q->where('cliente_id', $cliente->id))
+            $registros = RecorridoTimetable::whereHas('recorrido', fn ($q) => $q->where('cliente_id', $cliente->id))
                 ->with(['recorrido.empresaAsociada', 'patrulla', 'supervisor', 'user'])
                 ->orderBy('fecha_hora_inicio', 'desc')
                 ->get();
@@ -92,12 +92,12 @@ class RecorridosHistorialController extends Controller
         $user = auth()->user();
         $personal = $user->personal;
 
-        if (!$personal) {
+        if (! $personal) {
             return response()->json(['error' => 'Debe tener un registro de personal asignado para registrar recorridos.'], 422);
         }
 
         $patrullaAsignacion = SupervisorPatrulla::where('supervisor_id', $personal->id)->first();
-        if (!$patrullaAsignacion) {
+        if (! $patrullaAsignacion) {
             return response()->json(['error' => 'Debe tener una patrulla asignada para registrar recorridos.'], 422);
         }
 
@@ -154,7 +154,7 @@ class RecorridosHistorialController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente || $registro->recorrido->cliente_id !== $cliente->id) {
+        if (! $cliente || $registro->recorrido->cliente_id !== $cliente->id) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 
@@ -201,11 +201,11 @@ class RecorridosHistorialController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente || $registro->recorrido->cliente_id !== $cliente->id) {
+        if (! $cliente || $registro->recorrido->cliente_id !== $cliente->id) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 
-        if (!$user->hasRole('clientadmin')) {
+        if (! $user->hasRole('clientadmin')) {
             return response()->json(['error' => 'Solo administradores del cliente pueden eliminar registros de recorridos.'], 403);
         }
 

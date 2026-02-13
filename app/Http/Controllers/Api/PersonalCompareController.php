@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Personal;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PersonalCompareController extends Controller
@@ -12,6 +12,7 @@ class PersonalCompareController extends Controller
     public function index()
     {
         $personal = Personal::all();
+
         return response()->json($personal, 200);
     }
 
@@ -26,10 +27,10 @@ class PersonalCompareController extends Controller
         \Log::info('Tipo de datos:', ['type' => gettype($datos)]);
         \Log::info('Es array?', ['is_array' => is_array($datos)]);
 
-        if (!is_array($datos) || !isset($datos[0]) || !is_array($datos[0])) {
+        if (! is_array($datos) || ! isset($datos[0]) || ! is_array($datos[0])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Se esperaba un array de registros'
+                'message' => 'Se esperaba un array de registros',
             ], 422);
         }
 
@@ -47,8 +48,9 @@ class PersonalCompareController extends Controller
                         'indice' => $index,
                         'criterio' => $existe['criterio'],
                         'registro_existente' => $existe['registro'],
-                        'datos_nuevos' => $item
+                        'datos_nuevos' => $item,
                     ];
+
                     continue;
                 }
 
@@ -63,16 +65,16 @@ class PersonalCompareController extends Controller
                     'tipo_doc' => 'nullable|string',
                     'nro_doc' => 'nullable|string|unique:personal,nro_doc',
                     'telefono' => 'nullable|string',
-                    'legajo' => 'nullable|integer|unique:personal,legajo'
+                    'legajo' => 'nullable|integer|unique:personal,legajo',
                 ]);
-
 
                 if ($validator->fails()) {
                     $errores[] = [
                         'indice' => $index,
                         'errores' => $validator->errors()->toArray(),
-                        'data' => $item
+                        'data' => $item,
                     ];
+
                     continue;
                 }
 
@@ -87,24 +89,24 @@ class PersonalCompareController extends Controller
                     'tipo_doc' => $item['tipo_doc'] ?? 'DU',
                     'nro_doc' => $item['nro_doc'] ?? '',
                     'telefono' => $item['telefono'] ?? '',
-                    'legajo' => $item['legajo'] ?? null
+                    'legajo' => $item['legajo'] ?? null,
                 ]);
-            
-                \Log::info("Registro creado exitosamente:", [
+
+                \Log::info('Registro creado exitosamente:', [
                     'indice' => $index,
                     'id' => $personal->id,
                     'nombre' => $personal->nombre,
                     'apellido' => $personal->apellido,
-                    'legajo' => $personal->legajo
+                    'legajo' => $personal->legajo,
                 ]);
-                
+
                 $registros_nuevos[] = $personal;
 
             } catch (\Exception $e) {
                 $errores[] = [
                     'indice' => $index,
                     'error' => $e->getMessage(),
-                    'data' => $item
+                    'data' => $item,
                 ];
             }
         }
@@ -116,11 +118,11 @@ class PersonalCompareController extends Controller
                 'total_registros' => count($datos),
                 'nuevos_registros' => count($registros_nuevos),
                 'registros_duplicados' => count($registros_duplicados),
-                'errores' => count($errores)
+                'errores' => count($errores),
             ],
             'registros_nuevos' => $registros_nuevos,
             'registros_duplicados' => $registros_duplicados,
-            'errores' => $errores
+            'errores' => $errores,
         ], 201);
     }
 
@@ -137,7 +139,7 @@ class PersonalCompareController extends Controller
                 return [
                     'existe' => true,
                     'criterio' => 'legajo',
-                    'registro' => $registro
+                    'registro' => $registro,
                 ];
             }
         }
@@ -149,7 +151,7 @@ class PersonalCompareController extends Controller
                 return [
                     'existe' => true,
                     'criterio' => 'nro_doc',
-                    'registro' => $registro
+                    'registro' => $registro,
                 ];
             }
         }
@@ -157,13 +159,13 @@ class PersonalCompareController extends Controller
         // Por nombre + apellido
         if (isset($item['nombre']) && isset($item['apellido'])) {
             $registro = Personal::where('nombre', $item['nombre'])
-                                ->where('apellido', $item['apellido'])
-                                ->first();
+                ->where('apellido', $item['apellido'])
+                ->first();
             if ($registro) {
                 return [
                     'existe' => true,
                     'criterio' => 'nombre_apellido',
-                    'registro' => $registro
+                    'registro' => $registro,
                 ];
             }
         }
@@ -171,7 +173,7 @@ class PersonalCompareController extends Controller
         return [
             'existe' => false,
             'criterio' => '',
-            'registro' => null
+            'registro' => null,
         ];
     }
 
@@ -179,10 +181,10 @@ class PersonalCompareController extends Controller
     {
         $datos = $request->all();
 
-        if (!is_array($datos) || !isset($datos[0]) || !is_array($datos[0])) {
+        if (! is_array($datos) || ! isset($datos[0]) || ! is_array($datos[0])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Se esperaba un array de registros para verificación masiva'
+                'message' => 'Se esperaba un array de registros para verificación masiva',
             ], 422);
         }
 
@@ -191,13 +193,13 @@ class PersonalCompareController extends Controller
         foreach ($datos as $index => $item) {
             try {
                 $resultado = $this->verificarDuplicado($item);
-                
+
                 $resultados[] = [
                     'indice' => $index,
                     'existe' => $resultado['existe'],
                     'criterio' => $resultado['criterio'],
                     'registro_existente' => $resultado['registro'],
-                    'datos_consultados' => $item
+                    'datos_consultados' => $item,
                 ];
 
             } catch (\Exception $e) {
@@ -205,7 +207,7 @@ class PersonalCompareController extends Controller
                     'indice' => $index,
                     'error' => $e->getMessage(),
                     'existe' => false,
-                    'datos_consultados' => $item
+                    'datos_consultados' => $item,
                 ];
             }
         }
@@ -213,10 +215,10 @@ class PersonalCompareController extends Controller
         return response()->json([
             'success' => true,
             'total_registros' => count($datos),
-            'registros_existentes' => count(array_filter($resultados, fn($r) => $r['existe'])),
-            'registros_nuevos' => count(array_filter($resultados, fn($r) => !$r['existe'] && !isset($r['error']))),
-            'errores' => count(array_filter($resultados, fn($r) => isset($r['error']))),
-            'resultados' => $resultados
+            'registros_existentes' => count(array_filter($resultados, fn ($r) => $r['existe'])),
+            'registros_nuevos' => count(array_filter($resultados, fn ($r) => ! $r['existe'] && ! isset($r['error']))),
+            'errores' => count(array_filter($resultados, fn ($r) => isset($r['error']))),
+            'resultados' => $resultados,
         ], 200);
     }
 }

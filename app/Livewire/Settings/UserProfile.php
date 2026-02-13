@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
-use Laravel\Jetstream\Features;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -20,17 +19,21 @@ class UserProfile extends Component
     use WithFileUploads;
 
     public string $name = '';
+
     public string $email = '';
+
     public $photo;
-    
+
     // Password fields
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
-    
+
     // Delete account
     public string $delete_password = '';
-    
+
     // Sessions
     public $sessions = [];
 
@@ -52,6 +55,7 @@ class UserProfile extends Component
                 ->get()
                 ->map(function ($session) {
                     $agent = $this->createAgent($session);
+
                     return (object) [
                         'id' => $session->id,
                         'agent' => [
@@ -71,9 +75,9 @@ class UserProfile extends Component
     protected function createAgent($session): array
     {
         $userAgent = $session->user_agent ?? '';
-        
+
         return [
-            'is_desktop' => !preg_match('/Mobile|Android|iPhone|iPad/', $userAgent),
+            'is_desktop' => ! preg_match('/Mobile|Android|iPhone|iPad/', $userAgent),
             'platform' => $this->getPlatform($userAgent),
             'browser' => $this->getBrowser($userAgent),
         ];
@@ -81,22 +85,46 @@ class UserProfile extends Component
 
     protected function getPlatform(string $userAgent): string
     {
-        if (preg_match('/Windows/', $userAgent)) return 'Windows';
-        if (preg_match('/Macintosh|Mac OS/', $userAgent)) return 'macOS';
-        if (preg_match('/Linux/', $userAgent)) return 'Linux';
-        if (preg_match('/iPhone/', $userAgent)) return 'iPhone';
-        if (preg_match('/iPad/', $userAgent)) return 'iPad';
-        if (preg_match('/Android/', $userAgent)) return 'Android';
+        if (preg_match('/Windows/', $userAgent)) {
+            return 'Windows';
+        }
+        if (preg_match('/Macintosh|Mac OS/', $userAgent)) {
+            return 'macOS';
+        }
+        if (preg_match('/Linux/', $userAgent)) {
+            return 'Linux';
+        }
+        if (preg_match('/iPhone/', $userAgent)) {
+            return 'iPhone';
+        }
+        if (preg_match('/iPad/', $userAgent)) {
+            return 'iPad';
+        }
+        if (preg_match('/Android/', $userAgent)) {
+            return 'Android';
+        }
+
         return 'Unknown';
     }
 
     protected function getBrowser(string $userAgent): string
     {
-        if (preg_match('/Chrome/', $userAgent) && !preg_match('/Edge|Edg/', $userAgent)) return 'Chrome';
-        if (preg_match('/Firefox/', $userAgent)) return 'Firefox';
-        if (preg_match('/Safari/', $userAgent) && !preg_match('/Chrome/', $userAgent)) return 'Safari';
-        if (preg_match('/Edge|Edg/', $userAgent)) return 'Edge';
-        if (preg_match('/Opera|OPR/', $userAgent)) return 'Opera';
+        if (preg_match('/Chrome/', $userAgent) && ! preg_match('/Edge|Edg/', $userAgent)) {
+            return 'Chrome';
+        }
+        if (preg_match('/Firefox/', $userAgent)) {
+            return 'Firefox';
+        }
+        if (preg_match('/Safari/', $userAgent) && ! preg_match('/Chrome/', $userAgent)) {
+            return 'Safari';
+        }
+        if (preg_match('/Edge|Edg/', $userAgent)) {
+            return 'Edge';
+        }
+        if (preg_match('/Opera|OPR/', $userAgent)) {
+            return 'Opera';
+        }
+
         return 'Unknown';
     }
 
@@ -134,7 +162,7 @@ class UserProfile extends Component
         ]);
 
         $user = Auth::user();
-        
+
         // Delete old photo if exists
         if ($user->profile_photo_path) {
             Storage::disk('public')->delete($user->profile_photo_path);
@@ -142,13 +170,13 @@ class UserProfile extends Component
 
         // Store new photo
         $path = $this->photo->store('profile-photos', 'public');
-        
+
         $user->forceFill([
             'profile_photo_path' => $path,
         ])->save();
 
         $this->photo = null;
-        
+
         $this->dispatch('photo-updated');
     }
 
@@ -158,7 +186,7 @@ class UserProfile extends Component
 
         if ($user->profile_photo_path) {
             Storage::disk('public')->delete($user->profile_photo_path);
-            
+
             $user->forceFill([
                 'profile_photo_path' => null,
             ])->save();
@@ -239,6 +267,7 @@ class UserProfile extends Component
 
         if ($user->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
+
             return;
         }
 
@@ -253,4 +282,3 @@ class UserProfile extends Component
             ->layout('layouts.app');
     }
 }
-

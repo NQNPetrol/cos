@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Dispositivo;
-use App\Models\Cliente;
+use Illuminate\Http\Request;
 
 class InventarioController extends Controller
 {
-    
     public function index()
     {
         return view('inventario.index');
@@ -25,22 +23,22 @@ class InventarioController extends Controller
     public function exportar()
     {
         $dispositivos = Dispositivo::with('cliente')->get();
-        
-        $filename = 'dispositivos_' . date('Y-m-d_H-i-s') . '.csv';
-        
+
+        $filename = 'dispositivos_'.date('Y-m-d_H-i-s').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($dispositivos) {
+        $callback = function () use ($dispositivos) {
             $file = fopen('php://output', 'w');
-            
+
             // Encabezados
             fputcsv($file, [
-                'ID', 'Tipo', 'Estado', 'IP', 'Puerto', 'Serial', 'MAC', 'Cliente', 
+                'ID', 'Tipo', 'Estado', 'IP', 'Puerto', 'Serial', 'MAC', 'Cliente',
                 'Ubicación', 'Estado Inventario', 'Versión SW', 'Fecha Instalación',
-                'Necesita Mantenimiento', 'Necesita Actualización', 'Observaciones'
+                'Necesita Mantenimiento', 'Necesita Actualización', 'Observaciones',
             ]);
 
             // Datos
@@ -163,15 +161,15 @@ class InventarioController extends Controller
             'version_software' => 'nullable|string',
             'direccion_ipv6' => 'nullable|string|max:255',
             'estado_hikconnect' => 'nullable|string|max:255',
-            'cliente_id' =>'required|exists:clientes,id',
+            'cliente_id' => 'required|exists:clientes,id',
             'ubicacion' => 'nullable|string|max:255',
-            'observaciones'=> 'nullable|string|max:255',
+            'observaciones' => 'nullable|string|max:255',
             'necesita_mantenimiento',
             'necesita_actualizacion',
             'fecha_instalacion',
             'ultimo_mantenimiento',
             'proximo_mantenimiento',
-            'estado_inventario'
+            'estado_inventario',
         ]);
 
         Personal::create($validated);

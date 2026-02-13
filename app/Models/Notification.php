@@ -20,6 +20,7 @@ class Notification extends Model
         'priority',
         'is_active',
     ];
+
     protected $casts = [
         'is_active' => 'boolean',
         'created_at' => 'datetime',
@@ -43,19 +44,19 @@ class Notification extends Model
             ->withTimestamps();
     }
 
-    //notificaciones activas
+    // notificaciones activas
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    //notif globales
+    // notif globales
     public function scopeGlobal($query)
     {
         return $query->where('type', 'global');
     }
 
-    //notif especificas p un usuario
+    // notif especificas p un usuario
     public function scopeForUser($query, $userId)
     {
         return $query->where('type', 'user')->where('user_id', $userId);
@@ -70,7 +71,7 @@ class Notification extends Model
     // vsibilidad de notif
     public function isVisibleForUser(User $user): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -86,15 +87,15 @@ class Notification extends Model
         }
     }
 
-    //marcar la notif como leida
+    // marcar la notif como leida
     public function markAsReadForUser(User $user): void
     {
         $this->users()->syncWithoutDetaching([
             $user->id => [
                 'is_read' => true,
                 'read_at' => now(),
-                'updated_at' => now()
-            ]
+                'updated_at' => now(),
+            ],
         ]);
     }
 
@@ -104,20 +105,22 @@ class Notification extends Model
             $user->id => [
                 'is_dismissed' => true,
                 'dismissed_at' => now(),
-                'updated_at' => now()
-            ]
+                'updated_at' => now(),
+            ],
         ]);
     }
 
     public function isReadByUser(User $user): bool
     {
         $pivot = $this->users()->where('user_id', $user->id)->first();
+
         return $pivot ? $pivot->pivot->is_read : false;
     }
 
     public function isDismissedByUser(User $user): bool
     {
         $pivot = $this->users()->where('user_id', $user->id)->first();
+
         return $pivot ? $pivot->pivot->is_dismissed : false;
     }
 }

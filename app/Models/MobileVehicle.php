@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class MobileVehicle extends Model
 {
@@ -23,7 +23,7 @@ class MobileVehicle extends Model
         'vehicle_type',
         'vehicle_brand',
         'vehicle_color',
-        'patrulla_id'
+        'patrulla_id',
     ];
 
     protected $casts = [
@@ -62,7 +62,7 @@ class MobileVehicle extends Model
      */
     public function getStatusNameAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             1 => 'Activo',
             2 => 'Inactivo',
             default => 'Desconocido'

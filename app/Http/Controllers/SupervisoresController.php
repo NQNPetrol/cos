@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Patrulla;
+use App\Models\Personal;
+use App\Models\SupervisorPatrulla;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\Personal;
-use App\Models\Patrulla;
-use App\Models\SupervisorPatrulla;
-use App\Models\SupervisorEmpresaAsociada;
-use App\Models\EmpresaAsociada;
 
 class SupervisoresController extends Controller
 {
@@ -21,7 +19,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             abort(403, 'No tiene un cliente asociado.');
         }
 
@@ -29,15 +27,15 @@ class SupervisoresController extends Controller
 
         // Get all users with role clientsupervisor that belong to this client
         $supervisores = User::role('clientsupervisor')
-            ->whereHas('clientes', fn($q) => $q->where('clientes.id', $clienteId))
+            ->whereHas('clientes', fn ($q) => $q->where('clientes.id', $clienteId))
             ->with([
                 'personal.supervisorPatrulla.patrulla',
                 'personal.empresasAsociadas',
             ])
             ->get();
 
-        $conPersonal = $supervisores->filter(fn($s) => $s->personal !== null)->count();
-        $conPatrulla = $supervisores->filter(fn($s) => $s->personal && $s->personal->supervisorPatrulla !== null)->count();
+        $conPersonal = $supervisores->filter(fn ($s) => $s->personal !== null)->count();
+        $conPatrulla = $supervisores->filter(fn ($s) => $s->personal && $s->personal->supervisorPatrulla !== null)->count();
 
         // Empresas asociadas del cliente para el modal de asignación
         $empresasAsociadas = $cliente->empresasAsociadas ?? collect();
@@ -64,7 +62,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json(['error' => 'No tiene un cliente asociado.'], 403);
         }
 
@@ -73,13 +71,13 @@ class SupervisoresController extends Controller
             ->where('cliente_id', $cliente->id)
             ->first();
 
-        if (!$personal) {
+        if (! $personal) {
             return response()->json(['error' => 'Registro de personal no encontrado o ya asignado.'], 422);
         }
 
         // Verify the target user belongs to same client and is a supervisor
         $targetUser = User::find($request->user_id);
-        if (!$targetUser || !$targetUser->hasRole('clientsupervisor') || !$targetUser->perteneceACliente($cliente->id)) {
+        if (! $targetUser || ! $targetUser->hasRole('clientsupervisor') || ! $targetUser->perteneceACliente($cliente->id)) {
             return response()->json(['error' => 'Usuario supervisor no válido.'], 422);
         }
 
@@ -106,18 +104,18 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json([]);
         }
 
         $query = Personal::whereNull('user_id')
             ->where('cliente_id', $cliente->id);
 
-        if ($request->has('dni') && !empty($request->dni)) {
+        if ($request->has('dni') && ! empty($request->dni)) {
             $query->where(function ($q) use ($request) {
                 $q->where('nro_doc', 'LIKE', "%{$request->dni}%")
-                  ->orWhere('nombre', 'LIKE', "%{$request->dni}%")
-                  ->orWhere('apellido', 'LIKE', "%{$request->dni}%");
+                    ->orWhere('nombre', 'LIKE', "%{$request->dni}%")
+                    ->orWhere('apellido', 'LIKE', "%{$request->dni}%");
             });
         }
 
@@ -139,7 +137,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json(['error' => 'No tiene un cliente asociado.'], 403);
         }
 
@@ -148,7 +146,7 @@ class SupervisoresController extends Controller
             ->where('cliente_id', $cliente->id)
             ->first();
 
-        if (!$patrulla) {
+        if (! $patrulla) {
             return response()->json(['error' => 'Patrulla no encontrada o no pertenece al cliente.'], 422);
         }
 
@@ -163,7 +161,7 @@ class SupervisoresController extends Controller
             ->where('cliente_id', $cliente->id)
             ->first();
 
-        if (!$personal) {
+        if (! $personal) {
             return response()->json(['error' => 'Supervisor no encontrado.'], 422);
         }
 
@@ -198,7 +196,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json(['error' => 'No tiene un cliente asociado.'], 403);
         }
 
@@ -207,7 +205,7 @@ class SupervisoresController extends Controller
             ->where('cliente_id', $cliente->id)
             ->first();
 
-        if (!$patrulla) {
+        if (! $patrulla) {
             return response()->json(['error' => 'Patrulla no encontrada o no pertenece al cliente.'], 422);
         }
 
@@ -246,7 +244,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json([]);
         }
 
@@ -261,7 +259,7 @@ class SupervisoresController extends Controller
                 $query = Patrulla::where('cliente_id', $cliente->id)
                     ->where(function ($q) use ($currentPatrullaId) {
                         $q->whereDoesntHave('supervisorPatrulla')
-                          ->orWhere('id', $currentPatrullaId);
+                            ->orWhere('id', $currentPatrullaId);
                     });
             }
         }
@@ -283,7 +281,7 @@ class SupervisoresController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json(['error' => 'No tiene un cliente asociado.'], 403);
         }
 
@@ -291,7 +289,7 @@ class SupervisoresController extends Controller
             ->where('cliente_id', $cliente->id)
             ->first();
 
-        if (!$personal) {
+        if (! $personal) {
             return response()->json(['error' => 'Supervisor no encontrado.'], 422);
         }
 

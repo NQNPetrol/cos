@@ -2,21 +2,24 @@
 
 namespace App\Livewire\Admin;
 
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
-use Illuminate\Validation\Rule;
 
 class ManageRoles extends Component
 {
     public $name;
+
     public $roles;
+
     public $editingRoleId = null;
+
     public $editName = '';
 
     public function mount()
     {
         $this->loadRoles();
-    
+
     }
 
     public function loadRoles()
@@ -27,15 +30,15 @@ class ManageRoles extends Component
     public function createRole()
     {
         $this->validate([
-            'name' => 'required|unique:roles,name'
+            'name' => 'required|unique:roles,name',
         ]);
 
         // Asegurar que siempre se use guard_name = 'web'
         Role::create([
             'name' => $this->name,
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
-        
+
         $this->name = '';
         $this->loadRoles();
         session()->flash('success', 'Rol creado correctamente.');
@@ -59,16 +62,16 @@ class ManageRoles extends Component
         $this->validate([
             'editName' => [
                 'required',
-                Rule::unique('roles', 'name')->ignore($roleId)
-            ]
+                Rule::unique('roles', 'name')->ignore($roleId),
+            ],
         ]);
 
         $role = Role::findOrFail($roleId);
         $role->update([
             'name' => $this->editName,
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
-        
+
         $this->cancelEdit();
         $this->loadRoles();
 
@@ -78,10 +81,11 @@ class ManageRoles extends Component
     public function deleteRole($roleId)
     {
         $role = Role::findOrFail($roleId);
-        
+
         // Prevenir eliminación de roles del sistema si es necesario
         if (in_array($role->name, ['admin', 'super-admin'])) {
             session()->flash('error', 'No se puede eliminar este rol del sistema.');
+
             return;
         }
 
@@ -94,6 +98,7 @@ class ManageRoles extends Component
     public function redirectToPermissions($roleId)
     {
         $role = Role::findOrFail($roleId);
+
         return redirect()->route('asignar.permisos', ['role' => $roleId]);
     }
 

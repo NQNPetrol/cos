@@ -2,46 +2,64 @@
 
 namespace App\Livewire\Sites;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\FlytbaseSite;
 use App\Models\Cliente;
 use App\Models\FlytbaseDock;
 use App\Models\FlytbaseDrone;
-use App\Models\User;
 use App\Models\FlytbaseOrg;
+use App\Models\FlytbaseSite;
+use App\Models\User;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ManageFlytbaseSites extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $clienteFilter = '';
+
     public $dockDroneFilter = '';
+
     public $activoFilter = '';
 
     // Modal states
     public $showModal = false;
+
     public $editing = false;
+
     public $siteId = null;
 
     // Form fields
     public $nombre = '';
+
     public $descripcion = '';
+
     public $cliente_id = '';
+
     public $latitud = '';
+
     public $longitud = '';
+
     public $selectedDocks = [];
+
     public $selectedDrones = [];
+
     public $organization_id = '';
+
     public $selectedMembers = [];
+
     public $activo = true;
 
     // Lists for dropdowns
     public $clientes = [];
+
     public $organizations = [];
+
     public $users = [];
+
     public $availableDocks = [];
+
     public $availableDrones = [];
 
     protected $queryString = [
@@ -79,18 +97,18 @@ class ManageFlytbaseSites extends Component
     {
         // Obtener todos los docks activos
         $allDocks = FlytbaseDock::where('active', true)->orderBy('nombre')->get();
-        
+
         // Si estamos editando, excluir los docks que ya están asignados a otros sites
         if ($this->editing && $this->siteId) {
             $assignedDockIds = $this->getAssignedDockIdsExcludingCurrent();
-            $this->availableDocks = $allDocks->filter(function($dock) use ($assignedDockIds) {
-                return !in_array($dock->id, $assignedDockIds);
+            $this->availableDocks = $allDocks->filter(function ($dock) use ($assignedDockIds) {
+                return ! in_array($dock->id, $assignedDockIds);
             });
         } else {
             // Para creación, excluir todos los docks ya asignados
             $assignedDockIds = $this->getAllAssignedDockIds();
-            $this->availableDocks = $allDocks->filter(function($dock) use ($assignedDockIds) {
-                return !in_array($dock->id, $assignedDockIds);
+            $this->availableDocks = $allDocks->filter(function ($dock) use ($assignedDockIds) {
+                return ! in_array($dock->id, $assignedDockIds);
             });
         }
     }
@@ -99,18 +117,18 @@ class ManageFlytbaseSites extends Component
     {
         // Obtener todos los drones activos
         $allDrones = FlytbaseDrone::where('activo', true)->orderBy('drone')->get();
-        
+
         // Si estamos editando, excluir los drones que ya están asignados a otros sites
         if ($this->editing && $this->siteId) {
             $assignedDroneIds = $this->getAssignedDroneIdsExcludingCurrent();
-            $this->availableDrones = $allDrones->filter(function($drone) use ($assignedDroneIds) {
-                return !in_array($drone->id, $assignedDroneIds);
+            $this->availableDrones = $allDrones->filter(function ($drone) use ($assignedDroneIds) {
+                return ! in_array($drone->id, $assignedDroneIds);
             });
         } else {
             // Para creación, excluir todos los drones ya asignados
             $assignedDroneIds = $this->getAllAssignedDroneIds();
-            $this->availableDrones = $allDrones->filter(function($drone) use ($assignedDroneIds) {
-                return !in_array($drone->id, $assignedDroneIds);
+            $this->availableDrones = $allDrones->filter(function ($drone) use ($assignedDroneIds) {
+                return ! in_array($drone->id, $assignedDroneIds);
             });
         }
     }
@@ -119,7 +137,7 @@ class ManageFlytbaseSites extends Component
     {
         $assignedDockIds = [];
         $sites = FlytbaseSite::whereNotNull('devices')->get();
-        
+
         foreach ($sites as $site) {
             if (is_array($site->devices)) {
                 foreach ($site->devices as $device) {
@@ -129,7 +147,7 @@ class ManageFlytbaseSites extends Component
                 }
             }
         }
-        
+
         return array_unique($assignedDockIds);
     }
 
@@ -137,7 +155,7 @@ class ManageFlytbaseSites extends Component
     {
         $assignedDroneIds = [];
         $sites = FlytbaseSite::whereNotNull('devices')->get();
-        
+
         foreach ($sites as $site) {
             if (is_array($site->devices)) {
                 foreach ($site->devices as $device) {
@@ -147,7 +165,7 @@ class ManageFlytbaseSites extends Component
                 }
             }
         }
-        
+
         return array_unique($assignedDroneIds);
     }
 
@@ -155,9 +173,9 @@ class ManageFlytbaseSites extends Component
     {
         $assignedDockIds = [];
         $sites = FlytbaseSite::where('id', '!=', $this->siteId)
-                            ->whereNotNull('devices')
-                            ->get();
-        
+            ->whereNotNull('devices')
+            ->get();
+
         foreach ($sites as $site) {
             if (is_array($site->devices)) {
                 foreach ($site->devices as $device) {
@@ -167,7 +185,7 @@ class ManageFlytbaseSites extends Component
                 }
             }
         }
-        
+
         return array_unique($assignedDockIds);
     }
 
@@ -175,9 +193,9 @@ class ManageFlytbaseSites extends Component
     {
         $assignedDroneIds = [];
         $sites = FlytbaseSite::where('id', '!=', $this->siteId)
-                            ->whereNotNull('devices')
-                            ->get();
-        
+            ->whereNotNull('devices')
+            ->get();
+
         foreach ($sites as $site) {
             if (is_array($site->devices)) {
                 foreach ($site->devices as $device) {
@@ -187,7 +205,7 @@ class ManageFlytbaseSites extends Component
                 }
             }
         }
-        
+
         return array_unique($assignedDroneIds);
     }
 
@@ -223,7 +241,7 @@ class ManageFlytbaseSites extends Component
     public function openEditModal($siteId)
     {
         $site = FlytbaseSite::findOrFail($siteId);
-        
+
         $this->siteId = $site->id;
         $this->nombre = $site->nombre;
         $this->descripcion = $site->descripcion;
@@ -263,9 +281,9 @@ class ManageFlytbaseSites extends Component
     public function resetForm()
     {
         $this->reset([
-            'siteId', 'nombre', 'descripcion', 'cliente_id', 
+            'siteId', 'nombre', 'descripcion', 'cliente_id',
             'latitud', 'longitud', 'selectedDocks', 'selectedDrones',
-            'organization_id', 'selectedMembers', 'activo'
+            'organization_id', 'selectedMembers', 'activo',
         ]);
     }
 
@@ -277,6 +295,7 @@ class ManageFlytbaseSites extends Component
         if (count($this->selectedDocks) !== count($this->selectedDrones)) {
             $this->addError('selectedDocks', 'La cantidad de docks seleccionados debe coincidir con la cantidad de drones seleccionados.');
             $this->addError('selectedDrones', 'La cantidad de drones seleccionados debe coincidir con la cantidad de docks seleccionados.');
+
             return;
         }
 
@@ -285,7 +304,7 @@ class ManageFlytbaseSites extends Component
         for ($i = 0; $i < count($this->selectedDocks); $i++) {
             $devices[] = [
                 'dock_id' => $this->selectedDocks[$i],
-                'drone_id' => $this->selectedDrones[$i]
+                'drone_id' => $this->selectedDrones[$i],
             ];
         }
 
@@ -315,7 +334,7 @@ class ManageFlytbaseSites extends Component
     {
         $site = FlytbaseSite::findOrFail($siteId);
         $site->delete();
-        
+
         session()->flash('success', 'Sitio eliminado correctamente.');
     }
 
@@ -324,11 +343,11 @@ class ManageFlytbaseSites extends Component
         $sites = FlytbaseSite::with(['cliente', 'organization'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('nombre', 'like', '%' . $this->search . '%')
-                      ->orWhere('descripcion', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('cliente', function ($q2) {
-                          $q2->where('nombre', 'like', '%' . $this->search . '%');
-                      });
+                    $q->where('nombre', 'like', '%'.$this->search.'%')
+                        ->orWhere('descripcion', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('cliente', function ($q2) {
+                            $q2->where('nombre', 'like', '%'.$this->search.'%');
+                        });
                 });
             })
             ->when($this->clienteFilter, function ($query) {
@@ -337,9 +356,9 @@ class ManageFlytbaseSites extends Component
             ->when($this->dockDroneFilter, function ($query) {
                 $dockDronePair = explode('-', $this->dockDroneFilter);
                 if (count($dockDronePair) === 2) {
-                    $dockId = (int)$dockDronePair[0];
-                    $droneId = (int)$dockDronePair[1];
-                    
+                    $dockId = (int) $dockDronePair[0];
+                    $droneId = (int) $dockDronePair[1];
+
                     $query->where(function ($q) use ($dockId, $droneId) {
                         $q->whereJsonContains('devices', ['dock_id' => $dockId, 'drone_id' => $droneId]);
                     });
@@ -355,7 +374,7 @@ class ManageFlytbaseSites extends Component
 
         return view('livewire.sites.manage-flytbase-sites', [
             'sites' => $sites,
-            'dockDronePairs' => $dockDronePairs
+            'dockDronePairs' => $dockDronePairs,
         ]);
     }
 
@@ -370,10 +389,10 @@ class ManageFlytbaseSites extends Component
                     if (isset($device['dock_id']) && isset($device['drone_id'])) {
                         $dock = FlytbaseDock::find($device['dock_id']);
                         $drone = FlytbaseDrone::find($device['drone_id']);
-                        
+
                         if ($dock && $drone) {
-                            $key = $device['dock_id'] . '-' . $device['drone_id'];
-                            $pairs[$key] = $dock->nombre . ' - ' . $drone->drone;
+                            $key = $device['dock_id'].'-'.$device['drone_id'];
+                            $pairs[$key] = $dock->nombre.' - '.$drone->drone;
                         }
                     }
                 }
@@ -381,14 +400,16 @@ class ManageFlytbaseSites extends Component
         }
 
         asort($pairs);
+
         return $pairs;
     }
 
     public function getCantidadDispositivos($devices)
     {
         if (is_array($devices)) {
-            return count($devices)*2;
+            return count($devices) * 2;
         }
+
         return 0;
     }
 
@@ -397,6 +418,7 @@ class ManageFlytbaseSites extends Component
         if (is_array($members)) {
             return count($members);
         }
+
         return 0;
     }
 

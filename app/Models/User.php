@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -11,9 +13,6 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Cliente;
 
 class User extends Authenticatable
 {
@@ -21,11 +20,12 @@ class User extends Authenticatable
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
+    use HasRoles;
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use HasRoles; 
 
     /**
      * The attributes that are mass assignable.
@@ -78,7 +78,7 @@ class User extends Authenticatable
         return $this->hasMany(AlertLog::class);
     }
 
-     /**
+    /**
      * Tickets creados por este usuario
      */
     public function tickets(): HasMany
@@ -115,7 +115,7 @@ class User extends Authenticatable
     public function getLogoClienteAttribute()
     {
         $cliente = $this->cliente_principal;
-        
+
         if ($cliente && $cliente->logo) {
             return $cliente->logo_url;
         }
@@ -126,10 +126,11 @@ class User extends Authenticatable
     public function getNombreClienteAttribute()
     {
         $cliente = $this->cliente_principal;
+
         return $cliente ? $cliente->nombre : 'Centro de Operaciones';
     }
 
-     /**
+    /**
      * Verifica si el usuario es del COS (staff interno)
      */
     public function esCOS(): bool
@@ -154,13 +155,13 @@ class User extends Authenticatable
     {
         $nameParts = explode(' ', trim($this->name));
         $initials = '';
-        
+
         foreach ($nameParts as $part) {
-            if (!empty($part)) {
+            if (! empty($part)) {
                 $initials .= strtoupper(substr($part, 0, 1));
             }
         }
-        
+
         return $initials ?: strtoupper(substr($this->email, 0, 1)); // Fallback to first letter of email
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Camera extends Model
 {
@@ -21,13 +21,13 @@ class Camera extends Model
         'site_index_code',
         'status',
         'is_support_wake_up',
-        'wake_up_status'
+        'wake_up_status',
     ];
 
     protected $casts = [
         'status' => 'integer',
         'is_support_wake_up' => 'boolean',
-        'wake_up_status' => 'integer'
+        'wake_up_status' => 'integer',
     ];
 
     /**

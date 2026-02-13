@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Client\EmpresasAsociadas;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use Livewire\Attributes\Layout;
 use App\Models\EmpresaAsociada;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.cliente')]
 class Index extends Component
@@ -14,10 +14,13 @@ class Index extends Component
     use WithPagination;
 
     public $search = '';
+
     public $mostrarModalCrear = false;
+
     public $mostrarModalEditar = false;
+
     public $empresaEditar = null;
-    
+
     // Campos del formulario
     public $nombre = '';
 
@@ -36,8 +39,8 @@ class Index extends Component
     private function getClientePrincipal()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return null;
         }
 
@@ -50,8 +53,8 @@ class Index extends Component
     private function getClienteIds()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
 
@@ -62,11 +65,11 @@ class Index extends Component
     {
         $clienteIds = $this->getClienteIds();
 
-        $empresas = EmpresaAsociada::whereHas('cliente', function($query) use ($clienteIds) {
-                $query->whereIn('clientes.id', $clienteIds);
-            })
-            ->when($this->search, function($query) {
-                $query->where('nombre', 'like', '%' . $this->search . '%');
+        $empresas = EmpresaAsociada::whereHas('cliente', function ($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })
+            ->when($this->search, function ($query) {
+                $query->where('nombre', 'like', '%'.$this->search.'%');
             })
             ->orderBy('nombre')
             ->paginate(10);
@@ -103,9 +106,10 @@ class Index extends Component
         $this->validate();
 
         $cliente = $this->getClientePrincipal();
-        
-        if (!$cliente) {
+
+        if (! $cliente) {
             session()->flash('error', 'No tienes un cliente asignado');
+
             return;
         }
 
@@ -127,14 +131,15 @@ class Index extends Component
     public function abrirModalEditar($empresaId)
     {
         $clienteIds = $this->getClienteIds();
-        
-        $empresa = EmpresaAsociada::whereHas('cliente', function($query) use ($clienteIds) {
-                $query->whereIn('clientes.id', $clienteIds);
-            })
+
+        $empresa = EmpresaAsociada::whereHas('cliente', function ($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })
             ->find($empresaId);
-        
-        if (!$empresa) {
+
+        if (! $empresa) {
             session()->flash('error', 'Empresa no encontrada');
+
             return;
         }
 
@@ -158,8 +163,9 @@ class Index extends Component
      */
     public function actualizarEmpresa()
     {
-        if (!$this->empresaEditar) {
+        if (! $this->empresaEditar) {
             session()->flash('error', 'Empresa no encontrada');
+
             return;
         }
 
@@ -171,8 +177,9 @@ class Index extends Component
             ->whereIn('clientes.id', $clienteIds)
             ->exists();
 
-        if (!$tieneAcceso) {
+        if (! $tieneAcceso) {
             session()->flash('error', 'No tienes acceso a esta empresa');
+
             return;
         }
 

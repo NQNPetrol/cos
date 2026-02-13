@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Objetivo;
 use App\Models\Cliente;
-use App\Models\Contrato;
-use App\Models\EmpresaAsociada;
+use App\Models\Objetivo;
+use Illuminate\Http\Request;
 
 class ObjetivoController extends Controller
 {
@@ -16,6 +14,7 @@ class ObjetivoController extends Controller
     public function index()
     {
         $objetivos = Objetivo::with('cliente', 'contrato')->paginate(10);
+
         return view('objetivos.index', compact('objetivos'));
     }
 
@@ -37,7 +36,7 @@ class ObjetivoController extends Controller
             'latitud' => 'required|regex:/^-?\d{1,2}\.\d+$/',
             'longitud' => 'required|regex:/^-?\d{1,3}\.\d+$/',
             'localidad' => 'required|string|max:255',
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
         ]);
 
         Objetivo::create($validated);
@@ -63,7 +62,7 @@ class ObjetivoController extends Controller
             'latitud' => 'required|string|max:255',
             'longitud' => 'required|string|max:255',
             'localidad' => 'required|string|max:255',
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
         ]);
 
         $objetivo->update($validated);
@@ -74,8 +73,7 @@ class ObjetivoController extends Controller
     public function destroy(Objetivo $objetivo)
     {
         $objetivo->delete();
+
         return redirect()->route('objetivos.index')->with('success', 'Objetivo eliminado.');
     }
 }
-
-

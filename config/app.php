@@ -42,7 +42,7 @@ return [
         // Application Service Providers...
         App\Providers\AppServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        //App\Providers\RouteServiceProvider::class,
+        // App\Providers\RouteServiceProvider::class,
     ],
 
     /*
@@ -72,7 +72,7 @@ return [
         'DB' => Illuminate\Support\Facades\DB::class,
         'Eloquent' => Illuminate\Database\Eloquent\Model::class,
         'Event' => Illuminate\Support\Facades\Event::class,
-        'File' => Illuminate\Support\Facades\File::class, 
+        'File' => Illuminate\Support\Facades\File::class,
         'Filesystem' => Illuminate\Support\Facades\Filesystem::class,
         'Gate' => Illuminate\Support\Facades\Gate::class,
         'Hash' => Illuminate\Support\Facades\Hash::class,

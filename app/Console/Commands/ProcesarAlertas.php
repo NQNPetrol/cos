@@ -77,7 +77,7 @@ class ProcesarAlertas extends Command
      */
     private function evaluarVencimiento(AlertaAdmin $alerta, Carbon $hoy): bool
     {
-        if (!$alerta->fecha_alerta) {
+        if (! $alerta->fecha_alerta) {
             return false;
         }
 
@@ -98,7 +98,7 @@ class ProcesarAlertas extends Command
     private function evaluarCobroCliente(AlertaAdmin $alerta, Carbon $hoy): bool
     {
         $diaMes = $alerta->dia_mes ?? ($alerta->trigger_config['dia_mes'] ?? null);
-        if (!$diaMes) {
+        if (! $diaMes) {
             return false;
         }
 
@@ -134,7 +134,7 @@ class ProcesarAlertas extends Command
      */
     private function yaEjecutadaEnCiclo(AlertaAdmin $alerta, Carbon $hoy): bool
     {
-        if (!$alerta->ultima_ejecucion) {
+        if (! $alerta->ultima_ejecucion) {
             return false;
         }
 
@@ -185,9 +185,9 @@ class ProcesarAlertas extends Command
         }
 
         // For non-recurring alerts that have passed, deactivate
-        if (!$alerta->recurrente && $alerta->fecha_alerta && $hoy->gt($alerta->fecha_alerta)) {
+        if (! $alerta->recurrente && $alerta->fecha_alerta && $hoy->gt($alerta->fecha_alerta)) {
             $alerta->update(['activa' => false]);
-            $this->line("    → No recurrente: alerta desactivada");
+            $this->line('    → No recurrente: alerta desactivada');
         }
     }
 
@@ -199,7 +199,7 @@ class ProcesarAlertas extends Command
         // Notification for the creator (admin)
         if (in_array($alerta->destinatario_tipo, ['admin', 'ambos'])) {
             Notification::create([
-                'title' => 'Recordatorio: ' . $alerta->titulo,
+                'title' => 'Recordatorio: '.$alerta->titulo,
                 'message' => $alerta->descripcion ?? $alerta->titulo,
                 'type' => 'user',
                 'priority' => 'NORMAL',
@@ -211,7 +211,7 @@ class ProcesarAlertas extends Command
         // Notification for the client user
         if (in_array($alerta->destinatario_tipo, ['cliente', 'ambos']) && $alerta->destinatario_user_id) {
             Notification::create([
-                'title' => 'Recordatorio: ' . $alerta->titulo,
+                'title' => 'Recordatorio: '.$alerta->titulo,
                 'message' => $alerta->descripcion ?? $alerta->titulo,
                 'type' => 'user',
                 'priority' => 'NORMAL',

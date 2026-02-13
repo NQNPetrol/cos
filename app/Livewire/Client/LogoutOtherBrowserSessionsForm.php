@@ -13,7 +13,9 @@ use Livewire\Component;
 class LogoutOtherBrowserSessionsForm extends Component
 {
     public $sessions = [];
+
     public $password = '';
+
     public $confirmingLogout = false;
 
     public function mount()
@@ -25,6 +27,7 @@ class LogoutOtherBrowserSessionsForm extends Component
     {
         if (config('session.driver') !== 'database') {
             $this->sessions = collect([]);
+
             return;
         }
 
@@ -96,7 +99,7 @@ class LogoutOtherBrowserSessionsForm extends Component
     public function render()
     {
         return view('client.profile.logout-other-browser-sessions-form', [
-            'sessions' => $this->sessions
+            'sessions' => $this->sessions,
         ]);
     }
 }

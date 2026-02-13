@@ -33,7 +33,7 @@ class FlightLog extends Model
         'event_coordinates',
         'automation',
         'drone_battery',
-        'flight_details'
+        'flight_details',
     ];
 
     protected $casts = [
@@ -42,11 +42,13 @@ class FlightLog extends Model
         'flight_endtime' => 'datetime',
         'flight_time' => 'integer',
         'total_distance' => 'float',
-        'event_coordinates' => 'array'
+        'event_coordinates' => 'array',
     ];
 
     const ESTADO_EN_PROCESO = 'en_proceso';
+
     const ESTADO_COMPLETADO = 'completado';
+
     const ESTADO_INTERRUMPIDO = 'interrumpido';
 
     public function piloto(): BelongsTo
@@ -64,7 +66,6 @@ class FlightLog extends Model
         return $this->belongsTo(AlertLog::class, 'alert_log_id');
     }
 
-
     public function scopeEnProceso($query)
     {
         return $query->where('estado', self::ESTADO_EN_PROCESO);
@@ -79,7 +80,6 @@ class FlightLog extends Model
     {
         return $query->where('estado', self::ESTADO_INTERRUMPIDO);
     }
-    
 
     /**
      * Scope para vuelos por rango de fechas
@@ -101,9 +101,9 @@ class FlightLog extends Model
     {
         $fechaInicio = \Carbon\Carbon::parse($timestamp)->subMinutes($minutosTolerancia);
         $fechaFin = \Carbon\Carbon::parse($timestamp);
-        
+
         return $query->whereBetween('flight_starttime', [$fechaInicio, $fechaFin])
-                    ->where('flight_starttime', '<=', $fechaFin);
+            ->where('flight_starttime', '<=', $fechaFin);
     }
 
     /**
@@ -121,6 +121,7 @@ class FlightLog extends Model
     {
         $this->flight_starttime = now();
         $this->estado = self::ESTADO_EN_PROCESO;
+
         return $this->save();
     }
 
@@ -129,6 +130,7 @@ class FlightLog extends Model
         $this->flight_endtime = now();
         $this->calcularTiempoVuelo();
         $this->estado = self::ESTADO_COMPLETADO;
+
         return $this->save();
     }
 
@@ -137,6 +139,7 @@ class FlightLog extends Model
         $this->flight_endtime = now();
         $this->calcularTiempoVuelo();
         $this->estado = self::ESTADO_INTERRUMPIDO;
+
         return $this->save();
     }
 
@@ -161,13 +164,12 @@ class FlightLog extends Model
         return $this->estado === self::ESTADO_INTERRUMPIDO;
     }
 
-
     /**
      * Verificar si el vuelo está activo
      */
     public function estaActivo(): bool
     {
-        return $this->flight_starttime && !$this->flight_endtime;
+        return $this->flight_starttime && ! $this->flight_endtime;
     }
 
     /**
@@ -183,7 +185,7 @@ class FlightLog extends Model
      */
     public function getDuracionLegibleAttribute(): string
     {
-        if (!$this->flight_time) {
+        if (! $this->flight_time) {
             return 'No disponible';
         }
 
@@ -192,14 +194,14 @@ class FlightLog extends Model
         $segundos = $this->flight_time % 60;
 
         if ($horas > 0) {
-            return sprintf("%dh %dm %ds", $horas, $minutos, $segundos);
+            return sprintf('%dh %dm %ds', $horas, $minutos, $segundos);
         }
 
         if ($minutos > 0) {
-            return sprintf("%dm %ds", $minutos, $segundos);
+            return sprintf('%dm %ds', $minutos, $segundos);
         }
 
-        return sprintf("%ds", $segundos);
+        return sprintf('%ds', $segundos);
     }
 
     /**
@@ -207,32 +209,32 @@ class FlightLog extends Model
      */
     public function getDistanciaLegibleAttribute(): string
     {
-        if (!$this->total_distance) {
+        if (! $this->total_distance) {
             return 'No disponible';
         }
 
         if ($this->total_distance >= 1000) {
-            return number_format($this->total_distance / 1000, 2) . ' km';
+            return number_format($this->total_distance / 1000, 2).' km';
         }
 
-        return number_format($this->total_distance, 2) . ' m';
+        return number_format($this->total_distance, 2).' m';
     }
 
     public function scopeCercanosATriggerTime($query, $timestamp, $minutosTolerancia = 30)
     {
         $fechaInicio = \Carbon\Carbon::parse($timestamp)->subMinutes($minutosTolerancia);
         $fechaFin = \Carbon\Carbon::parse($timestamp)->addMinutes($minutosTolerancia);
-        
+
         return $query->whereBetween('trigger_senttime', [$fechaInicio, $fechaFin])
-                    ->whereNull('flight_starttime')
-                    ->where('estado', self::ESTADO_EN_PROCESO);
+            ->whereNull('flight_starttime')
+            ->where('estado', self::ESTADO_EN_PROCESO);
     }
 
     public function scopeActivos($query)
     {
         return $query->whereNotNull('flight_starttime')
-                    ->whereNull('flight_endtime')
-                    ->where('estado', self::ESTADO_EN_PROCESO);
+            ->whereNull('flight_endtime')
+            ->where('estado', self::ESTADO_EN_PROCESO);
     }
 
     public function esVueloManual(): bool
@@ -242,6 +244,6 @@ class FlightLog extends Model
 
     public function esVueloPorTrigger(): bool
     {
-        return !is_null($this->trigger_senttime);
+        return ! is_null($this->trigger_senttime);
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\AlertaAdmin;
-use App\Models\Rodado;
 use App\Models\Cliente;
-use App\Models\User;
+use App\Models\Rodado;
 use App\Models\ServicioUsuario;
 use App\Models\Taller;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class AlertaAdminController extends Controller
 {
@@ -90,7 +90,7 @@ class AlertaAdminController extends Controller
         unset($validated['acciones']);
 
         // Auto-set recurrence when a service is linked (monthly payment) or cobro_cliente
-        if (!empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
+        if (! empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
             $validated['recurrente'] = true;
             $validated['frecuencia_recurrencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
         }
@@ -98,19 +98,19 @@ class AlertaAdminController extends Controller
         // Build trigger config based on tipo
         $triggerConfig = [];
 
-        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && !empty($validated['km_intervalo'])) {
+        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && ! empty($validated['km_intervalo'])) {
             $triggerConfig['km_intervalo'] = $validated['km_intervalo'];
         }
-        if (!empty($validated['dia_mes'])) {
+        if (! empty($validated['dia_mes'])) {
             $triggerConfig['dia_mes'] = $validated['dia_mes'];
         }
-        if (!empty($validated['dias_anticipacion'])) {
+        if (! empty($validated['dias_anticipacion'])) {
             $triggerConfig['dias_anticipacion'] = $validated['dias_anticipacion'];
         }
         if ($validated['fecha_alerta'] ?? null) {
             $triggerConfig['fecha'] = $validated['fecha_alerta'];
         }
-        if (!empty($validated['recurrente'])) {
+        if (! empty($validated['recurrente'])) {
             $triggerConfig['recurrente'] = true;
             $triggerConfig['frecuencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
         }
@@ -154,25 +154,25 @@ class AlertaAdminController extends Controller
         unset($validated['acciones']);
 
         // Auto-set recurrence when a service is linked or cobro_cliente
-        if (!empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
+        if (! empty($validated['servicio_usuario_id']) || $validated['tipo'] === 'cobro_cliente') {
             $validated['recurrente'] = true;
             $validated['frecuencia_recurrencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
         }
 
         $triggerConfig = [];
-        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && !empty($validated['km_intervalo'])) {
+        if (in_array($validated['tipo'], ['km_vehiculo', 'agendar_turno_km']) && ! empty($validated['km_intervalo'])) {
             $triggerConfig['km_intervalo'] = $validated['km_intervalo'];
         }
-        if (!empty($validated['dia_mes'])) {
+        if (! empty($validated['dia_mes'])) {
             $triggerConfig['dia_mes'] = $validated['dia_mes'];
         }
-        if (!empty($validated['dias_anticipacion'])) {
+        if (! empty($validated['dias_anticipacion'])) {
             $triggerConfig['dias_anticipacion'] = $validated['dias_anticipacion'];
         }
         if ($validated['fecha_alerta'] ?? null) {
             $triggerConfig['fecha'] = $validated['fecha_alerta'];
         }
-        if (!empty($validated['recurrente'])) {
+        if (! empty($validated['recurrente'])) {
             $triggerConfig['recurrente'] = true;
             $triggerConfig['frecuencia'] = $validated['frecuencia_recurrencia'] ?? 'mensual';
         }
@@ -194,7 +194,7 @@ class AlertaAdminController extends Controller
 
     public function toggle(AlertaAdmin $alerta)
     {
-        $alerta->update(['activa' => !$alerta->activa]);
+        $alerta->update(['activa' => ! $alerta->activa]);
 
         $message = $alerta->activa ? 'Alerta activada.' : 'Alerta desactivada.';
 
@@ -204,5 +204,4 @@ class AlertaAdminController extends Controller
 
         return redirect()->route('rodados.alertas-admin.index')->with('success', $message);
     }
-
 }

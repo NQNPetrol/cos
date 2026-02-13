@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\ObjetivoAipem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ObjetivosCompareController extends Controller
@@ -12,6 +12,7 @@ class ObjetivosCompareController extends Controller
     public function index()
     {
         $objetivos = ObjetivoAipem::all();
+
         return response()->json($objetivos, 200);
     }
 
@@ -23,10 +24,10 @@ class ObjetivosCompareController extends Controller
         \Log::info('Tipo de datos:', ['type' => gettype($datos)]);
         \Log::info('Es array?', ['is_array' => is_array($datos)]);
 
-        if (!is_array($datos) || !isset($datos[0]) || !is_array($datos[0])) {
+        if (! is_array($datos) || ! isset($datos[0]) || ! is_array($datos[0])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Se esperaba un array de registros'
+                'message' => 'Se esperaba un array de registros',
             ], 422);
         }
 
@@ -44,8 +45,9 @@ class ObjetivosCompareController extends Controller
                         'indice' => $index,
                         'criterio' => $existe['criterio'],
                         'registro_existente' => $existe['registro'],
-                        'datos_nuevos' => $item
+                        'datos_nuevos' => $item,
                     ];
+
                     continue;
                 }
 
@@ -71,15 +73,16 @@ class ObjetivosCompareController extends Controller
                     'email' => 'nullable|email|max:255',
                     'valid_ini' => 'required|date',
                     'valid_fin' => 'required|date',
-                    'pto_descrip' => 'required|string'
+                    'pto_descrip' => 'required|string',
                 ]);
 
                 if ($validator->fails()) {
                     $errores[] = [
                         'indice' => $index,
                         'errores' => $validator->errors()->toArray(),
-                        'data' => $item
+                        'data' => $item,
                     ];
+
                     continue;
                 }
 
@@ -105,23 +108,23 @@ class ObjetivosCompareController extends Controller
                     'email' => $item['email'] ?? null,
                     'valid_ini' => $item['valid_ini'],
                     'valid_fin' => $item['valid_fin'],
-                    'pto_descrip' => $item['pto_descrip']
+                    'pto_descrip' => $item['pto_descrip'],
                 ]);
-            
-                \Log::info("Registro de objetivo creado exitosamente:", [
+
+                \Log::info('Registro de objetivo creado exitosamente:', [
                     'indice' => $index,
                     'id' => $objetivo->id,
                     'codobj' => $objetivo->codobj,
-                    'nombre' => $objetivo->nombre
+                    'nombre' => $objetivo->nombre,
                 ]);
-                
+
                 $registros_nuevos[] = $objetivo;
 
             } catch (\Exception $e) {
                 $errores[] = [
                     'indice' => $index,
                     'error' => $e->getMessage(),
-                    'data' => $item
+                    'data' => $item,
                 ];
             }
         }
@@ -133,11 +136,11 @@ class ObjetivosCompareController extends Controller
                 'total_registros' => count($datos),
                 'nuevos_registros' => count($registros_nuevos),
                 'registros_duplicados' => count($registros_duplicados),
-                'errores' => count($errores)
+                'errores' => count($errores),
             ],
             'registros_nuevos' => $registros_nuevos,
             'registros_duplicados' => $registros_duplicados,
-            'errores' => $errores
+            'errores' => $errores,
         ], 201);
     }
 
@@ -154,7 +157,7 @@ class ObjetivosCompareController extends Controller
                 return [
                     'existe' => true,
                     'criterio' => 'codobj',
-                    'registro' => $registro
+                    'registro' => $registro,
                 ];
             }
         }
@@ -162,14 +165,14 @@ class ObjetivosCompareController extends Controller
         // Por nombre + dirección (como criterio secundario)
         if (isset($item['nombre']) && isset($item['calle']) && isset($item['nro'])) {
             $registro = ObjetivoAipem::where('nombre', $item['nombre'])
-                                ->where('calle', $item['calle'])
-                                ->where('nro', $item['nro'])
-                                ->first();
+                ->where('calle', $item['calle'])
+                ->where('nro', $item['nro'])
+                ->first();
             if ($registro) {
                 return [
                     'existe' => true,
                     'criterio' => 'nombre_direccion',
-                    'registro' => $registro
+                    'registro' => $registro,
                 ];
             }
         }
@@ -177,7 +180,7 @@ class ObjetivosCompareController extends Controller
         return [
             'existe' => false,
             'criterio' => '',
-            'registro' => null
+            'registro' => null,
         ];
     }
 
@@ -185,10 +188,10 @@ class ObjetivosCompareController extends Controller
     {
         $datos = $request->all();
 
-        if (!is_array($datos) || !isset($datos[0]) || !is_array($datos[0])) {
+        if (! is_array($datos) || ! isset($datos[0]) || ! is_array($datos[0])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Se esperaba un array de registros para verificación masiva'
+                'message' => 'Se esperaba un array de registros para verificación masiva',
             ], 422);
         }
 
@@ -197,13 +200,13 @@ class ObjetivosCompareController extends Controller
         foreach ($datos as $index => $item) {
             try {
                 $resultado = $this->verificarDuplicado($item);
-                
+
                 $resultados[] = [
                     'indice' => $index,
                     'existe' => $resultado['existe'],
                     'criterio' => $resultado['criterio'],
                     'registro_existente' => $resultado['registro'],
-                    'datos_consultados' => $item
+                    'datos_consultados' => $item,
                 ];
 
             } catch (\Exception $e) {
@@ -211,7 +214,7 @@ class ObjetivosCompareController extends Controller
                     'indice' => $index,
                     'error' => $e->getMessage(),
                     'existe' => false,
-                    'datos_consultados' => $item
+                    'datos_consultados' => $item,
                 ];
             }
         }
@@ -219,10 +222,10 @@ class ObjetivosCompareController extends Controller
         return response()->json([
             'success' => true,
             'total_registros' => count($datos),
-            'registros_existentes' => count(array_filter($resultados, fn($r) => $r['existe'])),
-            'registros_nuevos' => count(array_filter($resultados, fn($r) => !$r['existe'] && !isset($r['error']))),
-            'errores' => count(array_filter($resultados, fn($r) => isset($r['error']))),
-            'resultados' => $resultados
+            'registros_existentes' => count(array_filter($resultados, fn ($r) => $r['existe'])),
+            'registros_nuevos' => count(array_filter($resultados, fn ($r) => ! $r['existe'] && ! isset($r['error']))),
+            'errores' => count(array_filter($resultados, fn ($r) => isset($r['error']))),
+            'resultados' => $resultados,
         ], 200);
     }
 }

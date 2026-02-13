@@ -2,12 +2,11 @@
 
 namespace App\Livewire\Client\UsuariosCliente;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Layout;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.cliente')]
 class Index extends Component
@@ -15,8 +14,11 @@ class Index extends Component
     use WithPagination;
 
     public $search = '';
+
     public $mostrarModalAsignar = false;
+
     public $usuarioSeleccionado = null;
+
     public $rolSeleccionado = '';
 
     /**
@@ -25,8 +27,8 @@ class Index extends Component
     private function getClientePrincipal()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return null;
         }
 
@@ -39,8 +41,8 @@ class Index extends Component
     private function getClienteIds()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
 
@@ -52,7 +54,7 @@ class Index extends Component
      */
     public function mount()
     {
-        if (!Auth::user() || !Auth::user()->hasRole('clientadmin')) {
+        if (! Auth::user() || ! Auth::user()->hasRole('clientadmin')) {
             abort(403, 'No autorizado');
         }
     }
@@ -61,13 +63,13 @@ class Index extends Component
     {
         $clienteIds = $this->getClienteIds();
 
-        $usuarios = User::whereHas('clientes', function($query) use ($clienteIds) {
-                $query->whereIn('clientes.id', $clienteIds);
-            })
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%');
+        $usuarios = User::whereHas('clientes', function ($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%');
                 });
             })
             ->with('roles')
@@ -86,32 +88,34 @@ class Index extends Component
     public function abrirModalAsignar($usuarioId)
     {
         $clienteIds = $this->getClienteIds();
-        
-        $usuario = User::whereHas('clientes', function($query) use ($clienteIds) {
-                $query->whereIn('clientes.id', $clienteIds);
-            })
+
+        $usuario = User::whereHas('clientes', function ($query) use ($clienteIds) {
+            $query->whereIn('clientes.id', $clienteIds);
+        })
             ->find($usuarioId);
-        
-        if (!$usuario) {
+
+        if (! $usuario) {
             session()->flash('error', 'Usuario no encontrado');
+
             return;
         }
 
         // No permitir modificar el propio usuario
         if ($usuario->id === Auth::id()) {
             session()->flash('error', 'No puedes modificar tu propio rol');
+
             return;
         }
 
         $this->usuarioSeleccionado = $usuario;
-        
+
         // Obtener el rol actual del usuario (clientsupervisor o cliente)
         if ($usuario->hasRole('clientsupervisor')) {
             $this->rolSeleccionado = 'clientsupervisor';
         } else {
             $this->rolSeleccionado = 'cliente';
         }
-        
+
         $this->mostrarModalAsignar = true;
     }
 
@@ -130,8 +134,9 @@ class Index extends Component
      */
     public function asignarRol()
     {
-        if (!$this->usuarioSeleccionado) {
+        if (! $this->usuarioSeleccionado) {
             session()->flash('error', 'Usuario no encontrado');
+
             return;
         }
 
@@ -141,22 +146,25 @@ class Index extends Component
             ->whereIn('clientes.id', $clienteIds)
             ->exists();
 
-        if (!$tieneAcceso) {
+        if (! $tieneAcceso) {
             session()->flash('error', 'No tienes acceso a este usuario');
+
             return;
         }
 
         // Solo permitir asignar clientsupervisor o cliente (básico)
         $rolesPermitidos = ['clientsupervisor', 'cliente'];
-        
-        if (!in_array($this->rolSeleccionado, $rolesPermitidos)) {
+
+        if (! in_array($this->rolSeleccionado, $rolesPermitidos)) {
             session()->flash('error', 'Rol no válido');
+
             return;
         }
 
         // No permitir modificar usuarios con rol clientadmin o admin
         if ($this->usuarioSeleccionado->hasRole(['clientadmin', 'admin', 'operador', 'supervisor'])) {
             session()->flash('error', 'No puedes modificar el rol de este usuario');
+
             return;
         }
 

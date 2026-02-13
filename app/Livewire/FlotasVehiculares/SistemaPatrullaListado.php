@@ -2,25 +2,31 @@
 
 namespace App\Livewire\FlotasVehiculares;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Patrulla;
 use App\Models\PatrullaSistema;
 use App\Models\Sistema;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class SistemaPatrullaListado extends Component
 {
     use WithPagination;
 
     public $patrullaId;
+
     public $patrulla;
+
     public $sistemasDisponibles = [];
 
     public $mostrarFormulario = false;
+
     public $nuevoSistemaId = '';
+
     public $nuevaFechaRegistro = '';
+
     public $nuevoNroInterno = '';
+
     public $nuevaFechaVto = '';
 
     public function mount($patrullaId)
@@ -39,7 +45,7 @@ class SistemaPatrullaListado extends Component
 
         return view('livewire.flotas-vehiculares.sistema-patrulla-listado', [
             'sistemas' => $sistemas,
-            'patrulla' => $this->patrulla
+            'patrulla' => $this->patrulla,
         ]);
     }
 
@@ -80,7 +86,7 @@ class SistemaPatrullaListado extends Component
             $this->resetPage(); // Resetear paginación para mostrar el nuevo registro
 
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al agregar el sistema: ' . $e->getMessage());
+            session()->flash('error', 'Error al agregar el sistema: '.$e->getMessage());
         }
     }
 

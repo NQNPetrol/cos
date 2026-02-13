@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('contratos', function (Blueprint $table) {
-            $table->id(); 
+            $table->id();
             $table->unsignedBigInteger('cliente_id');
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
@@ -28,7 +28,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('clientes')
                 ->onDelete('cascade');
-            });
+        });
     }
 
     /**

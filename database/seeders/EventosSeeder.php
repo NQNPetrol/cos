@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Evento;
-use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class EventosSeeder extends Seeder
 {
@@ -27,7 +25,7 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Cliente solicita seguimiento especial del caso'
+                'notas_adicionales' => 'Cliente solicita seguimiento especial del caso',
             ],
             [
                 'fecha_hora' => '2025-05-16 09:15:00',
@@ -41,7 +39,7 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Requiere reparaciones urgentes'
+                'notas_adicionales' => 'Requiere reparaciones urgentes',
             ],
             [
                 'fecha_hora' => '2025-05-17 22:45:00',
@@ -57,7 +55,7 @@ class EventosSeeder extends Seeder
                 'es_anulado' => false,
                 'elementos_sustraidos' => json_encode(['ninguno']),
                 'cantidad' => json_encode([0]),
-                'notas_adicionales' => 'Sistema de alarma funcionó correctamente'
+                'notas_adicionales' => 'Sistema de alarma funcionó correctamente',
             ],
             [
                 'fecha_hora' => '2025-05-18 11:00:00',
@@ -71,7 +69,7 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Bomberos asistieron, no hay heridos'
+                'notas_adicionales' => 'Bomberos asistieron, no hay heridos',
             ],
             [
                 'fecha_hora' => '2025-05-19 16:20:00',
@@ -85,13 +83,13 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada'
+                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada',
             ],
             [
                 'fecha_hora' => '2025-10-21 13:20:00',
                 'cliente_id' => 17,
                 'supervisor_id' => 1204,
-                'longitud' => -37.4601104070165, 
+                'longitud' => -37.4601104070165,
                 'latitud' => -68.9795384508562,
                 'descripcion' => 'Pérdida de equipos tecnológicos',
                 'observaciones' => 'Sustracción de laptops y proyectores de sala de reuniones',
@@ -99,13 +97,13 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada'
+                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada',
             ],
             [
                 'fecha_hora' => '2025-12-01 13:20:00',
                 'cliente_id' => 17,
                 'supervisor_id' => 1204,
-                'longitud' => -37.4601104070165, 
+                'longitud' => -37.4601104070165,
                 'latitud' => -68.9795384508562,
                 'descripcion' => 'Pérdida de equipos tecnológicos',
                 'observaciones' => 'Sustracción de laptops y proyectores de sala de reuniones',
@@ -113,7 +111,7 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada'
+                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada',
             ],
             [
                 'fecha_hora' => '2025-11-21 13:20:00',
@@ -127,7 +125,7 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada'
+                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada',
             ],
             [
                 'fecha_hora' => '2025-06-21 13:20:00',
@@ -141,8 +139,8 @@ class EventosSeeder extends Seeder
                 'categoria_id' => 1,
                 'user_id' => 1,
                 'es_anulado' => false,
-                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada'
-            ]
+                'notas_adicionales' => 'Clave para investigación: acceso con tarjeta identificada',
+            ],
         ];
 
         foreach ($eventos as $evento) {

@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\CambioEquipoRodado;
+use App\Models\Cobranza;
+use App\Models\PagoServiciosRodado;
+use App\Models\RegistroKilometraje;
 use App\Models\Rodado;
 use App\Models\TurnoRodado;
-use App\Models\PagoServiciosRodado;
-use App\Models\Cobranza;
-use App\Models\CambioEquipoRodado;
-use App\Models\RegistroKilometraje;
-use App\Models\AlertaAdmin;
-use App\Models\Cliente;
-use App\Models\Proveedor;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AdminRodadosDashboardController extends Controller
 {
@@ -59,7 +56,7 @@ class AdminRodadosDashboardController extends Controller
     public function getIngresosEgresos(Request $request)
     {
         $anio = (int) $request->get('anio', now()->year);
-        $meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         $ingresos = [];
         $egresos = [];
 
@@ -88,7 +85,7 @@ class AdminRodadosDashboardController extends Controller
     public function getFlotaIngresos(Request $request)
     {
         $anio = (int) $request->get('anio', now()->year);
-        $meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         $rodados = [];
         $ingresos = [];
 
@@ -124,7 +121,7 @@ class AdminRodadosDashboardController extends Controller
             ->orderByDesc('total')
             ->with('rodado:id,patente')
             ->get()
-            ->map(fn($t) => [
+            ->map(fn ($t) => [
                 'rodado_id' => $t->rodado_id,
                 'patente' => $t->rodado->patente ?? 'N/A',
                 'total' => $t->total,
@@ -145,6 +142,7 @@ class AdminRodadosDashboardController extends Controller
             ->get()
             ->map(function ($reg) {
                 $rodado = Rodado::find($reg->rodado_id);
+
                 return [
                     'rodado_id' => $reg->rodado_id,
                     'patente' => $rodado->patente ?? 'N/A',
@@ -167,7 +165,7 @@ class AdminRodadosDashboardController extends Controller
             ->orderBy('fecha_hora')
             ->take(5)
             ->get()
-            ->map(fn($t) => [
+            ->map(fn ($t) => [
                 'id' => $t->id,
                 'patente' => $t->rodado->patente ?? 'Sin patente',
                 'taller' => $t->taller->nombre ?? 'N/A',
@@ -182,7 +180,7 @@ class AdminRodadosDashboardController extends Controller
             ->orderBy('fecha_vencimiento')
             ->take(5)
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'id' => $p->id,
                 'patente' => $p->rodado?->patente ?? 'Sin patente',
                 'monto' => number_format($p->monto, 2, ',', '.'),
@@ -208,6 +206,7 @@ class AdminRodadosDashboardController extends Controller
                 ->whereMonth('fecha_pago', $m)->whereYear('fecha_pago', $year)->sum('monto');
             $data[] = ['mes' => Carbon::create($year, $m, 1)->format('M'), 'pagados' => (float) $pagados, 'pendientes' => (float) $pendientes];
         }
+
         return response()->json($data);
     }
 
@@ -232,6 +231,7 @@ class AdminRodadosDashboardController extends Controller
                 ->whereMonth('fecha_pago', $m)->whereYear('fecha_pago', $year)->sum('monto');
             $data[] = ['mes' => Carbon::create($year, $m, 1)->format('M'), 'cobrado' => (float) $cobrado, 'pagado' => (float) $pagado];
         }
+
         return response()->json($data);
     }
 }

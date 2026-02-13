@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\EncodingDevice;
 use App\Services\HikCentralService;
-use Illuminate\Http\Request;
 
 class EncodingDeviceController extends Controller
 {
@@ -27,9 +26,9 @@ class EncodingDeviceController extends Controller
                 EncodingDevice::updateOrCreate(
                     ['encode_dev_index_code' => $device['encodeDevIndexCode']],
                     [
-                        'name'   => $device['encodeDevName'],
-                        'ip'     => $device['encodeDevIp'],
-                        'port'   => $device['encodeDevPort'],
+                        'name' => $device['encodeDevName'],
+                        'ip' => $device['encodeDevIp'],
+                        'port' => $device['encodeDevPort'],
                         'status' => $device['status'],
                     ]
                 );

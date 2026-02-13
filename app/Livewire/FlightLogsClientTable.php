@@ -2,22 +2,26 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\FlightLog;
 use App\Models\MisionFlytbase;
 use App\Models\UserCliente;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class FlightLogsClientTable extends Component
 {
     use WithPagination;
 
     public $fechaDesde = '';
+
     public $fechaHasta = '';
+
     public $droneName = '';
+
     public $misionNombre = '';
+
     public $clienteId = '';
 
     protected $queryString = [
@@ -32,7 +36,7 @@ class FlightLogsClientTable extends Component
     {
         $user = Auth::user();
         $userCliente = UserCliente::where('user_id', $user->id)->first();
-        
+
         if ($userCliente) {
             $this->clienteId = $userCliente->cliente_id;
         }
@@ -47,7 +51,7 @@ class FlightLogsClientTable extends Component
     public function render()
     {
         $user = Auth::user();
-        
+
         // Obtener los IDs de cliente a los que pertenece el usuario
         $userClientes = UserCliente::where('user_id', $user->id)->get();
         $clienteIds = $userClientes->pluck('cliente_id')->toArray();
@@ -62,9 +66,9 @@ class FlightLogsClientTable extends Component
 
         // Obtener las misiones de los clientes del usuario
         $misionesQuery = MisionFlytbase::whereIn('cliente_id', $clienteIds);
-        
+
         if ($this->misionNombre) {
-            $misionesQuery->where('nombre', 'like', '%' . $this->misionNombre . '%');
+            $misionesQuery->where('nombre', 'like', '%'.$this->misionNombre.'%');
         }
 
         $misionIds = $misionesQuery->pluck('id')->toArray();
@@ -79,7 +83,7 @@ class FlightLogsClientTable extends Component
                 $query->whereDate('flight_starttime', '<=', Carbon::parse($this->fechaHasta));
             })
             ->when($this->droneName, function ($query) {
-                $query->where('drone_name', 'like', '%' . $this->droneName . '%');
+                $query->where('drone_name', 'like', '%'.$this->droneName.'%');
             })
             ->orderBy('flight_starttime', 'desc');
 
@@ -89,7 +93,7 @@ class FlightLogsClientTable extends Component
         $misionesDisponibles = MisionFlytbase::whereIn('cliente_id', $clienteIds)
             ->with('cliente')
             ->get();
-        
+
         $dronesDisponibles = FlightLog::whereIn('mision_flytbase_id', $misionIds)
             ->select('drone_name')
             ->distinct()

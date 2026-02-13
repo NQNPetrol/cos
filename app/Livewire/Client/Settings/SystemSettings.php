@@ -14,4 +14,3 @@ class SystemSettings extends Component
             ->layout('layouts.cliente');
     }
 }
-

@@ -2,37 +2,36 @@
 
 namespace App\Services;
 
-use ZipArchive;
-use SimpleXMLElement;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class KmzParserService
 {
     /**
      * Parsea un archivo KMZ y extrae los waypoints
-     * 
-     * @param string $kmzPath Ruta del archivo KMZ
+     *
+     * @param  string  $kmzPath  Ruta del archivo KMZ
      * @return array Array de waypoints con formato: [['latitud' => float, 'longitud' => float, 'altitud' => float, 'acciones' => []]]
      */
     public function parseKmzToWaypoints(string $kmzPath): array
     {
         Log::info('=== INICIO PARSEO KMZ ===');
         Log::info('Ruta del archivo KMZ:', ['path' => $kmzPath]);
-        
+
         $waypoints = [];
-        
+
         try {
             // El archivo se guarda en el disco 'public', así que debemos verificar ahí
             $disk = Storage::disk('public');
-            
+
             // Verificar que el archivo existe
-            if (!$disk->exists($kmzPath)) {
+            if (! $disk->exists($kmzPath)) {
                 Log::error('El archivo KMZ no existe en la ruta:', [
                     'path' => $kmzPath,
                     'disk' => 'public',
-                    'storage_path' => storage_path('app/public/' . $kmzPath),
-                    'file_exists' => file_exists(storage_path('app/public/' . $kmzPath))
+                    'storage_path' => storage_path('app/public/'.$kmzPath),
+                    'file_exists' => file_exists(storage_path('app/public/'.$kmzPath)),
                 ]);
                 throw new \Exception("El archivo KMZ no existe en la ruta: {$kmzPath}");
             }
@@ -43,23 +42,23 @@ class KmzParserService
             Log::info('Ruta completa del archivo:', [
                 'full_path' => $fullPath,
                 'file_exists' => file_exists($fullPath),
-                'is_readable' => is_readable($fullPath)
+                'is_readable' => is_readable($fullPath),
             ]);
-            
+
             // Abrir el archivo KMZ (que es un ZIP)
             $zip = new ZipArchive;
             $zipResult = $zip->open($fullPath);
             Log::info('Intento de abrir archivo ZIP:', ['result' => $zipResult, 'zip_error_code' => $zipResult]);
-            
-            if ($zipResult !== TRUE) {
+
+            if ($zipResult !== true) {
                 Log::error('No se pudo abrir el archivo KMZ:', [
                     'result' => $zipResult,
                     'full_path' => $fullPath,
-                    'file_exists' => file_exists($fullPath)
+                    'file_exists' => file_exists($fullPath),
                 ]);
-                throw new \Exception("No se pudo abrir el archivo KMZ. Verifique que sea un archivo válido.");
+                throw new \Exception('No se pudo abrir el archivo KMZ. Verifique que sea un archivo válido.');
             }
-            
+
             Log::info('Archivo ZIP abierto correctamente. Número de archivos:', ['num_files' => $zip->numFiles]);
 
             // Buscar el archivo KML dentro del KMZ
@@ -79,9 +78,9 @@ class KmzParserService
             $zip->close();
             Log::info('Archivo ZIP cerrado');
 
-            if (!$kmlContent) {
+            if (! $kmlContent) {
                 Log::error('No se encontró archivo KML dentro del KMZ');
-                throw new \Exception("No se encontró un archivo KML dentro del KMZ.");
+                throw new \Exception('No se encontró un archivo KML dentro del KMZ.');
             }
 
             // Parsear el contenido KML
@@ -92,15 +91,15 @@ class KmzParserService
             return $waypoints;
 
         } catch (\Exception $e) {
-            Log::error('Error al parsear archivo KMZ: ' . $e->getMessage());
+            Log::error('Error al parsear archivo KMZ: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Parsea el contenido XML de un archivo KML y extrae los waypoints
-     * 
-     * @param string $kmlContent Contenido XML del KML
+     *
+     * @param  string  $kmlContent  Contenido XML del KML
      * @return array Array de waypoints
      */
     private function parseKmlContent(string $kmlContent): array
@@ -113,20 +112,20 @@ class KmzParserService
             libxml_use_internal_errors(true);
             Log::info('Intentando parsear XML del KML...');
             $xml = simplexml_load_string($kmlContent);
-            
+
             if ($xml === false) {
                 $errors = libxml_get_errors();
-                $errorMessages = array_map(function($error) {
+                $errorMessages = array_map(function ($error) {
                     return trim($error->message);
                 }, $errors);
                 Log::error('Error al parsear XML:', [
                     'errors' => $errorMessages,
-                    'content_preview' => substr($kmlContent, 0, 500)
+                    'content_preview' => substr($kmlContent, 0, 500),
                 ]);
                 libxml_clear_errors();
-                throw new \Exception("Error al parsear XML: " . implode(', ', $errorMessages));
+                throw new \Exception('Error al parsear XML: '.implode(', ', $errorMessages));
             }
-            
+
             Log::info('XML parseado correctamente');
 
             // Registrar namespaces
@@ -136,27 +135,27 @@ class KmzParserService
             // Buscar Placemarks con coordenadas
             $placemarks = $xml->xpath('//kml:Placemark | //Placemark');
             $placemarks = $placemarks === false ? [] : $placemarks;
-            
+
             Log::info('Placemarks encontrados:', ['count' => count($placemarks)]);
-            
+
             foreach ($placemarks as $placemark) {
                 // Buscar coordenadas en Point
                 $points = $placemark->xpath('.//kml:Point | .//Point');
                 $points = $points === false ? [] : $points;
-                
+
                 foreach ($points as $point) {
                     $coordinates = $point->xpath('.//kml:coordinates | .//coordinates');
                     $coordinates = $coordinates === false ? [] : $coordinates;
-                    
-                    if (!empty($coordinates)) {
-                        $coordString = (string)$coordinates[0];
+
+                    if (! empty($coordinates)) {
+                        $coordString = (string) $coordinates[0];
                         $coords = $this->parseCoordinates($coordString);
                         if ($coords) {
                             $waypoints[] = [
-                                'latitud' => (string)$coords['lat'],
-                                'longitud' => (string)$coords['lon'],
-                                'altitud' => isset($coords['alt']) ? (string)$coords['alt'] : '35',
-                                'acciones' => []
+                                'latitud' => (string) $coords['lat'],
+                                'longitud' => (string) $coords['lon'],
+                                'altitud' => isset($coords['alt']) ? (string) $coords['alt'] : '35',
+                                'acciones' => [],
                             ];
                         }
                     }
@@ -165,34 +164,34 @@ class KmzParserService
                 // Buscar coordenadas en LineString o Path
                 $lineStrings = $placemark->xpath('.//kml:LineString | .//LineString | .//kml:gx:Track | .//gx:Track');
                 $lineStrings = $lineStrings === false ? [] : $lineStrings;
-                
+
                 foreach ($lineStrings as $lineString) {
                     $coordinates = $lineString->xpath('.//kml:coordinates | .//coordinates | .//kml:gx:coord | .//gx:coord');
                     $coordinates = $coordinates === false ? [] : $coordinates;
-                    
+
                     foreach ($coordinates as $coord) {
                         $coords = null;
-                        if (strpos((string)$coord, ',') !== false) {
+                        if (strpos((string) $coord, ',') !== false) {
                             // Formato: lon,lat,alt o lon,lat
-                            $coords = $this->parseCoordinates((string)$coord);
+                            $coords = $this->parseCoordinates((string) $coord);
                         } else {
                             // Formato gx:coord: lon lat alt
-                            $parts = explode(' ', trim((string)$coord));
+                            $parts = explode(' ', trim((string) $coord));
                             if (count($parts) >= 2) {
                                 $coords = [
                                     'lon' => floatval($parts[0]),
                                     'lat' => floatval($parts[1]),
-                                    'alt' => isset($parts[2]) ? floatval($parts[2]) : 35
+                                    'alt' => isset($parts[2]) ? floatval($parts[2]) : 35,
                                 ];
                             }
                         }
-                        
+
                         if ($coords) {
                             $waypoints[] = [
-                                'latitud' => (string)$coords['lat'],
-                                'longitud' => (string)$coords['lon'],
-                                'altitud' => isset($coords['alt']) ? (string)$coords['alt'] : '35',
-                                'acciones' => []
+                                'latitud' => (string) $coords['lat'],
+                                'longitud' => (string) $coords['lon'],
+                                'altitud' => isset($coords['alt']) ? (string) $coords['alt'] : '35',
+                                'acciones' => [],
                             ];
                         }
                     }
@@ -204,22 +203,24 @@ class KmzParserService
                 Log::info('No se encontraron waypoints en Placemarks, buscando coordenadas directamente...');
                 $allCoordinates = $xml->xpath('//kml:coordinates | //coordinates');
                 $allCoordinates = $allCoordinates === false ? [] : $allCoordinates;
-                
+
                 Log::info('Coordenadas encontradas directamente:', ['count' => count($allCoordinates)]);
-                
+
                 foreach ($allCoordinates as $coordElement) {
-                    $coordString = (string)$coordElement;
+                    $coordString = (string) $coordElement;
                     // Las coordenadas pueden estar separadas por espacios o saltos de línea
                     $coordLines = preg_split('/[\s\n]+/', trim($coordString));
                     foreach ($coordLines as $coordLine) {
-                        if (empty(trim($coordLine))) continue;
+                        if (empty(trim($coordLine))) {
+                            continue;
+                        }
                         $coords = $this->parseCoordinates(trim($coordLine));
                         if ($coords) {
                             $waypoints[] = [
-                                'latitud' => (string)$coords['lat'],
-                                'longitud' => (string)$coords['lon'],
-                                'altitud' => isset($coords['alt']) ? (string)$coords['alt'] : '35',
-                                'acciones' => []
+                                'latitud' => (string) $coords['lat'],
+                                'longitud' => (string) $coords['lon'],
+                                'altitud' => isset($coords['alt']) ? (string) $coords['alt'] : '35',
+                                'acciones' => [],
                             ];
                         }
                     }
@@ -232,15 +233,15 @@ class KmzParserService
             return $waypoints;
 
         } catch (\Exception $e) {
-            Log::error('Error al parsear contenido KML: ' . $e->getMessage());
+            Log::error('Error al parsear contenido KML: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Parsea una cadena de coordenadas en formato "lon,lat,alt" o "lon,lat"
-     * 
-     * @param string $coordString Cadena de coordenadas
+     *
+     * @param  string  $coordString  Cadena de coordenadas
      * @return array|null Array con 'lon', 'lat', 'alt' o null si no es válido
      */
     private function parseCoordinates(string $coordString): ?array
@@ -252,7 +253,7 @@ class KmzParserService
 
         // Separar por coma
         $parts = explode(',', $coordString);
-        
+
         if (count($parts) < 2) {
             return null;
         }
@@ -269,14 +270,14 @@ class KmzParserService
         return [
             'lon' => $lon,
             'lat' => $lat,
-            'alt' => $alt
+            'alt' => $alt,
         ];
     }
 
     /**
      * Elimina waypoints duplicados basándose en latitud y longitud
-     * 
-     * @param array $waypoints Array de waypoints
+     *
+     * @param  array  $waypoints  Array de waypoints
      * @return array Array de waypoints sin duplicados
      */
     private function removeDuplicateWaypoints(array $waypoints): array
@@ -285,8 +286,8 @@ class KmzParserService
         $unique = [];
 
         foreach ($waypoints as $waypoint) {
-            $key = $waypoint['latitud'] . ',' . $waypoint['longitud'];
-            if (!isset($seen[$key])) {
+            $key = $waypoint['latitud'].','.$waypoint['longitud'];
+            if (! isset($seen[$key])) {
                 $seen[$key] = true;
                 $unique[] = $waypoint;
             }
@@ -295,4 +296,3 @@ class KmzParserService
         return $unique;
     }
 }
-

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class ReporteGenerado extends Model
@@ -16,7 +16,7 @@ class ReporteGenerado extends Model
         'evento_id',
         'user_id',
         'nombre_archivo',
-        'ruta_archivo'
+        'ruta_archivo',
     ];
 
     public function evento()
@@ -48,5 +48,4 @@ class ReporteGenerado extends Model
     {
         return Storage::disk('public')->exists($this->ruta_archivo);
     }
-
 }

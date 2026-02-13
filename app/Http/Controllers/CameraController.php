@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Camera;
-use App\Models\EncodingDevice;
 use App\Models\Dispositivo;
 use App\Services\HikCentralService;
+use Illuminate\Http\Request;
 
 class CameraController extends Controller
 {
@@ -20,6 +19,7 @@ class CameraController extends Controller
     public function index()
     {
         $cameras = Camera::with('encodingDevice')->paginate(10);
+
         return view('cameras.index', compact('cameras'));
     }
 
@@ -28,7 +28,7 @@ class CameraController extends Controller
         try {
             \Log::info('Iniciando importación de cámaras...');
             $cameras = $this->hikCentral->getCameraList();
-            \Log::info('Cámaras obtenidas: ' . count($cameras));
+            \Log::info('Cámaras obtenidas: '.count($cameras));
 
             $imported = 0;
             $updated = 0;
@@ -62,13 +62,14 @@ class CameraController extends Controller
                 'message' => "Importación completada: $imported nuevas cámaras, $updated actualizadas",
                 'imported' => $imported,
                 'updated' => $updated,
-                'total' => count($cameras)
+                'total' => count($cameras),
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error en importación: ' . $e->getMessage());
+            \Log::error('Error en importación: '.$e->getMessage());
+
             return response()->json([
-                'error' => 'Error importando cámaras: ' . $e->getMessage()
+                'error' => 'Error importando cámaras: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -77,31 +78,31 @@ class CameraController extends Controller
     {
         try {
             $stream = StreamUrl::where('camera_index_code', $cameraIndexCode)->first();
-            
-            if (!$stream) {
+
+            if (! $stream) {
                 // Si no existe, obtenerla de HikCentral
                 $streamData = $this->hikCentral->getStreamingUrl($cameraIndexCode);
-                
+
                 $stream = StreamUrl::create([
                     'camera_index_code' => $cameraIndexCode,
                     'url' => $streamData['url'],
                     'authentication' => $streamData['authentication'] ?? null,
                     'protocol' => 'rtsp',
                     'stream_type' => 0,
-                    'is_active' => true
+                    'is_active' => true,
                 ]);
             }
 
             return response()->json([
                 'success' => true,
                 'stream_url' => $stream->url,
-                'authentication' => $stream->authentication
+                'authentication' => $stream->authentication,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -110,15 +111,15 @@ class CameraController extends Controller
     {
         try {
             $results = $this->hikCentral->importAllStreamingUrls();
-            
+
             return response()->json([
                 'message' => "Importación de URLs completada: {$results['success']} exitosas, {$results['failed']} fallidas",
-                'results' => $results
+                'results' => $results,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Error importando URLs: ' . $e->getMessage()
+                'error' => 'Error importando URLs: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -126,8 +127,8 @@ class CameraController extends Controller
     public function showStream($cameraIndexCode)
     {
         $camera = Camera::with('stream')->where('camera_index_code', $cameraIndexCode)->first();
-        
-        if (!$camera) {
+
+        if (! $camera) {
             abort(404, 'Cámara no encontrada');
         }
 
@@ -151,8 +152,8 @@ class CameraController extends Controller
                         'name' => $camera->encodingDevice->name,
                         'ip' => $camera->encodingDevice->ip,
                         'port' => $camera->encodingDevice->port,
-                        'status' => $camera->encodingDevice->status
-                    ] : null
+                        'status' => $camera->encodingDevice->status,
+                    ] : null,
                 ];
             });
 
@@ -162,10 +163,10 @@ class CameraController extends Controller
     public function findByEncodingDevice($encodeDevIndexCode)
     {
         $cameras = Camera::where('encode_dev_index_code', $encodeDevIndexCode)->get();
-        
+
         return response()->json([
             'encode_dev_index_code' => $encodeDevIndexCode,
-            'cameras' => $cameras
+            'cameras' => $cameras,
         ]);
     }
 
@@ -182,8 +183,8 @@ class CameraController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('modelo', 'like', "%{$search}%")
-                  ->orWhere('direccion_ip', 'like', "%{$search}%");
+                    ->orWhere('modelo', 'like', "%{$search}%")
+                    ->orWhere('direccion_ip', 'like', "%{$search}%");
             });
         }
 

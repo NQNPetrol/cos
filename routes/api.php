@@ -1,18 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\DroneStatusController;
+use App\Http\Controllers\Api\ObjetivosCompareController;
+use App\Http\Controllers\Api\PersonalCompareController;
+use App\Http\Controllers\Api\PersonalImportController;
+use App\Http\Controllers\CameraController;
+use App\Http\Controllers\EncodingDeviceController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\FlytbaseFlightLogsController;
+use App\Http\Controllers\MobileVehicleClientController;
+use App\Http\Controllers\MobileVehicleController;
+use App\Http\Controllers\S3WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventoController;
-use App\Http\Controllers\CameraController;
-use App\Http\Controllers\MobileVehicleController;
-use App\Http\Controllers\Api\PersonalImportController;
-use App\Http\Controllers\Api\PersonalCompareController;
-use App\Http\Controllers\EncodingDeviceController;
-use App\Http\Controllers\MobileVehicleClientController;
-use App\Http\Controllers\S3WebhookController;
-use App\Http\Controllers\FlytbaseFlightLogsController;
-use App\Http\Controllers\Api\ObjetivosCompareController;
-use App\Http\Controllers\Api\DroneStatusController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,7 +29,7 @@ Route::post('/personal', [PersonalImportController::class, 'store'])
 
 Route::post('/personal/verificar/importar', [PersonalCompareController::class, 'store']);
 
-//API PARA IMPORTAR OBJETIVOS
+// API PARA IMPORTAR OBJETIVOS
 Route::get('/objetivos-aipem', [ObjetivosCompareController::class, 'index']);
 
 Route::post('/objetivos-aipem/verificar', [ObjetivosCompareController::class, 'verificarExistencia']);
@@ -39,7 +39,7 @@ Route::post('/objetivos-aipem', [ObjetivosCompareController::class, 'store'])
 
 Route::post('/objetivos-aipem/verificar/importar', [ObjetivosCompareController::class, 'store']);
 
-//API PARA IMPORTAR ENCODING DEVICES
+// API PARA IMPORTAR ENCODING DEVICES
 Route::get('/encoding-devices', [EncodingDeviceController::class, 'index']);
 
 Route::post('/encoding-devices/import', [EncodingDeviceController::class, 'import']);
@@ -54,7 +54,7 @@ Route::prefix('cameras')->group(function () {
     Route::get('/encoding-device/{encodeDevIndexCode}', [CameraController::class, 'findByEncodingDevice']);
 });
 
-//API PARA IMPORTAR VEHICLE LIST Y OBTENER GPS INFO
+// API PARA IMPORTAR VEHICLE LIST Y OBTENER GPS INFO
 Route::prefix('/mobile-vehicles')->name('api.mobile-vehicles.')->group(function () {
     Route::get('/', [MobileVehicleController::class, 'api'])->name('index');
     Route::get('/{id}', [MobileVehicleController::class, 'apiShow'])->name('show');
@@ -71,7 +71,6 @@ Route::prefix('/client/mobile-vehicles')->name('api.client.mobile-vehicles.')->g
     Route::get('/stats', [MobileVehicleClientController::class, 'statsClient'])->name('stats');
 });
 
-
 // API para webhook de S3
 Route::prefix('s3-webhook')->group(function () {
     Route::post('/', [S3WebhookController::class, 'handleWebhook']);
@@ -85,9 +84,8 @@ Route::prefix('flytbase')->group(function () {
     Route::post('/flight-logs/email', [FlytbaseFlightLogsController::class, 'storeFromEmail']);
 });
 
-//API PARA OBTENER ESTADO DE UN DRON
+// API PARA OBTENER ESTADO DE UN DRON
 Route::get('dron/get-status', [DroneStatusController::class, 'getDroneStatus']);
-
 
 // Route::middleware('auth:sanctum')->get('/events', [EventController::class, 'index']);
 Route::get('eventos/barras', [EventoController::class, 'eventosBarras']);

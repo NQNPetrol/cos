@@ -12,17 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         // Verifica si la columna ya existe antes de agregarla
-        if (!Schema::hasColumn('seguimientos', 'evento_id')) {
+        if (! Schema::hasColumn('seguimientos', 'evento_id')) {
             Schema::table('seguimientos', function (Blueprint $table) {
                 $table->foreignId('evento_id')
-                      ->nullable()
-                      ->constrained('eventos')
-                      ->onDelete('set null');
+                    ->nullable()
+                    ->constrained('eventos')
+                    ->onDelete('set null');
             });
         }
     }
 
-    
     public function down(): void
     {
         Schema::table('seguimientos', function (Blueprint $table) {

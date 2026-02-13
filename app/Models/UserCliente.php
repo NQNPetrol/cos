@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserCliente extends Model
@@ -36,10 +36,11 @@ class UserCliente extends Model
     {
         return $query->where('cliente_id', $clienteId);
     }
+
     public static function exists($userId, $clienteId)
     {
         return self::where('user_id', $userId)
-                   ->where('cliente_id', $clienteId)
-                   ->exists();
+            ->where('cliente_id', $clienteId)
+            ->exists();
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\HikCentralService;
 use App\Models\MobileVehicle;
 use App\Models\Patrulla;
+use App\Services\HikCentralService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class MobileVehicleController extends Controller
@@ -16,7 +16,6 @@ class MobileVehicleController extends Controller
     {
         $this->hikCentral = $hikCentral;
     }
-
 
     /**
      * Muestra la lista de vehículos móviles
@@ -53,7 +52,7 @@ class MobileVehicleController extends Controller
                 $results['total_linked']
             );
 
-            if (!empty($results['errors'])) {
+            if (! empty($results['errors'])) {
                 $message .= sprintf('. Errores: %d', count($results['errors']));
                 Log::warning('Errores durante la importación', $results['errors']);
             }
@@ -61,15 +60,15 @@ class MobileVehicleController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'results' => $results
+                'results' => $results,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en importación de vehículos móviles: ' . $e->getMessage());
+            Log::error('Error en importación de vehículos móviles: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error durante la importación: ' . $e->getMessage()
+                'message' => 'Error durante la importación: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -80,27 +79,27 @@ class MobileVehicleController extends Controller
     public function linkToPatrulla(Request $request, MobileVehicle $mobileVehicle)
     {
         $request->validate([
-            'patrulla_id' => 'nullable|exists:patrullas,id'
+            'patrulla_id' => 'nullable|exists:patrullas,id',
         ]);
 
         try {
             $mobileVehicle->update([
-                'patrulla_id' => $request->patrulla_id
+                'patrulla_id' => $request->patrulla_id,
             ]);
 
-            $message = $request->patrulla_id 
+            $message = $request->patrulla_id
                 ? 'Vehículo vinculado exitosamente con la patrulla'
                 : 'Vinculación con patrulla removida exitosamente';
 
             return response()->json([
                 'success' => true,
-                'message' => $message
+                'message' => $message,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al vincular: ' . $e->getMessage()
+                'message' => 'Error al vincular: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -118,11 +117,11 @@ class MobileVehicleController extends Controller
 
             foreach ($mobileVehicles as $mobileVehicle) {
                 $patrulla = Patrulla::where('patente', $mobileVehicle->plate_no)->first();
-                
+
                 if ($patrulla && $mobileVehicle->patrulla_id !== $patrulla->id) {
                     $mobileVehicle->update(['patrulla_id' => $patrulla->id]);
                     $linked++;
-                } elseif (!$patrulla && $mobileVehicle->patrulla_id) {
+                } elseif (! $patrulla && $mobileVehicle->patrulla_id) {
                     $mobileVehicle->update(['patrulla_id' => null]);
                     $unlinked++;
                 }
@@ -133,16 +132,16 @@ class MobileVehicleController extends Controller
                 'message' => "Revinculación completada. Vinculados: {$linked}, Desvinculados: {$unlinked}",
                 'results' => [
                     'linked' => $linked,
-                    'unlinked' => $unlinked
-                ]
+                    'unlinked' => $unlinked,
+                ],
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en revinculación: ' . $e->getMessage());
+            Log::error('Error en revinculación: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error durante la revinculación: ' . $e->getMessage()
+                'message' => 'Error durante la revinculación: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -153,7 +152,7 @@ class MobileVehicleController extends Controller
     public function show(MobileVehicle $mobileVehicle)
     {
         $mobileVehicle->load('patrulla');
-        
+
         return view('mobile-vehicles.show', compact('mobileVehicle'));
     }
 
@@ -169,7 +168,7 @@ class MobileVehicleController extends Controller
                 'mobile_vehicle_name',
                 'status',
                 'plate_no',
-                'patrulla_id'
+                'patrulla_id',
             ])
             ->get();
 
@@ -182,7 +181,7 @@ class MobileVehicleController extends Controller
     public function apiShow($id)
     {
         $mobileVehicle = MobileVehicle::with('patrulla')->findOrFail($id);
-        
+
         return response()->json($mobileVehicle);
     }
 
@@ -211,7 +210,7 @@ class MobileVehicleController extends Controller
 
         // Obtener códigos de índice de todos los vehículos
         $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
-        
+
         // Obtener ubicaciones actuales
         $result = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
         $locations = $result['locations'];
@@ -221,18 +220,18 @@ class MobileVehicleController extends Controller
             'vehicles_count' => $mobileVehicles->count(),
             'locations_count' => count($locations),
             'latest_timestamp' => $latestTimestamp,
-            'locations_keys' => array_keys($locations)
+            'locations_keys' => array_keys($locations),
         ]);
 
-        $dataDate = $latestTimestamp ? 
-            date('Y-m-d', $latestTimestamp) : 
+        $dataDate = $latestTimestamp ?
+            date('Y-m-d', $latestTimestamp) :
             now()->format('Y-m-d');
-        
+
         // Formatear la última actualización para la vista
-        $lastUpdate = $latestTimestamp ? 
-            date('d/m/Y H:i:s', $latestTimestamp) : 
+        $lastUpdate = $latestTimestamp ?
+            date('d/m/Y H:i:s', $latestTimestamp) :
             'No hay datos disponibles';
-        
+
         return view('patrullas.location', compact('mobileVehicles', 'locations', 'lastUpdate', 'dataDate'));
     }
 
@@ -246,26 +245,27 @@ class MobileVehicleController extends Controller
 
             Log::debug('Vehículos en BD para locations', [
                 'count' => count($vehicleIndexCodes),
-                'codes' => $vehicleIndexCodes
+                'codes' => $vehicleIndexCodes,
             ]);
 
             if (empty($vehicleIndexCodes)) {
                 Log::warning('No hay vehículos móviles en la base de datos');
+
                 return response()->json([
                     'success' => true,
                     'locations' => [],
                     'timestamp' => now()->toISOString(),
-                    'message' => 'No hay vehículos móviles registrados'
+                    'message' => 'No hay vehículos móviles registrados',
                 ]);
             }
 
             $result = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
             $locations = $result['locations'];
-            
+
             Log::debug('Ubicaciones obtenidas para API', [
                 'count' => count($locations),
                 'vehicles_with_data' => array_keys($locations),
-                'sample_data' => !empty($locations) ? reset($locations) : 'No data'
+                'sample_data' => ! empty($locations) ? reset($locations) : 'No data',
             ]);
 
             // CORRECCIÓN: Devolver la estructura plana correcta
@@ -273,16 +273,16 @@ class MobileVehicleController extends Controller
                 'success' => true,
                 'locations' => $locations, // ← Directamente las locations
                 'latest_timestamp' => $result['latest_timestamp'],
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ]);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error en apiLocations: ' . $e->getMessage());
-            
+            Log::error('Error en apiLocations: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error obteniendo ubicaciones: ' . $e->getMessage(),
-                'timestamp' => now()->toISOString()
+                'message' => 'Error obteniendo ubicaciones: '.$e->getMessage(),
+                'timestamp' => now()->toISOString(),
             ], 500);
         }
     }
@@ -295,17 +295,17 @@ class MobileVehicleController extends Controller
         try {
             $vehicleIndexCodes = MobileVehicle::pluck('mobile_vehicle_index_code')->toArray();
             $locations = $this->hikCentral->getLatestGpsLocations($vehicleIndexCodes);
-            
+
             // Obtener información adicional de los vehículos
             $vehicles = MobileVehicle::whereIn('mobile_vehicle_index_code', array_keys($locations))
                 ->get()
                 ->keyBy('mobile_vehicle_index_code');
-            
+
             $mapData = [];
-            
+
             foreach ($locations as $vehicleCode => $location) {
                 $vehicle = $vehicles->get($vehicleCode);
-                
+
                 $mapData[] = [
                     'vehicle_code' => $vehicleCode,
                     'vehicle_name' => $vehicle ? $vehicle->mobile_vehicle_name : 'Desconocido',
@@ -315,23 +315,23 @@ class MobileVehicleController extends Controller
                     'occur_time' => $location['occurTime'],
                     'direction' => $location['direction'],
                     'speed' => $location['speed'],
-                    'status' => $vehicle ? $vehicle->status : 0
+                    'status' => $vehicle ? $vehicle->status : 0,
                 ];
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $mapData,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ]);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error en apiMapData: ' . $e->getMessage());
-            
+            Log::error('Error en apiMapData: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error obteniendo datos del mapa: ' . $e->getMessage(),
-                'timestamp' => now()->toISOString()
+                'message' => 'Error obteniendo datos del mapa: '.$e->getMessage(),
+                'timestamp' => now()->toISOString(),
             ], 500);
         }
     }

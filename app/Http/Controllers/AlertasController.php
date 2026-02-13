@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use App\Models\AlertLog;
-use App\Models\User;
-use App\Models\MisionFlytbase;
 use App\Models\FlightLog;
+use App\Models\MisionFlytbase;
 use App\Models\PilotoFlytbaseCliente;
+use App\Models\User;
 use App\Models\UserCliente;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AlertasController extends Controller
 {
@@ -45,29 +45,29 @@ class AlertasController extends Controller
             $misionId = $request->mision_id;
 
             // Validar que si es trigger_mision, tenga una misión seleccionada
-            if ($tipoAlerta === 'trigger_mision' && !$misionId) {
+            if ($tipoAlerta === 'trigger_mision' && ! $misionId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Debe seleccionar una misión para enviar el trigger.'
+                    'message' => 'Debe seleccionar una misión para enviar el trigger.',
                 ], 400);
             }
 
             // Obtener la misión si es trigger_mision
             if ($tipoAlerta === 'trigger_mision') {
                 $mision = MisionFlytbase::with('drone')->activas()->find($misionId);
-                
-                if (!$mision) {
+
+                if (! $mision) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'La misión seleccionada no existe o no está activa.'
+                        'message' => 'La misión seleccionada no existe o no está activa.',
                     ], 400);
                 }
 
                 // Verificar permisos del usuario para esta misión
-                if (!$this->usuarioPuedeAccederMision($user, $mision)) {
+                if (! $this->usuarioPuedeAccederMision($user, $mision)) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'No tiene permisos para acceder a esta misión.'
+                        'message' => 'No tiene permisos para acceder a esta misión.',
                     ], 403);
                 }
 
@@ -78,7 +78,7 @@ class AlertasController extends Controller
                 $descripcion = 'Alerta técnica/hardware';
             }
 
-            $token = 'Bearer ' . env('FLYTBASE_WEBHOOK_TOKEN');
+            $token = 'Bearer '.env('FLYTBASE_WEBHOOK_TOKEN');
 
             $payload = [
                 'timestamp' => round(microtime(true) * 1000),
@@ -90,8 +90,8 @@ class AlertasController extends Controller
                 'metadata' => [
                     'sensor_id' => 'TempSensor12A',
                     'temperature' => 50.2,
-                    'battery_level' => 80
-                ]
+                    'battery_level' => 80,
+                ],
             ];
 
             Log::info('Iniciando envío de alarma a Flytbase', [
@@ -99,7 +99,7 @@ class AlertasController extends Controller
                 'tipo_alerta' => $tipoAlerta,
                 'mision_id' => $misionId,
                 'payload' => $payload,
-                'user' => $user->name
+                'user' => $user->name,
             ]);
 
             $response = Http::withOptions(['verify' => false])
@@ -124,7 +124,7 @@ class AlertasController extends Controller
                 'codigo_respuesta' => $statusCode,
                 'mensaje_error' => $esExitoso ? null : $responseBody,
                 'payload' => $payload,
-                'respuesta' => json_decode($responseBody, true) ?: ['raw' => $responseBody]
+                'respuesta' => json_decode($responseBody, true) ?: ['raw' => $responseBody],
             ];
 
             // Solo agregar mision_id si es trigger_mision
@@ -141,22 +141,22 @@ class AlertasController extends Controller
             Log::info('Respuesta HTTP recibida de Flytbase', [
                 'status_code' => $statusCode,
                 'response_body' => $responseBody,
-                'es_exitoso' => $esExitoso
+                'es_exitoso' => $esExitoso,
             ]);
 
             if ($esExitoso) {
                 Log::info('Alarma enviada exitosamente a Flytbase');
                 $responseData = [
                     'success' => true,
-                    'message' => $tipoAlerta === 'trigger_mision' 
+                    'message' => $tipoAlerta === 'trigger_mision'
                         ? "Alarma enviada correctamente. Misión '{$mision->nombre}' desplegada."
-                        : 'Alarma enviada correctamente.'
+                        : 'Alarma enviada correctamente.',
                 ];
                 if ($tipoAlerta === 'trigger_mision' && $mision->hasLiveview()) {
                     Log::info('Misión tiene liveview', [
                         'mision_id' => $misionId,
                         'mision_nombre' => $mision->nombre,
-                        'has_liveview' => $mision->hasLiveview()
+                        'has_liveview' => $mision->hasLiveview(),
                     ]);
                     $responseData['mision_id'] = $misionId;
                     $responseData['mision_nombre'] = $mision->nombre;
@@ -173,34 +173,35 @@ class AlertasController extends Controller
                         'drone_id' => $mision->drone->id ?? 'No tiene drone',
                         'metodo_hasLiveview_existe' => method_exists($mision, 'hasLiveview'),
                         'hasLiveview_result' => method_exists($mision, 'hasLiveview') ? $mision->hasLiveview() : 'Método no existe',
-                        'drone_data' => $mision->drone ?? 'No hay datos de drone'
+                        'drone_data' => $mision->drone ?? 'No hay datos de drone',
                     ]);
-                    
+
                     // Si el método existe y retorna true, o si forzamos para testing
                     $shouldShowLiveview = (method_exists($mision, 'hasLiveview') && $mision->hasLiveview()) || true;
-                    
+
                     if ($shouldShowLiveview) {
                         Log::info('Misión tiene liveview - agregando a respuesta');
                         $responseData['mision_id'] = $misionId;
                         $responseData['mision_nombre'] = $mision->nombre;
                         $responseData['has_liveview'] = true;
                         $responseData['drone_name'] = $mision->drone->drone ?? 'Drone no disponible';
-                        $responseData['liveview_route'] = method_exists($mision, 'getLiveviewRoute') 
-                            ? $mision->getLiveviewRoute() 
+                        $responseData['liveview_route'] = method_exists($mision, 'getLiveviewRoute')
+                            ? $mision->getLiveviewRoute()
                             : route('alertas.liveview');
                     }
                 }
-                
+
                 return response()->json($responseData);
-                
+
             } else {
                 Log::warning('Flytbase respondió con código de error', [
                     'status_code' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al enviar la alarma. Código: ' . $response->status()
+                    'message' => 'Error al enviar la alarma. Código: '.$response->status(),
                 ], 500);
             }
 
@@ -224,12 +225,12 @@ class AlertasController extends Controller
             Log::error('Error en triggerAlarm', [
                 'exception_message' => $e->getMessage(),
                 'exception_file' => $e->getFile(),
-                'exception_line' => $e->getLine()
+                'exception_line' => $e->getLine(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error interno: ' . $e->getMessage()
+                'message' => 'Error interno: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -237,7 +238,7 @@ class AlertasController extends Controller
     private function crearFlightLog($alertLog, $mision, $user)
     {
         try {
-            
+
             $flightLog = FlightLog::create([
                 'piloto_flytbase_id' => null,
                 'mision_flytbase_id' => $mision->id,
@@ -252,14 +253,14 @@ class AlertasController extends Controller
                 'flight_log_id' => $flightLog->id,
                 'mision_id' => $mision->id,
                 'drone_name' => $mision->drone->drone ?? 'N/A',
-                 'trigger_senttime' => $flightLog->trigger_senttime
+                'trigger_senttime' => $flightLog->trigger_senttime,
             ]);
 
         } catch (\Exception $e) {
             Log::error('Error creando flight log', [
                 'exception' => $e->getMessage(),
                 'mision_id' => $mision->id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
         }
     }
@@ -269,17 +270,19 @@ class AlertasController extends Controller
         try {
             // Obtener cliente del usuario
             $userCliente = UserCliente::where('user_id', $user->id)->first();
-            
-            if (!$userCliente) {
+
+            if (! $userCliente) {
                 Log::error('Usuario no tiene cliente asignado', ['user_id' => $user->id]);
+
                 return null;
             }
 
             // Obtener piloto asignado al cliente
             $pilotoCliente = PilotoFlytbaseCliente::where('cliente_id', $userCliente->cliente_id)->first();
-            
-            if (!$pilotoCliente) {
+
+            if (! $pilotoCliente) {
                 Log::error('Cliente no tiene piloto asignado', ['cliente_id' => $userCliente->cliente_id]);
+
                 return null;
             }
 
@@ -288,8 +291,9 @@ class AlertasController extends Controller
         } catch (\Exception $e) {
             Log::error('Error obteniendo piloto del cliente', [
                 'user_id' => $user->id,
-                'exception' => $e->getMessage()
+                'exception' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -304,6 +308,7 @@ class AlertasController extends Controller
 
         if ($user->hasRole('cliente')) {
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+
             return $query->porClientes($userClientes)->get();
         }
 
@@ -318,6 +323,7 @@ class AlertasController extends Controller
 
         if ($user->hasRole('cliente')) {
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+
             return in_array($mision->cliente_id, $userClientes->toArray());
         }
 

@@ -2,58 +2,84 @@
 
 namespace App\Livewire\Patrullas;
 
-use Livewire\Component;
-use Livewire\WithPagination;
+use App\Models\Documento;
 use App\Models\Patrulla;
 use App\Models\PatrullaRegistroFlota;
 use App\Models\Sistema;
-use App\Models\Documento;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ListadoCliente extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $estadoFilter = '';
+
     public $editingEstadoId = null;
+
     public $nuevoEstado = '';
+
     public $editingObjetivoId = null;
+
     public $nuevoObjetivo = '';
+
     public $editingObservacionId = null;
+
     public $nuevaObservacion = '';
 
     public $mostrarFiltros = false;
+
     public $mostrarModal = false;
+
     public $patrullaSeleccionada = null;
 
     // Propiedades para crear/editar patrulla
     public $mostrarModalCrear = false;
+
     public $mostrarModalEditar = false;
+
     public $patrullaEditar = null;
-    
+
     // Campos del formulario patrulla
     public $patente = '';
+
     public $marca = '';
+
     public $modelo = '';
+
     public $color = '';
+
     public $año = '';
+
     public $estado = 'disponible';
+
     public $observaciones = '';
 
     // ── Sistemas CRUD ──
     public $mostrarPanelSistemas = false;
+
     public $sistemaEditId = null;
+
     public $sistemaNombre = '';
+
     public $sistemaLink = '';
+
     public $sistemaCorreo = '';
+
     public $sistemaTelefono = '';
 
     // ── Documentos CRUD ──
     public $mostrarPanelDocumentos = false;
+
     public $documentoEditId = null;
+
     public $documentoNombre = '';
+
     public $documentoDescripcion = '';
+
     public $documentoActivo = true;
 
     protected $rules = [
@@ -69,7 +95,10 @@ class ListadoCliente extends Component
     private function getClienteIds()
     {
         $user = Auth::user();
-        if (!$user) return collect();
+        if (! $user) {
+            return collect();
+        }
+
         return $user->clientes()->pluck('clientes.id');
     }
 
@@ -79,15 +108,15 @@ class ListadoCliente extends Component
 
         $patrullas = Patrulla::with(['cliente', 'ultimoRegistroFlota'])
             ->whereIn('cliente_id', $clienteIds)
-            ->when($this->search, function($query){
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     $q->where('patente', 'like', '%'.$this->search.'%')
-                      ->orWhere('marca', 'like', '%'.$this->search.'%')
-                      ->orWhere('modelo', 'like', '%'.$this->search.'%')
-                      ->orWhere('color', 'like', '%'.$this->search.'%');
+                        ->orWhere('marca', 'like', '%'.$this->search.'%')
+                        ->orWhere('modelo', 'like', '%'.$this->search.'%')
+                        ->orWhere('color', 'like', '%'.$this->search.'%');
                 });
             })
-            ->when($this->estadoFilter, function($query){
+            ->when($this->estadoFilter, function ($query) {
                 $query->where('estado', $this->estadoFilter);
             })
             ->orderBy('patente')
@@ -123,8 +152,9 @@ class ListadoCliente extends Component
     public function guardarEstado($patrullaId)
     {
         $estadosPermitidos = ['operativa', 'disponible', 'en mantenimiento'];
-        if (!in_array($this->nuevoEstado, $estadosPermitidos)) {
+        if (! in_array($this->nuevoEstado, $estadosPermitidos)) {
             session()->flash('error', 'Estado no válido');
+
             return;
         }
         $patrulla = Patrulla::find($patrullaId);
@@ -157,7 +187,7 @@ class ListadoCliente extends Component
                 'patrulla_id' => $patrullaId,
                 'objetivo_servicio' => $this->nuevoObjetivo,
                 'observacion' => $ultimoRegistro->observacion ?? null,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
             session()->flash('success', 'Objetivo/Servicio actualizado');
         }
@@ -186,7 +216,7 @@ class ListadoCliente extends Component
                 'patrulla_id' => $patrullaId,
                 'objetivo_servicio' => $ultimoRegistro->objetivo_servicio ?? null,
                 'observacion' => $this->nuevaObservacion,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
             session()->flash('success', 'Observación actualizada');
         }
@@ -201,11 +231,18 @@ class ListadoCliente extends Component
 
     public function toggleFiltros()
     {
-        $this->mostrarFiltros = !$this->mostrarFiltros;
+        $this->mostrarFiltros = ! $this->mostrarFiltros;
     }
 
-    public function updatingSearch() { $this->resetPage(); }
-    public function updatingEstadoFilter() { $this->resetPage(); }
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingEstadoFilter()
+    {
+        $this->resetPage();
+    }
 
     // ══════════════════════════════════════════════
     //  MODAL: View patrulla details
@@ -236,13 +273,15 @@ class ListadoCliente extends Component
     public function puedeGestionarPatrullas()
     {
         $user = Auth::user();
+
         return $user && $user->hasAnyRole(['clientadmin', 'clientsupervisor']);
     }
 
     public function abrirModalCrear()
     {
-        if (!$this->puedeGestionarPatrullas()) {
+        if (! $this->puedeGestionarPatrullas()) {
             session()->flash('error', 'No tienes permisos para crear patrullas');
+
             return;
         }
         $this->resetFormularioPatrulla();
@@ -257,11 +296,14 @@ class ListadoCliente extends Component
 
     public function crearPatrulla()
     {
-        if (!$this->puedeGestionarPatrullas()) return;
+        if (! $this->puedeGestionarPatrullas()) {
+            return;
+        }
         $this->validate();
         $clienteIds = $this->getClienteIds();
         if ($clienteIds->isEmpty()) {
             session()->flash('error', 'No tienes un cliente asignado');
+
             return;
         }
         Patrulla::create([
@@ -280,11 +322,17 @@ class ListadoCliente extends Component
 
     public function abrirModalEditar($patrullaId)
     {
-        if (!$this->puedeGestionarPatrullas()) return;
+        if (! $this->puedeGestionarPatrullas()) {
+            return;
+        }
         $patrulla = Patrulla::find($patrullaId);
-        if (!$patrulla) return;
+        if (! $patrulla) {
+            return;
+        }
         $clienteIds = $this->getClienteIds();
-        if (!$clienteIds->contains($patrulla->cliente_id)) return;
+        if (! $clienteIds->contains($patrulla->cliente_id)) {
+            return;
+        }
 
         $this->patrullaEditar = $patrulla;
         $this->patente = $patrulla->patente;
@@ -306,7 +354,9 @@ class ListadoCliente extends Component
 
     public function actualizarPatrulla()
     {
-        if (!$this->puedeGestionarPatrullas() || !$this->patrullaEditar) return;
+        if (! $this->puedeGestionarPatrullas() || ! $this->patrullaEditar) {
+            return;
+        }
         $this->validate();
         $this->patrullaEditar->update([
             'patente' => strtoupper($this->patente),
@@ -340,14 +390,16 @@ class ListadoCliente extends Component
 
     public function togglePanelSistemas()
     {
-        $this->mostrarPanelSistemas = !$this->mostrarPanelSistemas;
+        $this->mostrarPanelSistemas = ! $this->mostrarPanelSistemas;
         $this->resetFormularioSistema();
     }
 
     public function editarSistema($id)
     {
         $sistema = Sistema::find($id);
-        if (!$sistema) return;
+        if (! $sistema) {
+            return;
+        }
         $this->sistemaEditId = $id;
         $this->sistemaNombre = $sistema->nombre;
         $this->sistemaLink = $sistema->link ?? '';
@@ -417,14 +469,16 @@ class ListadoCliente extends Component
 
     public function togglePanelDocumentos()
     {
-        $this->mostrarPanelDocumentos = !$this->mostrarPanelDocumentos;
+        $this->mostrarPanelDocumentos = ! $this->mostrarPanelDocumentos;
         $this->resetFormularioDocumento();
     }
 
     public function editarDocumento($id)
     {
         $doc = Documento::find($id);
-        if (!$doc) return;
+        if (! $doc) {
+            return;
+        }
         $this->documentoEditId = $id;
         $this->documentoNombre = $doc->nombre;
         $this->documentoDescripcion = $doc->descripcion ?? '';

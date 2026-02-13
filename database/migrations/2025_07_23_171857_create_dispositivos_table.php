@@ -17,18 +17,18 @@ return new class extends Migration
             $table->enum('categoria', [
                 'dispositivos de seguridad',
                 'vehiculos',
-                'dispositivos tecnológicos'
+                'dispositivos tecnológicos',
             ]);
             $table->enum('tipo', [
-                'cámara_ip', 
-                'nvr_dvr', 
-                'control_acceso', 
-                'intercomunicador', 
-                'switch_poe', 
+                'cámara_ip',
+                'nvr_dvr',
+                'control_acceso',
+                'intercomunicador',
+                'switch_poe',
                 'sensor_alarma',
                 'dispositivo_reconocimiento',
                 'gps',
-                'otros'
+                'otros',
             ]);
             $table->string('modelo')->nullable();
             $table->string('direccion_ip')->nullable();
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('version_software')->nullable();
             $table->string('direccion_ipv6')->nullable();
             $table->enum('estado_hikconnect', ['conectado', 'a conectar', 'en proceso']);
-            
+
             // Campos adicionales para el inventario
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->onDelete('set null');
             $table->string('ubicacion')->nullable(); // Ubicación física del dispositivo
@@ -50,7 +50,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            //indice
+            // indice
             $table->index(['estado_inventario', 'cliente_id']);
         });
     }

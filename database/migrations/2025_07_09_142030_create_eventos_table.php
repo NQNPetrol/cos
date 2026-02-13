@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('tipo');
             $table->dateTime('fecha_hora');
 
-            //geo tables
+            // geo tables
             $table->decimal('latitud', 10, 7);
             $table->decimal('longitud', 10, 7);
 
-            //relaciones
+            // relaciones
             $table->foreignId('supervisor_id')->constrained('personal')->onDelete('cascade');
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');

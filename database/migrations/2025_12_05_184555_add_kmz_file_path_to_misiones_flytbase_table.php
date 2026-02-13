@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         // Schema::table('misiones_flytbase', function (Blueprint $table) {
-           
+
         // });
     }
 };

@@ -16,7 +16,7 @@ class PilotoFlytbase extends Model
     protected $fillable = [
         'nombre',
         'token',
-        'user_id'
+        'user_id',
     ];
 
     /**
@@ -33,7 +33,6 @@ class PilotoFlytbase extends Model
     public function clientes(): BelongsToMany
     {
         return $this->belongsToMany(Cliente::class, 'piloto_flytbase_cliente', 'piloto_flytbase_id', 'cliente_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
-
 }

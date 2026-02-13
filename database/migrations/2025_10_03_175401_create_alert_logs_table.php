@@ -22,7 +22,7 @@ return new class extends Migration
             $table->json('payload')->nullable();
             $table->json('respuesta')->nullable();
             $table->timestamps();
-            
+
             $table->index(['user_id', 'created_at']);
             $table->index('tipo_alerta');
             $table->index('exito');

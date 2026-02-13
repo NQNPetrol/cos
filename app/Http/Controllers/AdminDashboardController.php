@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Evento;
-use App\Models\Cliente;
 use App\Models\Categoria;
+use App\Models\Cliente;
+use App\Models\Evento;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
@@ -33,19 +33,19 @@ class AdminDashboardController extends Controller
             if ($total > 0) {
                 $chartDataClientes[] = [
                     'nombre' => $cliente->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
 
         // Ordenar por total de eventos (mayor a menor)
-        usort($chartDataClientes, function($a, $b) {
+        usort($chartDataClientes, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
         // Obtener estadísticas de eventos por categoría
         $categorias = Categoria::all();
-        
+
         $eventosPorCategoria = Evento::where('es_anulado', false)
             ->whereNotNull('categoria_id')
             ->select('categoria_id', DB::raw('COUNT(*) as total'))
@@ -59,12 +59,12 @@ class AdminDashboardController extends Controller
             if ($total > 0) {
                 $chartDataCategorias[] = [
                     'nombre' => $categoria->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
 
-        usort($chartDataCategorias, function($a, $b) {
+        usort($chartDataCategorias, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -80,7 +80,7 @@ class AdminDashboardController extends Controller
             'chartDataCategorias' => $chartDataCategorias,
             'totalEventos' => $totalEventos,
             'totalClientes' => $totalClientes,
-            'eventosSinCliente' => $eventosSinCliente
+            'eventosSinCliente' => $eventosSinCliente,
         ]);
     }
 
@@ -113,7 +113,7 @@ class AdminDashboardController extends Controller
             if ($total > 0) {
                 $chartData[] = [
                     'nombre' => $cliente->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
@@ -133,11 +133,11 @@ class AdminDashboardController extends Controller
         if ($sinCliente > 0) {
             $chartData[] = [
                 'nombre' => 'Sin Cliente',
-                'total' => $sinCliente
+                'total' => $sinCliente,
             ];
         }
 
-        usort($chartData, function($a, $b) {
+        usort($chartData, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -173,16 +173,15 @@ class AdminDashboardController extends Controller
             if ($total > 0) {
                 $chartData[] = [
                     'nombre' => $categoria->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
 
-        usort($chartData, function($a, $b) {
+        usort($chartData, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
         return response()->json($chartData);
     }
 }
-

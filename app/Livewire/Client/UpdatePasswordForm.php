@@ -10,7 +10,9 @@ use Livewire\Component;
 class UpdatePasswordForm extends Component
 {
     public $current_password = '';
+
     public $password = '';
+
     public $password_confirmation = '';
 
     public function updatePassword()

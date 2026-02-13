@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\ChecklistPatrulla;
 use App\Models\Patrulla;
+use Illuminate\Http\Request;
 
 class ChecklistPatrullaController extends Controller
 {

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('url');
             $table->boolean('activo')->default(true);
             $table->timestamps();
-            
+
             $table->index(['cliente_id', 'activo']);
         });
     }

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('patrullas', function (Blueprint $table) {
             $table->foreignId('cliente_id')
-                  ->nullable()
-                  ->constrained('clientes');
+                ->nullable()
+                ->constrained('clientes');
         });
     }
 

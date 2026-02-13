@@ -17,7 +17,7 @@ class PersonasEventos extends Model
         'relacion_evento',
         'descripcion_fisica',
         'comportamiento_observado',
-        'tipo'
+        'tipo',
     ];
 
     public function evento()

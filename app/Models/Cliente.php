@@ -3,10 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\EmpresaAsociada;
-use App\Models\ClienteEmpresaAsociada;
-use App\Models\Contrato;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cliente extends Model
@@ -19,15 +15,15 @@ class Cliente extends Model
         'provincia',
         'categoria',
         'convenio',
-        'logo'
+        'logo',
     ];
 
     public function getLogoUrlAttribute()
     {
         if ($this->logo) {
-            return asset('storage/' . $this->logo);
+            return asset('storage/'.$this->logo);
         }
-        
+
         return asset('public/cyh.png');
     }
 
@@ -44,7 +40,7 @@ class Cliente extends Model
     public function empresasAsociadas()
     {
         return $this->belongsToMany(EmpresaAsociada::class, 'cliente_empresa_asociada')
-                    ->using(ClienteEmpresaAsociada::class);
+            ->using(ClienteEmpresaAsociada::class);
     }
 
     public function tickets(): HasMany
@@ -68,15 +64,14 @@ class Cliente extends Model
     public function pilotosFlytbase(): BelongsToMany
     {
         return $this->belongsToMany(PilotoFlytbase::class, 'piloto_flytbase_cliente', 'cliente_id', 'piloto_flytbase_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
-     * Verifica si este es el cliente COS 
+     * Verifica si este es el cliente COS
      */
     public function esCOS(): bool
     {
         return $this->id === 2;
     }
-
 }

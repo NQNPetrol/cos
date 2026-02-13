@@ -6,15 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    
     public function up()
     {
         Schema::table('seguimientos', function (Blueprint $table) {
-            //agregar columna
+            // agregar columna
             $table->foreignId('evento_id')
-                  ->nullable()
-                  ->constrained('eventos')
-                  ->onDelete('set null');
+                ->nullable()
+                ->constrained('eventos')
+                ->onDelete('set null');
         });
     }
 

@@ -2,15 +2,17 @@
 
 namespace App\Livewire\Seguimientos;
 
-use Livewire\Component;
 use App\Models\Evento;
 use App\Models\Seguimiento;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class NuevoSeguimiento extends Component
 {
     public $id_evento = '';
+
     public $estado = 'ABIERTO';
+
     public $observaciones = '';
 
     protected $rules = [
@@ -23,33 +25,33 @@ class NuevoSeguimiento extends Component
         'id_evento.required' => 'Debe seleccionar un evento',
     ];
 
-
     public function render()
     {
-        $eventos = Evento::whereDoesntHave('seguimientos', function($query) {
+        $eventos = Evento::whereDoesntHave('seguimientos', function ($query) {
             $query->where('estado', 'CERRADO');
         })->get();
 
         return view('livewire.seguimientos.nuevo-seguimiento', [
             'eventos' => $eventos,
-            'header' => 'Nuevo Seguimiento de Evento'
+            'header' => 'Nuevo Seguimiento de Evento',
         ]);
     }
 
     public function save()
     {
         $this->validate();
-        try{
+        try {
             Seguimiento::create([
-            'evento_id' => $this->id_evento,
-            'estado' => $this->estado,
-            'observaciones' => $this->observaciones,
-            'user_id' => Auth::id(),
-            'fecha' => now(),
-            'titulo' => 'Seguimiento para Evento #'.$this->id_evento
-        ]);
+                'evento_id' => $this->id_evento,
+                'estado' => $this->estado,
+                'observaciones' => $this->observaciones,
+                'user_id' => Auth::id(),
+                'fecha' => now(),
+                'titulo' => 'Seguimiento para Evento #'.$this->id_evento,
+            ]);
 
             session()->flash('sucess', 'Seguimiento creado exitosamente!');
+
             return redirect()->route('seguimientos.index');
         } catch (\Exception $e) {
             $this->addError('save_error', 'Error al guardar el seguimiento:'.$e->getMessage());

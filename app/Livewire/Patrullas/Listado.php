@@ -2,29 +2,39 @@
 
 namespace App\Livewire\Patrullas;
 
-use Livewire\Component;
-use Livewire\WithPagination;
+use App\Models\Cliente;
 use App\Models\Patrulla;
 use Illuminate\Validation\Rule;
-use App\Models\Cliente;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class Listado extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $estadoFilter = '';
+
     public $showModal = false;
+
     public $editingId = null;
 
-    //formulario
+    // formulario
     public $patente;
+
     public $marca;
+
     public $modelo;
+
     public $año;
+
     public $color;
+
     public $estado = 'operativa';
+
     public $observaciones;
+
     public $cliente_id;
 
     public $clientes = [];
@@ -42,31 +52,32 @@ class Listado extends Component
                 'required',
                 'string',
                 'max:10',
-                Rule::unique('patrullas', 'patente')->ignore($this->editingId)
+                Rule::unique('patrullas', 'patente')->ignore($this->editingId),
             ],
             'cliente_id' => 'required|exists:clientes,id',
-            
+
         ];
     }
 
     public function render()
     {
         $patrullas = Patrulla::with(['cliente'])
-            ->when($this->search, function($query){
+            ->when($this->search, function ($query) {
                 $query->where('patente', 'like', '%'.$this->search.'%')
-                      ->orwhere('marca', 'like', '%'.$this->search.'%')
-                      ->orwhere('modelo', 'like', '%'.$this->search.'%')
-                      ->orWhereHas('cliente', function($q) {
-                          $q->where('nombre', 'like', '%'.$this->search.'%');
-                      });
+                    ->orwhere('marca', 'like', '%'.$this->search.'%')
+                    ->orwhere('modelo', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('cliente', function ($q) {
+                        $q->where('nombre', 'like', '%'.$this->search.'%');
+                    });
             })
-            ->when($this->estadoFilter, function($query){
+            ->when($this->estadoFilter, function ($query) {
                 $query->where('estado', $this->estadoFilter);
             })
             ->orderBy('patente')
             ->paginate(10);
+
         return view('livewire.patrullas.listado', [
-            'patrullas' => $patrullas
+            'patrullas' => $patrullas,
         ]);
     }
 
@@ -78,7 +89,7 @@ class Listado extends Component
 
     public function closeModal()
     {
-        
+
         $this->showModal = false;
         $this->resetForm();
     }
@@ -101,7 +112,7 @@ class Listado extends Component
     {
         $this->validate();
 
-        if ($this->editingId){
+        if ($this->editingId) {
             $patrulla = Patrulla::find($this->editingId);
             $patrulla->update([
                 'patente' => $this->patente,
@@ -135,7 +146,7 @@ class Listado extends Component
     public function edit($id)
     {
         $patrulla = Patrulla::findOrFail($id);
-        
+
         $this->editingId = $id;
         $this->patente = $patrulla->patente;
         $this->marca = $patrulla->marca;
@@ -145,14 +156,13 @@ class Listado extends Component
         $this->estado = $patrulla->estado;
         $this->observaciones = $patrulla->observaciones;
         $this->cliente_id = $patrulla->cliente_id;
-        
+
         $this->showModal = true;
     }
-    
+
     public function delete($id)
     {
         Patrulla::find($id)->delete();
         session()->flash('success', 'Patrulla eliminada correctamente');
     }
-
 }

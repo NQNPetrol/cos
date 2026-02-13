@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\Contrato;
-use App\Models\EmpresaAsociada;
+use Illuminate\Http\Request;
 
 class ContratoController extends Controller
 {
@@ -18,19 +17,20 @@ class ContratoController extends Controller
     {
         $clientes = Cliente::all();
         $empresas_asociadas = collect();
+
         return view('contratos.create', compact(['clientes', 'empresas_asociadas']));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'cliente_id'      => 'required|exists:clientes,id',
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'cliente_id' => 'required|exists:clientes,id',
+            'empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
             'nombre_proyecto' => 'required|string|max:255',
-            'localidad'       => 'nullable|string|max:255',
-            'provincia'       => 'nullable|string|max:255',
-            'observaciones'   => 'nullable|string',
-            'fecha_inicio'    => 'nullable|date',
+            'localidad' => 'nullable|string|max:255',
+            'provincia' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string',
+            'fecha_inicio' => 'nullable|date',
         ]);
 
         Contrato::create($validated);
@@ -47,13 +47,13 @@ class ContratoController extends Controller
     public function update(Request $request, Contrato $contrato)
     {
         $validated = $request->validate([
-            'cliente_id'      => 'required|exists:clientes,id',
-            'empresa_asociada_id'=> 'required|exists:empresas_asociadas,id',
+            'cliente_id' => 'required|exists:clientes,id',
+            'empresa_asociada_id' => 'required|exists:empresas_asociadas,id',
             'nombre_proyecto' => 'required|string|max:255',
-            'localidad'       => 'nullable|string|max:255',
-            'provincia'       => 'nullable|string|max:255',
-            'observaciones'   => 'nullable|string',
-            'fecha_inicio'    => 'nullable|date',
+            'localidad' => 'nullable|string|max:255',
+            'provincia' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string',
+            'fecha_inicio' => 'nullable|date',
         ]);
 
         $contrato->update($validated);
@@ -68,5 +68,4 @@ class ContratoController extends Controller
 
         return back()->with('success', 'Contrato eliminado correctamente.');
     }
-
 }

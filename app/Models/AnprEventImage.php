@@ -56,7 +56,7 @@ class AnprEventImage extends Model
      */
     public function getIsAvailableAttribute(): bool
     {
-        return $this->status === 'completed' && !empty($this->image_base64);
+        return $this->status === 'completed' && ! empty($this->image_base64);
     }
 
     /**
@@ -67,6 +67,7 @@ class AnprEventImage extends Model
         if ($this->is_available) {
             return "data:{$this->mime_type};base64,{$this->image_base64}";
         }
+
         return null;
     }
 }

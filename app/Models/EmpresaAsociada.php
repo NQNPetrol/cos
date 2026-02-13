@@ -4,24 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Cliente;
-use App\Models\ClienteEmpresaAsociada;
-use App\Models\Recorrido;
 
 class EmpresaAsociada extends Model
 {
-
     protected $table = 'empresas_asociadas';
 
     protected $fillable = [
-        'nombre'
+        'nombre',
     ];
-    
+
     public function cliente()
     {
         return $this->belongsToMany(Cliente::class, 'cliente_empresa_asociada')
-                    ->withPivot(['created_at', 'updated_at'])
-                    ->using(ClienteEmpresaAsociada::class);
+            ->withPivot(['created_at', 'updated_at'])
+            ->using(ClienteEmpresaAsociada::class);
     }
 
     public function recorridos(): HasMany

@@ -2,20 +2,25 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\PilotoFlytbase;
 use App\Models\Cliente;
+use App\Models\PilotoFlytbase;
 use Illuminate\Support\Facades\DB;
+use Livewire\Component;
 
 class AsignarPilotosClientes extends Component
 {
-
     public $pilotos;
+
     public $clientes;
+
     public $asignaciones = [];
+
     public $pilotoSeleccionado = null;
+
     public $clienteSeleccionado = null;
+
     public $paginaActual = 1;
+
     public $porPagina = 2; // Mostrar 2 cartas por página
 
     protected $rules = [
@@ -57,7 +62,7 @@ class AsignarPilotosClientes extends Component
             ->where('cliente_id', $this->clienteSeleccionado)
             ->exists();
 
-        if (!$existeAsignacion) {
+        if (! $existeAsignacion) {
             DB::table('piloto_flytbase_cliente')->insert([
                 'piloto_flytbase_id' => $this->pilotoSeleccionado,
                 'cliente_id' => $this->clienteSeleccionado,
@@ -86,20 +91,21 @@ class AsignarPilotosClientes extends Component
 
     public function getPilotosPaginados()
     {
-        $pilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
+        $pilotosConAsignaciones = $this->pilotos->filter(function ($piloto) {
             return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
         });
-        
+
         $inicio = ($this->paginaActual - 1) * $this->porPagina;
+
         return $pilotosConAsignaciones->slice($inicio, $this->porPagina);
     }
 
     public function getTotalPaginas()
     {
-        $totalPilotosConAsignaciones = $this->pilotos->filter(function($piloto) {
+        $totalPilotosConAsignaciones = $this->pilotos->filter(function ($piloto) {
             return isset($this->asignaciones[$piloto->id]) && count($this->asignaciones[$piloto->id]) > 0;
         })->count();
-        
+
         return ceil($totalPilotosConAsignaciones / $this->porPagina);
     }
 

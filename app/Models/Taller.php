@@ -43,11 +43,12 @@ class Taller extends Model
     public function getWhatsappLinkAttribute(): ?string
     {
         $number = $this->whatsapp ?? $this->telefono;
-        if (!$number) {
+        if (! $number) {
             return null;
         }
         $cleaned = preg_replace('/[^0-9]/', '', $number);
-        return 'https://wa.me/' . $cleaned;
+
+        return 'https://wa.me/'.$cleaned;
     }
 
     /**
@@ -55,6 +56,6 @@ class Taller extends Model
      */
     public function getMailtoLinkAttribute(): ?string
     {
-        return $this->email ? 'mailto:' . $this->email : null;
+        return $this->email ? 'mailto:'.$this->email : null;
     }
 }

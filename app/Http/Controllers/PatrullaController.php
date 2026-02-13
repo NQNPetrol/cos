@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class PatrullaController extends Controller
 {
     public function index()
@@ -20,5 +18,4 @@ class PatrullaController extends Controller
     {
         return view('patrullas.client.index-client');
     }
-
 }

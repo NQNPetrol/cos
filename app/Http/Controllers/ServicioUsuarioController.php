@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\ServicioUsuario;
+use Illuminate\Http\Request;
 
 class ServicioUsuarioController extends Controller
 {
     public function index()
     {
         $servicios = ServicioUsuario::orderBy('nombre')->get();
+
         return response()->json($servicios);
     }
 

@@ -2,35 +2,43 @@
 
 namespace App\Livewire\Seguimientos;
 
+use App\Models\Evento;
+use App\Models\Seguimiento;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Seguimiento;
-use App\Models\Evento;
 
 class VerSeguimientos extends Component
 {
-
     use WithPagination;
 
     // Propiedades para filtros
     public $search = '';
+
     public $estadoFilter = '';
+
     public $eventoFilter = '';
+
     public $tipoFilter = '';
+
     public $eventosDisponibles = [];
-    
+
     // Propiedades para ordenar
     public $sortField = 'fecha';
+
     public $sortDirection = 'desc';
 
     // Propiedades para el modal
     public $showModal = false;
+
     public $editingId = null;
-    
+
     // Propiedades del formulario
     public $evento_id;
+
     public $fecha;
+
     public $estado = 'ABIERTO';
+
     public $observaciones;
 
     protected $rules = [
@@ -42,7 +50,7 @@ class VerSeguimientos extends Component
 
     public function mount()
     {
-        $this->eventosDisponibles = Evento::whereDoesntHave('seguimientos', function($query) {
+        $this->eventosDisponibles = Evento::whereDoesntHave('seguimientos', function ($query) {
             $query->where('estado', 'CERRADO');
         })->with(['cliente', 'categoria'])->get();
     }
@@ -52,8 +60,8 @@ class VerSeguimientos extends Component
         $this->validate([
             'evento_id' => 'required|exists:eventos,id',
             'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
-            'observaciones' => 'nullable|string|max:1000' // Corregido "nulalble" a "nullable"
-            ]);
+            'observaciones' => 'nullable|string|max:1000', // Corregido "nulalble" a "nullable"
+        ]);
 
         try {
             $seguimiento = Seguimiento::create([
@@ -62,16 +70,16 @@ class VerSeguimientos extends Component
                 'observaciones' => $this->observaciones,
                 'user_id' => auth()->id(),
                 'fecha' => now(), // Usar now() en lugar de $this->fecha que no está definido
-                'titulo' => 'Seguimiento para Evento #'.$this->evento_id
+                'titulo' => 'Seguimiento para Evento #'.$this->evento_id,
             ]);
 
-        $this->reset(['evento_id', 'observaciones', 'estado']);
-        $this->estado = 'ABIERTO';
-        
-        $this->showModal = false;
-        session()->flash('success', 'Seguimiento creado exitosamente!');
-        $this->resetPage();
-        
+            $this->reset(['evento_id', 'observaciones', 'estado']);
+            $this->estado = 'ABIERTO';
+
+            $this->showModal = false;
+            session()->flash('success', 'Seguimiento creado exitosamente!');
+            $this->resetPage();
+
         } catch (\Exception $e) {
             session()->flash('error', 'Error al crear el seguimiento: '.$e->getMessage());
             \Log::error('Error al crear seguimiento: '.$e->getMessage());
@@ -90,8 +98,8 @@ class VerSeguimientos extends Component
         $seguimiento = Seguimiento::findOrFail($id);
         $this->editingId = $id;
         $this->evento_id = $seguimiento->evento_id;
-        $this->fecha  = $seguimiento->fecha->format('Y-m-d');
-        $this->estado  = $seguimiento->estado;
+        $this->fecha = $seguimiento->fecha->format('Y-m-d');
+        $this->estado = $seguimiento->estado;
         $this->observaciones = $seguimiento->observaciones;
         $this->showModal = true;
     }
@@ -120,7 +128,6 @@ class VerSeguimientos extends Component
         session()->flash('success', $message);
     }
 
-
     public function delete($id)
     {
         Seguimiento::find($id)->delete();
@@ -142,7 +149,6 @@ class VerSeguimientos extends Component
         $this->observaciones = '';
     }
 
-
     public function updatingSearch()
     {
         $this->resetPage();
@@ -155,7 +161,7 @@ class VerSeguimientos extends Component
         } else {
             $this->sortDirection = 'asc';
         }
-        
+
         $this->sortField = $field;
     }
 
@@ -174,31 +180,32 @@ class VerSeguimientos extends Component
         $this->reset(['search', 'estadoFilter', 'tipoFilter']);
         $this->resetPage();
     }
+
     public function render()
     {
         $query = Seguimiento::with(['evento', 'user'])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
 
                     if (preg_match('/#(\d+)/', $this->search, $matches)) {
-                        $q->whereHas('evento', function($subQuery) use ($matches) {
+                        $q->whereHas('evento', function ($subQuery) use ($matches) {
                             $subQuery->where('id', $matches[1]);
                         });
                     }
                     // Buscar en detalles o tipo
                     $q->orWhere('observaciones', 'like', '%'.$this->search.'%')
-                      ->orWhere('estado', 'like', '%'.$this->search.'%')
-                      ->orWhere('id', 'like', '%'.$this->search.'%')
-                      ->orWhereHas('evento', function($subQuery) {
-                          $subQuery->where('tipo', 'like', '%'.$this->search.'%');
-                      });
+                        ->orWhere('estado', 'like', '%'.$this->search.'%')
+                        ->orWhere('id', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('evento', function ($subQuery) {
+                            $subQuery->where('tipo', 'like', '%'.$this->search.'%');
+                        });
                 });
             })
-            ->when($this->estadoFilter, function($query) {
+            ->when($this->estadoFilter, function ($query) {
                 $query->where('estado', $this->estadoFilter);
             })
-            ->when($this->tipoFilter, function($query) {
-                $query->whereHas('evento', function($subQuery) {
+            ->when($this->tipoFilter, function ($query) {
+                $query->whereHas('evento', function ($subQuery) {
                     $subQuery->where('tipo', 'like', '%'.$this->tipoFilter.'%');
                 });
             })
@@ -206,8 +213,7 @@ class VerSeguimientos extends Component
 
         return view('livewire.seguimientos.ver-seguimientos', [
             'seguimientos' => $query->paginate(10),
-            'header' => 'Listado de Seguimientos'
+            'header' => 'Listado de Seguimientos',
         ]);
     }
-
 }

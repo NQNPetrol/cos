@@ -68,7 +68,7 @@ class Recorrido extends Model
         $content = file_get_contents($file->getRealPath());
         $xml = simplexml_load_string($content);
 
-        if (!$xml) {
+        if (! $xml) {
             return ['waypoints' => [], 'longitud_mts' => 0, 'metadata' => []];
         }
 
@@ -85,21 +85,23 @@ class Recorrido extends Model
 
         if ($coordinates) {
             foreach ($coordinates as $coordSet) {
-                $coordString = trim((string)$coordSet);
+                $coordString = trim((string) $coordSet);
                 // Split by whitespace or newlines
                 $coordPairs = preg_split('/[\s]+/', $coordString);
 
                 foreach ($coordPairs as $pair) {
                     $pair = trim($pair);
-                    if (empty($pair)) continue;
+                    if (empty($pair)) {
+                        continue;
+                    }
 
                     $parts = explode(',', $pair);
                     if (count($parts) >= 2) {
                         $waypoints[] = [
                             'order' => count($waypoints) + 1,
-                            'lng' => (float)$parts[0],
-                            'lat' => (float)$parts[1],
-                            'alt' => isset($parts[2]) ? (float)$parts[2] : null,
+                            'lng' => (float) $parts[0],
+                            'lat' => (float) $parts[1],
+                            'alt' => isset($parts[2]) ? (float) $parts[2] : null,
                         ];
                     }
                 }
@@ -112,8 +114,8 @@ class Recorrido extends Model
         if (empty($nameNodes)) {
             $nameNodes = $xml->xpath('//name');
         }
-        if (!empty($nameNodes)) {
-            $name = (string)$nameNodes[0];
+        if (! empty($nameNodes)) {
+            $name = (string) $nameNodes[0];
         }
 
         // Extract description if available
@@ -122,8 +124,8 @@ class Recorrido extends Model
         if (empty($descNodes)) {
             $descNodes = $xml->xpath('//description');
         }
-        if (!empty($descNodes)) {
-            $description = (string)$descNodes[0];
+        if (! empty($descNodes)) {
+            $description = (string) $descNodes[0];
         }
 
         // Calculate total distance using Haversine
@@ -144,15 +146,15 @@ class Recorrido extends Model
                 'imported_at' => now()->toDateTimeString(),
                 'kml_name' => $name,
                 'kml_description' => $description,
-                'start_point' => !empty($waypoints) ? [
+                'start_point' => ! empty($waypoints) ? [
                     'lat' => $waypoints[0]['lat'],
                     'lng' => $waypoints[0]['lng'],
                 ] : null,
-                'end_point' => !empty($waypoints) ? [
+                'end_point' => ! empty($waypoints) ? [
                     'lat' => end($waypoints)['lat'],
                     'lng' => end($waypoints)['lng'],
                 ] : null,
-            ]
+            ],
         ];
     }
 

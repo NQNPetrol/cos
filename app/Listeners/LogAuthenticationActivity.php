@@ -8,8 +8,6 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Spatie\Activitylog\Models\Activity;
 
 class LogAuthenticationActivity
 {
@@ -74,7 +72,7 @@ class LogAuthenticationActivity
     public function handleLockout(Lockout $event): void
     {
         $request = $event->request;
-        
+
         activity('lockout')
             ->withProperties([
                 'ip_address' => $request->ip(),
@@ -131,4 +129,3 @@ class LogAuthenticationActivity
         ];
     }
 }
-

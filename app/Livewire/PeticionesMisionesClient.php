@@ -2,45 +2,56 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\PeticionMisionFlytbase;
-use App\Models\FlytbaseSite;
-use App\Models\FlytbaseDrone;
-use App\Models\FlytbaseDock;
 use App\Models\Cliente;
+use App\Models\FlytbaseDock;
+use App\Models\FlytbaseDrone;
+use App\Models\FlytbaseSite;
+use App\Models\PeticionMisionFlytbase;
 use App\Models\UserCliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class PeticionesMisionesClient extends Component
 {
     use WithPagination;
 
     public $showCreateForm = false;
+
     public $showViewModal = false;
+
     public $selectedPeticion;
 
     // Datos del formulario
     public $nombre;
+
     public $descripcion;
+
     public $site_id;
+
     public $drone_id;
+
     public $route_altitude = 35.00;
+
     public $route_speed = 5.33;
+
     public $route_waypoint_type = 'linear_route';
+
     public $observaciones;
+
     public $waypoints = [];
-            
+
     public $currentWaypointIndex = 0;
+
     public $showActionModal = false;
+
     public $waypointInputMode = 'manual'; // 'manual' o 'kmz'
+
     public $kmz_file_path = null; // Path del archivo KMZ subido
 
     // Filtros
     public $filtroEstado = '';
-
-  
 
     public function mount()
     {
@@ -53,13 +64,13 @@ class PeticionesMisionesClient extends Component
         if (empty($peticion->waypoints)) {
             return 'sin waypoints';
         }
-        
+
         $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
-        
-        if (empty($waypoints) || !is_array($waypoints)) {
+
+        if (empty($waypoints) || ! is_array($waypoints)) {
             return 'sin waypoints';
         }
-        
+
         return count($waypoints);
     }
 
@@ -70,9 +81,9 @@ class PeticionesMisionesClient extends Component
             'latitud' => '',
             'longitud' => '',
             'altitud' => $this->route_altitude,
-            'acciones' => []
+            'acciones' => [],
         ];
-        
+
         // Si es el primer waypoint, establecer como current
         if (count($this->waypoints) === 1) {
             $this->currentWaypointIndex = 0;
@@ -86,12 +97,12 @@ class PeticionesMisionesClient extends Component
         if (count($this->waypoints) > 0) {
             unset($this->waypoints[$index]);
             $this->waypoints = array_values($this->waypoints);
-            
+
             // Ajustar el índice actual si es necesario
             if ($this->currentWaypointIndex >= count($this->waypoints)) {
                 $this->currentWaypointIndex = max(0, count($this->waypoints) - 1);
             }
-            
+
             // Si no hay waypoints, resetear el índice
             if (count($this->waypoints) === 0) {
                 $this->currentWaypointIndex = 0;
@@ -127,11 +138,11 @@ class PeticionesMisionesClient extends Component
         Log::info('Abriendo modal de acciones', [
             'currentWaypointIndex' => $this->currentWaypointIndex,
             'totalWaypoints' => count($this->waypoints),
-            'showActionModal' => $this->showActionModal
+            'showActionModal' => $this->showActionModal,
         ]);
-        
+
         $this->showActionModal = true;
-        
+
         Log::info('Modal de acciones abierto', ['showActionModal' => $this->showActionModal]);
         $this->dispatch('modal-opened');
     }
@@ -148,28 +159,29 @@ class PeticionesMisionesClient extends Component
         Log::info('Agregando acción', [
             'accion' => $accion,
             'currentIndex' => $this->currentWaypointIndex,
-            'waypointsCount' => count($this->waypoints)
+            'waypointsCount' => count($this->waypoints),
         ]);
 
-        if (!isset($this->waypoints[$this->currentWaypointIndex])) {
+        if (! isset($this->waypoints[$this->currentWaypointIndex])) {
             Log::error('Waypoint actual no existe', ['currentIndex' => $this->currentWaypointIndex]);
+
             return;
         }
 
         $currentIndex = $this->currentWaypointIndex;
-        
-        if (!in_array($accion, $this->waypoints[$currentIndex]['acciones'])) {
+
+        if (! in_array($accion, $this->waypoints[$currentIndex]['acciones'])) {
             $this->waypoints[$currentIndex]['acciones'][] = $accion;
             Log::info('Acción agregada exitosamente', [
                 'accion' => $accion,
-                'accionesActuales' => $this->waypoints[$currentIndex]['acciones']
+                'accionesActuales' => $this->waypoints[$currentIndex]['acciones'],
             ]);
             session()->flash('action-added', 'Acción agregada correctamente');
         } else {
             Log::info('La acción ya existe en el waypoint', ['accion' => $accion]);
             session()->flash('info', 'La acción ya está agregada en este waypoint');
         }
-        
+
         $this->showActionModal = false;
         Log::info('Modal cerrado después de agregar acción');
     }
@@ -179,53 +191,53 @@ class PeticionesMisionesClient extends Component
         Log::info('Eliminando acción', [
             'waypointIndex' => $waypointIndex,
             'accion' => $accion,
-            'accionesAntes' => $this->waypoints[$waypointIndex]['acciones'] ?? []
+            'accionesAntes' => $this->waypoints[$waypointIndex]['acciones'] ?? [],
         ]);
 
         if (isset($this->waypoints[$waypointIndex]['acciones'])) {
             $acciones = $this->waypoints[$waypointIndex]['acciones'];
             $this->waypoints[$waypointIndex]['acciones'] = array_values(array_diff($acciones, [$accion]));
             Log::info('Acción eliminada exitosamente', [
-                'accionesDespues' => $this->waypoints[$waypointIndex]['acciones']
+                'accionesDespues' => $this->waypoints[$waypointIndex]['acciones'],
             ]);
         } else {
             Log::warning('No se encontraron acciones para eliminar en el waypoint', ['waypointIndex' => $waypointIndex]);
         }
     }
 
-     public function getAccionesUnicas($peticion)
+    public function getAccionesUnicas($peticion)
     {
         if (empty($peticion->waypoints)) {
             return 'sin acciones';
         }
-        
+
         $waypoints = is_array($peticion->waypoints) ? $peticion->waypoints : json_decode($peticion->waypoints, true);
-        
-        if (empty($waypoints) || !is_array($waypoints)) {
+
+        if (empty($waypoints) || ! is_array($waypoints)) {
             return 'sin acciones';
         }
-        
+
         $accionesUnicas = [];
-        
+
         foreach ($waypoints as $waypoint) {
             if (isset($waypoint['acciones']) && is_array($waypoint['acciones'])) {
                 foreach ($waypoint['acciones'] as $accion) {
-                    if (!in_array($accion, $accionesUnicas)) {
+                    if (! in_array($accion, $accionesUnicas)) {
                         $accionesUnicas[] = $accion;
                     }
                 }
             }
         }
-        
+
         if (empty($accionesUnicas)) {
             return 'sin acciones';
         }
-        
+
         // Convertir códigos de acciones a texto legible
-        $accionesLegibles = array_map(function($accion) {
+        $accionesLegibles = array_map(function ($accion) {
             return $this->getActionLabel($accion);
         }, $accionesUnicas);
-        
+
         return implode(', ', $accionesLegibles);
     }
 
@@ -241,7 +253,7 @@ class PeticionesMisionesClient extends Component
             'set_gimbal_90' => 'Rotar Camara a 90°',
             'set_gimbal_45' => 'Rotar Camara 45°',
         ];
-        
+
         return $acciones[$action] ?? $action;
     }
 
@@ -249,30 +261,32 @@ class PeticionesMisionesClient extends Component
     {
         try {
             // Si hay waypoints manuales y no está confirmado, retornar para mostrar advertencia
-            if (!empty($this->waypoints) && !$confirmed) {
+            if (! empty($this->waypoints) && ! $confirmed) {
                 $this->dispatch('show-kmz-warning', [
                     'waypointsCount' => count($this->waypoints),
                     'waypointsJson' => $waypointsJson,
-                    'kmzFilePath' => $kmzFilePath
+                    'kmzFilePath' => $kmzFilePath,
                 ]);
+
                 return;
             }
 
             $waypoints = json_decode($waypointsJson, true);
-            
-            if (!is_array($waypoints) || empty($waypoints)) {
+
+            if (! is_array($waypoints) || empty($waypoints)) {
                 session()->flash('error', 'No se pudieron extraer waypoints del archivo KMZ.');
+
                 return;
             }
 
             // Asegurar que cada waypoint tenga el campo acciones inicializado
             foreach ($waypoints as &$wp) {
-                if (!isset($wp['acciones'])) {
+                if (! isset($wp['acciones'])) {
                     $wp['acciones'] = [];
                 }
                 // Asegurar que altitud sea numérico
                 if (isset($wp['altitud'])) {
-                    $wp['altitud'] = (float)$wp['altitud'];
+                    $wp['altitud'] = (float) $wp['altitud'];
                 } else {
                     $wp['altitud'] = $this->route_altitude;
                 }
@@ -282,16 +296,16 @@ class PeticionesMisionesClient extends Component
             $this->waypoints = $waypoints;
             $this->currentWaypointIndex = 0;
             $this->waypointInputMode = 'kmz';
-            
+
             // Guardar el path del archivo KMZ
             if ($kmzFilePath) {
                 $this->kmz_file_path = $kmzFilePath;
             }
-            
+
             session()->flash('success', 'Waypoints importados exitosamente desde el archivo KMZ. Los waypoints manuales anteriores han sido reemplazados.');
-            
+
         } catch (\Exception $e) {
-            Log::error('Error al procesar waypoints desde KMZ: ' . $e->getMessage());
+            Log::error('Error al procesar waypoints desde KMZ: '.$e->getMessage());
             session()->flash('error', 'Error al procesar los waypoints del archivo KMZ.');
         }
     }
@@ -299,13 +313,13 @@ class PeticionesMisionesClient extends Component
     public function switchWaypointMode($mode)
     {
         // Si se cambia a modo KMZ y hay waypoints manuales, limpiarlos
-        if ($mode === 'kmz' && !empty($this->waypoints)) {
+        if ($mode === 'kmz' && ! empty($this->waypoints)) {
             $this->waypoints = [];
             $this->currentWaypointIndex = 0;
             $this->kmz_file_path = null; // Limpiar path si se cambia a modo KMZ
             session()->flash('info', 'Se han limpiado los waypoints manuales al cambiar al modo de importación KMZ.');
         }
-        
+
         // Si se cambia a modo manual, limpiar el path del KMZ
         if ($mode === 'manual') {
             $this->kmz_file_path = null;
@@ -313,7 +327,7 @@ class PeticionesMisionesClient extends Component
                 $this->waypoints = [];
             }
         }
-        
+
         $this->waypointInputMode = $mode;
         $this->dispatch('waypointModeChanged');
     }
@@ -323,11 +337,11 @@ class PeticionesMisionesClient extends Component
         Log::info('Renderizando componente', [
             'showActionModal' => $this->showActionModal,
             'currentWaypointIndex' => $this->currentWaypointIndex,
-            'waypointsCount' => count($this->waypoints)
+            'waypointsCount' => count($this->waypoints),
         ]);
 
         $user = Auth::user();
-        
+
         // Obtener peticiones del usuario cliente
         $query = PeticionMisionFlytbase::where('user_id', $user->id)
             ->with(['cliente', 'site', 'drone', 'dock'])
@@ -370,20 +384,23 @@ class PeticionesMisionesClient extends Component
         $drone = FlytbaseDrone::activos()->find($this->drone_id);
         $site = FlytbaseSite::activos()->find($this->site_id);
 
-        if (!$drone) {
+        if (! $drone) {
             session()->flash('error', 'El drone seleccionado no está disponible o no está activo.');
+
             return;
         }
 
-        if (!$site) {
+        if (! $site) {
             session()->flash('error', 'El site seleccionado no está disponible o no está activo.');
+
             return;
         }
 
         $dock = FlytbaseDock::activos()->where('flytbase_site_id', $this->site_id)->first();
 
-        if (!$dock) {
+        if (! $dock) {
             session()->flash('error', 'No hay un dock activo disponible para el site seleccionado.');
+
             return;
         }
 
@@ -400,7 +417,7 @@ class PeticionesMisionesClient extends Component
             'kmz_file_path' => $this->kmz_file_path,
             'observaciones' => $this->observaciones,
             'user_id' => $user->id,
-            'estado' => 'pendiente'
+            'estado' => 'pendiente',
         ]);
 
         // TODO: Enviar notificación a operadores
@@ -429,11 +446,10 @@ class PeticionesMisionesClient extends Component
         session()->flash('success', 'Petición anulada correctamente.');
     }
 
-
     public function toggleAccion($waypointIndex, $accion)
     {
         $acciones = $this->waypoints[$waypointIndex]['acciones'] ?? [];
-        
+
         if (in_array($accion, $acciones)) {
             $acciones = array_diff($acciones, [$accion]);
         } else {
@@ -458,7 +474,7 @@ class PeticionesMisionesClient extends Component
             'currentWaypointIndex',
             'showActionModal',
             'kmz_file_path',
-            'waypointInputMode'
+            'waypointInputMode',
         ]);
 
         $this->waypoints = [
@@ -466,8 +482,8 @@ class PeticionesMisionesClient extends Component
                 'latitud' => '',
                 'longitud' => '',
                 'altitud' => $this->route_altitude,
-                'acciones' => []
-            ]
+                'acciones' => [],
+            ],
         ];
         $this->currentWaypointIndex = 0;
         $this->waypointInputMode = 'manual';

@@ -30,32 +30,44 @@ class PeticionMisionFlytbase extends Model
         'revisado_por',
         'comentarios_revisor',
         'revisado_en',
-        'mision_aprobada_id'
+        'mision_aprobada_id',
     ];
 
     protected $casts = [
         'route_altitude' => 'decimal:2',
         'route_speed' => 'decimal:2',
         'waypoints' => 'array',
-        'revisado_en' => 'datetime'
+        'revisado_en' => 'datetime',
     ];
 
     const ESTADO_PENDIENTE = 'pendiente';
+
     const ESTADO_APROBADA = 'aprobada';
+
     const ESTADO_RECHAZADA = 'rechazada';
 
     const TIPO_RUTA_LINEAL = 'linear_route';
+
     const TIPO_RUTA_TRANSITO = 'transits_waypoint';
+
     const TIPO_RUTA_CURVA_PARADA = 'curved_route_drone_stops';
+
     const TIPO_RUTA_CURVA_CONTINUA = 'curved_route_drone_continues';
 
     const ACCION_IMAGEN_TERMICA = 'take_thermal_image';
+
     const ACCION_INICIAR_GRABACION = 'start_recording';
+
     const ACCION_DETENER_GRABACION = 'stop_recording';
+
     const ACCION_ZOOM_IN = 'zoom_in';
+
     const ACCION_ZOOM_OUT = 'zoom_out';
+
     const ACCION_GIMBAL_90 = 'set_gimbal_90';
+
     const ACCION_GIMBAL_45 = 'set_gimbal_45';
+
     const ACCION_GIMBAL_0 = 'set_gimbal_0';
 
     public function cliente(): BelongsTo
@@ -135,7 +147,7 @@ class PeticionMisionFlytbase extends Model
             'kmz_file_path' => $this->kmz_file_path,
             'observaciones' => $this->observaciones,
             'url' => '', // Se generará después
-            'activo' => true
+            'activo' => true,
         ]);
 
         return $mision;
@@ -147,7 +159,7 @@ class PeticionMisionFlytbase extends Model
             'estado' => self::ESTADO_RECHAZADA,
             'revisado_por' => $revisor->id,
             'comentarios_revisor' => $comentarios ?: $razon,
-            'revisado_en' => now()
+            'revisado_en' => now(),
         ]);
     }
 
@@ -155,13 +167,13 @@ class PeticionMisionFlytbase extends Model
     public function agregarWaypoint(float $latitud, float $longitud, float $altitud, array $acciones = []): void
     {
         $waypoints = $this->waypoints ?? [];
-        
+
         $waypoints[] = [
             'latitud' => $latitud,
             'longitud' => $longitud,
             'altitud' => $altitud,
             'acciones' => $acciones,
-            'orden' => count($waypoints) + 1
+            'orden' => count($waypoints) + 1,
         ];
 
         $this->update(['waypoints' => $waypoints]);

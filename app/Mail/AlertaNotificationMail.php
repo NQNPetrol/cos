@@ -12,6 +12,7 @@ class AlertaNotificationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $alerta;
+
     public $userName;
 
     /**
@@ -28,11 +29,11 @@ class AlertaNotificationMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Alerta: ' . $this->alerta->titulo)
-                    ->view('emails.alerta-notification')
-                    ->with([
-                        'alerta' => $this->alerta,
-                        'userName' => $this->userName,
-                    ]);
+        return $this->subject('Alerta: '.$this->alerta->titulo)
+            ->view('emails.alerta-notification')
+            ->with([
+                'alerta' => $this->alerta,
+                'userName' => $this->userName,
+            ]);
     }
 }

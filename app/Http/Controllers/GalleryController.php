@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use App\Services\GalleryService;
+use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
@@ -13,7 +11,7 @@ class GalleryController extends Controller
 
     public function __construct()
     {
-        $this->galleryService = new GalleryService();
+        $this->galleryService = new GalleryService;
     }
 
     /**
@@ -22,21 +20,21 @@ class GalleryController extends Controller
     public function index(Request $request)
     {
         $filterDrone = $request->get('drone');
-        $filterClient = $request->get('client'); 
+        $filterClient = $request->get('client');
         $filterMission = $request->get('mission');
-        
+
         $galleryData = $this->galleryService->getOrganizedGallery([
             'drone' => $filterDrone,
             'client' => $filterClient,
-            'mission' => $filterMission
+            'mission' => $filterMission,
         ]);
 
         return view('gallery.index', [
             'galleryData' => $galleryData,
             'filterDrone' => $filterDrone,
-            'filterClient' => $filterClient, 
+            'filterClient' => $filterClient,
             'filterMission' => $filterMission,
-            'galleryService' => $this->galleryService // Para usar en la vista
+            'galleryService' => $this->galleryService, // Para usar en la vista
         ]);
     }
 
@@ -46,13 +44,13 @@ class GalleryController extends Controller
     public function apiIndex(Request $request)
     {
         $filters = $request->only(['drone', 'client', 'mission', 'type']);
-        
+
         $galleryData = $this->galleryService->getOrganizedGallery($filters);
 
         return response()->json([
             'success' => true,
             'data' => $galleryData,
-            'filters' => $filters
+            'filters' => $filters,
         ]);
     }
 
@@ -62,8 +60,8 @@ class GalleryController extends Controller
     public function missionShow($drone, $client, $mission)
     {
         $missionData = $this->galleryService->getMissionDetails($drone, $client, $mission);
-        
-        if (!$missionData) {
+
+        if (! $missionData) {
             abort(404, 'Misión no encontrada');
         }
 
@@ -77,12 +75,12 @@ class GalleryController extends Controller
     {
         $missionKey = $request->get('mission_key');
         $limit = $request->get('limit', 12);
-        
+
         $thumbnails = $this->galleryService->getMissionThumbnails($missionKey, $limit);
 
         return response()->json([
             'success' => true,
-            'thumbnails' => $thumbnails
+            'thumbnails' => $thumbnails,
         ]);
     }
 }

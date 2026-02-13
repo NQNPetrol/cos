@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\FlytbaseDrone;
 
 class FlytbaseDock extends Model
 {
@@ -21,14 +20,14 @@ class FlytbaseDock extends Model
         'latitud',
         'longitud',
         'altitude',
-        'active'
+        'active',
     ];
 
     protected $casts = [
         'latitud' => 'decimal:8',
         'longitud' => 'decimal:8',
         'altitude' => 'decimal:2',
-        'active' => 'boolean'
+        'active' => 'boolean',
     ];
 
     public function site(): BelongsTo
@@ -61,7 +60,7 @@ class FlytbaseDock extends Model
         return [
             'latitud' => $this->latitud,
             'longitud' => $this->longitud,
-            'altitude' => $this->altitude
+            'altitude' => $this->altitude,
         ];
     }
 }
