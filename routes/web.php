@@ -220,6 +220,18 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
 
     // ========== SUPERVISORES Y RECORRIDOS ==========
 
+    // Dashboard Patrullas
+    Route::get('/dashboard-patrullas', [\App\Http\Controllers\PatrullasDashboardController::class, 'index'])
+        ->name('dashboard-patrullas');
+    Route::get('/dashboard-patrullas/recorridos-map', [\App\Http\Controllers\PatrullasDashboardController::class, 'getRecorridosMapData'])
+        ->name('dashboard-patrullas.recorridos-map');
+    Route::get('/dashboard-patrullas/recorridos-tendencia', [\App\Http\Controllers\PatrullasDashboardController::class, 'getRecorridosTendencia'])
+        ->name('dashboard-patrullas.recorridos-tendencia');
+    Route::get('/dashboard-patrullas/top-recorridos', [\App\Http\Controllers\PatrullasDashboardController::class, 'getTopRecorridos'])
+        ->name('dashboard-patrullas.top-recorridos');
+    Route::get('/dashboard-patrullas/indicadores', [\App\Http\Controllers\PatrullasDashboardController::class, 'getIndicadores'])
+        ->name('dashboard-patrullas.indicadores');
+
     // Supervisores
     Route::get('/supervisores', [\App\Http\Controllers\SupervisoresController::class, 'index'])
         ->name('supervisores.index');
