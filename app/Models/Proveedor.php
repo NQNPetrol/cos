@@ -24,6 +24,11 @@ class Proveedor extends Model
         return $this->hasMany(Rodado::class);
     }
 
+    public function talleres(): HasMany
+    {
+        return $this->hasMany(Taller::class);
+    }
+
     public function pagosServicios(): HasMany
     {
         return $this->hasMany(PagoServiciosRodado::class);

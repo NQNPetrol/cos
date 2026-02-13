@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Cliente;
 use App\Models\ClienteEmpresaAsociada;
+use App\Models\Recorrido;
 
 class EmpresaAsociada extends Model
 {
@@ -20,5 +22,10 @@ class EmpresaAsociada extends Model
         return $this->belongsToMany(Cliente::class, 'cliente_empresa_asociada')
                     ->withPivot(['created_at', 'updated_at'])
                     ->using(ClienteEmpresaAsociada::class);
+    }
+
+    public function recorridos(): HasMany
+    {
+        return $this->hasMany(Recorrido::class, 'empresa_asociada_id');
     }
 }

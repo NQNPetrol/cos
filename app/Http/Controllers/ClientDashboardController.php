@@ -8,9 +8,9 @@ use App\Models\Evento;
 use App\Models\EmpresaAsociada;
 use App\Models\Categoria;
 use App\Models\Patrulla;
-use App\Models\PatrullaDocumental;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientDashboardController extends Controller
 {
@@ -43,20 +43,8 @@ class ClientDashboardController extends Controller
                 'totalEventos' => 0,
                 'eventosUltimos7Dias' => 0,
                 'empresasAsociadas' => collect(),
-                // Patrullas
-                'totalPatrullas' => 0,
-                'patrullasConGPS' => 0,
-                'patrullasSinGPS' => 0,
-                'chartDataPatrullasEstado' => [],
-                'chartDataPatrullasGPS' => [],
-                // Documentos de patrullas
-                'totalDocumentos' => 0,
-                'documentosVencidos' => 0,
-                'documentosPorVencer7Dias' => 0,
-                'documentosPorVencer30Dias' => 0,
-                'documentosVigentes' => 0,
-                'chartDataDocumentos' => [],
-                'documentosAlerta' => collect()
+                'patrullas' => collect(),
+                'empresasConRecorridos' => collect(),
             ]);
         }
 
@@ -294,116 +282,19 @@ class ClientDashboardController extends Controller
             })
             ->values();
 
-        // ========== ESTADÍSTICAS DE PATRULLAS ==========
-        
-        // Total de patrullas del cliente
-        $totalPatrullas = Patrulla::whereIn('cliente_id', $clienteIds)->count();
-        
-        // Patrullas por estado
-        $patrullasPorEstado = Patrulla::whereIn('cliente_id', $clienteIds)
-            ->select('estado', DB::raw('COUNT(*) as total'))
-            ->groupBy('estado')
+        // Patrullas para filtro del mapa de recorridos
+        $patrullas = Patrulla::whereIn('cliente_id', $clienteIds)
+            ->select('id', 'patente')
+            ->orderBy('patente')
             ->get();
 
-        $chartDataPatrullasEstado = [];
-        foreach ($patrullasPorEstado as $item) {
-            $chartDataPatrullasEstado[] = [
-                'nombre' => ucfirst($item->estado ?? 'Sin estado'),
-                'total' => $item->total
-            ];
-        }
-
-        // Ordenar por total
-        usort($chartDataPatrullasEstado, function($a, $b) {
-            return $b['total'] - $a['total'];
-        });
-
-        // Patrullas con GPS (tienen mobile_vehicle asociado)
-        $patrullasConGPS = Patrulla::whereIn('cliente_id', $clienteIds)
-            ->whereHas('mobileVehicle')
-            ->count();
-
-        $patrullasSinGPS = $totalPatrullas - $patrullasConGPS;
-
-        // Datos para gráfico de GPS
-        $chartDataPatrullasGPS = [];
-        if ($patrullasConGPS > 0) {
-            $chartDataPatrullasGPS[] = ['nombre' => 'Con GPS', 'total' => $patrullasConGPS];
-        }
-        if ($patrullasSinGPS > 0) {
-            $chartDataPatrullasGPS[] = ['nombre' => 'Sin GPS', 'total' => $patrullasSinGPS];
-        }
-
-        // ========== ESTADÍSTICAS DE DOCUMENTOS DE PATRULLAS ==========
-        
-        // Obtener IDs de patrullas del cliente
-        $patrullaIds = Patrulla::whereIn('cliente_id', $clienteIds)->pluck('id');
-        
-        $hoy = Carbon::today();
-        $en30Dias = Carbon::today()->addDays(30);
-        $en7Dias = Carbon::today()->addDays(7);
-        
-        // Total de documentos
-        $totalDocumentos = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)->count();
-        
-        // Documentos vencidos
-        $documentosVencidos = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '<', $hoy)
-            ->count();
-        
-        // Documentos por vencer en 7 días
-        $documentosPorVencer7Dias = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '>=', $hoy)
-            ->whereDate('fecha_vto', '<=', $en7Dias)
-            ->count();
-        
-        // Documentos por vencer en 30 días
-        $documentosPorVencer30Dias = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '>=', $hoy)
-            ->whereDate('fecha_vto', '<=', $en30Dias)
-            ->count();
-        
-        // Documentos vigentes (fecha_vto > 30 días o sin fecha)
-        $documentosVigentes = $totalDocumentos - $documentosVencidos - $documentosPorVencer30Dias;
-        
-        // Datos para gráfico de estado de documentos
-        $chartDataDocumentos = [];
-        if ($documentosVencidos > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vencidos', 'total' => $documentosVencidos];
-        }
-        if ($documentosPorVencer7Dias > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vence en 7 días', 'total' => $documentosPorVencer7Dias];
-        }
-        if (($documentosPorVencer30Dias - $documentosPorVencer7Dias) > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vence en 30 días', 'total' => $documentosPorVencer30Dias - $documentosPorVencer7Dias];
-        }
-        if ($documentosVigentes > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vigentes', 'total' => $documentosVigentes];
-        }
-        
-        // Lista de documentos próximos a vencer o vencidos (para tabla)
-        $documentosAlerta = PatrullaDocumental::with('patrulla')
-            ->whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '<=', $en30Dias)
-            ->orderBy('fecha_vto', 'asc')
-            ->get()
-            ->map(function ($doc) use ($hoy) {
-                $fechaVto = Carbon::parse($doc->fecha_vto);
-                $diasRestantes = $hoy->diffInDays($fechaVto, false);
-                
-                return [
-                    'id' => $doc->id,
-                    'nombre' => $doc->nombre,
-                    'patrulla' => $doc->patrulla->patente ?? 'N/A',
-                    'fecha_vto' => $doc->fecha_vto->format('d/m/Y'),
-                    'dias_restantes' => $diasRestantes,
-                    'estado' => $diasRestantes < 0 ? 'vencido' : ($diasRestantes <= 7 ? 'critico' : 'alerta')
-                ];
-            });
+        // Empresas asociadas que tienen al menos un recorrido (para el dropdown del mapa de recorridos)
+        $empresasConRecorridos = EmpresaAsociada::whereHas('cliente', function($q) use ($clienteIds) {
+                $q->whereIn('clientes.id', $clienteIds);
+            })
+            ->whereHas('recorridos')
+            ->orderBy('nombre')
+            ->get();
 
         return view('client.dashboard', [
             'chartData' => $chartData,
@@ -414,20 +305,8 @@ class ClientDashboardController extends Controller
             'eventosUltimos7Dias' => $eventosUltimos7Dias,
             'empresasAsociadas' => $empresasAsociadas,
             'categoriasTiposMapa' => $categoriasTipos,
-            // Patrullas
-            'totalPatrullas' => $totalPatrullas,
-            'patrullasConGPS' => $patrullasConGPS,
-            'patrullasSinGPS' => $patrullasSinGPS,
-            'chartDataPatrullasEstado' => $chartDataPatrullasEstado,
-            'chartDataPatrullasGPS' => $chartDataPatrullasGPS,
-            // Documentos de patrullas
-            'totalDocumentos' => $totalDocumentos,
-            'documentosVencidos' => $documentosVencidos,
-            'documentosPorVencer7Dias' => $documentosPorVencer7Dias,
-            'documentosPorVencer30Dias' => $documentosPorVencer30Dias,
-            'documentosVigentes' => $documentosVigentes,
-            'chartDataDocumentos' => $chartDataDocumentos,
-            'documentosAlerta' => $documentosAlerta
+            'patrullas' => $patrullas,
+            'empresasConRecorridos' => $empresasConRecorridos,
         ]);
     }
 
@@ -528,6 +407,11 @@ class ClientDashboardController extends Controller
             $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
         }
 
+        // Filtro opcional por empresa asociada
+        if ($request->filled('empresa_asociada_id')) {
+            $query->where('empresa_asociada_id', $request->empresa_asociada_id);
+        }
+
         // Obtener IDs de categorías que tienen eventos (con filtros aplicados)
         $queryCategorias = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
@@ -539,6 +423,9 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $queryCategorias->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('empresa_asociada_id')) {
+            $queryCategorias->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
         
         $categoriaIds = $queryCategorias->distinct()->pluck('categoria_id');
@@ -555,6 +442,9 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $queryEmpresas->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('empresa_asociada_id')) {
+            $queryEmpresas->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
         
         $empresaIds = $queryEmpresas->distinct()->pluck('empresa_asociada_id');
@@ -663,6 +553,11 @@ class ClientDashboardController extends Controller
         }
         if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_hora', '<=', $request->fecha_hasta);
+        }
+
+        // Filtro opcional por empresa asociada
+        if ($request->filled('empresa_asociada_id')) {
+            $query->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
 
         // Obtener eventos agrupados por mes
@@ -941,6 +836,160 @@ class ClientDashboardController extends Controller
                 'message' => 'Error interno del servidor'
             ], 500);
         }
+    }
+
+    /**
+     * Genera PDF de estadísticas del dashboard
+     */
+    public function generatePdf(Request $request)
+    {
+        $clienteIds = $this->getClienteIds();
+
+        if ($clienteIds->isEmpty()) {
+            abort(404, 'No hay clientes asignados');
+        }
+
+        // Obtener información del cliente principal
+        $user = Auth::user();
+        $clientePrincipal = $user->clientes()->first();
+        
+        // Obtener logo del cliente y convertir a base64 para el PDF
+        $logoBase64 = null;
+        if ($clientePrincipal && $clientePrincipal->logo) {
+            $logoPath = storage_path('app/public/' . $clientePrincipal->logo);
+            if (file_exists($logoPath)) {
+                $logoData = file_get_contents($logoPath);
+                $logoMime = mime_content_type($logoPath);
+                $logoBase64 = 'data:' . $logoMime . ';base64,' . base64_encode($logoData);
+            }
+        }
+
+        // Obtener empresa asociada seleccionada (si existe)
+        $empresaAsociadaSeleccionada = null;
+        $empresaAsociadaId = $request->input('empresa_asociada_id');
+        if ($empresaAsociadaId) {
+            $empresaAsociadaSeleccionada = EmpresaAsociada::find($empresaAsociadaId);
+        }
+
+        // Fechas del filtro
+        $fechaDesde = $request->input('fecha_desde');
+        $fechaHasta = $request->input('fecha_hasta');
+
+        // Construir query base
+        $query = Evento::whereIn('cliente_id', $clienteIds)
+            ->where('es_anulado', false);
+
+        if ($fechaDesde) {
+            $query->whereDate('fecha_hora', '>=', $fechaDesde);
+        }
+        if ($fechaHasta) {
+            $query->whereDate('fecha_hora', '<=', $fechaHasta);
+        }
+        if ($empresaAsociadaId) {
+            $query->where('empresa_asociada_id', $empresaAsociadaId);
+        }
+
+        // Total de eventos
+        $totalEventos = (clone $query)->count();
+
+        // Eventos últimos 7 días
+        $fechaHace7Dias = Carbon::today()->subDays(7);
+        $queryUltimos7 = (clone $query)
+            ->whereDate('fecha_hora', '>=', $fechaHace7Dias)
+            ->whereDate('fecha_hora', '<=', Carbon::today());
+        $eventosUltimos7Dias = $queryUltimos7->count();
+
+        // Eventos por categoría
+        $eventosPorCategoria = (clone $query)
+            ->whereNotNull('categoria_id')
+            ->select('categoria_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('categoria_id')
+            ->get();
+
+        $categorias = Categoria::whereIn('id', $eventosPorCategoria->pluck('categoria_id'))->get()->keyBy('id');
+        
+        $chartDataCategorias = [];
+        foreach ($eventosPorCategoria as $item) {
+            $categoria = $categorias->get($item->categoria_id);
+            if ($categoria) {
+                $chartDataCategorias[] = [
+                    'nombre' => $categoria->nombre,
+                    'total' => $item->total
+                ];
+            }
+        }
+        usort($chartDataCategorias, function($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+
+        // Eventos por mes
+        $eventosMensuales = (clone $query)
+            ->select(
+                DB::raw('YEAR(fecha_hora) as año'),
+                DB::raw('MONTH(fecha_hora) as mes'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('año', 'mes')
+            ->orderBy('año', 'asc')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        $mesesCortos = [
+            1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+        ];
+
+        $datosMensuales = [];
+        foreach ($eventosMensuales as $evento) {
+            $datosMensuales[] = [
+                'mes' => $mesesCortos[$evento->mes] . ' ' . $evento->año,
+                'total' => $evento->total
+            ];
+        }
+
+        // Promedio mensual
+        $promedioMensual = count($datosMensuales) > 0 
+            ? round(array_sum(array_column($datosMensuales, 'total')) / count($datosMensuales))
+            : 0;
+
+        // Eventos por ubicación (para estadísticas geográficas)
+        $eventosPorUbicacion = (clone $query)
+            ->whereNotNull('latitud')
+            ->whereNotNull('longitud')
+            ->where('latitud', '!=', 0)
+            ->where('longitud', '!=', 0)
+            ->select(
+                DB::raw('ROUND(latitud, 2) as lat'),
+                DB::raw('ROUND(longitud, 2) as lng'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy(DB::raw('ROUND(latitud, 2)'), DB::raw('ROUND(longitud, 2)'))
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Preparar datos para el PDF
+        $data = [
+            'clienteNombre' => $clientePrincipal->nombre ?? 'Cliente',
+            'logoBase64' => $logoBase64,
+            'empresaAsociadaNombre' => $empresaAsociadaSeleccionada ? $empresaAsociadaSeleccionada->nombre : 'Todas las empresas',
+            'fechaDesde' => $fechaDesde ? Carbon::parse($fechaDesde)->format('d/m/Y') : 'Inicio',
+            'fechaHasta' => $fechaHasta ? Carbon::parse($fechaHasta)->format('d/m/Y') : 'Hoy',
+            'fechaGeneracion' => Carbon::now()->format('d/m/Y H:i'),
+            'totalEventos' => $totalEventos,
+            'eventosUltimos7Dias' => $eventosUltimos7Dias,
+            'promedioMensual' => $promedioMensual,
+            'chartDataCategorias' => $chartDataCategorias,
+            'datosMensuales' => $datosMensuales,
+            'eventosPorUbicacion' => $eventosPorUbicacion,
+        ];
+
+        $pdf = PDF::loadView('client.dashboard-pdf', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = 'estadisticas_' . ($empresaAsociadaSeleccionada ? str_replace(' ', '_', $empresaAsociadaSeleccionada->nombre) : 'general') . '_' . date('Y-m-d') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }
 

@@ -13,6 +13,17 @@
         
         <!-- Filtros de fecha -->
         <div class="flex flex-wrap gap-3 items-center">
+            <!-- Filtro por Cliente (Empresa Asociada) -->
+            <div class="flex items-center gap-2">
+                <label for="empresa_asociada_filter" class="text-sm text-gray-300">Cliente:</label>
+                <select id="empresa_asociada_filter" 
+                        class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-w-[150px]">
+                    <option value="">Todos</option>
+                    @foreach($empresasAsociadas as $empresa)
+                        <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="flex items-center gap-2">
                 <label for="fecha_desde" class="text-sm text-gray-300">Desde:</label>
                 <input type="date" id="fecha_desde" 
@@ -33,6 +44,13 @@
             <button id="btn_limpiar" 
                     class="bg-zinc-600 hover:bg-zinc-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                 Limpiar
+            </button>
+            <button id="btn_generar_pdf" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Generar PDF
             </button>
         </div>
     </div>
@@ -298,259 +316,145 @@
         </div>
     </div>
 
-    <!-- ==================== SECCIÓN PATRULLAS ==================== -->
-    <div class="border-b border-zinc-600 pb-2 mt-8">
-        <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
+    <!-- ==================== MAPA DE INTENSIDAD DE RECORRIDOS ==================== -->
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl mt-6">
+        <!-- Header con título y filtros -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                    </svg>
+                    Mapa de calor de frecuencia de recorridos
+                </h2>
+                <p class="text-gray-400 text-sm mt-1">Intensidad basada en la frecuencia de realización mensual</p>
+            </div>
+            <div class="flex flex-wrap gap-3 items-end">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Cliente</label>
+                    <select id="recmap_empresa" class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 min-w-[180px] focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Seleccionar cliente...</option>
+                        @foreach($empresasConRecorridos as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Patrulla</label>
+                    <select id="recmap_patrulla" class="bg-zinc-800 border border-zinc-600 text-white text-sm rounded-lg px-3 py-2 min-w-[150px] focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todas</option>
+                        @foreach($patrullas as $pat)
+                            <option value="{{ $pat->id }}">{{ $pat->patente }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button id="btn_cargar_recmap" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all">
+                    <i class="bi bi-arrow-repeat mr-1"></i> Cargar Mapa
+                </button>
+            </div>
+        </div>
+
+        <!-- Mapa -->
+        <div class="relative rounded-xl overflow-hidden border border-zinc-600" style="height: 520px;">
+            <div id="recorridos-map" style="height: 100%; width: 100%; background: #1a1a2e;"></div>
+            <div id="recmap-loading" class="absolute inset-0 bg-gray-900/80 flex items-center justify-center hidden z-[1000]">
+                <div class="flex items-center gap-3 text-gray-300">
+                    <svg class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    Cargando recorridos...
+                </div>
+            </div>
+            <div id="recmap-empty" class="absolute inset-0 flex items-center justify-center z-[999] pointer-events-none">
+                <div class="text-center text-gray-500">
+                    <svg class="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                    </svg>
+                    <p class="text-sm">Seleccione un cliente para ver los recorridos en el mapa</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leyenda -->
+        <div id="recmap-legend" class="mt-4 hidden">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs text-gray-400 font-medium">Baja</span>
+                <div class="w-40 h-4 rounded-md overflow-hidden border border-zinc-600 shadow-inner"
+                     style="background: linear-gradient(to right, #2563eb 0%, #06b6d4 30%, #84cc16 60%, #eab308 80%, #ef4444 100%);">
+                </div>
+                <span class="text-xs text-gray-400 font-medium">Alta</span>
+                <span class="text-xs text-gray-500 italic ml-2">Escala de intensidad de recorridos</span>
+            </div>
+        </div>
+
+        <!-- Indicadores colapsables -->
+        <div class="mt-4 border-t border-zinc-700 pt-3">
+            <button id="toggle-indicadores-rec" type="button" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors w-full">
+                <svg id="indicadores-chevron" class="w-4 h-4 transform -rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+                <span class="font-medium">Indicadores del Mes</span>
+                <span id="indicadores-count" class="text-xs bg-zinc-700 text-gray-400 px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <div id="indicadores-recorridos-panel" class="hidden mt-3">
+                <div id="indicadores-recorridos-container" class="space-y-2">
+                    <div class="text-center py-4 text-gray-500 text-sm">
+                        <svg class="animate-spin h-5 w-5 mx-auto mb-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                        Cargando indicadores...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GRÁFICOS DE ANÁLISIS DE RECORRIDOS ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <!-- Tendencia día/hora -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Tendencia de Recorridos</h2>
+                    <p class="text-gray-400 text-sm mt-1">Distribución por día de semana y hora</p>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-600/20 text-purple-400">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>Heatmap
+                </span>
+            </div>
+            <div class="relative" style="height: 320px;"><canvas id="chartTendenciaRecorridos"></canvas></div>
+        </div>
+
+        <!-- Top 5 más vs menos realizados -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Top Recorridos del Mes</h2>
+                    <p class="text-gray-400 text-sm mt-1">5 más realizados vs 5 menos realizados</p>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-600/20 text-blue-400">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>Ranking
+                </span>
+            </div>
+            <div class="relative" style="height: 320px;"><canvas id="chartTopRecorridos"></canvas></div>
+        </div>
+    </div>
+
+    <!-- Link al Dashboard de Patrullas -->
+    <div class="mt-6">
+        <a href="{{ route('client.dashboard-patrullas') }}" class="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-cyan-600/20 to-cyan-400/10 border border-cyan-500/30 rounded-xl text-cyan-400 hover:from-cyan-600/30 hover:to-cyan-400/20 hover:border-cyan-500/50 transition-all group">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
             </svg>
-            Estadísticas de Patrullas
-        </h2>
-    </div>
-
-    <!-- Tarjetas de resumen de patrullas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Total Patrullas -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Patrullas</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $totalPatrullas ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-cyan-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Patrullas con GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Con GPS</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $patrullasConGPS ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-green-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Patrullas sin GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Sin GPS</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $patrullasSinGPS ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-red-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grid de gráficos de patrullas - 2 columnas en pantallas lg -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Gráfico de patrullas por estado -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Patrullas por Estado</h2>
-                    <p class="text-gray-400 text-sm mt-1">Distribución según estado operativo</p>
-                </div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-cyan-600/20 text-cyan-400">
-                    <span class="w-2 h-2 bg-cyan-500 rounded-full mr-2"></span>
-                    Por estado
-                </span>
-            </div>
-            
-            <div class="relative" style="height: 300px;">
-                <canvas id="chartPatrullasEstado"></canvas>
-            </div>
-        </div>
-
-        <!-- Gráfico de patrullas por GPS -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Cobertura GPS</h2>
-                    <p class="text-gray-400 text-sm mt-1">Patrullas con y sin seguimiento GPS</p>
-                </div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-600/20 text-green-400">
-                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    GPS
-                </span>
-            </div>
-            
-            <div class="relative" style="height: 300px;">
-                <canvas id="chartPatrullasGPS"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== SECCIÓN DOCUMENTOS DE PATRULLAS ==================== -->
-    <div class="border-b border-zinc-600 pb-2 mt-8">
-        <h2 class="text-lg font-semibold text-orange-400 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            <span class="font-medium">Dashboard Patrullas</span>
+            <span class="text-xs text-gray-500">Estadísticas y documentación de patrullas</span>
+            <svg class="w-4 h-4 ml-auto opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            Documentación de Patrullas
-        </h2>
-    </div>
-
-    <!-- Tarjetas de resumen de documentos -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <!-- Total Documentos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Documentos</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $totalDocumentos ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-orange-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documentos Vencidos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-red-900/50 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vencidos</p>
-                    <p class="text-3xl font-bold text-red-500 mt-2">{{ $documentosVencidos ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-red-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Por vencer en 7 días -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-amber-900/50 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vence en 7 días</p>
-                    <p class="text-3xl font-bold text-amber-500 mt-2">{{ $documentosPorVencer7Dias ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-amber-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documentos Vigentes -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-green-900/50 shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Vigentes</p>
-                    <p class="text-3xl font-bold text-green-500 mt-2">{{ $documentosVigentes ?? 0 }}</p>
-                </div>
-                <div class="w-14 h-14 bg-green-600/20 rounded-xl flex items-center justify-center">
-                    <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grid: Gráfico + Tabla de documentos -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Gráfico de estado de documentos -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl relative">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Estado de Documentos</h2>
-                    <p class="text-gray-400 text-sm mt-1">Distribución por estado de vencimiento</p>
-                </div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-600/20 text-orange-400">
-                    <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
-                    Vencimientos
-                </span>
-            </div>
-            
-            <div class="relative" style="height: 300px;">
-                <canvas id="chartDocumentos"></canvas>
-            </div>
-        </div>
-
-        <!-- Tabla de documentos próximos a vencer -->
-        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-zinc-700 shadow-xl">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Alertas de Vencimiento</h2>
-                    <p class="text-gray-400 text-sm mt-1">Documentos próximos a vencer o vencidos</p>
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto max-h-72 overflow-y-auto">
-                @if(isset($documentosAlerta) && count($documentosAlerta) > 0)
-                <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-gray-400 uppercase bg-zinc-800/50 sticky top-0">
-                        <tr>
-                            <th scope="col" class="px-4 py-3">Documento</th>
-                            <th scope="col" class="px-4 py-3">Patrulla</th>
-                            <th scope="col" class="px-4 py-3 text-center">Vencimiento</th>
-                            <th scope="col" class="px-4 py-3 text-center">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        @foreach($documentosAlerta as $doc)
-                        <tr class="hover:bg-zinc-700/50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-white">{{ $doc['nombre'] }}</td>
-                            <td class="px-4 py-3 text-gray-300">{{ $doc['patrulla'] }}</td>
-                            <td class="px-4 py-3 text-center text-gray-300">{{ $doc['fecha_vto'] }}</td>
-                            <td class="px-4 py-3 text-center">
-                                @if($doc['estado'] === 'vencido')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
-                                        Vencido ({{ abs($doc['dias_restantes']) }} días)
-                                    </span>
-                                @elseif($doc['estado'] === 'critico')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-600/20 text-amber-400">
-                                        {{ $doc['dias_restantes'] }} días
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-600/20 text-yellow-400">
-                                        {{ $doc['dias_restantes'] }} días
-                                    </span>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                @else
-                <div class="text-center py-8 text-gray-400">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <p>No hay documentos próximos a vencer</p>
-                </div>
-                @endif
-            </div>
-        </div>
+        </a>
     </div>
 </div>
 @push('scripts')
 <!-- Leaflet CSS y JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+ src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
 <style>
     /* Scrollbar personalizada para los contenedores de filtros */
@@ -735,12 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const initialDataStacked = @json($chartDataStacked ?? ['clientes' => [], 'datasets' => []]);
     const initialDataMensual = @json($chartDataMensual ?? ['labels' => [], 'data' => [], 'promedio' => 0]);
     
-    // Datos iniciales - Patrullas
-    const initialDataPatrullasEstado = @json($chartDataPatrullasEstado ?? []);
-    const initialDataPatrullasGPS = @json($chartDataPatrullasGPS ?? []);
-    
-    // Datos iniciales - Documentos
-    const initialDataDocumentos = @json($chartDataDocumentos ?? []);
+    // (Datos de patrullas y documentos movidos a Dashboard Patrullas)
     
     // URLs de API
     const urlStacked = "{{ route('client.dashboard.eventos-stacked') }}";
@@ -782,30 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
                  'rgba(5, 150, 105, 1)']
     };
 
-    const colorsPatrullas = {
-        bg: ['rgba(30, 58, 138, 0.85)',   // Azul navy
-             'rgba(20, 83, 45, 0.85)',     // Verde oscuro
-             'rgba(55, 65, 81, 0.85)',     // Gris
-             'rgba(22, 78, 99, 0.85)',     // Cyan oscuro
-             'rgba(71, 85, 105, 0.85)'],   // Gris slate
-        border: ['rgba(30, 58, 138, 1)', 'rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)',
-                 'rgba(22, 78, 99, 1)', 'rgba(71, 85, 105, 1)']
-    };
-
-    const colorsGPS = {
-        bg: ['rgba(20, 83, 45, 0.85)',    // Verde oscuro (con GPS)
-             'rgba(55, 65, 81, 0.85)'],    // Gris oscuro (sin GPS)
-        border: ['rgba(20, 83, 45, 1)', 'rgba(55, 65, 81, 1)']
-    };
-
-    // Colores para documentos (mantener semáforo pero más sobrio)
-    const colorsDocumentos = {
-        bg: ['rgba(127, 29, 29, 0.85)',   // Rojo oscuro (vencido)
-             'rgba(146, 64, 14, 0.85)',    // Ámbar oscuro (7 días)
-             'rgba(113, 63, 18, 0.85)',    // Marrón dorado (30 días)
-             'rgba(20, 83, 45, 0.85)'],    // Verde oscuro (vigente)
-        border: ['rgba(127, 29, 29, 1)', 'rgba(146, 64, 14, 1)', 'rgba(113, 63, 18, 1)', 'rgba(20, 83, 45, 1)']
-    };
+    // (Colores de patrullas y documentos movidos a Dashboard Patrullas)
 
     // Opciones comunes para gráficos de barras
     const getBarChartOptions = () => ({
@@ -1111,62 +987,14 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: [labelPlugin]
     });
 
-    // ========== GRÁFICOS DE PATRULLAS ==========
-    
-    // Gráfico de patrullas por estado
-    const ctxPatrullasEstado = document.getElementById('chartPatrullasEstado').getContext('2d');
-    new Chart(ctxPatrullasEstado, {
-        type: 'doughnut',
-        data: {
-            labels: initialDataPatrullasEstado.map(i => i.nombre),
-            datasets: [{
-                data: initialDataPatrullasEstado.map(i => i.total),
-                backgroundColor: initialDataPatrullasEstado.map((_, i) => colorsPatrullas.bg[i % colorsPatrullas.bg.length]),
-                borderColor: initialDataPatrullasEstado.map((_, i) => colorsPatrullas.border[i % colorsPatrullas.border.length]),
-                borderWidth: 2
-            }]
-        },
-        options: getDoughnutOptions()
-    });
-
-    // Gráfico de patrullas GPS
-    const ctxPatrullasGPS = document.getElementById('chartPatrullasGPS').getContext('2d');
-    new Chart(ctxPatrullasGPS, {
-        type: 'doughnut',
-        data: {
-            labels: initialDataPatrullasGPS.map(i => i.nombre),
-            datasets: [{
-                data: initialDataPatrullasGPS.map(i => i.total),
-                backgroundColor: colorsGPS.bg,
-                borderColor: colorsGPS.border,
-                borderWidth: 2
-            }]
-        },
-        options: getDoughnutOptions()
-    });
-
-    // ========== GRÁFICO DE DOCUMENTOS ==========
-    
-    const ctxDocumentos = document.getElementById('chartDocumentos').getContext('2d');
-    new Chart(ctxDocumentos, {
-        type: 'doughnut',
-        data: {
-            labels: initialDataDocumentos.map(i => i.nombre),
-            datasets: [{
-                data: initialDataDocumentos.map(i => i.total),
-                backgroundColor: initialDataDocumentos.map((_, i) => colorsDocumentos.bg[i % colorsDocumentos.bg.length]),
-                borderColor: initialDataDocumentos.map((_, i) => colorsDocumentos.border[i % colorsDocumentos.border.length]),
-                borderWidth: 2
-            }]
-        },
-        options: getDoughnutOptions()
-    });
+    // (Gráficos de patrullas y documentos movidos a Dashboard Patrullas)
 
     // ========== FILTROS DE EVENTOS ==========
     
     async function updateCharts() {
         const fechaDesde = document.getElementById('fecha_desde').value;
         const fechaHasta = document.getElementById('fecha_hasta').value;
+        const empresaAsociada = document.getElementById('empresa_asociada_filter').value;
         
         document.getElementById('loading-stacked').classList.remove('hidden');
         document.getElementById('loading-mensual').classList.remove('hidden');
@@ -1175,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams();
             if (fechaDesde) params.append('fecha_desde', fechaDesde);
             if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            if (empresaAsociada) params.append('empresa_asociada_id', empresaAsociada);
             const queryString = params.toString() ? `?${params.toString()}` : '';
 
             const [resStacked, resMensual] = await Promise.all([
@@ -1204,6 +1033,11 @@ document.addEventListener('DOMContentLoaded', function() {
             promedioActual = dataMensual.promedio || 0;
             chartMensual.update('active');
 
+            // Actualizar también el mapa de calor si existe
+            if (typeof window.heatmapReload === 'function') {
+                window.heatmapReload();
+            }
+
         } catch (error) {
             console.error('Error al cargar datos:', error);
         } finally {
@@ -1217,8 +1051,27 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_limpiar').addEventListener('click', function() {
         document.getElementById('fecha_desde').value = '';
         document.getElementById('fecha_hasta').value = '';
+        document.getElementById('empresa_asociada_filter').value = '';
         updateCharts();
     });
+    
+    // Event listener para generar PDF
+    const btnGenerarPdf = document.getElementById('btn_generar_pdf');
+    if (btnGenerarPdf) {
+        btnGenerarPdf.addEventListener('click', function() {
+            const fechaDesde = document.getElementById('fecha_desde').value;
+            const fechaHasta = document.getElementById('fecha_hasta').value;
+            const empresaAsociada = document.getElementById('empresa_asociada_filter').value;
+            
+            const params = new URLSearchParams();
+            if (fechaDesde) params.append('fecha_desde', fechaDesde);
+            if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            if (empresaAsociada) params.append('empresa_asociada_id', empresaAsociada);
+            
+            const url = '{{ route("client.dashboard.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
+            window.open(url, '_blank');
+        });
+    }
 });
 
 // ========== INTERACCIÓN FILTROS MAPA DE CALOR ==========
@@ -2076,6 +1929,490 @@ document.addEventListener('DOMContentLoaded', function () {
     window.heatmapReload = loadHeatmap;
     window.actualizarTiposPorCategorias = actualizarTiposPorCategorias;
     })();
+</script>
+
+<style>
+    .recorrido-popup .leaflet-popup-content-wrapper {
+        background: #1f2937; color: #e5e7eb; border-radius: 12px;
+        border: 1px solid #374151; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .recorrido-popup .leaflet-popup-tip { background: #1f2937; }
+    .recorrido-popup .leaflet-popup-content { margin: 0; padding: 0; }
+    .recmap-tooltip {
+        background: rgba(31,41,55,0.92); color: #e5e7eb; border: 1px solid #374151;
+        border-radius: 8px; padding: 6px 12px; font-size: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+    }
+    .recmap-tooltip .leaflet-tooltip-arrow { display: none; }
+    #recorridos-map .leaflet-control-map-style a {
+        width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+        background: #fff; color: #333;
+    }
+    #recorridos-map .leaflet-control-map-style a svg { width: 16px; height: 16px; }
+</style>
+
+<script>
+// ========== MAPA DE INTENSIDAD DE RECORRIDOS + GRÁFICOS ==========
+(function() {
+    const urlRecorridosMap = "{{ route('client.dashboard-patrullas.recorridos-map') }}";
+    const urlTendencia = "{{ route('client.dashboard-patrullas.recorridos-tendencia') }}";
+    const urlTopRecorridos = "{{ route('client.dashboard-patrullas.top-recorridos') }}";
+    const urlIndicadores = "{{ route('client.dashboard-patrullas.indicadores') }}";
+
+    let recMap = null;
+    let recRouteLayers = [];
+    let recBaseLayers = {};
+    let recLabelsLayer = null;
+    let recCurrentBase = 'satelital';
+
+    // Same gradient as the events heatmap: blue -> cyan -> green -> yellow -> red
+    function getHeatColor(intensity) {
+        const stops = [
+            { pos: 0.0, r: 37,  g: 99,  b: 235 }, // #2563eb
+            { pos: 0.3, r: 6,   g: 182, b: 212 }, // #06b6d4
+            { pos: 0.6, r: 132, g: 204, b: 22  }, // #84cc16
+            { pos: 0.8, r: 234, g: 179, b: 8   }, // #eab308
+            { pos: 1.0, r: 239, g: 68,  b: 68  }, // #ef4444
+        ];
+        const t = Math.max(0, Math.min(1, intensity));
+        let lower = stops[0], upper = stops[stops.length - 1];
+        for (let i = 0; i < stops.length - 1; i++) {
+            if (t >= stops[i].pos && t <= stops[i + 1].pos) {
+                lower = stops[i]; upper = stops[i + 1]; break;
+            }
+        }
+        const range = upper.pos - lower.pos || 1;
+        const f = (t - lower.pos) / range;
+        const r = Math.round(lower.r + f * (upper.r - lower.r));
+        const g = Math.round(lower.g + f * (upper.g - lower.g));
+        const b = Math.round(lower.b + f * (upper.b - lower.b));
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function initRecMap() {
+        if (recMap) return;
+        recMap = L.map('recorridos-map', { center: [-38.95, -68.05], zoom: 12, zoomControl: true });
+
+        // Grayscale base layer (CartoDB Positron)
+        recBaseLayers.grayscale = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+            subdomains: 'abcd', maxZoom: 19
+        });
+
+        // Satellite base layer (Esri)
+        recBaseLayers.satelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri, Maxar, Earthstar Geographics', maxZoom: 19
+        });
+
+        // Labels overlay for satellite mode
+        recLabelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+            attribution: '', subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane'
+        });
+
+        // Default: satellite with labels
+        recBaseLayers.satelital.addTo(recMap);
+        recLabelsLayer.addTo(recMap);
+        recCurrentBase = 'satelital';
+
+        // Style toggle control
+        const MapStyleCtrl = L.Control.extend({
+            onAdd: function() {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-map-style');
+                const btn = L.DomUtil.create('a', '', container);
+                btn.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"></path></svg>';
+                btn.href = '#';
+                btn.title = 'Cambiar a vista de mapa';
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    if (recCurrentBase === 'satelital') {
+                        recMap.removeLayer(recBaseLayers.satelital);
+                        recMap.removeLayer(recLabelsLayer);
+                        recBaseLayers.grayscale.addTo(recMap);
+                        recCurrentBase = 'grayscale';
+                        btn.title = 'Cambiar a vista satelital';
+                    } else {
+                        recMap.removeLayer(recBaseLayers.grayscale);
+                        recBaseLayers.satelital.addTo(recMap);
+                        recLabelsLayer.addTo(recMap);
+                        recCurrentBase = 'satelital';
+                        btn.title = 'Cambiar a vista de mapa';
+                    }
+                });
+                return container;
+            }
+        });
+        new MapStyleCtrl({ position: 'topleft' }).addTo(recMap);
+    }
+
+    function clearRecRoutes() {
+        recRouteLayers.forEach(l => recMap.removeLayer(l));
+        recRouteLayers = [];
+    }
+
+    function loadRecorridosMap() {
+        const empresaId = document.getElementById('recmap_empresa').value;
+        if (!empresaId) return;
+
+        if (!recMap) initRecMap();
+
+        document.getElementById('recmap-loading').classList.remove('hidden');
+        document.getElementById('recmap-empty').classList.add('hidden');
+
+        const params = new URLSearchParams({ empresa_asociada_id: empresaId });
+        const fechaDesde = document.getElementById('fecha_desde')?.value;
+        const fechaHasta = document.getElementById('fecha_hasta')?.value;
+        const patrullaId = document.getElementById('recmap_patrulla')?.value;
+        if (fechaDesde) params.append('fecha_desde', fechaDesde);
+        if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+        if (patrullaId) params.append('patrulla_id', patrullaId);
+
+        fetch(`${urlRecorridosMap}?${params.toString()}`)
+            .then(r => r.json())
+            .then(data => {
+                clearRecRoutes();
+                const bounds = [];
+
+                data.recorridos.forEach((rec, idx) => {
+                    // Normalize waypoints: handle nested {points:[...]} or flat array
+                    let waypoints = rec.waypoints;
+                    if (waypoints && !Array.isArray(waypoints) && waypoints.points) {
+                        waypoints = waypoints.points;
+                    }
+                    if (!waypoints || !Array.isArray(waypoints) || waypoints.length < 2) return;
+
+                    const latlngs = waypoints.map(wp => [
+                        parseFloat(wp.lat || wp.latitude),
+                        parseFloat(wp.lng || wp.lon || wp.longitude)
+                    ]);
+                    bounds.push(...latlngs);
+
+                    const color = getHeatColor(rec.intensidad);
+                    const t = Math.max(0.15, rec.intensidad); // min intensity for visibility
+
+                    // ── Heat corridor: multiple concentric glow layers ──
+                    // Widths and opacities scale with intensity for a radiant aura
+                    const glowLayers = [];
+                    const auraSpecs = [
+                        { weight: 44, opacity: 0.03 + t * 0.03 },
+                        { weight: 34, opacity: 0.04 + t * 0.05 },
+                        { weight: 26, opacity: 0.06 + t * 0.07 },
+                        { weight: 18, opacity: 0.08 + t * 0.10 },
+                        { weight: 12, opacity: 0.12 + t * 0.13 },
+                    ];
+                    auraSpecs.forEach(spec => {
+                        const gl = L.polyline(latlngs, {
+                            color: color, weight: spec.weight, opacity: spec.opacity,
+                            smoothFactor: 1.5, lineCap: 'round', lineJoin: 'round', interactive: false
+                        }).addTo(recMap);
+                        glowLayers.push(gl);
+                        recRouteLayers.push(gl);
+                    });
+
+                    // Core line (interactive)
+                    const polyline = L.polyline(latlngs, {
+                        color: color, weight: 4, opacity: 0.95,
+                        smoothFactor: 1.5, lineCap: 'round', lineJoin: 'round'
+                    }).addTo(recMap);
+
+                    // Bright inner stroke for definition
+                    const innerGlow = L.polyline(latlngs, {
+                        color: '#ffffff', weight: 1.5, opacity: 0.15 + t * 0.2,
+                        smoothFactor: 1.5, lineCap: 'round', lineJoin: 'round', interactive: false
+                    }).addTo(recMap);
+
+                    // Hover tooltip: invite to click
+                    polyline.bindTooltip(`<b>${rec.nombre}</b><br><span style="opacity:0.7">Click para ver detalles</span>`, {
+                        className: 'recmap-tooltip', sticky: true, direction: 'top', offset: [0, -10]
+                    });
+
+                    // Highlight on hover: expand the aura
+                    polyline.on('mouseover', function() {
+                        this.setStyle({ weight: 6, opacity: 1 });
+                        innerGlow.setStyle({ opacity: 0.4 });
+                        glowLayers.forEach((gl, i) => {
+                            gl.setStyle({ weight: auraSpecs[i].weight + 8, opacity: auraSpecs[i].opacity + 0.06 });
+                        });
+                    });
+                    polyline.on('mouseout', function() {
+                        this.setStyle({ weight: 4, opacity: 0.95 });
+                        innerGlow.setStyle({ opacity: 0.15 + t * 0.2 });
+                        glowLayers.forEach((gl, i) => {
+                            gl.setStyle({ weight: auraSpecs[i].weight, opacity: auraSpecs[i].opacity });
+                        });
+                    });
+
+                    // Popup on click with full details
+                    let patBreakdown = '';
+                    if (rec.frecuencia_patrulla && Object.keys(rec.frecuencia_patrulla).length > 0) {
+                        patBreakdown = '<div class="mt-2 border-t border-gray-600 pt-2"><span class="text-[10px] uppercase tracking-wider text-gray-500">Por patrulla:</span>';
+                        for (const [pat, cnt] of Object.entries(rec.frecuencia_patrulla)) {
+                            patBreakdown += `<div class="flex justify-between text-xs mt-0.5"><span class="text-gray-400">${pat}</span><span class="text-white font-medium">${cnt}</span></div>`;
+                        }
+                        patBreakdown += '</div>';
+                    }
+
+                    polyline.bindPopup(`
+                        <div class="p-3 min-w-[220px]">
+                            <div class="font-bold text-sm text-white mb-1">${rec.nombre}</div>
+                            ${rec.descripcion ? `<div class="text-xs text-gray-400 mb-2">${rec.descripcion}</div>` : ''}
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-gray-400">Frecuencia</span><span class="font-bold" style="color:${color}">${rec.frecuencia} veces</span></div>
+                                ${rec.longitud_km ? `<div class="flex justify-between"><span class="text-gray-400">Longitud</span><span class="text-white">${rec.longitud_km} km</span></div>` : ''}
+                                ${rec.velocidadmax ? `<div class="flex justify-between"><span class="text-gray-400">Vel. Máx</span><span class="text-white">${rec.velocidadmax} km/h</span></div>` : ''}
+                                ${rec.duracion_promedio ? `<div class="flex justify-between"><span class="text-gray-400">Dur. Prom.</span><span class="text-white">${rec.duracion_promedio} min</span></div>` : ''}
+                            </div>
+                            ${patBreakdown}
+                        </div>`, { className: 'recorrido-popup', maxWidth: 300 });
+
+                    recRouteLayers.push(polyline, innerGlow);
+                });
+
+                if (bounds.length > 0) {
+                    recMap.fitBounds(bounds, { padding: [40, 40] });
+                } else {
+                    document.getElementById('recmap-empty').classList.remove('hidden');
+                }
+                renderRecLegend(data.legend, data.maxFreq);
+                document.getElementById('recmap-loading').classList.add('hidden');
+            })
+            .catch(err => {
+                console.error('Error loading recorridos map:', err);
+                document.getElementById('recmap-loading').classList.add('hidden');
+            });
+    }
+
+    function renderRecLegend(legend, maxFreq) {
+        const wrapper = document.getElementById('recmap-legend');
+        // Show the gradient legend bar whenever there's data
+        if (maxFreq > 0) {
+            wrapper.classList.remove('hidden');
+        } else {
+            wrapper.classList.add('hidden');
+        }
+    }
+
+    // Init map lazily when container is visible
+    document.addEventListener('DOMContentLoaded', function() {
+        initRecMap();
+
+        document.getElementById('btn_cargar_recmap').addEventListener('click', loadRecorridosMap);
+        document.getElementById('recmap_empresa').addEventListener('change', function() {
+            if (this.value) loadRecorridosMap();
+        });
+
+        // React to main dashboard date filters
+        const fdEl = document.getElementById('fecha_desde');
+        const fhEl = document.getElementById('fecha_hasta');
+        if (fdEl) fdEl.addEventListener('change', function() { loadTendenciaChart(); loadTopChart(); if (document.getElementById('recmap_empresa').value) loadRecorridosMap(); });
+        if (fhEl) fhEl.addEventListener('change', function() { loadTendenciaChart(); loadTopChart(); if (document.getElementById('recmap_empresa').value) loadRecorridosMap(); });
+
+        // Load charts on page load
+        loadTendenciaChart();
+        loadTopChart();
+        loadIndicadoresRecorridos();
+    });
+
+    // ========== TENDENCIA DÍA/HORA ==========
+    let chartTendencia = null;
+
+    function loadTendenciaChart() {
+        const params = new URLSearchParams();
+        const fd = document.getElementById('fecha_desde')?.value;
+        const fh = document.getElementById('fecha_hasta')?.value;
+        if (fd) params.append('fecha_desde', fd);
+        if (fh) params.append('fecha_hasta', fh);
+
+        fetch(`${urlTendencia}?${params.toString()}`)
+            .then(r => r.json())
+            .then(data => {
+                const days = data.days;
+                const matrix = data.matrix;
+                const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
+
+                const dayColors = [
+                    'rgba(59,130,246,0.9)','rgba(99,102,241,0.9)','rgba(168,85,247,0.9)',
+                    'rgba(236,72,153,0.9)','rgba(249,115,22,0.9)','rgba(234,179,8,0.9)','rgba(34,197,94,0.9)',
+                ];
+
+                const datasets = days.map((day, di) => ({
+                    label: day,
+                    data: matrix[di],
+                    borderColor: dayColors[di],
+                    backgroundColor: dayColors[di].replace('0.9', '0.15'),
+                    borderWidth: 2, tension: 0.4, fill: false,
+                    pointRadius: 3, pointHoverRadius: 6,
+                }));
+
+                if (chartTendencia) chartTendencia.destroy();
+                chartTendencia = new Chart(document.getElementById('chartTendenciaRecorridos').getContext('2d'), {
+                    type: 'line',
+                    data: { labels: hours, datasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'bottom', labels: { color: '#9ca3af', padding: 12, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
+                            tooltip: { backgroundColor: 'rgba(17,24,39,0.95)', titleColor: '#fff', bodyColor: '#9ca3af', padding: 12, cornerRadius: 8, mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            x: { grid: { color: 'rgba(75,85,99,0.2)', drawBorder: false }, ticks: { color: '#6b7280', font: { size: 10 }, maxRotation: 45 } },
+                            y: { beginAtZero: true, grid: { color: 'rgba(75,85,99,0.2)', drawBorder: false }, ticks: { color: '#6b7280', font: { size: 10 }, stepSize: 1 } }
+                        },
+                        interaction: { mode: 'index', intersect: false },
+                        animation: { duration: 800 }
+                    }
+                });
+            });
+    }
+
+    // ========== TOP RECORRIDOS ==========
+    let chartTop = null;
+
+    function loadTopChart() {
+        const params = new URLSearchParams();
+        const fd = document.getElementById('fecha_desde')?.value;
+        const fh = document.getElementById('fecha_hasta')?.value;
+        if (fd) params.append('fecha_desde', fd);
+        if (fh) params.append('fecha_hasta', fh);
+
+        fetch(`${urlTopRecorridos}?${params.toString()}`)
+            .then(r => r.json())
+            .then(data => {
+                const top5 = data.top5 || [];
+                const bottom5 = data.bottom5 || [];
+                const labels = [], values = [], colors = [];
+
+                top5.forEach(item => {
+                    labels.push(item.nombre + ' (' + item.empresa + ')');
+                    values.push(item.freq);
+                    colors.push('rgba(34,197,94,0.85)');
+                });
+
+                if (bottom5.length > 0) {
+                    labels.push('── Menos realizados ──'); values.push(null); colors.push('transparent');
+                    bottom5.forEach(item => {
+                        labels.push(item.nombre + ' (' + item.empresa + ')');
+                        values.push(item.freq);
+                        colors.push('rgba(239,68,68,0.85)');
+                    });
+                }
+
+                if (chartTop) chartTop.destroy();
+
+                if (top5.length === 0) {
+                    const canvas = document.getElementById('chartTopRecorridos');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = '14px sans-serif';
+                    ctx.fillStyle = '#6b7280';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No hay datos de recorridos para el periodo', canvas.width / 2, canvas.height / 2);
+                    return;
+                }
+
+                chartTop = new Chart(document.getElementById('chartTopRecorridos').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels, datasets: [{
+                            data: values, backgroundColor: colors,
+                            borderColor: colors.map(c => c.replace('0.85', '1')),
+                            borderWidth: 1, borderRadius: 6, borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(17,24,39,0.95)', titleColor: '#fff', bodyColor: '#9ca3af',
+                                padding: 12, cornerRadius: 8,
+                                filter: ctx => ctx.raw !== null,
+                                callbacks: { label: ctx => `${ctx.raw} recorridos realizados` }
+                            }
+                        },
+                        scales: {
+                            x: { beginAtZero: true, grid: { color: 'rgba(75,85,99,0.2)', drawBorder: false }, ticks: { color: '#6b7280', font: { size: 10 }, stepSize: 1 } },
+                            y: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: function(ctx) {
+                                        const label = labels[ctx.index] || '';
+                                        if (label.includes('──')) return '#6b7280';
+                                        return colors[ctx.index] === 'rgba(239,68,68,0.85)' ? '#f87171' : '#9ca3af';
+                                    },
+                                    font: function(ctx) {
+                                        const label = labels[ctx.index] || '';
+                                        return { size: label.includes('──') ? 9 : 10, style: label.includes('──') ? 'italic' : 'normal' };
+                                    },
+                                    crossAlign: 'far'
+                                }
+                            }
+                        },
+                        animation: { duration: 800 }
+                    }
+                });
+            });
+    }
+
+    // ========== INDICADORES (collapsible inside map card) ==========
+    // Toggle visibility
+    document.getElementById('toggle-indicadores-rec')?.addEventListener('click', function() {
+        const panel = document.getElementById('indicadores-recorridos-panel');
+        const chevron = document.getElementById('indicadores-chevron');
+        const isHidden = panel.classList.toggle('hidden');
+        if (isHidden) {
+            chevron.classList.add('-rotate-90');
+        } else {
+            chevron.classList.remove('-rotate-90');
+        }
+    });
+
+    function loadIndicadoresRecorridos() {
+        fetch(urlIndicadores)
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('indicadores-recorridos-container');
+                const countBadge = document.getElementById('indicadores-count');
+                const indicadores = data.indicadores || [];
+
+                if (indicadores.length === 0) {
+                    container.innerHTML = '<div class="text-center py-4 text-gray-500 text-sm"><p>No hay indicadores de recorridos disponibles para este mes</p></div>';
+                    countBadge.classList.add('hidden');
+                    return;
+                }
+
+                // Show count badge
+                countBadge.textContent = indicadores.length;
+                countBadge.classList.remove('hidden');
+
+                const iconMap = {
+                    trophy: '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
+                    alert: '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+                    car: '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>',
+                    speed: '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+                };
+                const dotColor = {
+                    success: 'text-emerald-400',
+                    warning: 'text-amber-400',
+                    info: 'text-blue-400',
+                    danger: 'text-red-400',
+                };
+
+                container.innerHTML = indicadores.map(ind => {
+                    const dc = dotColor[ind.tipo] || dotColor.info;
+                    const icon = iconMap[ind.icon] || iconMap.alert;
+                    return `<div class="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-zinc-700/40 transition-colors">
+                        <span class="${dc}">${icon}</span>
+                        <span class="text-sm text-gray-300 leading-snug">${ind.texto}</span>
+                    </div>`;
+                }).join('');
+            })
+            .catch(() => {
+                document.getElementById('indicadores-recorridos-container').innerHTML = '<div class="text-center py-4 text-gray-500 text-sm">Error al cargar indicadores</div>';
+            });
+    }
+})();
 </script>
 
 @endpush

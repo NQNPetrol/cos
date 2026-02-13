@@ -95,7 +95,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {{ $pago->rodado->patente ?? 'Sin patente' }} - {{ $pago->rodado->marca }} {{ $pago->rodado->modelo }}
+                        {{ $pago->rodado?->patente ?? 'Sin patente' }} - {{ $pago->rodado?->marca ?? '' }} {{ $pago->rodado?->modelo ?? '' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {{ $pago->fecha_pago->format('d/m/Y') }}

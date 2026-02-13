@@ -8,21 +8,27 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BNRkXuhC.css",
+    "file": "assets/app-BNkCOuvT.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DeU1Hgev.js",
+    "file": "assets/app-DMchlA7-.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-B8hH5JRU.css"
+      "assets/app-C68x81oa.css"
     ]
   },
+  "resources/js/landing.js": {
+    "file": "assets/landing-qT7NM-jd.js",
+    "name": "landing",
+    "src": "resources/js/landing.js",
+    "isEntry": true
+  },
   "resources/js/modern-navigation.js": {
-    "file": "assets/modern-navigation-h4zOHgIf.js",
+    "file": "assets/modern-navigation-BQrHODD9.js",
     "name": "modern-navigation",
     "src": "resources/js/modern-navigation.js",
     "isEntry": true
@@ -34,7 +40,7 @@
     "isEntry": true
   },
   "resources/js/operaciones-dashboard.js": {
-    "file": "assets/operaciones-dashboard-WpKjCJBx.js",
+    "file": "assets/operaciones-dashboard-B4dPTiqi.js",
     "name": "operaciones-dashboard",
     "src": "resources/js/operaciones-dashboard.js",
     "isEntry": true

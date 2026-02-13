@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="py-6">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header mejorado -->
@@ -48,4 +48,4 @@
             @livewire('rodados.calendario-rodados')
         </div>
     </div>
-</x-app-layout>
+</x-administrative-layout>

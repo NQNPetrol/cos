@@ -30,6 +30,27 @@ class PermissionsSeeder extends Seeder
         
         // Patrullas cliente
         Permission::firstOrCreate(['name' => 'ver.patrullas-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.patrullas-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.patrullas-cliente']);
+        
+        // Empresas asociadas cliente
+        Permission::firstOrCreate(['name' => 'ver.empresas-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.empresas-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.empresas-cliente']);
+        
+        // Usuarios cliente (para clientadmin)
+        Permission::firstOrCreate(['name' => 'ver.usuarios-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar-rol.usuarios-cliente']);
+        
+        // Dashboard PDF cliente
+        Permission::firstOrCreate(['name' => 'generar.pdf-dashboard-cliente']);
+        
+        // Anular eventos cliente
+        Permission::firstOrCreate(['name' => 'anular.eventos-cliente']);
+        Permission::firstOrCreate(['name' => 'agregar-notas.eventos-cliente']);
+        
+        // Operaciones cliente
+        Permission::firstOrCreate(['name' => 'ver.operaciones-cliente']);
         
         // Location cliente
         Permission::firstOrCreate(['name' => 'ver.location-cliente']);
@@ -52,6 +73,19 @@ class PermissionsSeeder extends Seeder
         
         // Misiones cliente
         Permission::firstOrCreate(['name' => 'crear.peticion-misiones']);
+
+        // Supervisores cliente
+        Permission::firstOrCreate(['name' => 'ver.supervisores-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.personal-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.patrulla-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.empresas-cliente']);
+
+        // Recorridos cliente
+        Permission::firstOrCreate(['name' => 'ver.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'eliminar.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'eliminar.historial-recorridos-cliente']);
 
         // ========== PERMISOS PARA ADMINISTRACIÓN (VISTA ADMIN) ==========
         
@@ -180,6 +214,8 @@ class PermissionsSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $operadorRole = Role::firstOrCreate(['name' => 'operador']);
         $clienteRole = Role::firstOrCreate(['name' => 'cliente']);
+        $clientAdminRole = Role::firstOrCreate(['name' => 'clientadmin']);
+        $clientSupervisorRole = Role::firstOrCreate(['name' => 'clientsupervisor']);
 
         // Asignar todos los permisos al rol admin
         $adminRole->syncPermissions(Permission::all());
@@ -257,15 +293,86 @@ class PermissionsSeeder extends Seeder
             'ver.flightlogs-cliente',
             // 'ver.galeria-cliente',
             'crear.peticion-misiones',
-            'ver.reportes'
+            'ver.reportes',
+            // Supervisores y Recorridos
+            'ver.supervisores-cliente',
+            'ver.recorridos-cliente',
         ];
 
         $clienteRole->syncPermissions($clientePermissions);
+
+        // Permisos para clientadmin (todos los de cliente + gestión de usuarios y empresas)
+        $clientAdminPermissions = array_merge($clientePermissions, [
+            // Empresas asociadas
+            'ver.empresas-cliente', 'crear.empresas-cliente', 'editar.empresas-cliente',
+            // Usuarios cliente
+            'ver.usuarios-cliente', 'asignar-rol.usuarios-cliente',
+            // Patrullas crear/editar
+            'crear.patrullas-cliente', 'editar.patrullas-cliente',
+            // Dashboard PDF
+            'generar.pdf-dashboard-cliente',
+            // Anular eventos
+            'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
+            // Operaciones
+            'ver.operaciones-cliente',
+            // Supervisores y Recorridos
+            'asignar.personal-cliente',
+            'asignar.patrulla-cliente',
+            'asignar.empresas-cliente',
+            'crear.recorridos-cliente',
+            'editar.recorridos-cliente',
+            'eliminar.recorridos-cliente',
+            'eliminar.historial-recorridos-cliente',
+        ]);
+
+        $clientAdminRole->syncPermissions($clientAdminPermissions);
+
+        // Permisos para clientsupervisor (todos los de cliente + crear/editar patrullas)
+        $clientSupervisorPermissions = array_merge($clientePermissions, [
+            // Patrullas crear/editar
+            'crear.patrullas-cliente', 'editar.patrullas-cliente',
+            // Dashboard PDF
+            'generar.pdf-dashboard-cliente',
+            // Anular eventos
+            'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
+            // Operaciones
+            'ver.operaciones-cliente',
+            // Recorridos (crear y editar, NO eliminar historial)
+            'crear.recorridos-cliente',
+            'editar.recorridos-cliente',
+        ]);
+
+        $clientSupervisorRole->syncPermissions($clientSupervisorPermissions);
+
+        // ========== ROL ADMINISTRATIVE ==========
+        // Acceso completo a la sección Administración: rodados, clientes, personal,
+        // empresas, proveedores/talleres, pagos, cobranzas, calendario, alertas.
+        $administrativeRole = Role::firstOrCreate(['name' => 'administrative']);
+
+        $administrativePermissions = [
+            // Clientes
+            'crear.cliente', 'editar.cliente',
+            // Empresas asociadas
+            'crear.empresas', 'ver.empresas',
+            // Personal
+            'ver.personal', 'crear.personal', 'editar.personal',
+            // Contratos
+            'ver.contratos', 'crear.contratos', 'editar.contratos', 'eliminar.contratos',
+            // Notificaciones
+            'crear.notif', 'administrar.notificaciones', 'crear.notificaciones',
+            // Usuarios (asignar clientes)
+            'asignar.clientes',
+        ];
+
+        $administrativeRole->syncPermissions($administrativePermissions);
         
         $this->command->info('Todos los permisos han sido creados y asignados a sus roles.');
         $this->command->info('Total de permisos creados: ' . Permission::count());
         $this->command->info('- Admin: ' . $adminRole->permissions->count() . ' permisos');
         $this->command->info('- Operador: ' . count($operadorPermissions) . ' permisos');
         $this->command->info('- Cliente: ' . count($clientePermissions) . ' permisos');
+        $this->command->info('- ClientAdmin: ' . count($clientAdminPermissions) . ' permisos');
+        $this->command->info('- ClientSupervisor: ' . count($clientSupervisorPermissions) . ' permisos');
+        $this->command->info('- Administrative: ' . count($administrativePermissions) . ' permisos');
     }
 }

@@ -3,6 +3,7 @@ import EventosBarras from './components/EventosBarras.vue';
 import ClientDashboard from './components/Dashboard/ClientDashboard.vue';
 import BarChart from './components/Dashboard/BarChart.vue';
 import HeatmapChart from './components/Dashboard/HeatmapChart.vue';
+import AdminDashboard from './components/Dashboard/AdminDashboard.vue';
 import OperacionesDashboard from './operaciones-dashboard.js';
 
 console.log('app.js cargando...');
@@ -20,7 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
         app.component('eventos-barras', EventosBarras);
         app.component('client-dashboard', ClientDashboard);
         app.component('bar-chart', BarChart);
+        app.component('admin-dashboard', AdminDashboard);
         app.mount('#app');
+    }
+
+    // Admin Dashboard Vue app
+    const adminDashEl = document.getElementById('admin-dashboard-app');
+    if (adminDashEl) {
+        const props = { apiBaseUrl: adminDashEl.dataset.apiBaseUrl || '' };
+        const adminApp = createApp(AdminDashboard, props);
+        adminApp.mount('#admin-dashboard-app');
     }
 
     // App para el dashboard del cliente

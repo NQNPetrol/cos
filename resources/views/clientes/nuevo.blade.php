@@ -1,11 +1,11 @@
 
-<x-app-layout>
+<x-administrative-layout>
     <div class="py-8">
         <livewire:clientes />
     </div>
-</x-app-layout>
+</x-administrative-layout>
 
-{{-- <x-app-layout>
+{{-- <x-administrative-layout>
     <div class="max-w-7xl mx-auto py-6 px-4">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Listado de Clientes</h2>
 
@@ -56,4 +56,4 @@
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
     </script>
-</x-app-layout> --}}
+</x-administrative-layout> --}}

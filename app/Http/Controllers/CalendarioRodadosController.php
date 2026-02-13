@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\TurnoRodado;
 use App\Models\CambioEquipoRodado;
 use App\Models\PagoServiciosRodado;
+use App\Models\Cobranza;
 use Carbon\Carbon;
 
 class CalendarioRodadosController extends Controller
@@ -68,18 +69,44 @@ class CalendarioRodadosController extends Controller
         // Obtener pagos (mostrar vencimientos)
         $pagos = PagoServiciosRodado::with(['rodado', 'proveedor'])->get();
         foreach ($pagos as $pago) {
-            // Para pagos, podríamos mostrar la fecha de pago o calcular una fecha de vencimiento
-            // Por ahora mostramos la fecha de pago
+            // Use fecha_vencimiento if available, else fecha_pago
+            $fecha = $pago->fecha_vencimiento ?? $pago->fecha_pago;
+            if (!$fecha) continue;
+
+            $isPendiente = in_array($pago->estado, ['pendiente', 'vencido']);
             $eventos->push([
                 'id' => 'pago_' . $pago->id,
-                'title' => 'Pago: ' . ($pago->rodado->patente ?? 'Sin patente'),
-                'start' => Carbon::parse($pago->fecha_pago)->toIso8601String(),
-                'color' => '#ef4444', // Rojo
+                'title' => ($isPendiente ? '⏳ Pago pendiente: ' : '✓ Pago: ') . ($pago->rodado->patente ?? 'Sin patente'),
+                'start' => Carbon::parse($fecha)->toIso8601String(),
+                'color' => $isPendiente ? '#ef4444' : '#6b7280', // Rojo si pendiente, gris si pagado
                 'tipo' => 'pago',
                 'pago_id' => $pago->id,
-                'estado' => $this->calcularEstadoPago($pago),
+                'estado' => $pago->estado ?? $this->calcularEstadoPago($pago),
                 'extendedProps' => [
                     'pago_id' => $pago->id,
+                ],
+            ]);
+        }
+
+        // Obtener cobranzas (deadlines)
+        $cobranzas = Cobranza::with(['cliente'])->get();
+        foreach ($cobranzas as $cobranza) {
+            $fecha = $cobranza->fecha_vencimiento ?? $cobranza->fecha_emision;
+            if (!$fecha) continue;
+
+            $isPendiente = in_array($cobranza->estado, ['pendiente', 'vencido']);
+            $eventos->push([
+                'id' => 'cobranza_' . $cobranza->id,
+                'title' => ($isPendiente ? '💰 Cobrar: ' : '✓ Cobrado: ') . ($cobranza->cliente->nombre ?? 'Sin cliente'),
+                'start' => Carbon::parse($fecha)->toIso8601String(),
+                'color' => $isPendiente ? '#f59e0b' : '#6b7280', // Amarillo si pendiente
+                'tipo' => 'cobranza',
+                'cobranza_id' => $cobranza->id,
+                'estado' => $cobranza->estado,
+                'extendedProps' => [
+                    'cobranza_id' => $cobranza->id,
+                    'cliente' => $cobranza->cliente->nombre ?? 'N/A',
+                    'monto' => $cobranza->monto_total,
                 ],
             ]);
         }

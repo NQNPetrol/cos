@@ -21,13 +21,14 @@ class CategoriaSeeder extends Seeder
             // 'Entorno y contexto',
             // 'Administrativos/reportables al cliente',
             'Salud/Emergencias',
+            'Otros',
         ];
 
         foreach ($categorias as $nombre) {
-            Categoria::create([
-                'nombre' => $nombre,
-                'descripcion' => $nombre,
-            ]);
+            Categoria::firstOrCreate(
+                ['nombre' => $nombre],
+                ['descripcion' => $nombre]
+            );
         }
     }
 }

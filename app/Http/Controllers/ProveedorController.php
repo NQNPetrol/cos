@@ -21,7 +21,13 @@ class ProveedorController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        return Proveedor::create($validated);
+        $proveedor = Proveedor::create($validated);
+
+        if ($request->expectsJson()) {
+            return $proveedor;
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Proveedor creado exitosamente.');
     }
 
     public function show(Proveedor $proveedor)
@@ -39,12 +45,22 @@ class ProveedorController extends Controller
         ]);
 
         $proveedor->update($validated);
-        return $proveedor;
+
+        if ($request->expectsJson()) {
+            return $proveedor;
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Proveedor actualizado exitosamente.');
     }
 
     public function destroy(Proveedor $proveedor)
     {
         $proveedor->delete();
-        return response()->json(['message' => 'Proveedor eliminado exitosamente']);
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Proveedor eliminado exitosamente']);
+        }
+
+        return redirect()->route('rodados.proveedores-talleres.index')->with('success', 'Proveedor eliminado exitosamente.');
     }
 }

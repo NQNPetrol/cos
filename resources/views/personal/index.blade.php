@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="container mx-auto p-6">
         <div class="flex justify-end mb-4">
             <a href="{{ route('personal.create') }}"
@@ -8,4 +8,4 @@
         </div>
         <livewire:personal.listado />
     </div>
-</x-app-layout>
+</x-administrative-layout>

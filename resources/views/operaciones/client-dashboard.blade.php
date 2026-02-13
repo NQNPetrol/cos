@@ -26,7 +26,7 @@
         <!-- Fila 2: Mapa (5 columnas) + Eventos (1 columna) -->
         @include('operaciones.partials.map-container')
         
-        @include('operaciones.partials.eventos-list', ['eventos' => $eventosIniciales ?? null])
+        @include('operaciones.partials.eventos-list', ['eventos' => $eventosIniciales ?? null, 'isClient' => $isClient ?? true])
     </div>
 
     <!-- KPIs Secundarios: Vuelos y Triggers -->

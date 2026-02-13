@@ -5,21 +5,36 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Evento;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\DispositivoPatrulla\AsignarDispositivos;
 use App\Http\Controllers\DispositivoPatrullaController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LandingController;
 use App\Models\Patrulla;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\UserClienteController;
 
+// Landing Page Routes (públicas)
+Route::get('/landing', [LandingController::class, 'index'])->name('landing');
+Route::get('/landing-alt', [LandingController::class, 'indexAlt'])->name('landing.alt');
+Route::post('/landing/contact', [LandingController::class, 'submitContact'])->name('landing.contact');
 
+// Home - Redirige al landing para no autenticados, dashboard para autenticados
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('landing');
 })->name('home');
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Página de sin acceso para usuarios sin rol asignado
+Route::get('/no-access', function () {
+    return view('auth.no-access');
+})->middleware(['auth'])->name('no-access');
 
 // DASHBOARD LAYOUT PRINCIPAL (ADMIN)
 Route::get('/main-dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
@@ -58,6 +73,9 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->name('dashboard.eventos-mapa-calor');
     Route::get('/dashboard/eventos-por-ubicacion', [\App\Http\Controllers\ClientDashboardController::class, 'getEventosPorUbicacion'])
         ->name('dashboard.eventos-por-ubicacion');
+    
+    Route::get('/dashboard/pdf', [\App\Http\Controllers\ClientDashboardController::class, 'generatePdf'])
+        ->name('dashboard.pdf');
 
     // PROFILE
     Route::get('/profile', function () {
@@ -177,6 +195,92 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/planificar-misiones', function () {
         return view('misiones-flytbase.client.index');
     })->name('misiones')->middleware('can:crear.peticion-misiones');
+
+    // EMPRESAS ASOCIADAS (CLIENT ADMIN)
+    Route::get('/empresas-asociadas', \App\Livewire\Client\EmpresasAsociadas\Index::class)
+        ->name('empresas-asociadas.index');
+
+    // ADMINISTRACIÓN DE USUARIOS (CLIENT ADMIN)
+    Route::get('/usuarios', \App\Livewire\Client\UsuariosCliente\Index::class)
+        ->name('usuarios.index')
+        ->middleware('role:clientadmin');
+
+    // DASHBOARD OPERACIONES
+    Route::get('/operaciones/dashboard', [\App\Http\Controllers\ClientOperacionesDashboardController::class, 'index'])
+        ->name('operaciones.dashboard')
+        ->middleware('can:ver.operaciones-cliente');
+
+    // Checklist (clientsupervisor)
+    Route::get('/checklist', [\App\Http\Controllers\ChecklistPatrullaController::class, 'index'])->name('checklist.index');
+    Route::post('/checklist', [\App\Http\Controllers\ChecklistPatrullaController::class, 'store'])->name('checklist.store');
+
+    // Calendario (clientsupervisor, solo lectura)
+    Route::get('/calendario', [\App\Http\Controllers\CalendarioClienteController::class, 'index'])->name('calendario.index');
+    Route::get('/calendario/eventos', [\App\Http\Controllers\CalendarioClienteController::class, 'getEventos'])->name('calendario.eventos');
+
+    // ========== SUPERVISORES Y RECORRIDOS ==========
+
+    // Dashboard Patrullas
+    Route::get('/dashboard-patrullas', [\App\Http\Controllers\PatrullasDashboardController::class, 'index'])
+        ->name('dashboard-patrullas');
+    Route::get('/dashboard-patrullas/recorridos-map', [\App\Http\Controllers\PatrullasDashboardController::class, 'getRecorridosMapData'])
+        ->name('dashboard-patrullas.recorridos-map');
+    Route::get('/dashboard-patrullas/recorridos-tendencia', [\App\Http\Controllers\PatrullasDashboardController::class, 'getRecorridosTendencia'])
+        ->name('dashboard-patrullas.recorridos-tendencia');
+    Route::get('/dashboard-patrullas/top-recorridos', [\App\Http\Controllers\PatrullasDashboardController::class, 'getTopRecorridos'])
+        ->name('dashboard-patrullas.top-recorridos');
+    Route::get('/dashboard-patrullas/indicadores', [\App\Http\Controllers\PatrullasDashboardController::class, 'getIndicadores'])
+        ->name('dashboard-patrullas.indicadores');
+
+    // Supervisores
+    Route::get('/supervisores', [\App\Http\Controllers\SupervisoresController::class, 'index'])
+        ->name('supervisores.index');
+    Route::post('/supervisores/asignar-personal', [\App\Http\Controllers\SupervisoresController::class, 'asignarPersonal'])
+        ->name('supervisores.asignar-personal');
+    Route::post('/supervisores/asignar-patrulla', [\App\Http\Controllers\SupervisoresController::class, 'asignarPatrulla'])
+        ->name('supervisores.asignar-patrulla');
+    Route::put('/supervisores/cambiar-patrulla', [\App\Http\Controllers\SupervisoresController::class, 'cambiarPatrulla'])
+        ->name('supervisores.cambiar-patrulla');
+    Route::post('/supervisores/asignar-empresas', [\App\Http\Controllers\SupervisoresController::class, 'asignarEmpresas'])
+        ->name('supervisores.asignar-empresas');
+    Route::get('/supervisores/personal-disponible', [\App\Http\Controllers\SupervisoresController::class, 'getPersonalDisponible'])
+        ->name('supervisores.personal-disponible');
+    Route::get('/supervisores/patrullas-disponibles', [\App\Http\Controllers\SupervisoresController::class, 'getPatrullasDisponibles'])
+        ->name('supervisores.patrullas-disponibles');
+
+    // Recorridos - Historial (must be before {recorrido} route)
+    Route::get('/recorridos/historial', [\App\Http\Controllers\RecorridosHistorialController::class, 'index'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.historial');
+    Route::post('/recorridos/historial', [\App\Http\Controllers\RecorridosHistorialController::class, 'store'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.historial.store');
+    Route::put('/recorridos/historial/{registro}', [\App\Http\Controllers\RecorridosHistorialController::class, 'update'])
+        ->middleware('can:editar.recorridos-cliente')
+        ->name('recorridos.historial.update');
+    Route::delete('/recorridos/historial/{registro}', [\App\Http\Controllers\RecorridosHistorialController::class, 'destroy'])
+        ->middleware('can:eliminar.historial-recorridos-cliente')
+        ->name('recorridos.historial.destroy');
+
+    // Recorridos - CRUD
+    Route::get('/recorridos', [\App\Http\Controllers\RecorridosController::class, 'index'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.index');
+    Route::post('/recorridos', [\App\Http\Controllers\RecorridosController::class, 'store'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.store');
+    Route::post('/recorridos/import-kml', [\App\Http\Controllers\RecorridosController::class, 'importKml'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.import-kml');
+    Route::get('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'show'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.show');
+    Route::put('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'update'])
+        ->middleware('can:editar.recorridos-cliente')
+        ->name('recorridos.update');
+    Route::delete('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'destroy'])
+        ->middleware('can:eliminar.recorridos-cliente')
+        ->name('recorridos.destroy');
 
 });
 
@@ -748,8 +852,64 @@ Route::middleware([
         Route::get('/calendario/evento/{tipo}/{id}', [\App\Http\Controllers\CalendarioRodadosController::class, 'getDetalleEvento'])->name('calendario.evento');
         
         // Proveedores y Talleres (CRUD auxiliar)
-        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class);
-        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class);
+        Route::apiResource('proveedores', \App\Http\Controllers\ProveedorController::class)->parameters(['proveedores' => 'proveedor']);
+        Route::apiResource('talleres', \App\Http\Controllers\TallerController::class)->parameters(['talleres' => 'taller']);
+
+        // Dashboard Admin Rodados
+        Route::get('/admin-dashboard', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'index'])->name('admin-dashboard');
+        Route::get('/admin-dashboard/pagos-mensuales', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getPagosMensuales'])->name('admin-dashboard.pagos-mensuales');
+        Route::get('/admin-dashboard/turnos-por-estado', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTurnosPorEstado'])->name('admin-dashboard.turnos-por-estado');
+        Route::get('/admin-dashboard/cobros-vs-pagos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getCobrosVsPagos'])->name('admin-dashboard.cobros-vs-pagos');
+
+        // Dashboard Admin Rodados - New API endpoints
+        Route::get('/admin-dashboard/kpis', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getKpis'])->name('admin-dashboard.kpis');
+        Route::get('/admin-dashboard/ingresos-egresos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getIngresosEgresos'])->name('admin-dashboard.ingresos-egresos');
+        Route::get('/admin-dashboard/flota-ingresos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getFlotaIngresos'])->name('admin-dashboard.flota-ingresos');
+        Route::get('/admin-dashboard/turnos-por-vehiculo', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTurnosPorVehiculo'])->name('admin-dashboard.turnos-por-vehiculo');
+        Route::get('/admin-dashboard/top-km', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTopKm'])->name('admin-dashboard.top-km');
+        Route::get('/admin-dashboard/upcoming', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getUpcoming'])->name('admin-dashboard.upcoming');
+
+        // Proveedores y Talleres (vista unificada)
+        Route::get('/proveedores-talleres', function () {
+            $proveedores = \App\Models\Proveedor::with('talleres')->orderBy('nombre')->get();
+            $talleres = \App\Models\Taller::with('proveedor')->orderBy('nombre')->get();
+            return view('rodados.proveedores-talleres', compact('proveedores', 'talleres'));
+        })->name('proveedores-talleres.index');
+
+        // Pagos de Servicios (vista independiente)
+        Route::get('/pagos-servicios', function () {
+            $pagos = \App\Models\PagoServiciosRodado::with(['rodado', 'proveedor', 'servicioUsuario', 'turnoRodado.taller'])->get();
+            $rodados = \App\Models\Rodado::with(['cliente', 'proveedor'])->get();
+            $proveedores = \App\Models\Proveedor::orderBy('nombre')->get();
+            $servicios = \App\Models\ServicioUsuario::activos()->orderBy('nombre')->get();
+            $pagosRealizados = $pagos->where('estado', 'pagado')->sortByDesc('fecha_pago');
+            $pagosPendientes = $pagos->where('estado', '!=', 'pagado')->sortBy('fecha_vencimiento');
+            return view('rodados.pagos', compact('pagos', 'rodados', 'proveedores', 'servicios', 'pagosRealizados', 'pagosPendientes'));
+        })->name('pagos-servicios.index');
+
+        // Servicios del usuario (CRUD modal)
+        Route::apiResource('servicios-usuario', \App\Http\Controllers\ServicioUsuarioController::class);
+
+        // Cobranzas
+        Route::prefix('cobranzas')->name('cobranzas.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\CobranzaController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\CobranzaController::class, 'store'])->name('store');
+            Route::put('/{cobranza}', [\App\Http\Controllers\CobranzaController::class, 'update'])->name('update');
+            Route::delete('/{cobranza}', [\App\Http\Controllers\CobranzaController::class, 'destroy'])->name('destroy');
+            Route::post('/{cobranza}/adjuntar', [\App\Http\Controllers\CobranzaController::class, 'adjuntar'])->name('adjuntar');
+        });
+
+        // Alertas Admin
+        Route::prefix('alertas-admin')->name('alertas-admin.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\AlertaAdminController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\AlertaAdminController::class, 'store'])->name('store');
+            Route::put('/{alerta}', [\App\Http\Controllers\AlertaAdminController::class, 'update'])->name('update');
+            Route::delete('/{alerta}', [\App\Http\Controllers\AlertaAdminController::class, 'destroy'])->name('destroy');
+            Route::post('/{alerta}/toggle', [\App\Http\Controllers\AlertaAdminController::class, 'toggle'])->name('toggle');
+        });
+
+        // Documentacion unificada para turnos
+        Route::post('/turnos/{turno}/documentacion', [\App\Http\Controllers\TurnoRodadoController::class, 'adjuntarDocumentacion'])->name('turnos.documentacion');
     });
 
 });

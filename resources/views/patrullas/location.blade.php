@@ -1,4 +1,95 @@
 <x-app-layout>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        /* Estilos para el popup personalizado del mapa */
+        .vehicle-popup .leaflet-popup-content-wrapper {
+            background: #1f2937;
+            color: #fff;
+            border-radius: 8px;
+            padding: 0;
+        }
+        
+        .vehicle-popup .leaflet-popup-content {
+            margin: 0;
+            padding: 12px 16px;
+            min-width: 200px;
+        }
+        
+        .vehicle-popup .leaflet-popup-tip {
+            background: #1f2937;
+        }
+        
+        /* Estilos para el botón de restablecer vista del mapa */
+        .leaflet-control-reset-view {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            box-sizing: border-box;
+        }
+        
+        .leaflet-control-reset-view:hover {
+            background-color: #f4f4f4;
+        }
+        
+        .leaflet-control-reset-view svg {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            vertical-align: middle;
+            stroke: currentColor;
+        }
+        
+        /* Estilos para el botón de cambio de estilo del mapa */
+        .leaflet-control-map-style {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            box-sizing: border-box;
+        }
+        
+        .leaflet-control-map-style:hover {
+            background-color: #f4f4f4;
+        }
+        
+        .leaflet-control-map-style svg {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            vertical-align: middle;
+            stroke: currentColor;
+        }
+        
+        /* Estilo para el icono del vehículo */
+        .vehicle-icon {
+            background: none;
+            border: none;
+        }
+        
+        .vehicle-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .vehicle-marker svg {
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));
+        }
+    </style>
+    
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
@@ -27,7 +118,7 @@
                         </div>
                     </div>
                     <div id="refresh-counter" class="bg-blue-800 text-blue-200 px-3 py-1 rounded text-sm">
-                        Actualizando en: <span id="countdown">10</span>s
+                        Actualizando en: <span id="countdown">90</span>s
                     </div>
                 </div>
             </div>
@@ -64,7 +155,7 @@
             <div class="bg-[#252728] rounded-lg p-6 mb-6 border border-transparent">
                 <!-- Contenedor del Mapa -->
                 <div class="bg-[#252728] rounded-lg p-4">
-                    <div class="h-[600px] bg-zinc-700 rounded-lg" id="map-container">
+                    <div class="h-[600px] bg-zinc-700 rounded-lg overflow-hidden" id="map-container">
                         <div id="map" style="height: 100%; width: 100%;"></div>
                     </div>
                 </div>
@@ -164,36 +255,177 @@
         </div>
     </div>
 
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap" async defer></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
         let map;
         let markers = {};
+        let markersLayer;
         let refreshInterval;
         let countdownInterval;
-        let countdownValue = 10;
+        let countdownValue = 90;
         let isMapInitialized = false;
+        let baseLayers = {};
+        let labelsLayer;
+        let currentBaseLayer = 'satelital';
         
-        // Inicializar el mapa
-        function initMap() {
-            // Centro inicial del mapa (puedes ajustar estas coordenadas)
-            const initialCenter = { lat: -34.6037, lng: -58.3816 }; // Buenos Aires por defecto
+        // Centro inicial del mapa
+        const initialCenter = [-34.6037, -58.3816]; // Buenos Aires por defecto
+        const initialZoom = 12;
+        
+        // Crear icono de patrulla de seguridad - Escudo con vehículo
+        function createVehicleIcon(status, direction = 0) {
+            const isActive = status == 1;
+            const mainColor = isActive ? '#3b82f6' : '#6b7280'; // Azul si activo, gris si no
+            const accentColor = isActive ? '#22c55e' : '#ef4444'; // Verde activo, rojo inactivo
+            const glowColor = isActive ? '#3b82f6' : '#ef4444';
             
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: initialCenter,
-                mapTypeId: google.maps.MapTypeId.SATELLITE,
-                mapTypeControl: true, // Permitir cambiar entre tipos de mapa
-                mapTypeControlOptions: {
-                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-                    position: google.maps.ControlPosition.TOP_RIGHT
-                },
-                zoomControl: true,
-                streetViewControl: true,
-                fullscreenControl: true
-                
+            // Marcador estilo escudo de seguridad con indicador de estado
+            const svgIcon = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 56" width="48" height="56" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px ${glowColor}80);">
+                    <!-- Pin/Marcador base -->
+                    <path d="M24 0 C10.745 0 0 10.745 0 24 C0 36 24 56 24 56 C24 56 48 36 48 24 C48 10.745 37.255 0 24 0Z" 
+                          fill="${mainColor}" stroke="#1e3a8a" stroke-width="2"/>
+                    
+                    <!-- Círculo interior blanco -->
+                    <circle cx="24" cy="22" r="16" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+                    
+                    <!-- Escudo de seguridad -->
+                    <path d="M24 8 L34 12 L34 22 C34 28 30 33 24 36 C18 33 14 28 14 22 L14 12 Z" 
+                          fill="${mainColor}" stroke="#1e3a8a" stroke-width="1.5"/>
+                    
+                    <!-- Símbolo de patrulla/camioneta dentro del escudo -->
+                    <g transform="translate(17, 14)">
+                        <!-- Carrocería SUV -->
+                        <rect x="1" y="6" width="12" height="8" rx="1.5" fill="#ffffff" stroke="#1e3a8a" stroke-width="0.8"/>
+                        <!-- Cabina -->
+                        <path d="M3 6 L4 3 L10 3 L11 6" fill="#ffffff" stroke="#1e3a8a" stroke-width="0.8"/>
+                        <!-- Ventanas -->
+                        <rect x="4" y="3.5" width="6" height="2" rx="0.5" fill="#0f172a"/>
+                        <!-- Ruedas -->
+                        <circle cx="3.5" cy="14" r="2" fill="#1f2937" stroke="#374151" stroke-width="0.5"/>
+                        <circle cx="10.5" cy="14" r="2" fill="#1f2937" stroke="#374151" stroke-width="0.5"/>
+                        <!-- Barra de luces en techo -->
+                        <rect x="4" y="2" width="6" height="1.5" rx="0.5" fill="#3b82f6" stroke="#1e40af" stroke-width="0.3">
+                            ${isActive ? '<animate attributeName="fill" values="#3b82f6;#ef4444;#3b82f6" dur="0.8s" repeatCount="indefinite"/>' : ''}
+                        </rect>
+                    </g>
+                    
+                    <!-- Indicador de estado (punto) -->
+                    <circle cx="38" cy="8" r="6" fill="${accentColor}" stroke="#ffffff" stroke-width="2">
+                        ${isActive ? '<animate attributeName="r" values="5;6;5" dur="1s" repeatCount="indefinite"/>' : ''}
+                    </circle>
+                    
+                    <!-- Texto PATROL si está activo -->
+                    ${isActive ? '<text x="24" y="42" text-anchor="middle" fill="#ffffff" font-size="5" font-weight="bold" font-family="Arial">ACTIVO</text>' : ''}
+                </svg>
+            `;
+            
+            return L.divIcon({
+                html: `<div class="vehicle-marker">${svgIcon}</div>`,
+                className: 'vehicle-icon',
+                iconSize: [48, 56],
+                iconAnchor: [24, 56],
+                popupAnchor: [0, -56]
             });
+        }
+        
+        // Inicializar el mapa con Leaflet
+        function initMap() {
+            if (isMapInitialized) return;
+            
+            map = L.map('map', {
+                center: initialCenter,
+                zoom: initialZoom,
+                zoomControl: true
+            });
+            
+            // Capa satelital (Esri World Imagery)
+            baseLayers.satelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+                maxZoom: 19
+            });
+            
+            // Capa física/normal (OpenStreetMap)
+            baseLayers.fisico = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            });
+            
+            // Capa de etiquetas con rutas y nombres (solo para satelital)
+            labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                attribution: '',
+                subdomains: 'abcd',
+                maxZoom: 19,
+                pane: 'shadowPane'
+            });
+            
+            // Agregar capa satelital por defecto con etiquetas
+            baseLayers.satelital.addTo(map);
+            labelsLayer.addTo(map);
+            currentBaseLayer = 'satelital';
+            
+            // Capa para los marcadores
+            markersLayer = L.layerGroup().addTo(map);
+            
+            // Crear control personalizado para restablecer vista
+            const ResetViewControl = L.Control.extend({
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    const button = L.DomUtil.create('a', 'leaflet-control-reset-view', container);
+                    button.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
+                    button.href = '#';
+                    button.title = 'Restablecer vista inicial';
+                    
+                    L.DomEvent.disableClickPropagation(button);
+                    L.DomEvent.on(button, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        map.setView(initialCenter, initialZoom, {
+                            animate: true,
+                            duration: 0.5
+                        });
+                    });
+                    
+                    return container;
+                }
+            });
+            
+            new ResetViewControl({ position: 'topleft' }).addTo(map);
+            
+            // Crear control para cambiar estilo del mapa
+            const MapStyleControl = L.Control.extend({
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    const button = L.DomUtil.create('a', 'leaflet-control-map-style', container);
+                    button.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>';
+                    button.href = '#';
+                    button.title = 'Cambiar estilo del mapa';
+                    
+                    L.DomEvent.disableClickPropagation(button);
+                    L.DomEvent.on(button, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        
+                        if (currentBaseLayer === 'satelital') {
+                            map.removeLayer(baseLayers.satelital);
+                            map.removeLayer(labelsLayer);
+                            baseLayers.fisico.addTo(map);
+                            currentBaseLayer = 'fisico';
+                        } else {
+                            map.removeLayer(baseLayers.fisico);
+                            baseLayers.satelital.addTo(map);
+                            labelsLayer.addTo(map);
+                            currentBaseLayer = 'satelital';
+                        }
+                    });
+                    
+                    return container;
+                }
+            });
+            
+            new MapStyleControl({ position: 'topleft' }).addTo(map);
             
             isMapInitialized = true;
             
@@ -212,7 +444,6 @@
                 const data = await response.json();
 
                 console.log('Respuesta de locations/current API:', data);
-                
                 
                 if (data.success && data.locations) {
                     console.log('Datos recibidos:', Object.keys(data.locations).length, 'vehículos');
@@ -246,11 +477,10 @@
                 
                 const mapData = [];
                 
-                // Procesar cada ubicación - locations ahora es un objeto plano
+                // Procesar cada ubicación
                 for (const [vehicleCode, location] of Object.entries(locations)) {
                     const vehicle = vehiclesMap[vehicleCode];
                     
-                    // Validar que la ubicación tenga coordenadas
                     if (location && location.latitude && location.longitude) {
                         mapData.push({
                             'vehicle_code': vehicleCode,
@@ -286,63 +516,56 @@
             console.log('Actualizando mapa con', vehiclesData.length, 'vehículos');
             
             // Limpiar marcadores antiguos
-            Object.values(markers).forEach(marker => marker.setMap(null));
+            markersLayer.clearLayers();
             markers = {};
+            
+            const bounds = [];
             
             // Crear nuevos marcadores
             vehiclesData.forEach(vehicle => {
                 if (vehicle.latitude && vehicle.longitude) {
-                    const position = { 
-                        lat: parseFloat(vehicle.latitude), 
-                        lng: parseFloat(vehicle.longitude) 
-                    };
+                    const position = [parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)];
+                    bounds.push(position);
                     
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: vehicle.vehicle_name,
-                        icon: {
-                            url: vehicle.status == 1 
-                                ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
-                                : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                            scaledSize: new google.maps.Size(32, 32)
-                        }
+                    // Crear icono de vehículo
+                    const vehicleIcon = createVehicleIcon(vehicle.status, vehicle.direction);
+                    
+                    // Crear marcador
+                    const marker = L.marker(position, {
+                        icon: vehicleIcon,
+                        title: vehicle.vehicle_name
                     });
                     
-                    // Info window con detalles del vehículo
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div class="text-gray-800 p-2">
-                                <h3 class="font-bold text-lg">${vehicle.vehicle_name}</h3>
-                                <p class="text-sm"><strong>Patente:</strong> ${vehicle.plate_no}</p>
-                                <p class="text-sm"><strong>Velocidad:</strong> ${vehicle.speed} km/h</p>
-                                <p class="text-sm"><strong>Dirección:</strong> ${vehicle.direction}°</p>
-                                <p class="text-sm"><strong>Última actualización:</strong> ${vehicle.occur_time}</p>
-                                <p class="text-sm"><strong>Coordenadas:</strong> ${vehicle.latitude.toFixed(6)}, ${vehicle.longitude.toFixed(6)}</p>
+                    // Popup con detalles del vehículo
+                    const popupContent = `
+                        <div class="text-white">
+                            <h3 class="font-bold text-lg mb-2 text-blue-400">${vehicle.vehicle_name}</h3>
+                            <div class="space-y-1 text-sm">
+                                <p><span class="text-gray-400">Patente:</span> <span class="text-white">${vehicle.plate_no || 'N/A'}</span></p>
+                                <p><span class="text-gray-400">Velocidad:</span> <span class="text-green-400">${vehicle.speed} km/h</span></p>
+                                <p><span class="text-gray-400">Dirección:</span> <span class="text-white">${vehicle.direction}°</span></p>
+                                <p><span class="text-gray-400">Última actualización:</span><br><span class="text-yellow-400">${vehicle.occur_time}</span></p>
+                                <p><span class="text-gray-400">Coordenadas:</span><br><span class="text-gray-300 text-xs">${vehicle.latitude.toFixed(6)}, ${vehicle.longitude.toFixed(6)}</span></p>
                             </div>
-                        `
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent, {
+                        className: 'vehicle-popup',
+                        maxWidth: 280
                     });
                     
-                    marker.addListener('click', () => {
-                        infoWindow.open(map, marker);
-                    });
-                    
+                    marker.addTo(markersLayer);
                     markers[vehicle.vehicle_code] = marker;
                 }
             });
             
-            // Ajustar zoom y centro si hay marcadores
-            if (vehiclesData.length > 0 && vehiclesData[0].latitude && vehiclesData[0].longitude) {
-                const bounds = new google.maps.LatLngBounds();
-                vehiclesData.forEach(vehicle => {
-                    if (vehicle.latitude && vehicle.longitude) {
-                        bounds.extend(new google.maps.LatLng(
-                            parseFloat(vehicle.latitude), 
-                            parseFloat(vehicle.longitude)
-                        ));
-                    }
+            // Ajustar vista si hay marcadores
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, {
+                    padding: [50, 50],
+                    maxZoom: 15
                 });
-                map.fitBounds(bounds);
             }
         }
         
@@ -356,6 +579,8 @@
                         locationElement.innerHTML = `
                             ${vehicle.latitude.toFixed(6)}, ${vehicle.longitude.toFixed(6)}<br>
                             <small class="text-gray-400">${vehicle.occur_time}</small>
+                            <br>
+                            <small class="text-blue-400">Velocidad: ${vehicle.speed} km/h</small>
                         `;
 
                         const statusElement = locationElement.closest('tr').querySelector('.px-2.py-1.text-xs.font-medium.rounded');
@@ -379,7 +604,6 @@
                     new Date(timestamp * 1000);
                 timeString = date.toLocaleDateString('es-AR') + ' ' + date.toLocaleTimeString('es-AR');
                 
-                // Actualizar el texto en el header
                 const lastUpdateElement = document.querySelector('#last-update span');
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = timeString;
@@ -392,21 +616,19 @@
         
         // Iniciar actualización automática
         function startAutoRefresh() {
-            console.log('Iniciando auto-refresh cada 10 segundos');
+            console.log('Iniciando auto-refresh cada 90 segundos');
             
-            // Configurar intervalo de actualización (10 segundos)
             refreshInterval = setInterval(() => {
                 loadMapData();
                 resetCountdown();
-            }, 10000);
+            }, 90000);
             
-            // Configurar contador regresivo
             resetCountdown();
         }
         
         // Reiniciar contador regresivo
         function resetCountdown() {
-            countdownValue = 10;
+            countdownValue = 90;
             updateCountdown();
             
             if (countdownInterval) clearInterval(countdownInterval);
@@ -435,31 +657,19 @@
             resetCountdown();
         }
         
-        // Verificar si Google Maps está cargado y inicializar
-        function checkGoogleMaps() {
-            if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
-                initMap();
-            } else {
-                // Reintentar después de un breve delay
-                setTimeout(checkGoogleMaps, 100);
-            }
-        }
-        
         // Iniciar cuando el documento esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado, inicializando mapa...');
-            checkGoogleMaps();
+            console.log('DOM cargado, inicializando mapa Leaflet...');
+            initMap();
         });
         
         // Manejar visibilidad de la página para optimizar recursos
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                // Página oculta, pausar actualizaciones
                 if (refreshInterval) clearInterval(refreshInterval);
                 if (countdownInterval) clearInterval(countdownInterval);
                 console.log('Actualizaciones pausadas (página oculta)');
             } else {
-                // Página visible, reanudar actualizaciones
                 startAutoRefresh();
                 console.log('Actualizaciones reanudadas (página visible)');
             }
