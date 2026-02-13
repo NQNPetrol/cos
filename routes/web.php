@@ -218,6 +218,58 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
     Route::get('/calendario', [\App\Http\Controllers\CalendarioClienteController::class, 'index'])->name('calendario.index');
     Route::get('/calendario/eventos', [\App\Http\Controllers\CalendarioClienteController::class, 'getEventos'])->name('calendario.eventos');
 
+    // ========== SUPERVISORES Y RECORRIDOS ==========
+
+    // Supervisores
+    Route::get('/supervisores', [\App\Http\Controllers\SupervisoresController::class, 'index'])
+        ->name('supervisores.index');
+    Route::post('/supervisores/asignar-personal', [\App\Http\Controllers\SupervisoresController::class, 'asignarPersonal'])
+        ->name('supervisores.asignar-personal');
+    Route::post('/supervisores/asignar-patrulla', [\App\Http\Controllers\SupervisoresController::class, 'asignarPatrulla'])
+        ->name('supervisores.asignar-patrulla');
+    Route::put('/supervisores/cambiar-patrulla', [\App\Http\Controllers\SupervisoresController::class, 'cambiarPatrulla'])
+        ->name('supervisores.cambiar-patrulla');
+    Route::post('/supervisores/asignar-empresas', [\App\Http\Controllers\SupervisoresController::class, 'asignarEmpresas'])
+        ->name('supervisores.asignar-empresas');
+    Route::get('/supervisores/personal-disponible', [\App\Http\Controllers\SupervisoresController::class, 'getPersonalDisponible'])
+        ->name('supervisores.personal-disponible');
+    Route::get('/supervisores/patrullas-disponibles', [\App\Http\Controllers\SupervisoresController::class, 'getPatrullasDisponibles'])
+        ->name('supervisores.patrullas-disponibles');
+
+    // Recorridos - Historial (must be before {recorrido} route)
+    Route::get('/recorridos/historial', [\App\Http\Controllers\RecorridosHistorialController::class, 'index'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.historial');
+    Route::post('/recorridos/historial', [\App\Http\Controllers\RecorridosHistorialController::class, 'store'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.historial.store');
+    Route::put('/recorridos/historial/{registro}', [\App\Http\Controllers\RecorridosHistorialController::class, 'update'])
+        ->middleware('can:editar.recorridos-cliente')
+        ->name('recorridos.historial.update');
+    Route::delete('/recorridos/historial/{registro}', [\App\Http\Controllers\RecorridosHistorialController::class, 'destroy'])
+        ->middleware('can:eliminar.historial-recorridos-cliente')
+        ->name('recorridos.historial.destroy');
+
+    // Recorridos - CRUD
+    Route::get('/recorridos', [\App\Http\Controllers\RecorridosController::class, 'index'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.index');
+    Route::post('/recorridos', [\App\Http\Controllers\RecorridosController::class, 'store'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.store');
+    Route::post('/recorridos/import-kml', [\App\Http\Controllers\RecorridosController::class, 'importKml'])
+        ->middleware('can:crear.recorridos-cliente')
+        ->name('recorridos.import-kml');
+    Route::get('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'show'])
+        ->middleware('can:ver.recorridos-cliente')
+        ->name('recorridos.show');
+    Route::put('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'update'])
+        ->middleware('can:editar.recorridos-cliente')
+        ->name('recorridos.update');
+    Route::delete('/recorridos/{recorrido}', [\App\Http\Controllers\RecorridosController::class, 'destroy'])
+        ->middleware('can:eliminar.recorridos-cliente')
+        ->name('recorridos.destroy');
+
 });
 
 Route::middleware(['auth'])->group(function () {

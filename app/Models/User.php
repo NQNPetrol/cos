@@ -168,4 +168,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReporteGenerado::class);
     }
+
+    /**
+     * Registro de personal asociado al usuario (para supervisores)
+     */
+    public function personal()
+    {
+        return $this->hasOne(Personal::class, 'user_id');
+    }
 }

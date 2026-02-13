@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 use App\Observers\PermissionObserver;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,10 @@ use App\Livewire\Client\UpdatePasswordForm;
 use App\Livewire\Client\LogoutOtherBrowserSessionsForm;
 use App\Livewire\Client\DeleteUserForm;
 use App\Listeners\LogAuthenticationActivity;
+use App\Models\Recorrido;
+use App\Models\RecorridoTimetable;
+use App\Policies\RecorridoPolicy;
+use App\Policies\RecorridoTimetablePolicy;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -40,5 +45,9 @@ class AppServiceProvider extends ServiceProvider
          
          // Register authentication activity log subscriber
          Event::subscribe(LogAuthenticationActivity::class);
+
+         // Register policies
+         Gate::policy(Recorrido::class, RecorridoPolicy::class);
+         Gate::policy(RecorridoTimetable::class, RecorridoTimetablePolicy::class);
     }
 }

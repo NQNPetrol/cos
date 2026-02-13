@@ -74,6 +74,19 @@ class PermissionsSeeder extends Seeder
         // Misiones cliente
         Permission::firstOrCreate(['name' => 'crear.peticion-misiones']);
 
+        // Supervisores cliente
+        Permission::firstOrCreate(['name' => 'ver.supervisores-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.personal-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.patrulla-cliente']);
+        Permission::firstOrCreate(['name' => 'asignar.empresas-cliente']);
+
+        // Recorridos cliente
+        Permission::firstOrCreate(['name' => 'ver.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'crear.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'editar.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'eliminar.recorridos-cliente']);
+        Permission::firstOrCreate(['name' => 'eliminar.historial-recorridos-cliente']);
+
         // ========== PERMISOS PARA ADMINISTRACIÓN (VISTA ADMIN) ==========
         
         // Clientes
@@ -280,7 +293,10 @@ class PermissionsSeeder extends Seeder
             'ver.flightlogs-cliente',
             // 'ver.galeria-cliente',
             'crear.peticion-misiones',
-            'ver.reportes'
+            'ver.reportes',
+            // Supervisores y Recorridos
+            'ver.supervisores-cliente',
+            'ver.recorridos-cliente',
         ];
 
         $clienteRole->syncPermissions($clientePermissions);
@@ -299,6 +315,14 @@ class PermissionsSeeder extends Seeder
             'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
             // Operaciones
             'ver.operaciones-cliente',
+            // Supervisores y Recorridos
+            'asignar.personal-cliente',
+            'asignar.patrulla-cliente',
+            'asignar.empresas-cliente',
+            'crear.recorridos-cliente',
+            'editar.recorridos-cliente',
+            'eliminar.recorridos-cliente',
+            'eliminar.historial-recorridos-cliente',
         ]);
 
         $clientAdminRole->syncPermissions($clientAdminPermissions);
@@ -313,6 +337,9 @@ class PermissionsSeeder extends Seeder
             'anular.eventos-cliente', 'agregar-notas.eventos-cliente',
             // Operaciones
             'ver.operaciones-cliente',
+            // Recorridos (crear y editar, NO eliminar historial)
+            'crear.recorridos-cliente',
+            'editar.recorridos-cliente',
         ]);
 
         $clientSupervisorRole->syncPermissions($clientSupervisorPermissions);

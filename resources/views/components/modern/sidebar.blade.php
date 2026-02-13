@@ -136,19 +136,42 @@
             </a>
         </template>
 
-        <template id="sidebar-tickets">
-            <a href="{{ route('client.tickets.nuevo') }}" class="modern-sidebar-item" data-route="{{ route('client.tickets.nuevo') }}">
+        <template id="sidebar-supervisores-recorridos">
+            <div class="modern-sidebar-section-title">Supervisores y Recorridos</div>
+            <a href="{{ route('client.supervisores.index') }}" class="modern-sidebar-item" data-route="{{ route('client.supervisores.index') }}">
                 <div class="modern-sidebar-item-icon-container">
                     <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                     </svg>
                 </div>
-                <span>Tickets</span>
+                <span>Supervisores</span>
             </a>
+            @can('ver.recorridos-cliente')
+            <a href="{{ route('client.recorridos.index') }}" class="modern-sidebar-item" data-route="{{ route('client.recorridos.index') }}">
+                <div class="modern-sidebar-item-icon-container">
+                    <svg class="modern-sidebar-item-icon" fill="currentColor" viewBox="0 0 217.205 217.205" style="width:18px;height:18px;">
+                        <path d="M167.631,101.102H49.574c-16.216,0-29.408-13.199-29.408-29.422c0-16.211,13.192-29.399,29.408-29.399h73.789 c4.143,0,7.5-3.358,7.5-7.5c0-4.142-3.357-7.5-7.5-7.5H49.574c-24.486,0-44.408,19.917-44.408,44.399 c0,24.494,19.922,44.422,44.408,44.422h118.057c16.216,0,29.408,13.199,29.408,29.423c0,16.211-13.192,29.399-29.408,29.399H93.205 c-4.142,0-7.5,3.358-7.5,7.5s3.358,7.5,7.5,7.5h74.426c24.486,0,44.408-19.917,44.408-44.399 C212.039,121.03,192.117,101.102,167.631,101.102z"/>
+                        <path d="M48.516,130.001c-17.407,0-31.568,14.162-31.568,31.568c0,26.865,25.192,52.367,26.265,53.439 c1.407,1.407,3.314,2.197,5.304,2.197c1.989,0,3.897-0.79,5.304-2.197c1.072-1.073,26.263-26.574,26.263-53.439 C80.082,144.163,65.922,130.001,48.516,130.001z M48.516,198.357c-6.477-7.995-16.568-22.713-16.568-36.788 c0-9.136,7.433-16.568,16.568-16.568c9.135,0,16.566,7.433,16.566,16.568C65.082,175.644,54.991,190.362,48.516,198.357z"/>
+                        <path d="M168.053,87.202c1.919,0,3.838-0.732,5.302-2.195c1.073-1.072,26.278-26.573,26.278-53.44 C199.633,14.161,185.466,0,168.053,0c-17.407,0-31.568,14.161-31.568,31.566c0,26.866,25.192,52.367,26.266,53.439 C164.214,86.47,166.133,87.202,168.053,87.202z M168.053,15c9.143,0,16.58,7.432,16.58,16.566c0,14.076-10.1,28.796-16.579,36.79 c-6.476-7.994-16.569-22.713-16.569-36.79C151.484,22.432,158.917,15,168.053,15z"/>
+                    </svg>
+                </div>
+                <span>Mis Recorridos</span>
+            </a>
+            @endcan
+            @can('ver.recorridos-cliente')
+            <a href="{{ route('client.recorridos.historial') }}" class="modern-sidebar-item" data-route="{{ route('client.recorridos.historial') }}">
+                <div class="modern-sidebar-item-icon-container">
+                    <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span>Historial de Recorridos</span>
+            </a>
+            @endcan
         </template>
 
         <template id="sidebar-administracion-cliente">
-            <div class="modern-sidebar-section-title">Administración</div>
+            <div class="modern-sidebar-section-title">Sistema y Configuración</div>
             <a href="{{ route('client.empresas-asociadas.index') }}" class="modern-sidebar-item" data-route="{{ route('client.empresas-asociadas.index') }}">
                 <div class="modern-sidebar-item-icon-container">
                     <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,6 +190,14 @@
                 <span>Administrar Usuarios</span>
             </a>
             @endif
+            <a href="{{ route('client.tickets.nuevo') }}" class="modern-sidebar-item" data-route="{{ route('client.tickets.nuevo') }}">
+                <div class="modern-sidebar-item-icon-container">
+                    <svg class="modern-sidebar-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                </div>
+                <span>Tickets de Sistema</span>
+            </a>
         </template>
     @else
         <!-- Admin Sidebar Templates -->
