@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="py-6">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
@@ -550,4 +550,4 @@
         .toast-progress { animation: toastProgress 4s linear forwards; }
         @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
     </style>
-</x-app-layout>
+</x-administrative-layout>

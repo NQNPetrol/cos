@@ -316,6 +316,28 @@ class PermissionsSeeder extends Seeder
         ]);
 
         $clientSupervisorRole->syncPermissions($clientSupervisorPermissions);
+
+        // ========== ROL ADMINISTRATIVE ==========
+        // Acceso completo a la sección Administración: rodados, clientes, personal,
+        // empresas, proveedores/talleres, pagos, cobranzas, calendario, alertas.
+        $administrativeRole = Role::firstOrCreate(['name' => 'administrative']);
+
+        $administrativePermissions = [
+            // Clientes
+            'crear.cliente', 'editar.cliente',
+            // Empresas asociadas
+            'crear.empresas', 'ver.empresas',
+            // Personal
+            'ver.personal', 'crear.personal', 'editar.personal',
+            // Contratos
+            'ver.contratos', 'crear.contratos', 'editar.contratos', 'eliminar.contratos',
+            // Notificaciones
+            'crear.notif', 'administrar.notificaciones', 'crear.notificaciones',
+            // Usuarios (asignar clientes)
+            'asignar.clientes',
+        ];
+
+        $administrativeRole->syncPermissions($administrativePermissions);
         
         $this->command->info('Todos los permisos han sido creados y asignados a sus roles.');
         $this->command->info('Total de permisos creados: ' . Permission::count());
@@ -324,5 +346,6 @@ class PermissionsSeeder extends Seeder
         $this->command->info('- Cliente: ' . count($clientePermissions) . ' permisos');
         $this->command->info('- ClientAdmin: ' . count($clientAdminPermissions) . ' permisos');
         $this->command->info('- ClientSupervisor: ' . count($clientSupervisorPermissions) . ' permisos');
+        $this->command->info('- Administrative: ' . count($administrativePermissions) . ' permisos');
     }
 }

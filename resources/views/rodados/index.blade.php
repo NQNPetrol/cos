@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="py-6">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Mensajes de estado -->
@@ -35,7 +35,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-100 tracking-tight">Gestión de Rodados</h1>
+                            <h1 class="text-2xl font-bold text-gray-100 tracking-tight">Gestión de Vehículos</h1>
                             <p class="text-sm text-gray-400 mt-0.5">Administra vehículos, turnos y mantenimientos</p>
                         </div>
                     </div>
@@ -137,4 +137,4 @@
             .modal-backdrop { padding-left: 1rem !important; padding-top: 1rem !important; }
         }
     </style>
-</x-app-layout>
+</x-administrative-layout>

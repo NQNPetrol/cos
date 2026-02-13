@@ -143,15 +143,25 @@ class RodadoController extends Controller
             'cliente_id' => 'required|exists:clientes,id',
             'es_propio' => 'nullable|boolean',
             'patente' => 'nullable|string|max:20',
+            'imagen_frente' => 'nullable|image|max:5120',
+            'imagen_costado_izq' => 'nullable|image|max:5120',
+            'imagen_costado_der' => 'nullable|image|max:5120',
+            'imagen_dorso' => 'nullable|image|max:5120',
         ]);
 
         // Asegurar que es_propio sea boolean
         $validated['es_propio'] = $request->has('es_propio') ? (bool)$request->es_propio : true;
 
+        // Remove image files from validated (handled separately)
+        unset($validated['imagen_frente'], $validated['imagen_costado_izq'], $validated['imagen_costado_der'], $validated['imagen_dorso']);
+
         $rodado = Rodado::create($validated);
 
+        // Handle image uploads
+        $this->handleImageUploads($request, $rodado);
+
         return redirect()->route('rodados.index')
-            ->with('success', 'Rodado creado exitosamente.');
+            ->with('success', 'Vehículo creado exitosamente.');
     }
 
     /**
@@ -168,15 +178,36 @@ class RodadoController extends Controller
             'cliente_id' => 'required|exists:clientes,id',
             'es_propio' => 'nullable|boolean',
             'patente' => 'nullable|string|max:20',
+            'imagen_frente' => 'nullable|image|max:5120',
+            'imagen_costado_izq' => 'nullable|image|max:5120',
+            'imagen_costado_der' => 'nullable|image|max:5120',
+            'imagen_dorso' => 'nullable|image|max:5120',
         ]);
 
         // Asegurar que es_propio sea boolean
         $validated['es_propio'] = $request->has('es_propio') ? (bool)$request->es_propio : false;
 
+        // Remove image files from validated
+        unset($validated['imagen_frente'], $validated['imagen_costado_izq'], $validated['imagen_costado_der'], $validated['imagen_dorso']);
+
+        // Handle image deletions
+        foreach (['frente', 'costado_izq', 'costado_der', 'dorso'] as $tipo) {
+            if ($request->has("eliminar_imagen_{$tipo}")) {
+                $field = "imagen_{$tipo}_path";
+                if ($rodado->$field) {
+                    Storage::disk('public')->delete($rodado->$field);
+                    $validated[$field] = null;
+                }
+            }
+        }
+
         $rodado->update($validated);
 
+        // Handle image uploads
+        $this->handleImageUploads($request, $rodado);
+
         return redirect()->route('rodados.index')
-            ->with('success', 'Rodado actualizado exitosamente.');
+            ->with('success', 'Vehículo actualizado exitosamente.');
     }
 
     /**
@@ -217,7 +248,42 @@ class RodadoController extends Controller
 
         $rodado->delete();
 
+        // Delete vehicle images
+        foreach (['imagen_frente_path', 'imagen_costado_izq_path', 'imagen_costado_der_path', 'imagen_dorso_path'] as $field) {
+            if ($rodado->$field) {
+                Storage::disk('public')->delete($rodado->$field);
+            }
+        }
+
+        $rodado->delete();
+
         return redirect()->route('rodados.index')
-            ->with('success', 'Rodado eliminado exitosamente.');
+            ->with('success', 'Vehículo eliminado exitosamente.');
+    }
+
+    /**
+     * Handle image uploads for a rodado
+     */
+    private function handleImageUploads(Request $request, Rodado $rodado): void
+    {
+        $imageFields = [
+            'imagen_frente' => 'imagen_frente_path',
+            'imagen_costado_izq' => 'imagen_costado_izq_path',
+            'imagen_costado_der' => 'imagen_costado_der_path',
+            'imagen_dorso' => 'imagen_dorso_path',
+        ];
+
+        foreach ($imageFields as $inputName => $dbField) {
+            if ($request->hasFile($inputName)) {
+                // Delete old image if exists
+                if ($rodado->$dbField) {
+                    Storage::disk('public')->delete($rodado->$dbField);
+                }
+                $path = $request->file($inputName)->store("rodados/{$rodado->id}", 'public');
+                $rodado->$dbField = $path;
+            }
+        }
+
+        $rodado->save();
     }
 }

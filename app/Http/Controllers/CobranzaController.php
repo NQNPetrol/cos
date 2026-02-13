@@ -13,55 +13,95 @@ class CobranzaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cobranza::with(['cliente', 'servicioUsuario']);
+        $mes = (int) $request->get('mes', now()->month);
+        $anio = (int) $request->get('anio', now()->year);
+        $clienteFilter = $request->get('cliente_id');
+        $estadoFilter = $request->get('estado');
 
-        if ($request->filled('cliente_id')) {
-            $query->where('cliente_id', $request->cliente_id);
+        // Base query filtered by period
+        $query = Cobranza::with(['cliente', 'servicioUsuario'])
+            ->whereMonth('fecha_emision', $mes)
+            ->whereYear('fecha_emision', $anio);
+
+        if ($clienteFilter) {
+            $query->where('cliente_id', $clienteFilter);
         }
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-        if ($request->filled('mes') && $request->filled('anio')) {
-            $query->whereMonth('fecha_emision', $request->mes)->whereYear('fecha_emision', $request->anio);
+        if ($estadoFilter) {
+            $query->where('estado', $estadoFilter);
         }
 
         $cobranzas = $query->latest('fecha_emision')->get();
-
-        $cobradas = $cobranzas->where('estado', Cobranza::ESTADO_COBRADO);
         $pendientes = $cobranzas->where('estado', '!=', Cobranza::ESTADO_COBRADO);
+        $cobradas = $cobranzas->where('estado', Cobranza::ESTADO_COBRADO);
 
         $clientes = Cliente::orderBy('nombre')->get();
-        $servicios = ServicioUsuario::activos()->orderBy('nombre')->get();
+        $servicios = ServicioUsuario::where('activo', true)->orderBy('nombre')->get();
 
-        // Comparativa cobrado vs pagado por mes por cliente
+        // ==========================================
+        // RESUMEN DEL PERIODO (siempre se calcula)
+        // ==========================================
+
+        // Total ingresos (cobrado) del periodo
+        $qIngresos = Cobranza::where('estado', Cobranza::ESTADO_COBRADO)
+            ->whereMonth('fecha_pago', $mes)
+            ->whereYear('fecha_pago', $anio);
+        if ($clienteFilter) {
+            $qIngresos->where('cliente_id', $clienteFilter);
+        }
+        $totalIngresos = (float) $qIngresos->sum('monto_total');
+
+        // Total ingresos pendientes del periodo
+        $qPendientesTotal = Cobranza::where('estado', '!=', Cobranza::ESTADO_COBRADO)
+            ->whereMonth('fecha_emision', $mes)
+            ->whereYear('fecha_emision', $anio);
+        if ($clienteFilter) {
+            $qPendientesTotal->where('cliente_id', $clienteFilter);
+        }
+        $totalPendiente = (float) $qPendientesTotal->sum('monto_total');
+
+        // Total egresos (pagos realizados) del periodo
+        $qEgresos = PagoServiciosRodado::where('estado', PagoServiciosRodado::ESTADO_PAGADO)
+            ->whereMonth('fecha_pago', $mes)
+            ->whereYear('fecha_pago', $anio);
+        if ($clienteFilter) {
+            $qEgresos->whereHas('rodado', function ($q) use ($clienteFilter) {
+                $q->where('cliente_id', $clienteFilter);
+            });
+        }
+        $totalEgresos = (float) $qEgresos->sum('monto');
+
+        $diferencia = $totalIngresos - $totalEgresos;
+
+        // ==========================================
+        // COMPARATIVA POR CLIENTE del periodo
+        // ==========================================
         $comparativa = [];
-        if ($request->filled('cliente_id') || $request->filled('comparativa')) {
-            $clienteIds = $request->filled('cliente_id') ? [$request->cliente_id] : Cliente::pluck('id')->toArray();
-            $mes = $request->get('mes', now()->month);
-            $anio = $request->get('anio', now()->year);
+        $clienteIds = $clienteFilter ? [$clienteFilter] : Cliente::pluck('id')->toArray();
 
-            foreach ($clienteIds as $clienteId) {
-                $cliente = Cliente::find($clienteId);
-                if (!$cliente) continue;
+        foreach ($clienteIds as $cId) {
+            $cliente = Cliente::find($cId);
+            if (!$cliente) continue;
 
-                $totalCobrado = Cobranza::where('cliente_id', $clienteId)
-                    ->where('estado', Cobranza::ESTADO_COBRADO)
-                    ->whereMonth('fecha_pago', $mes)
-                    ->whereYear('fecha_pago', $anio)
-                    ->sum('monto_total');
+            $cobrado = (float) Cobranza::where('cliente_id', $cId)
+                ->where('estado', Cobranza::ESTADO_COBRADO)
+                ->whereMonth('fecha_pago', $mes)
+                ->whereYear('fecha_pago', $anio)
+                ->sum('monto_total');
 
-                $totalPagado = PagoServiciosRodado::whereHas('rodado', function ($q) use ($clienteId) {
-                    $q->where('cliente_id', $clienteId);
-                })->where('estado', PagoServiciosRodado::ESTADO_PAGADO)
-                    ->whereMonth('fecha_pago', $mes)
-                    ->whereYear('fecha_pago', $anio)
-                    ->sum('monto');
+            $pagado = (float) PagoServiciosRodado::whereHas('rodado', function ($q) use ($cId) {
+                $q->where('cliente_id', $cId);
+            })->where('estado', PagoServiciosRodado::ESTADO_PAGADO)
+                ->whereMonth('fecha_pago', $mes)
+                ->whereYear('fecha_pago', $anio)
+                ->sum('monto');
 
+            // Only include clients that have any activity
+            if ($cobrado > 0 || $pagado > 0) {
                 $comparativa[] = [
                     'cliente' => $cliente->nombre,
-                    'cobrado' => (float) $totalCobrado,
-                    'pagado' => (float) $totalPagado,
-                    'diferencia' => (float) $totalCobrado - (float) $totalPagado,
+                    'cobrado' => $cobrado,
+                    'pagado' => $pagado,
+                    'diferencia' => $cobrado - $pagado,
                 ];
             }
         }
@@ -72,7 +112,13 @@ class CobranzaController extends Controller
             'pendientes',
             'clientes',
             'servicios',
-            'comparativa'
+            'comparativa',
+            'totalIngresos',
+            'totalPendiente',
+            'totalEgresos',
+            'diferencia',
+            'mes',
+            'anio'
         ));
     }
 
@@ -90,14 +136,15 @@ class CobranzaController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
-        // Calcular monto total
         $validated['monto_total'] = $validated['valor_unitario'] * $validated['cantidad'];
         $validated['estado'] = Cobranza::ESTADO_PENDIENTE;
 
         Cobranza::create($validated);
 
-        return redirect()->route('rodados.cobranzas.index')
-            ->with('success', 'Cobranza registrada exitosamente.');
+        return redirect()->route('rodados.cobranzas.index', [
+            'mes' => $request->get('mes', now()->month),
+            'anio' => $request->get('anio', now()->year),
+        ])->with('success', 'Cobranza registrada exitosamente.');
     }
 
     public function update(Request $request, Cobranza $cobranza)
@@ -117,7 +164,6 @@ class CobranzaController extends Controller
         ]);
 
         $validated['monto_total'] = $validated['valor_unitario'] * $validated['cantidad'];
-
         $cobranza->update($validated);
 
         return redirect()->route('rodados.cobranzas.index')
@@ -171,6 +217,6 @@ class CobranzaController extends Controller
         $cobranza->save();
 
         return redirect()->route('rodados.cobranzas.index')
-            ->with('success', 'Documentación adjuntada exitosamente.');
+            ->with('success', 'Documentacion adjuntada exitosamente.');
     }
 }

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-administrative-layout>
     <div class="py-6">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
@@ -341,7 +341,7 @@
                             <textarea name="descripcion" rows="2" class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-gray-200 px-3.5 py-2.5 text-sm placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all" placeholder="Detalle opcional de la alerta"></textarea>
                         </div>
 
-                        <!-- === COBRO CLIENTE: Cliente + Dia del mes + Anticipacion === -->
+                        <!-- === COBRO CLIENTE: Cliente + Servicio + Dia del mes + Anticipacion === -->
                         <div id="field-cobro-cliente" class="hidden space-y-3">
                             <div class="grid grid-cols-3 gap-4">
                                 <div class="col-span-2">
@@ -356,6 +356,32 @@
                                 <div>
                                     <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Dia del mes *</label>
                                     <input type="number" name="dia_mes" id="input-dia-mes" min="1" max="31" class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-gray-200 px-3.5 py-2.5 text-sm placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all" placeholder="1-31">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Servicio mensual a cobrar</label>
+                                <select name="servicio_usuario_id" id="select-servicio-cobro" class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-gray-200 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all" onchange="updateServicioCobro(this)">
+                                    <option value="">Sin servicio vinculado</option>
+                                    @foreach(\App\Models\ServicioUsuario::activos()->orderBy('nombre')->get() as $servicio)
+                                        <option value="{{ $servicio->id }}" data-monto="{{ $servicio->valor_unitario }}" data-moneda="{{ $servicio->moneda }}" data-tipo="{{ $servicio->tipo_calculo }}">
+                                            {{ $servicio->nombre }} ({{ $servicio->moneda }} ${{ number_format($servicio->valor_unitario, 2, ',', '.') }} - {{ ucfirst($servicio->tipo_calculo) }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="text-[10px] text-gray-600 mt-1">Seleccione el servicio mensual para incluir el monto en alertas y notificaciones</p>
+                                <!-- Quantity field for variable services -->
+                                <div id="cobro-cantidad-container" class="hidden mt-3">
+                                    <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Cantidad *</label>
+                                    <input type="number" name="cobro_cantidad" id="input-cobro-cantidad" min="1" value="1"
+                                        class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-gray-200 px-3.5 py-2.5 text-sm placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                        placeholder="Cantidad de unidades" oninput="recalcularCobroTotal()">
+                                    <p class="text-[10px] text-gray-600 mt-1">Servicio de tipo variable: ingrese la cantidad para calcular el total a cobrar</p>
+                                </div>
+                                <div id="servicio-cobro-info" class="hidden mt-2 p-2.5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span class="text-xs text-emerald-300" id="servicio-cobro-monto-text"></span>
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -389,7 +415,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Dias de anticipacion</label>
+                                <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Km de anticipacion</label>
                                 <input type="number" name="dias_anticipacion" min="1" class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-gray-200 px-3.5 py-2.5 text-sm placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all" placeholder="Ej: 500 (avisar 500 km antes)" value="500">
                                 <p class="text-[10px] text-gray-600 mt-1">Se disparara la alerta cuando falten estos km para el proximo intervalo</p>
                             </div>
@@ -608,6 +634,60 @@
         let currentDestinatario = 'admin';
 
         // ==============================
+        // SERVICE COBRO SELECTOR
+        // ==============================
+        // Store current service data for total calculation
+        let currentCobroServicio = { monto: 0, moneda: 'ARS', tipo: '' };
+
+        function updateServicioCobro(select) {
+            const opt = select.options[select.selectedIndex];
+            const info = document.getElementById('servicio-cobro-info');
+            const text = document.getElementById('servicio-cobro-monto-text');
+            const cantidadContainer = document.getElementById('cobro-cantidad-container');
+            const cantidadInput = document.getElementById('input-cobro-cantidad');
+
+            if (opt && opt.value) {
+                const monto = parseFloat(opt.dataset.monto || '0');
+                const moneda = opt.dataset.moneda || 'ARS';
+                const tipo = (opt.dataset.tipo || '').toLowerCase();
+
+                currentCobroServicio = { monto, moneda, tipo };
+
+                if (tipo === 'variable') {
+                    // Show quantity input for variable services
+                    cantidadContainer.classList.remove('hidden');
+                    cantidadInput.disabled = false;
+                    if (!cantidadInput.value || cantidadInput.value === '0') {
+                        cantidadInput.value = 1;
+                    }
+                    recalcularCobroTotal();
+                } else {
+                    // Fixed service: hide quantity, show direct amount
+                    cantidadContainer.classList.add('hidden');
+                    cantidadInput.disabled = true;
+                    text.textContent = `Monto fijo: ${moneda} $${monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+                    info.classList.remove('hidden');
+                }
+            } else {
+                // No service selected
+                info.classList.add('hidden');
+                cantidadContainer.classList.add('hidden');
+                cantidadInput.disabled = true;
+                currentCobroServicio = { monto: 0, moneda: 'ARS', tipo: '' };
+            }
+        }
+
+        function recalcularCobroTotal() {
+            const info = document.getElementById('servicio-cobro-info');
+            const text = document.getElementById('servicio-cobro-monto-text');
+            const cantidad = parseInt(document.getElementById('input-cobro-cantidad').value) || 1;
+            const { monto, moneda } = currentCobroServicio;
+            const total = monto * cantidad;
+
+            text.textContent = `${moneda} $${monto.toLocaleString('es-AR', {minimumFractionDigits: 2})} × ${cantidad} = Total: ${moneda} $${total.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+            info.classList.remove('hidden');
+        }
+
         // TIPO SELECTOR
         // ==============================
         function seleccionarTipo(tipo) {
@@ -877,6 +957,13 @@
             const selFrec = document.getElementById('select-frecuencia');
             if (selFrec) selFrec.disabled = false;
 
+            // Reset cobro cantidad/servicio state
+            document.getElementById('cobro-cantidad-container').classList.add('hidden');
+            document.getElementById('input-cobro-cantidad').value = 1;
+            document.getElementById('input-cobro-cantidad').disabled = true;
+            document.getElementById('servicio-cobro-info').classList.add('hidden');
+            currentCobroServicio = { monto: 0, moneda: 'ARS', tipo: '' };
+
             // Disable all type-specific fields
             disableDuplicateFields();
         }
@@ -938,4 +1025,4 @@
         .toast-progress { animation: toastProgress 4s linear forwards; }
         @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
     </style>
-</x-app-layout>
+</x-administrative-layout>

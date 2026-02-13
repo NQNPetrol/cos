@@ -83,6 +83,10 @@ class Rodado extends Model
         'cliente_id',
         'es_propio',
         'patente',
+        'imagen_frente_path',
+        'imagen_costado_izq_path',
+        'imagen_costado_der_path',
+        'imagen_dorso_path',
     ];
 
     protected $casts = [

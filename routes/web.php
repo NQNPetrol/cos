@@ -797,6 +797,14 @@ Route::middleware([
         Route::get('/admin-dashboard/turnos-por-estado', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTurnosPorEstado'])->name('admin-dashboard.turnos-por-estado');
         Route::get('/admin-dashboard/cobros-vs-pagos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getCobrosVsPagos'])->name('admin-dashboard.cobros-vs-pagos');
 
+        // Dashboard Admin Rodados - New API endpoints
+        Route::get('/admin-dashboard/kpis', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getKpis'])->name('admin-dashboard.kpis');
+        Route::get('/admin-dashboard/ingresos-egresos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getIngresosEgresos'])->name('admin-dashboard.ingresos-egresos');
+        Route::get('/admin-dashboard/flota-ingresos', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getFlotaIngresos'])->name('admin-dashboard.flota-ingresos');
+        Route::get('/admin-dashboard/turnos-por-vehiculo', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTurnosPorVehiculo'])->name('admin-dashboard.turnos-por-vehiculo');
+        Route::get('/admin-dashboard/top-km', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getTopKm'])->name('admin-dashboard.top-km');
+        Route::get('/admin-dashboard/upcoming', [\App\Http\Controllers\AdminRodadosDashboardController::class, 'getUpcoming'])->name('admin-dashboard.upcoming');
+
         // Proveedores y Talleres (vista unificada)
         Route::get('/proveedores-talleres', function () {
             $proveedores = \App\Models\Proveedor::with('talleres')->orderBy('nombre')->get();

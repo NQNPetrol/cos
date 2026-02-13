@@ -115,13 +115,13 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-semibold text-gray-100">{{ $rodado->marca }} {{ $rodado->modelo }}</div>
-                                    <div class="flex items-center gap-2 mt-0.5">
-                                        @if($rodado->patente)
-                                            <span class="inline-flex items-center px-2 py-0.5 bg-zinc-700/80 rounded text-xs font-mono font-medium text-gray-300 tracking-wider">{{ $rodado->patente }}</span>
-                                        @endif
-                                        <span class="text-xs text-gray-500">{{ $rodado->año }}</span>
-                                    </div>
+                                    @if($rodado->patente)
+                                        <button onclick="openDetalleVehiculoModal({{ $rodado->id }})"
+                                            class="text-lg font-bold text-blue-400 hover:text-blue-300 font-mono tracking-wider cursor-pointer transition-colors">
+                                            {{ $rodado->patente }}
+                                        </button>
+                                    @endif
+                                    <div class="text-sm text-gray-400">{{ $rodado->marca }} {{ $rodado->modelo }} <span class="text-xs text-gray-500">{{ $rodado->año }}</span></div>
                                 </div>
                             </div>
                         </td>
@@ -233,6 +233,7 @@
 
 <!-- Modales -->
 @include('rodados.modals.vehiculo-modal')
+@include('rodados.modals.detalle-vehiculo-modal')
 @include('rodados.modals.kilometraje-modal')
 
 <script>

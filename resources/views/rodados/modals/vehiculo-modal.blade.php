@@ -19,7 +19,7 @@
 
         <!-- Body -->
         <div class="px-6 py-5 max-h-[65vh] overflow-y-auto modal-scroll">
-            <form id="vehiculo-form" method="POST" action="{{ route('rodados.store') }}">
+            <form id="vehiculo-form" method="POST" action="{{ route('rodados.store') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" id="vehiculo-id" name="id">
                 @method('POST')
@@ -89,6 +89,29 @@
                             </select>
                         </div>
                     </div>
+
+                    <!-- Imágenes del Vehículo -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Imágenes del Vehículo</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            @foreach(['frente' => 'Frente', 'costado_izq' => 'Costado Izq.', 'costado_der' => 'Costado Der.', 'dorso' => 'Dorso'] as $key => $label)
+                            <div class="relative">
+                                <label class="block text-[10px] text-gray-500 mb-1">{{ $label }}</label>
+                                <div id="img-preview-{{ $key }}" class="hidden mb-1.5 relative group">
+                                    <img id="img-thumb-{{ $key }}" src="" class="w-full h-20 object-cover rounded-lg border border-zinc-700">
+                                    <button type="button" onclick="removeImagePreview('{{ $key }}')"
+                                        class="absolute top-1 right-1 p-1 bg-red-600/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                    <input type="hidden" name="eliminar_imagen_{{ $key }}" id="eliminar-img-{{ $key }}" value="0">
+                                </div>
+                                <input type="file" name="imagen_{{ $key }}" id="input-img-{{ $key }}" accept="image/*"
+                                    class="w-full text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-zinc-700 file:text-gray-300 hover:file:bg-zinc-600 file:cursor-pointer cursor-pointer"
+                                    onchange="previewImage(this, '{{ $key }}')">
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -109,6 +132,25 @@
 </div>
 
 <script>
+    function previewImage(input, key) {
+        const preview = document.getElementById('img-preview-' + key);
+        const thumb = document.getElementById('img-thumb-' + key);
+        const eliminar = document.getElementById('eliminar-img-' + key);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) { thumb.src = e.target.result; preview.classList.remove('hidden'); };
+            reader.readAsDataURL(input.files[0]);
+            if (eliminar) eliminar.value = '0';
+        }
+    }
+    function removeImagePreview(key) {
+        document.getElementById('img-preview-' + key).classList.add('hidden');
+        document.getElementById('img-thumb-' + key).src = '';
+        document.getElementById('input-img-' + key).value = '';
+        const eliminar = document.getElementById('eliminar-img-' + key);
+        if (eliminar) eliminar.value = '1';
+    }
+
     document.getElementById('vehiculo-form')?.addEventListener('submit', function(e) {
         const tipoVehiculo = document.getElementById('vehiculo-tipo')?.value;
         const marca = document.getElementById('vehiculo-marca')?.value;
