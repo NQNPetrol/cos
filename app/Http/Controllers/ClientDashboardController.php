@@ -8,7 +8,6 @@ use App\Models\Evento;
 use App\Models\EmpresaAsociada;
 use App\Models\Categoria;
 use App\Models\Patrulla;
-use App\Models\PatrullaDocumental;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -44,20 +43,8 @@ class ClientDashboardController extends Controller
                 'totalEventos' => 0,
                 'eventosUltimos7Dias' => 0,
                 'empresasAsociadas' => collect(),
-                // Patrullas
-                'totalPatrullas' => 0,
-                'patrullasConGPS' => 0,
-                'patrullasSinGPS' => 0,
-                'chartDataPatrullasEstado' => [],
-                'chartDataPatrullasGPS' => [],
-                // Documentos de patrullas
-                'totalDocumentos' => 0,
-                'documentosVencidos' => 0,
-                'documentosPorVencer7Dias' => 0,
-                'documentosPorVencer30Dias' => 0,
-                'documentosVigentes' => 0,
-                'chartDataDocumentos' => [],
-                'documentosAlerta' => collect()
+                'patrullas' => collect(),
+                'empresasConRecorridos' => collect(),
             ]);
         }
 
@@ -295,116 +282,19 @@ class ClientDashboardController extends Controller
             })
             ->values();
 
-        // ========== ESTADÍSTICAS DE PATRULLAS ==========
-        
-        // Total de patrullas del cliente
-        $totalPatrullas = Patrulla::whereIn('cliente_id', $clienteIds)->count();
-        
-        // Patrullas por estado
-        $patrullasPorEstado = Patrulla::whereIn('cliente_id', $clienteIds)
-            ->select('estado', DB::raw('COUNT(*) as total'))
-            ->groupBy('estado')
+        // Patrullas para filtro del mapa de recorridos
+        $patrullas = Patrulla::whereIn('cliente_id', $clienteIds)
+            ->select('id', 'patente')
+            ->orderBy('patente')
             ->get();
 
-        $chartDataPatrullasEstado = [];
-        foreach ($patrullasPorEstado as $item) {
-            $chartDataPatrullasEstado[] = [
-                'nombre' => ucfirst($item->estado ?? 'Sin estado'),
-                'total' => $item->total
-            ];
-        }
-
-        // Ordenar por total
-        usort($chartDataPatrullasEstado, function($a, $b) {
-            return $b['total'] - $a['total'];
-        });
-
-        // Patrullas con GPS (tienen mobile_vehicle asociado)
-        $patrullasConGPS = Patrulla::whereIn('cliente_id', $clienteIds)
-            ->whereHas('mobileVehicle')
-            ->count();
-
-        $patrullasSinGPS = $totalPatrullas - $patrullasConGPS;
-
-        // Datos para gráfico de GPS
-        $chartDataPatrullasGPS = [];
-        if ($patrullasConGPS > 0) {
-            $chartDataPatrullasGPS[] = ['nombre' => 'Con GPS', 'total' => $patrullasConGPS];
-        }
-        if ($patrullasSinGPS > 0) {
-            $chartDataPatrullasGPS[] = ['nombre' => 'Sin GPS', 'total' => $patrullasSinGPS];
-        }
-
-        // ========== ESTADÍSTICAS DE DOCUMENTOS DE PATRULLAS ==========
-        
-        // Obtener IDs de patrullas del cliente
-        $patrullaIds = Patrulla::whereIn('cliente_id', $clienteIds)->pluck('id');
-        
-        $hoy = Carbon::today();
-        $en30Dias = Carbon::today()->addDays(30);
-        $en7Dias = Carbon::today()->addDays(7);
-        
-        // Total de documentos
-        $totalDocumentos = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)->count();
-        
-        // Documentos vencidos
-        $documentosVencidos = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '<', $hoy)
-            ->count();
-        
-        // Documentos por vencer en 7 días
-        $documentosPorVencer7Dias = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '>=', $hoy)
-            ->whereDate('fecha_vto', '<=', $en7Dias)
-            ->count();
-        
-        // Documentos por vencer en 30 días
-        $documentosPorVencer30Dias = PatrullaDocumental::whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '>=', $hoy)
-            ->whereDate('fecha_vto', '<=', $en30Dias)
-            ->count();
-        
-        // Documentos vigentes (fecha_vto > 30 días o sin fecha)
-        $documentosVigentes = $totalDocumentos - $documentosVencidos - $documentosPorVencer30Dias;
-        
-        // Datos para gráfico de estado de documentos
-        $chartDataDocumentos = [];
-        if ($documentosVencidos > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vencidos', 'total' => $documentosVencidos];
-        }
-        if ($documentosPorVencer7Dias > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vence en 7 días', 'total' => $documentosPorVencer7Dias];
-        }
-        if (($documentosPorVencer30Dias - $documentosPorVencer7Dias) > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vence en 30 días', 'total' => $documentosPorVencer30Dias - $documentosPorVencer7Dias];
-        }
-        if ($documentosVigentes > 0) {
-            $chartDataDocumentos[] = ['nombre' => 'Vigentes', 'total' => $documentosVigentes];
-        }
-        
-        // Lista de documentos próximos a vencer o vencidos (para tabla)
-        $documentosAlerta = PatrullaDocumental::with('patrulla')
-            ->whereIn('patrulla_id', $patrullaIds)
-            ->whereNotNull('fecha_vto')
-            ->whereDate('fecha_vto', '<=', $en30Dias)
-            ->orderBy('fecha_vto', 'asc')
-            ->get()
-            ->map(function ($doc) use ($hoy) {
-                $fechaVto = Carbon::parse($doc->fecha_vto);
-                $diasRestantes = $hoy->diffInDays($fechaVto, false);
-                
-                return [
-                    'id' => $doc->id,
-                    'nombre' => $doc->nombre,
-                    'patrulla' => $doc->patrulla->patente ?? 'N/A',
-                    'fecha_vto' => $doc->fecha_vto->format('d/m/Y'),
-                    'dias_restantes' => $diasRestantes,
-                    'estado' => $diasRestantes < 0 ? 'vencido' : ($diasRestantes <= 7 ? 'critico' : 'alerta')
-                ];
-            });
+        // Empresas asociadas que tienen al menos un recorrido (para el dropdown del mapa de recorridos)
+        $empresasConRecorridos = EmpresaAsociada::whereHas('cliente', function($q) use ($clienteIds) {
+                $q->whereIn('clientes.id', $clienteIds);
+            })
+            ->whereHas('recorridos')
+            ->orderBy('nombre')
+            ->get();
 
         return view('client.dashboard', [
             'chartData' => $chartData,
@@ -415,20 +305,8 @@ class ClientDashboardController extends Controller
             'eventosUltimos7Dias' => $eventosUltimos7Dias,
             'empresasAsociadas' => $empresasAsociadas,
             'categoriasTiposMapa' => $categoriasTipos,
-            // Patrullas
-            'totalPatrullas' => $totalPatrullas,
-            'patrullasConGPS' => $patrullasConGPS,
-            'patrullasSinGPS' => $patrullasSinGPS,
-            'chartDataPatrullasEstado' => $chartDataPatrullasEstado,
-            'chartDataPatrullasGPS' => $chartDataPatrullasGPS,
-            // Documentos de patrullas
-            'totalDocumentos' => $totalDocumentos,
-            'documentosVencidos' => $documentosVencidos,
-            'documentosPorVencer7Dias' => $documentosPorVencer7Dias,
-            'documentosPorVencer30Dias' => $documentosPorVencer30Dias,
-            'documentosVigentes' => $documentosVigentes,
-            'chartDataDocumentos' => $chartDataDocumentos,
-            'documentosAlerta' => $documentosAlerta
+            'patrullas' => $patrullas,
+            'empresasConRecorridos' => $empresasConRecorridos,
         ]);
     }
 

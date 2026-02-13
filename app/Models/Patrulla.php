@@ -84,4 +84,19 @@ class Patrulla extends Model
     {
         return $this->hasOne(ChecklistPatrulla::class)->latestOfMany();
     }
+
+    public function supervisorPatrulla()
+    {
+        return $this->hasOne(SupervisorPatrulla::class, 'patrulla_id');
+    }
+
+    public function scopeDisponibles($query)
+    {
+        return $query->whereDoesntHave('supervisorPatrulla');
+    }
+
+    public function scopeDelCliente($query, $clienteId)
+    {
+        return $query->where('cliente_id', $clienteId);
+    }
 }

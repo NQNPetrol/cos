@@ -1,66 +1,52 @@
 @extends('layouts.cliente')
 @section('content')
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-zinc-900 text-gray-100 overflow-hidden shadow-sm sm:rounded-lg"">
-                <div class="p-6 text-gray-100 dark:text-gray-100">
+            <div class="text-gray-100">
+                <div class="text-gray-100">
 
                     <!-- Mensajes de sesión -->
                     @if(session('success'))
-                        <div class="mb-6 p-4 bg-green-800 border border-green-600 text-green-100 rounded-lg flex items-center justify-between shadow-lg">
+                        <div class="mb-5 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-between">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('success') }}</span>
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span class="text-sm">{{ session('success') }}</span>
                             </div>
-                            <button type="button" class="text-green-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
+                            <button type="button" class="text-emerald-400/60 hover:text-emerald-300" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
+                        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center justify-between">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('error') }}</span>
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="text-sm">{{ session('error') }}</span>
                             </div>
-                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
+                            <button type="button" class="text-red-400/60 hover:text-red-300" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                     @endif
 
                     @if(session('info'))
-                        <div class="mb-6 p-4 bg-blue-800 border border-blue-600 text-blue-100 rounded-lg flex items-center justify-between shadow-lg">
+                        <div class="mb-5 p-4 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-between">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>{{ session('info') }}</span>
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="text-sm">{{ session('info') }}</span>
                             </div>
-                            <button type="button" class="text-blue-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
+                            <button type="button" class="text-blue-400/60 hover:text-blue-300" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                     @endif
 
                     @if($errors->any())
-                        <div class="mb-6 p-4 bg-red-800 border border-red-600 text-red-100 rounded-lg flex items-center justify-between shadow-lg">
+                        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center justify-between">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <div>
+                                <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="text-sm">
                                     <ul class="list-disc list-inside">
                                         @foreach($errors->all() as $error)
                                             <li>{{ $error }}</li>
@@ -68,17 +54,23 @@
                                     </ul>
                                 </div>
                             </div>
-                            <button type="button" class="text-red-300 hover:text-white" onclick="this.parentElement.style.display='none'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
+                            <button type="button" class="text-red-400/60 hover:text-red-300" onclick="this.parentElement.style.display='none'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                     @endif
 
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Registrar Nuevo Evento</h2>
-                        <a href="{{ route('client.eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-gradient-to-br from-blue-600/20 to-blue-400/10 rounded-xl border border-blue-500/20">
+                                <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-white">Registrar Nuevo Evento</h1>
+                                <p class="text-gray-400 text-sm">Complete el formulario para registrar un evento</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('client.eventos.index') }}" class="text-blue-400 hover:text-blue-300 flex items-center text-sm">
                             <i class="bi bi-arrow-left mr-2"></i> Volver al listado
                         </a>
                     </div>
@@ -86,15 +78,15 @@
                     <form action="{{ route('client.eventos.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         <!-- 1. Categoria -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4"> 1. ¿A qué categoría pertenece el evento? <span class="text-red-500">*</span></h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4"> 1. ¿A qué categoría pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($categorias as $categoria)
                                 <div class="flex items-center">
                                     <input id="categoria-{{ Str::slug($categoria->nombre) }}" name="categoria_id" type="radio"
                                         data-nombre="{{ $categoria->nombre }}"
                                         value="{{ $categoria->id }}" 
-                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600" required
+                                           class="h-4 w-4 text-blue-500 focus:ring-blue-500/30 border-zinc-600 bg-zinc-800" required
                                            @if(old('categoria') === $categoria->nombre) checked @endif>
                                     <label for="categoria-{{ Str::slug($categoria->nombre) }}" class="ml-3 block text-sm font-medium text-gray-300">
                                         {{ $categoria->nombre }}
@@ -108,8 +100,8 @@
                         </div>
 
                         <!-- Sección 2: Tipo de Evento (dinámico) -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">2. ¿A qué tipo pertenece el evento? <span class="text-red-500">*</span></h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">2. ¿A qué tipo pertenece el evento? <span class="text-red-500">*</span></h3>
                             <div id="tipos-container">
                                 <!-- Opciones se cargarán dinámicamente con JavaScript -->
                                 <p class="text-gray-400 italic">Seleccione primero una categoría</p>
@@ -120,10 +112,10 @@
                         </div>
 
                         <!-- Sección 3: Fecha y Hora -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">3. Fecha y hora del incidente <span class="text-red-500">*</span></h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">3. Fecha y hora del incidente <span class="text-red-500">*</span></h3>
                             <input type="datetime-local" name="fecha_hora" id="fecha_hora"
-                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5"
                                    value="{{ old('fecha_hora') }}" required>
                             @error('fecha_hora')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
@@ -131,9 +123,9 @@
                         </div>
 
                         <!-- Sección 4: Coordenadas -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">4. Ubicación <span class="text-red-500">*</span></h3>
-                            <div class="mb-4 bg-zinc-800 p-3 rounded-md">
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">4. Ubicación <span class="text-red-500">*</span></h3>
+                            <div class="mb-4 bg-zinc-900/60 p-3 rounded-lg border border-zinc-700/50">
                                 <p class="text-sm text-gray-300 mb-2">Cómo obtener las coordenadas:</p>
                                 <ol class="list-decimal list-inside text-sm text-gray-400 space-y-1">
                                     <li>Entrar a <a href="https://www.google.com/maps" target="_blank" class="text-blue-400 hover:underline">Google Maps</a></li>
@@ -145,7 +137,7 @@
                                 <p class="text-sm text-yellow-400 mt-2">Ejemplo: -38.88266056726054, -68.0446703200311</p>
                             </div>
                             <input type="text" name="coordenadas" id="coordenadas" placeholder="Pegue las coordenadas aquí"
-                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5"
                                    value="{{ old('coordenadas') }}" required
                                    pattern="^-?\d{1,3}\.\d+,\s-?\d{1,3}\.\d+$"
                                    title="Formato requerido: latitud, longitud (ejemplo: -38.88266056726054, -68.0446703200311)">
@@ -155,10 +147,10 @@
                         </div>
 
                         <!-- Sección 5: Cliente -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5. Cliente <span class="text-red-500">*</span></h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">5. Cliente <span class="text-red-500">*</span></h3>
                             <select name="cliente_id" id="cliente_id" required
-                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">
                                 <option value="">Seleccione un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}"
@@ -174,10 +166,10 @@
                         </div>
 
                         <!-- Sección 5.1: Empresa Asociada -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">5.1 Empresa Asociada</h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">5.1 Empresa Asociada</h3>
                             <select name="empresa_asociada_id" id="empresa_asociada_id"
-                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">
                                 <option value="">Seleccione una empresa asociada al cliente</option>
                                 @foreach($empresas as $empresa)
                                     <option value="{{ $empresa->id }}" @if(old('empresa_asociada_id') == $empresa->id) selected @endif>
@@ -191,10 +183,10 @@
                         </div>
 
                         <!-- Sección 6: Supervisor -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">6. Supervisor <span class="text-red-500">*</span></h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">6. Supervisor <span class="text-red-500">*</span></h3>
                             <select name="supervisor_id" id="supervisor_id" required
-                                    class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">
                                 <option value="">Seleccione un supervisor</option>
                                 @foreach($supervisores as $supervisor)
                                     <option value="{{ $supervisor->id }}"
@@ -209,15 +201,15 @@
                             @enderror
                         </div>
 
-                        <div class="bg-zinc-700 p-4 rounded-lg">
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
                             <h3 class="text-lg font-medium text-white mb-1">7. Descripción <span class="text-red-500">*</span></h3>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Escriba en detalle lo sucedido en el evento o incidente.</label>
                             <textarea name="descripcion" id="descripcion"
-                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">{{ old('observaciones') }}</textarea>
                         </div>
                         <!-- Elementos Evento -->
-                        <div class="bg-zinc-700 p-4 rounded-lg" id="elementos-sustraidos" >
-                            <h3 class="text-lg font-medium text-white mb-4">7.1 Elementos Involucrados en el evento</h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50" id="elementos-sustraidos" >
+                            <h3 class="text-lg font-semibold text-white mb-4">7.1 Elementos Involucrados en el evento</h3>
                             <p class="text-sm text-gray-300 mb-4">Complete esta sección solo si el evento involucra elementos sustraídos, encontrados o dañados.</p>
                             
                             <div id="elementos-container">
@@ -225,13 +217,13 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Elemento</label>
                                         <input type="text" name="elementos[]" placeholder="Ej: rueda, batería, linterna..."
-                                            class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            class="block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-300 mb-2">Cantidad</label>
                                         <div class="flex">
                                             <input type="number" name="cantidades[]" min="1" value="1"
-                                                class="block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                                class="block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">
                                             <button type="button" class="remove-elemento-btn ml-2 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors" title="Eliminar elemento" style="display: none;">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -241,7 +233,7 @@
                             </div> 
                             
                             <button type="button" id="add-elemento-btn" 
-                                class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
+                                class="mt-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm">
                             <i class="bi bi-plus-circle mr-1"></i> Añadir
                         </button>
                             
@@ -254,8 +246,8 @@
                         </div>
 
                         <!-- Personas evento -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">7.2 Personas Involucradas en el Evento</h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">7.2 Personas Involucradas en el Evento</h3>
                            
                                 
                             <div id="personas-container">
@@ -263,32 +255,32 @@
                             </div>
                                 
                             <button type="button" id="add-persona-btn" 
-                                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all text-sm">
                                 <i class="bi bi-person-plus mr-2"></i> Agregar Persona
                             </button>
                         </div>
 
                         <!-- Sección 7: Observaciones -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">8. Observaciones Adicionales</h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">8. Observaciones Adicionales</h3>
                             <textarea name="observaciones" id="observaciones" rows="3"
-                                      class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">{{ old('observaciones') }}</textarea>
+                                      class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5">{{ old('observaciones') }}</textarea>
                         </div>
 
                         <!-- Sección 8: Link del Reporte -->
-                        <div class="bg-zinc-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-medium text-white mb-4">9. Link del reporte</h3>
+                        <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                            <h3 class="text-lg font-semibold text-white mb-4">9. Link del reporte</h3>
                             <input type="url" name="reporte_url" id="url_reporte" placeholder="https://drive.google.com/..."
-                                   class="mt-1 block w-full rounded-md bg-zinc-600 border-zinc-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                                   class="mt-1 block w-full rounded-lg bg-zinc-900 border border-zinc-700 text-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm px-3 py-2.5"
                                    value="{{ old('reporte_url') }}">
                         </div>
 
                         <!-- Sección 9: Multimedia -->
-                         <div class="bg-zinc-700 p-4 rounded-lg">
-                             <h3 class="text-lg font-medium text-white mb-4">10. Multimedia</h3>
+                         <div class="bg-zinc-800/50 backdrop-blur p-5 rounded-xl border border-zinc-700/50">
+                             <h3 class="text-lg font-semibold text-white mb-4">10. Multimedia</h3>
                              <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Imágenes (JPG, PNG - Máx. 2MB c/u)</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-600 border-dashed rounded-md">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-700 border-dashed rounded-xl">
                                     <div class="space-y-1 text-center">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -311,10 +303,10 @@
 
                         <!-- Botones de acción -->
                         <div class="flex justify-end space-x-4 pt-4">
-                            <button type="reset" class="px-4 py-2 border border-zinc-600 rounded-md text-gray-300 bg-zinc-700 hover:bg-zinc-600">
+                            <button type="reset" class="px-5 py-2.5 border border-zinc-700 rounded-xl text-gray-300 bg-zinc-700 hover:bg-zinc-600 text-sm transition-all">
                                 Limpiar formulario
                             </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm font-medium transition-all shadow-lg shadow-blue-600/20">
                                 <i class="bi bi-save mr-2"></i> Guardar Evento
                             </button>
                         </div>

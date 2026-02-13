@@ -6,7 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Patrulla;
 use App\Models\PatrullaDocumental;
+use App\Models\Documento;
 use Illuminate\Support\Facades\Auth;
+
 class DocumentacionPatrullaListado extends Component
 {
     use WithPagination;
@@ -20,15 +22,6 @@ class DocumentacionPatrullaListado extends Component
     public $nuevaFechaVto = '';
     public $nuevosDetalles = '';
 
-    public $opcionesDocumentacion = [
-        'Seguro',
-        'Poliza Seguro', 
-        'VTV',
-        'RTO Provincial',
-        'RTO Nacional',
-        'Constancia 0km'
-    ];
-
     public function mount($patrullaId)
     {
         $this->patrullaId = $patrullaId;
@@ -41,10 +34,14 @@ class DocumentacionPatrullaListado extends Component
             ->orderBy('fecha_vto', 'asc')
             ->paginate(4);
 
+        // Pull active document types from DB
+        $opcionesDocumentacion = Documento::activos()->orderBy('nombre')->pluck('nombre')->toArray();
+
         return view('livewire.flotas-vehiculares.documentacion-patrulla-listado', [
             'documentacion' => $documentacion,
-            'patrulla' => $this->patrulla
-        ]);  
+            'patrulla' => $this->patrulla,
+            'opcionesDocumentacion' => $opcionesDocumentacion,
+        ]);
     }
 
     public function mostrarFormularioAgregar()
@@ -61,8 +58,10 @@ class DocumentacionPatrullaListado extends Component
 
     public function guardarDocumentacion()
     {
+        $opcionesActivas = Documento::activos()->pluck('nombre')->toArray();
+
         $this->validate([
-            'nuevoNombre' => 'required|string|in:' . implode(',', $this->opcionesDocumentacion),
+            'nuevoNombre' => 'required|string|in:' . implode(',', $opcionesActivas),
             'nuevaFechaInicio' => 'required|date',
             'nuevaFechaVto' => 'nullable|date',
             'nuevosDetalles' => 'nullable|string|max:500',
