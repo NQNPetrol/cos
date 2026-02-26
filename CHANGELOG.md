@@ -18,6 +18,22 @@
 
 ---
 
+## [v0.3.0] — 2025-02-26
+
+### Fixed
+- **Recorridos KML:** parseo de archivos KML que reportaban 0 waypoints. Soporte para namespace KML 2.2 y XPath con `local-name()` para LineString/Point.
+- Mapa de previsualización y mapa en detalle muestran la ruta cuando el KML tiene coordenadas válidas.
+
+### Added
+- Recorridos: soporte para archivos .kmz (ZIP con .kml interno).
+- Validación de extensión .kml/.kmz y mensaje claro cuando no se pueden extraer waypoints.
+- Velocidad máxima permitida persistida y mostrada en listado y detalle de recorridos.
+
+### Changed
+- `Recorrido::parseKmlFile()` refactorizado: `parseKmlContent()` para XML en string, `extractKmlFromKmz()` para KMZ, `extractWaypointsFromKml()` y `parseCoordinatePair()` para extracción robusta de coordenadas.
+
+---
+
 ## Versión base (en producción) — 2025
 
 > Estado: versión base desplegada, en testing y ajuste de features existentes.
