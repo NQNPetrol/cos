@@ -78,8 +78,8 @@ Ver [ROADMAP.md](./ROADMAP.md) para el plan de versiones y funcionalidades.
 ## 🧪 Tests
 
 - **Ejecutar en local:** `./vendor/bin/pest` o `php artisan test`
-- **Base de datos:** en CI se usa MySQL; en local se recomienda MySQL (copiar `.env.testing.example` a `.env.testing` y configurar una base `cos_test`).
-- **Cobertura actual (v0.1.0):** autenticación (login, logout) y autorización por permisos (Spatie) en rutas admin y cliente. Base para ampliar con tests de módulos (v0.2.0).
+- **Framework:** Pest (PHPUnit bajo el capó). En CI se usa MySQL; en local se recomienda MySQL (copiar `.env.testing.example` a `.env.testing` y configurar una base `cos_test`).
+- **Cobertura (v0.1.0 + v0.2.0):** autenticación y autorización (Spatie); tests unitarios y feature para **Eventos**, **Rodados** y **Tickets** (listados, creación, edición, permisos). Factories para Evento, Rodado, Ticket y modelos relacionados.
 
 Más detalle en [docs/testing.md](./docs/testing.md).
 
