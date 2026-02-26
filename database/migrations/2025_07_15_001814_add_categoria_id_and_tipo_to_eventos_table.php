@@ -12,15 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('eventos', function (Blueprint $table) {
-            $table->foreignId('categoria_id')
-                ->nullable()
-                ->constrained('categorias')
-                ->onDelete('set null')
-                ->after('cliente_id');
-
-            $table->string('tipo')
-                ->nullable()
-                ->after('categoria_id');
+            if (! Schema::hasColumn('eventos', 'categoria_id')) {
+                $table->foreignId('categoria_id')
+                    ->nullable()
+                    ->constrained('categorias')
+                    ->onDelete('set null')
+                    ->after('cliente_id');
+            }
+            if (! Schema::hasColumn('eventos', 'tipo')) {
+                $table->string('tipo')
+                    ->nullable()
+                    ->after('categoria_id');
+            }
         });
     }
 
