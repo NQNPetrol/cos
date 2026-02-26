@@ -61,71 +61,91 @@ class Recorrido extends Model
     }
 
     /**
-     * Parse a KML file and extract waypoints, distance, and metadata.
+     * Parse a KML or KMZ file and extract waypoints, distance, and metadata.
+     * Supports KML 2.2 with or without namespace, LineString and Point coordinates.
+     * KMZ: opens as ZIP and parses the first .kml file inside.
      */
     public static function parseKmlFile($file): array
     {
-        $content = file_get_contents($file->getRealPath());
-        $xml = simplexml_load_string($content);
-
-        if (! $xml) {
-            return ['waypoints' => [], 'longitud_mts' => 0, 'metadata' => []];
+        $safe = ['waypoints' => [], 'longitud_mts' => 0, 'metadata' => []];
+        $path = $file->getRealPath();
+        if (! $path || ! is_readable($path)) {
+            return $safe;
         }
 
-        $xml->registerXPathNamespace('kml', 'http://www.opengis.net/kml/2.2');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $content = null;
+        $filename = $file->getClientOriginalName();
 
-        $waypoints = [];
-
-        // Try standard KML coordinates
-        $coordinates = $xml->xpath('//kml:coordinates');
-        if (empty($coordinates)) {
-            // Fallback: try without namespace
-            $coordinates = $xml->xpath('//coordinates');
+        if ($extension === 'kmz') {
+            $content = self::extractKmlFromKmz($path);
+            if ($content === null) {
+                return $safe;
+            }
+        } else {
+            $content = @file_get_contents($path);
         }
 
-        if ($coordinates) {
-            foreach ($coordinates as $coordSet) {
-                $coordString = trim((string) $coordSet);
-                // Split by whitespace or newlines
-                $coordPairs = preg_split('/[\s]+/', $coordString);
+        if ($content === false || $content === null) {
+            return $safe;
+        }
 
-                foreach ($coordPairs as $pair) {
-                    $pair = trim($pair);
-                    if (empty($pair)) {
-                        continue;
-                    }
+        return self::parseKmlContent($content, $filename);
+    }
 
-                    $parts = explode(',', $pair);
-                    if (count($parts) >= 2) {
-                        $waypoints[] = [
-                            'order' => count($waypoints) + 1,
-                            'lng' => (float) $parts[0],
-                            'lat' => (float) $parts[1],
-                            'alt' => isset($parts[2]) ? (float) $parts[2] : null,
-                        ];
-                    }
-                }
+    /**
+     * Extract KML XML string from a KMZ (ZIP) file path.
+     */
+    protected static function extractKmlFromKmz(string $path): ?string
+    {
+        if (! class_exists(\ZipArchive::class)) {
+            return null;
+        }
+        $zip = new \ZipArchive;
+        if ($zip->open($path, \ZipArchive::RDONLY) !== true) {
+            return null;
+        }
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+            if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) === 'kml') {
+                $content = $zip->getFromIndex($i);
+                $zip->close();
+                return $content !== false ? $content : null;
             }
         }
+        $zip->close();
+        return null;
+    }
 
-        // Extract name if available
-        $name = '';
-        $nameNodes = $xml->xpath('//kml:name');
-        if (empty($nameNodes)) {
-            $nameNodes = $xml->xpath('//name');
+    /**
+     * Parse KML XML string and return waypoints, length and metadata.
+     */
+    public static function parseKmlContent(string $content, string $filename = ''): array
+    {
+        $safe = ['waypoints' => [], 'longitud_mts' => 0, 'metadata' => []];
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($content);
+        if ($xml === false) {
+            libxml_clear_errors();
+            return $safe;
         }
+
+        $waypoints = self::extractWaypointsFromKml($xml);
+        libxml_clear_errors();
+
+        // Extract name if available (namespace-agnostic)
+        $name = '';
+        $nameNodes = $xml->xpath('//*[local-name()="name"]');
         if (! empty($nameNodes)) {
-            $name = (string) $nameNodes[0];
+            $name = trim((string) $nameNodes[0]);
         }
 
         // Extract description if available
         $description = '';
-        $descNodes = $xml->xpath('//kml:description');
-        if (empty($descNodes)) {
-            $descNodes = $xml->xpath('//description');
-        }
+        $descNodes = $xml->xpath('//*[local-name()="description"]');
         if (! empty($descNodes)) {
-            $description = (string) $descNodes[0];
+            $description = trim((string) $descNodes[0]);
         }
 
         // Calculate total distance using Haversine
@@ -142,7 +162,7 @@ class Recorrido extends Model
             'longitud_mts' => round($longitudTotal, 2),
             'metadata' => [
                 'total_points' => count($waypoints),
-                'filename' => $file->getClientOriginalName(),
+                'filename' => $filename,
                 'imported_at' => now()->toDateTimeString(),
                 'kml_name' => $name,
                 'kml_description' => $description,
@@ -155,6 +175,70 @@ class Recorrido extends Model
                     'lng' => end($waypoints)['lng'],
                 ] : null,
             ],
+        ];
+    }
+
+    /**
+     * Extract waypoints from parsed KML (SimpleXMLElement).
+     * Uses namespace-agnostic XPath so it works with or without xmlns.
+     */
+    protected static function extractWaypointsFromKml(\SimpleXMLElement $xml): array
+    {
+        $waypoints = [];
+
+        // Strategy 1: coordinates with namespace (KML 2.2)
+        $xml->registerXPathNamespace('kml', 'http://www.opengis.net/kml/2.2');
+        $coordinates = $xml->xpath('//kml:coordinates');
+        if (empty($coordinates)) {
+            // Strategy 2: local-name() works with default namespace or no namespace
+            $coordinates = $xml->xpath('//*[local-name()="coordinates"]');
+        }
+
+        if (! empty($coordinates)) {
+            foreach ($coordinates as $coordSet) {
+                $coordString = trim((string) $coordSet);
+                if ($coordString === '') {
+                    continue;
+                }
+                // Split by whitespace or newlines (KML uses space/newline between lon,lat,alt pairs)
+                $coordPairs = preg_split('/[\s]+/', $coordString, -1, PREG_SPLIT_NO_EMPTY);
+                foreach ($coordPairs as $pair) {
+                    $pair = trim($pair);
+                    if ($pair === '') {
+                        continue;
+                    }
+                    $point = self::parseCoordinatePair($pair);
+                    if ($point !== null) {
+                        $point['order'] = count($waypoints) + 1;
+                        $waypoints[] = $point;
+                    }
+                }
+            }
+        }
+
+        return $waypoints;
+    }
+
+    /**
+     * Parse a single "lon,lat,alt" or "lon,lat" string.
+     *
+     * @return array{lat: float, lng: float, alt: float|null}|null
+     */
+    protected static function parseCoordinatePair(string $pair): ?array
+    {
+        $parts = array_map('trim', explode(',', $pair));
+        if (count($parts) < 2) {
+            return null;
+        }
+        $lng = (float) $parts[0];
+        $lat = (float) $parts[1];
+        if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+            return null;
+        }
+        return [
+            'lat' => $lat,
+            'lng' => $lng,
+            'alt' => isset($parts[2]) && $parts[2] !== '' ? (float) $parts[2] : null,
         ];
     }
 
