@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('eventos', function (Blueprint $table) {
             // Cambiar la columna para permitir NULL
             $table->foreignId('empresa_asociada_id')
-                  ->nullable()
-                  ->change();
+                ->nullable()
+                ->change();
         });
     }
 

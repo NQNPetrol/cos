@@ -12,7 +12,7 @@ class Media extends Model
         'file_type',
         'file_size',
         'model_id',
-        'model_type'
+        'model_type',
     ];
 
     public function model()

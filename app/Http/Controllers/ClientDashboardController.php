@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
+use App\Models\EmpresaAsociada;
+use App\Models\Evento;
+use App\Models\Patrulla;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Evento;
-use App\Models\EmpresaAsociada;
-use App\Models\Categoria;
-use App\Models\Patrulla;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientDashboardController extends Controller
 {
@@ -20,7 +20,7 @@ class ClientDashboardController extends Controller
     private function getClienteIds()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return collect();
         }
 
@@ -49,7 +49,7 @@ class ClientDashboardController extends Controller
         }
 
         // Obtener empresas asociadas de los clientes del usuario
-        $empresasAsociadas = EmpresaAsociada::whereHas('cliente', function($query) use ($clienteIds) {
+        $empresasAsociadas = EmpresaAsociada::whereHas('cliente', function ($query) use ($clienteIds) {
             $query->whereIn('clientes.id', $clienteIds);
         })->get();
 
@@ -67,7 +67,7 @@ class ClientDashboardController extends Controller
         foreach ($empresasAsociadas as $empresa) {
             $chartData[] = [
                 'nombre' => $empresa->nombre,
-                'total' => $eventosStats->has($empresa->id) ? $eventosStats[$empresa->id]->total : 0
+                'total' => $eventosStats->has($empresa->id) ? $eventosStats[$empresa->id]->total : 0,
             ];
         }
 
@@ -80,7 +80,7 @@ class ClientDashboardController extends Controller
             ->count();
 
         // Ordenar por total de eventos (mayor a menor)
-        usort($chartData, function($a, $b) {
+        usort($chartData, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -106,18 +106,18 @@ class ClientDashboardController extends Controller
             if ($total > 0) { // Solo incluir categorías con eventos
                 $chartDataCategorias[] = [
                     'nombre' => $categoria->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
 
         // Ordenar por total de eventos (mayor a menor)
-        usort($chartDataCategorias, function($a, $b) {
+        usort($chartDataCategorias, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
         // ========== DATOS PARA GRÁFICO STACKED (Categorías x Clientes) ==========
-        
+
         // Obtener IDs de categorías que tienen eventos
         $categoriaIdsConEventos = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
@@ -125,7 +125,7 @@ class ClientDashboardController extends Controller
             ->whereNotNull('categoria_id')
             ->distinct()
             ->pluck('categoria_id');
-        
+
         // Obtener categorías que tienen eventos
         $categoriasConEventos = Categoria::whereIn('id', $categoriaIdsConEventos)->get();
 
@@ -136,7 +136,7 @@ class ClientDashboardController extends Controller
             ->whereNotNull('empresa_asociada_id')
             ->distinct()
             ->pluck('empresa_asociada_id');
-        
+
         // Obtener empresas asociadas que tienen eventos
         $empresasConEventos = EmpresaAsociada::whereIn('id', $empresaIdsConEventos)->get();
 
@@ -152,7 +152,7 @@ class ClientDashboardController extends Controller
         // Crear estructura de datos para el gráfico stacked (Clientes en X, Categorías como segmentos)
         $chartDataStacked = [
             'clientes' => $empresasConEventos->pluck('nombre')->toArray(),
-            'datasets' => []
+            'datasets' => [],
         ];
 
         // Colores en tonos azules y verdes oscuros
@@ -171,19 +171,20 @@ class ClientDashboardController extends Controller
 
         // Colores específicos para categorías (comparación case-insensitive)
         $coloresEspecificos = [
-            'Seguridad vial y patrullaje' => ['bg' => 'rgba(71, 102, 151, 0.85)', 'border' => 'rgba(71, 102, 151, 0.85)'], 
-            'Tecnológicos/comunicación' => ['bg' => 'rgba(22, 57, 100, 0.85)', 'border' => 'rgba(22, 57, 100, 0.85)'], 
+            'Seguridad vial y patrullaje' => ['bg' => 'rgba(71, 102, 151, 0.85)', 'border' => 'rgba(71, 102, 151, 0.85)'],
+            'Tecnológicos/comunicación' => ['bg' => 'rgba(22, 57, 100, 0.85)', 'border' => 'rgba(22, 57, 100, 0.85)'],
         ];
 
         // Función helper para obtener color específico (comparación case-insensitive)
-        $getColorEspecifico = function($nombreCategoria) use ($coloresEspecificos) {
+        $getColorEspecifico = function ($nombreCategoria) use ($coloresEspecificos) {
             $nombreNormalizado = mb_strtolower(trim($nombreCategoria));
-            
+
             foreach ($coloresEspecificos as $nombreExacto => $color) {
                 if (mb_strtolower(trim($nombreExacto)) === $nombreNormalizado) {
                     return $color;
                 }
             }
+
             return null;
         };
 
@@ -208,7 +209,7 @@ class ClientDashboardController extends Controller
                     'data' => $data,
                     'backgroundColor' => $color['bg'],
                     'borderColor' => $color['border'],
-                    'borderWidth' => 2
+                    'borderWidth' => 2,
                 ];
                 // Solo incrementar el índice si no usamos un color específico
                 if ($colorEspecifico === null) {
@@ -218,7 +219,7 @@ class ClientDashboardController extends Controller
         }
 
         // ========== DATOS PARA GRÁFICO MENSUAL (Barras + Línea de tendencia) ==========
-        
+
         // Obtener eventos agrupados por mes
         $eventosMensuales = Evento::whereIn('cliente_id', $clienteIds)
             ->where('es_anulado', false)
@@ -236,16 +237,16 @@ class ClientDashboardController extends Controller
         $chartDataMensual = [
             'labels' => [],
             'data' => [],
-            'promedio' => 0
+            'promedio' => 0,
         ];
 
         $meses = [
             1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
-            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic',
         ];
 
         foreach ($eventosMensuales as $evento) {
-            $label = $meses[$evento->mes] . ' ' . $evento->año;
+            $label = $meses[$evento->mes].' '.$evento->año;
             $chartDataMensual['labels'][] = $label;
             $chartDataMensual['data'][] = $evento->total;
         }
@@ -277,7 +278,7 @@ class ClientDashboardController extends Controller
                 return [
                     'id' => (int) $categoriaId,
                     'nombre' => optional($categoriasMap->get($categoriaId))->nombre ?? 'Sin nombre',
-                    'tipos' => $group->pluck('tipo')->values()
+                    'tipos' => $group->pluck('tipo')->values(),
                 ];
             })
             ->values();
@@ -289,9 +290,9 @@ class ClientDashboardController extends Controller
             ->get();
 
         // Empresas asociadas que tienen al menos un recorrido (para el dropdown del mapa de recorridos)
-        $empresasConRecorridos = EmpresaAsociada::whereHas('cliente', function($q) use ($clienteIds) {
-                $q->whereIn('clientes.id', $clienteIds);
-            })
+        $empresasConRecorridos = EmpresaAsociada::whereHas('cliente', function ($q) use ($clienteIds) {
+            $q->whereIn('clientes.id', $clienteIds);
+        })
             ->whereHas('recorridos')
             ->orderBy('nombre')
             ->get();
@@ -334,7 +335,7 @@ class ClientDashboardController extends Controller
         }
 
         // Obtener empresas asociadas
-        $empresasAsociadas = EmpresaAsociada::whereHas('cliente', function($q) use ($clienteIds) {
+        $empresasAsociadas = EmpresaAsociada::whereHas('cliente', function ($q) use ($clienteIds) {
             $q->whereIn('clientes.id', $clienteIds);
         })->get();
 
@@ -348,7 +349,7 @@ class ClientDashboardController extends Controller
         foreach ($empresasAsociadas as $empresa) {
             $chartData[] = [
                 'nombre' => $empresa->nombre,
-                'total' => $eventosStats->has($empresa->id) ? $eventosStats[$empresa->id]->total : 0
+                'total' => $eventosStats->has($empresa->id) ? $eventosStats[$empresa->id]->total : 0,
             ];
         }
 
@@ -369,11 +370,11 @@ class ClientDashboardController extends Controller
         if ($eventosSinCliente > 0) {
             $chartData[] = [
                 'nombre' => 'Sin Cliente',
-                'total' => $eventosSinCliente
+                'total' => $eventosSinCliente,
             ];
         }
 
-        usort($chartData, function($a, $b) {
+        usort($chartData, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -390,7 +391,7 @@ class ClientDashboardController extends Controller
         if ($clienteIds->isEmpty()) {
             return response()->json([
                 'clientes' => [],
-                'datasets' => []
+                'datasets' => [],
             ]);
         }
 
@@ -417,7 +418,7 @@ class ClientDashboardController extends Controller
             ->where('es_anulado', false)
             ->whereNotNull('empresa_asociada_id')
             ->whereNotNull('categoria_id');
-        
+
         if ($request->filled('fecha_desde')) {
             $queryCategorias->whereDate('fecha_hora', '>=', $request->fecha_desde);
         }
@@ -427,7 +428,7 @@ class ClientDashboardController extends Controller
         if ($request->filled('empresa_asociada_id')) {
             $queryCategorias->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
-        
+
         $categoriaIds = $queryCategorias->distinct()->pluck('categoria_id');
         $categorias = Categoria::whereIn('id', $categoriaIds)->get();
 
@@ -436,7 +437,7 @@ class ClientDashboardController extends Controller
             ->where('es_anulado', false)
             ->whereNotNull('categoria_id')
             ->whereNotNull('empresa_asociada_id');
-        
+
         if ($request->filled('fecha_desde')) {
             $queryEmpresas->whereDate('fecha_hora', '>=', $request->fecha_desde);
         }
@@ -446,7 +447,7 @@ class ClientDashboardController extends Controller
         if ($request->filled('empresa_asociada_id')) {
             $queryEmpresas->where('empresa_asociada_id', $request->empresa_asociada_id);
         }
-        
+
         $empresaIds = $queryEmpresas->distinct()->pluck('empresa_asociada_id');
         $empresasAsociadas = EmpresaAsociada::whereIn('id', $empresaIds)->get();
 
@@ -458,7 +459,7 @@ class ClientDashboardController extends Controller
 
         // Crear estructura de datos para el gráfico (Clientes en X, Categorías como segmentos)
         $clientesLabels = $empresasAsociadas->pluck('nombre')->toArray();
-        
+
         // Colores en tonos azules y verdes oscuros
         $colors = [
             ['bg' => 'rgba(30, 58, 138, 0.85)', 'border' => 'rgba(30, 58, 138, 1)'], // Azul navy oscuro
@@ -475,19 +476,20 @@ class ClientDashboardController extends Controller
 
         // Colores específicos para categorías (comparación case-insensitive)
         $coloresEspecificos = [
-            'Seguridad vial y patrullaje' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 1)'], 
-            'Tecnológicos/comunicación' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 0.85)'], 
+            'Seguridad vial y patrullaje' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 1)'],
+            'Tecnológicos/comunicación' => ['bg' => 'rgba(59, 130, 246, 0.85)', 'border' => 'rgba(59, 130, 246, 0.85)'],
         ];
 
         // Función helper para obtener color específico (comparación case-insensitive)
-        $getColorEspecifico = function($nombreCategoria) use ($coloresEspecificos) {
+        $getColorEspecifico = function ($nombreCategoria) use ($coloresEspecificos) {
             $nombreNormalizado = mb_strtolower(trim($nombreCategoria));
-            
+
             foreach ($coloresEspecificos as $nombreExacto => $color) {
                 if (mb_strtolower(trim($nombreExacto)) === $nombreNormalizado) {
                     return $color;
                 }
             }
+
             return null;
         };
 
@@ -514,7 +516,7 @@ class ClientDashboardController extends Controller
                     'data' => $data,
                     'backgroundColor' => $color['bg'],
                     'borderColor' => $color['border'],
-                    'borderWidth' => 2
+                    'borderWidth' => 2,
                 ];
                 // Solo incrementar el índice si no usamos un color específico
                 if ($colorEspecifico === null) {
@@ -525,7 +527,7 @@ class ClientDashboardController extends Controller
 
         return response()->json([
             'clientes' => $clientesLabels,
-            'datasets' => $datasets
+            'datasets' => $datasets,
         ]);
     }
 
@@ -540,7 +542,7 @@ class ClientDashboardController extends Controller
             return response()->json([
                 'labels' => [],
                 'data' => [],
-                'promedio' => 0
+                'promedio' => 0,
             ]);
         }
 
@@ -576,16 +578,16 @@ class ClientDashboardController extends Controller
         $chartDataMensual = [
             'labels' => [],
             'data' => [],
-            'promedio' => 0
+            'promedio' => 0,
         ];
 
         $meses = [
             1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
-            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic',
         ];
 
         foreach ($eventosMensuales as $evento) {
-            $label = $meses[$evento->mes] . ' ' . $evento->año;
+            $label = $meses[$evento->mes].' '.$evento->año;
             $chartDataMensual['labels'][] = $label;
             $chartDataMensual['data'][] = $evento->total;
         }
@@ -635,12 +637,12 @@ class ClientDashboardController extends Controller
             if ($total > 0) {
                 $chartData[] = [
                     'nombre' => $categoria->nombre,
-                    'total' => $total
+                    'total' => $total,
                 ];
             }
         }
 
-        usort($chartData, function($a, $b) {
+        usort($chartData, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -651,19 +653,19 @@ class ClientDashboardController extends Controller
     {
         try {
             \Log::info('API Mapa Calor solicitada');
-            
+
             $clienteIds = $this->getClienteIds();
-            
+
             if ($clienteIds->isEmpty()) {
                 return response()->json([]);
             }
 
             $query = Evento::whereIn('cliente_id', $clienteIds)
                 ->where('es_anulado', false)
-                ->whereNotNull('latitud')  
-                ->whereNotNull('longitud') 
-                ->where('latitud', '!=', 0)  
-                ->where('longitud', '!=', 0); 
+                ->whereNotNull('latitud')
+                ->whereNotNull('longitud')
+                ->where('latitud', '!=', 0)
+                ->where('longitud', '!=', 0);
 
             // Filtrar por rango de fechas si se proporciona
             if ($request->filled('fecha_desde')) {
@@ -675,37 +677,37 @@ class ClientDashboardController extends Controller
 
             // Filtro opcional por empresa asociada (cliente)
             $empresas = $request->input('empresa_asociada_id');
-            if (!empty($empresas)) {
+            if (! empty($empresas)) {
                 // Puede venir como array o CSV: "1,3,5"
                 $empresaIds = is_array($empresas)
                     ? $empresas
                     : array_filter(explode(',', $empresas));
 
-                if (!empty($empresaIds)) {
+                if (! empty($empresaIds)) {
                     $query->whereIn('empresa_asociada_id', $empresaIds);
                 }
             }
 
             // Filtro opcional por categorías (puede venir como array o CSV)
             $categorias = $request->input('categorias');
-            if (!empty($categorias)) {
+            if (! empty($categorias)) {
                 $categoriaIds = is_array($categorias)
                     ? $categorias
                     : array_filter(explode(',', $categorias));
 
-                if (!empty($categoriaIds)) {
+                if (! empty($categoriaIds)) {
                     $query->whereIn('categoria_id', $categoriaIds);
                 }
             }
 
             // Filtro opcional por tipos de evento (puede venir como array o CSV)
             $tipos = $request->input('tipos');
-            if (!empty($tipos)) {
+            if (! empty($tipos)) {
                 $tiposArray = is_array($tipos)
                     ? $tipos
                     : array_filter(explode(',', $tipos));
 
-                if (!empty($tiposArray)) {
+                if (! empty($tiposArray)) {
                     $query->whereIn('tipo', $tiposArray);
                 }
             }
@@ -713,8 +715,8 @@ class ClientDashboardController extends Controller
             // Agrupar por ubicación para obtener el recuento
             $eventosPorUbicacion = $query
                 ->select(
-                    DB::raw('ROUND(latitud, 4) as lat'),  
-                    DB::raw('ROUND(longitud, 4) as lng'), 
+                    DB::raw('ROUND(latitud, 4) as lat'),
+                    DB::raw('ROUND(longitud, 4) as lng'),
                     DB::raw('COUNT(*) as count')
                 )
                 ->groupBy(DB::raw('ROUND(latitud, 4)'), DB::raw('ROUND(longitud, 4)')) // <-- Cambiado
@@ -724,7 +726,7 @@ class ClientDashboardController extends Controller
                     return [
                         'lat' => (float) $item->lat,
                         'lng' => (float) $item->lng,
-                        'count' => $item->count
+                        'count' => $item->count,
                     ];
                 });
 
@@ -736,13 +738,13 @@ class ClientDashboardController extends Controller
             \Log::error('Error en API Mapa Calor:', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]);
-            
+
             return response()->json([
                 'error' => true,
                 'message' => 'Error interno del servidor',
-                'debug' => config('app.debug') ? $e->getMessage() : null
+                'debug' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -754,7 +756,7 @@ class ClientDashboardController extends Controller
     {
         try {
             $clienteIds = $this->getClienteIds();
-            
+
             if ($clienteIds->isEmpty()) {
                 return response()->json([]);
             }
@@ -762,7 +764,7 @@ class ClientDashboardController extends Controller
             $lat = $request->input('lat');
             $lng = $request->input('lng');
 
-            if (!$lat || !$lng) {
+            if (! $lat || ! $lng) {
                 return response()->json(['error' => 'Coordenadas requeridas'], 400);
             }
 
@@ -782,25 +784,25 @@ class ClientDashboardController extends Controller
             }
 
             $empresas = $request->input('empresa_asociada_id');
-            if (!empty($empresas)) {
+            if (! empty($empresas)) {
                 $empresaIds = is_array($empresas) ? $empresas : array_filter(explode(',', $empresas));
-                if (!empty($empresaIds)) {
+                if (! empty($empresaIds)) {
                     $query->whereIn('empresa_asociada_id', $empresaIds);
                 }
             }
 
             $categorias = $request->input('categorias');
-            if (!empty($categorias)) {
+            if (! empty($categorias)) {
                 $categoriaIds = is_array($categorias) ? $categorias : array_filter(explode(',', $categorias));
-                if (!empty($categoriaIds)) {
+                if (! empty($categoriaIds)) {
                     $query->whereIn('categoria_id', $categoriaIds);
                 }
             }
 
             $tipos = $request->input('tipos');
-            if (!empty($tipos)) {
+            if (! empty($tipos)) {
                 $tiposArray = is_array($tipos) ? $tipos : array_filter(explode(',', $tipos));
-                if (!empty($tiposArray)) {
+                if (! empty($tiposArray)) {
                     $query->whereIn('tipo', $tiposArray);
                 }
             }
@@ -821,19 +823,19 @@ class ClientDashboardController extends Controller
                 'lat' => (float) $lat,
                 'lng' => (float) $lng,
                 'count' => $eventos->count(),
-                'eventos' => $eventos
+                'eventos' => $eventos,
             ]);
 
         } catch (\Exception $e) {
             \Log::error('Error en getEventosPorUbicacion:', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]);
-            
+
             return response()->json([
                 'error' => true,
-                'message' => 'Error interno del servidor'
+                'message' => 'Error interno del servidor',
             ], 500);
         }
     }
@@ -852,15 +854,15 @@ class ClientDashboardController extends Controller
         // Obtener información del cliente principal
         $user = Auth::user();
         $clientePrincipal = $user->clientes()->first();
-        
+
         // Obtener logo del cliente y convertir a base64 para el PDF
         $logoBase64 = null;
         if ($clientePrincipal && $clientePrincipal->logo) {
-            $logoPath = storage_path('app/public/' . $clientePrincipal->logo);
+            $logoPath = storage_path('app/public/'.$clientePrincipal->logo);
             if (file_exists($logoPath)) {
                 $logoData = file_get_contents($logoPath);
                 $logoMime = mime_content_type($logoPath);
-                $logoBase64 = 'data:' . $logoMime . ';base64,' . base64_encode($logoData);
+                $logoBase64 = 'data:'.$logoMime.';base64,'.base64_encode($logoData);
             }
         }
 
@@ -907,18 +909,18 @@ class ClientDashboardController extends Controller
             ->get();
 
         $categorias = Categoria::whereIn('id', $eventosPorCategoria->pluck('categoria_id'))->get()->keyBy('id');
-        
+
         $chartDataCategorias = [];
         foreach ($eventosPorCategoria as $item) {
             $categoria = $categorias->get($item->categoria_id);
             if ($categoria) {
                 $chartDataCategorias[] = [
                     'nombre' => $categoria->nombre,
-                    'total' => $item->total
+                    'total' => $item->total,
                 ];
             }
         }
-        usort($chartDataCategorias, function($a, $b) {
+        usort($chartDataCategorias, function ($a, $b) {
             return $b['total'] - $a['total'];
         });
 
@@ -936,19 +938,19 @@ class ClientDashboardController extends Controller
 
         $mesesCortos = [
             1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun',
-            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+            7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic',
         ];
 
         $datosMensuales = [];
         foreach ($eventosMensuales as $evento) {
             $datosMensuales[] = [
-                'mes' => $mesesCortos[$evento->mes] . ' ' . $evento->año,
-                'total' => $evento->total
+                'mes' => $mesesCortos[$evento->mes].' '.$evento->año,
+                'total' => $evento->total,
             ];
         }
 
         // Promedio mensual
-        $promedioMensual = count($datosMensuales) > 0 
+        $promedioMensual = count($datosMensuales) > 0
             ? round(array_sum(array_column($datosMensuales, 'total')) / count($datosMensuales))
             : 0;
 
@@ -987,9 +989,8 @@ class ClientDashboardController extends Controller
         $pdf = PDF::loadView('client.dashboard-pdf', $data);
         $pdf->setPaper('A4', 'portrait');
 
-        $filename = 'estadisticas_' . ($empresaAsociadaSeleccionada ? str_replace(' ', '_', $empresaAsociadaSeleccionada->nombre) : 'general') . '_' . date('Y-m-d') . '.pdf';
-        
+        $filename = 'estadisticas_'.($empresaAsociadaSeleccionada ? str_replace(' ', '_', $empresaAsociadaSeleccionada->nombre) : 'general').'_'.date('Y-m-d').'.pdf';
+
         return $pdf->download($filename);
     }
 }
-

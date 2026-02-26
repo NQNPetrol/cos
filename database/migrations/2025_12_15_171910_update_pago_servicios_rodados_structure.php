@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::table('pago_servicios_rodados', function (Blueprint $table) {
             // Drop mes and año columns
             $table->dropColumn(['mes', 'año']);
-            
+
             // Add moneda enum column
             $table->enum('moneda', ['ARS', 'USD'])->default('ARS')->after('monto');
         });

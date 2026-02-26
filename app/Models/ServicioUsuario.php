@@ -27,9 +27,11 @@ class ServicioUsuario extends Model
     ];
 
     const TIPO_FIJO = 'fijo';
+
     const TIPO_VARIABLE = 'variable';
 
     const MONEDA_ARS = 'ARS';
+
     const MONEDA_USD = 'USD';
 
     public function pagos(): HasMany

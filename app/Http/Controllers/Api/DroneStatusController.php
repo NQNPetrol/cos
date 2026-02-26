@@ -2,35 +2,35 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 use App\Models\FlightLog;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DroneStatusController extends Controller
 {
     public function getDroneStatus(Request $request)
     {
         try {
-            
+
             $validator = \Validator::make($request->all(), [
-                'drone_name' => 'required|string|max:255'
+                'drone_name' => 'required|string|max:255',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Validation failed',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
             $droneName = $request->drone_name;
-            
+
             Log::info('Consultando estado del drone', [
                 'drone_name' => $droneName,
-                'client_ip' => $request->ip()
+                'client_ip' => $request->ip(),
             ]);
 
             // Obtener el estado del drone
@@ -38,24 +38,24 @@ class DroneStatusController extends Controller
 
             Log::info('Estado del drone obtenido', [
                 'drone_name' => $droneName,
-                'status' => $droneStatus['status']
+                'status' => $droneStatus['status'],
             ]);
 
             return response()->json([
                 'success' => true,
-                'data' => $droneStatus
+                'data' => $droneStatus,
             ], 200);
 
         } catch (\Exception $e) {
             Log::error('Error obteniendo estado del drone', [
                 'exception' => $e->getMessage(),
                 'drone_name' => $request->drone_name ?? 'unknown',
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Internal server error: ' . $e->getMessage()
+                'message' => 'Internal server error: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -69,7 +69,7 @@ class DroneStatusController extends Controller
             ->first();
 
         // Si no hay flight logs registrados
-        if (!$latestFlight) {
+        if (! $latestFlight) {
             return [
                 'status' => 'unknown',
                 'drone_name' => $droneName,
@@ -92,7 +92,7 @@ class DroneStatusController extends Controller
     {
         return $flightLog->estado === FlightLog::ESTADO_EN_PROCESO &&
                $flightLog->flight_starttime &&
-               !$flightLog->flight_endtime;
+               ! $flightLog->flight_endtime;
     }
 
     private function isDroneIdle(FlightLog $flightLog): bool
@@ -115,7 +115,7 @@ class DroneStatusController extends Controller
             'message' => 'Drone is currently on flight',
             'flight_start_time' => $flightLog->flight_starttime?->toISOString(),
             'current_flight_duration_minutes' => $flightDuration,
-            'battery_level' => $flightLog->drone_battery
+            'battery_level' => $flightLog->drone_battery,
         ];
     }
 
@@ -146,14 +146,13 @@ class DroneStatusController extends Controller
 
     private function estimateLandingTime(FlightLog $flightLog): ?string
     {
-        if (!$flightLog->flight_starttime) {
+        if (! $flightLog->flight_starttime) {
             return null;
         }
 
         // Asumir un vuelo máximo de 30 minutos por seguridad
         $estimatedLanding = $flightLog->flight_starttime->copy()->addMinutes(30);
-        
+
         return $estimatedLanding->toISOString();
     }
-
 }

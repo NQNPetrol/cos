@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Client;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -13,6 +12,7 @@ class UpdateProfileInformationForm extends Component
     use WithFileUploads;
 
     public $photo;
+
     public $state = [];
 
     public function mount()
@@ -33,10 +33,10 @@ class UpdateProfileInformationForm extends Component
             'photo' => ['nullable', 'image', 'max:1024'],
             'state.name' => ['required', 'string', 'max:255'],
             'state.email' => [
-                'required', 
-                'email', 
-                'max:255', 
-                Rule::unique('users', 'email')->ignore($user->id)
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
             ],
         ]);
 
@@ -53,7 +53,7 @@ class UpdateProfileInformationForm extends Component
             $user->forceFill([
                 'email_verified_at' => null,
             ])->save();
-            
+
             $user->sendEmailVerificationNotification();
         }
 

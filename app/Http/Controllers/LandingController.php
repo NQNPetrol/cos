@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactLead;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class LandingController extends Controller
 {
@@ -66,18 +66,18 @@ class LandingController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => '¡Gracias por contactarnos! Nos comunicaremos contigo pronto.'
+                    'message' => '¡Gracias por contactarnos! Nos comunicaremos contigo pronto.',
                 ]);
             }
 
             return back()->with('success', '¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
         } catch (\Exception $e) {
-            Log::error('Error al guardar lead de contacto: ' . $e->getMessage());
+            Log::error('Error al guardar lead de contacto: '.$e->getMessage());
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.'
+                    'message' => 'Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.',
                 ], 500);
             }
 
@@ -92,13 +92,13 @@ class LandingController extends Controller
     {
         try {
             $salesEmail = config('mail.sales_email', 'ventas@cyhsur.com');
-            
+
             Mail::send('emails.contact-lead-notification', ['lead' => $lead], function ($message) use ($lead, $salesEmail) {
                 $message->to($salesEmail)
-                    ->subject('Nuevo Lead de Contacto - ' . $lead->nombre);
+                    ->subject('Nuevo Lead de Contacto - '.$lead->nombre);
             });
         } catch (\Exception $e) {
-            Log::warning('No se pudo enviar email de notificación de lead: ' . $e->getMessage());
+            Log::warning('No se pudo enviar email de notificación de lead: '.$e->getMessage());
         }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class PatrullaDocumental extends Model
 {
@@ -14,7 +14,7 @@ class PatrullaDocumental extends Model
         'nombre',
         'fecha_inicio',
         'fecha_vto',
-        'detalles'
+        'detalles',
     ];
 
     protected $casts = [
@@ -29,28 +29,30 @@ class PatrullaDocumental extends Model
 
     public function getInfoDiasAttribute()
     {
-        if (!$this->fecha_vto) {
+        if (! $this->fecha_vto) {
             return null;
         }
 
         $hoy = Carbon::today();
         $fechaVto = Carbon::parse($this->fecha_vto);
-        
+
         if ($fechaVto->isPast()) {
             $dias = $fechaVto->diffInDays($hoy);
+
             return "(vencido hace {$dias} días)";
         } else {
             $dias = $hoy->diffInDays($fechaVto);
+
             return "({$dias} días restantes)";
         }
     }
 
     public function getEstaVencidoAttribute()
     {
-        if (!$this->fecha_vto) {
+        if (! $this->fecha_vto) {
             return false;
         }
-        
+
         return Carbon::parse($this->fecha_vto)->isPast();
     }
 }

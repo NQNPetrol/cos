@@ -35,8 +35,11 @@ class CambioEquipoRodado extends Model
     ];
 
     const TIPO_CUBIERTAS = 'cubiertas';
+
     const TIPO_ANTENA_STARLINK = 'antena_starlink';
+
     const TIPO_CAMARA_MOBIL = 'camara_mobil';
+
     const TIPO_DVR = 'dvr';
 
     public function rodado(): BelongsTo

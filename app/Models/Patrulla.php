@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Patrulla extends Model
 {
     protected $fillable = ['patente', 'marca', 'modelo', 'color', 'estado', 'observaciones', 'cliente_id', 'año'];
-    
+
     public function dispositivos()
     {
         return $this->belongsToMany(Dispositivo::class)
-                    ->using(DispositivoPatrulla::class)
-                    ->withPivot('fecha_asignacion')
-                    ->withTimestamps();
+            ->using(DispositivoPatrulla::class)
+            ->withPivot('fecha_asignacion')
+            ->withTimestamps();
     }
 
     public function cliente()
@@ -50,24 +50,26 @@ class Patrulla extends Model
     {
         return $this->hasOne(PatrullaRegistroFlota::class)->latestOfMany();
     }
-    
+
     public function getUltimoObjetivoServicioAttribute()
     {
         $ultimoRegistro = $this->registrosFlota()->latest('fecha_registro')->first();
+
         return $ultimoRegistro->objetivo_servicio ?? 'N/A';
     }
 
     public function getUltimaObservacionAttribute()
     {
         $ultimoRegistro = $this->registrosFlota()->latest('fecha_registro')->first();
+
         return $ultimoRegistro->observacion ?? 'N/A';
     }
 
     public function sistemas()
     {
         return $this->belongsToMany(Sistema::class, 'patrulla_sistemas')
-                    ->withPivot('fecha_registro', 'nro_interno', 'registra_user')
-                    ->withTimestamps();
+            ->withPivot('fecha_registro', 'nro_interno', 'registra_user')
+            ->withTimestamps();
     }
 
     public function documentacion()

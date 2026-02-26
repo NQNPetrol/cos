@@ -14,16 +14,27 @@ class Rodado extends Model
 
     // Constantes para marcas
     const MARCA_TOYOTA = 'Toyota';
+
     const MARCA_NISSAN = 'Nissan';
+
     const MARCA_FORD = 'Ford';
+
     const MARCA_VOLKSWAGEN = 'Volkswagen';
+
     const MARCA_CHEVROLET = 'Chevrolet';
+
     const MARCA_RENAULT = 'Renault';
+
     const MARCA_MERCEDES_BENZ = 'Mercedes Benz';
+
     const MARCA_SCANIA = 'Scania';
+
     const MARCA_JMC = 'JMC';
+
     const MARCA_IVECO = 'Iveco';
+
     const MARCA_VOLVO = 'Volvo';
+
     const MARCA_OTRO = 'Otro';
 
     public static function getMarcas(): array
@@ -46,15 +57,25 @@ class Rodado extends Model
 
     // Constantes para tipos de vehículo
     const TIPO_CAMIONETA = 'Camioneta';
+
     const TIPO_CAMIONETA_TODOTERRENO = 'Camioneta todoterreno';
+
     const TIPO_CAMION_REMOLQUE = 'Camion remolque';
+
     const TIPO_AUTO = 'Auto';
+
     const TIPO_MOTO = 'Moto';
+
     const TIPO_CAMION_SEMI_REMOLQUE = 'Camion semi remolque';
+
     const TIPO_CAMION_CARGA = 'Camion carga';
+
     const TIPO_CAMIONETA_TRANSPORTE_PASAJEROS = 'Camioneta de transporte de pasajeros';
+
     const TIPO_CAMIONETA_CARGA_COMERCIAL = 'Camioneta de carga comercial';
+
     const TIPO_CAMIONETA_PLATAFORMA = 'Camioneta de plataforma';
+
     const TIPO_OTRO = 'Otro';
 
     public static function getTiposVehiculo(): array
@@ -99,21 +120,21 @@ class Rodado extends Model
     public function getDisplayNameAttribute(): string
     {
         $parts = [];
-        
+
         if ($this->patente) {
             $parts[] = $this->patente;
         }
-        
+
         if ($this->cliente) {
-            $parts[] = 'Cliente: ' . $this->cliente->nombre;
+            $parts[] = 'Cliente: '.$this->cliente->nombre;
         }
-        
+
         if ($this->proveedor) {
-            $parts[] = 'Proveedor: ' . $this->proveedor->nombre;
+            $parts[] = 'Proveedor: '.$this->proveedor->nombre;
         } else {
             $parts[] = 'Proveedor: -';
         }
-        
+
         return implode(' - ', $parts);
     }
 

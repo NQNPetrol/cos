@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Recorrido;
 use App\Models\SupervisorEmpresaAsociada;
-use App\Models\Personal;
+use Illuminate\Http\Request;
 
 class RecorridosController extends Controller
 {
@@ -17,7 +16,7 @@ class RecorridosController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             abort(403, 'No tiene un cliente asociado.');
         }
 
@@ -81,13 +80,13 @@ class RecorridosController extends Controller
         $cliente = $user->clientes()->first();
         $personal = $user->personal;
 
-        if (!$cliente) {
+        if (! $cliente) {
             return response()->json(['error' => 'No tiene un cliente asociado.'], 403);
         }
 
         // Verify supervisor has this empresa assigned (unless clientadmin)
-        if (!$user->hasRole('clientadmin')) {
-            if (!$personal) {
+        if (! $user->hasRole('clientadmin')) {
+            if (! $personal) {
                 return response()->json(['error' => 'Debe tener un registro de personal asignado.'], 422);
             }
 
@@ -95,7 +94,7 @@ class RecorridosController extends Controller
                 ->where('empresa_asociada_id', $request->empresa_asociada_id)
                 ->exists();
 
-            if (!$tieneEmpresa) {
+            if (! $tieneEmpresa) {
                 return response()->json(['error' => 'No tiene permisos para crear recorridos en este cliente.'], 403);
             }
         }
@@ -118,7 +117,7 @@ class RecorridosController extends Controller
             $data['longitud_mts'] = $parsed['longitud_mts'];
 
             // Store metadata inside waypoints JSON
-            if (!empty($parsed['metadata'])) {
+            if (! empty($parsed['metadata'])) {
                 $data['waypoints'] = [
                     'points' => $parsed['waypoints'],
                     'metadata' => $parsed['metadata'],
@@ -143,7 +142,7 @@ class RecorridosController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente || $recorrido->cliente_id !== $cliente->id) {
+        if (! $cliente || $recorrido->cliente_id !== $cliente->id) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 
@@ -169,7 +168,7 @@ class RecorridosController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente || $recorrido->cliente_id !== $cliente->id) {
+        if (! $cliente || $recorrido->cliente_id !== $cliente->id) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 
@@ -208,7 +207,7 @@ class RecorridosController extends Controller
         $user = auth()->user();
         $cliente = $user->clientes()->first();
 
-        if (!$cliente || $recorrido->cliente_id !== $cliente->id) {
+        if (! $cliente || $recorrido->cliente_id !== $cliente->id) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 

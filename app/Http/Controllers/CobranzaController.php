@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Cobranza;
 use App\Models\Cliente;
-use App\Models\ServicioUsuario;
+use App\Models\Cobranza;
 use App\Models\PagoServiciosRodado;
+use App\Models\ServicioUsuario;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CobranzaController extends Controller
@@ -80,7 +80,9 @@ class CobranzaController extends Controller
 
         foreach ($clienteIds as $cId) {
             $cliente = Cliente::find($cId);
-            if (!$cliente) continue;
+            if (! $cliente) {
+                continue;
+            }
 
             $cobrado = (float) Cobranza::where('cliente_id', $cId)
                 ->where('estado', Cobranza::ESTADO_COBRADO)
@@ -198,7 +200,7 @@ class CobranzaController extends Controller
                 Storage::disk('public')->delete($cobranza->factura_path);
             }
             $cobranza->factura_path = $request->file('factura')
-                ->store('cobranzas/' . $cobranza->cliente_id . '/facturas', 'public');
+                ->store('cobranzas/'.$cobranza->cliente_id.'/facturas', 'public');
         }
 
         if ($request->hasFile('comprobante')) {
@@ -206,7 +208,7 @@ class CobranzaController extends Controller
                 Storage::disk('public')->delete($cobranza->comprobante_path);
             }
             $cobranza->comprobante_path = $request->file('comprobante')
-                ->store('cobranzas/' . $cobranza->cliente_id . '/comprobantes', 'public');
+                ->store('cobranzas/'.$cobranza->cliente_id.'/comprobantes', 'public');
         }
 
         if ($request->filled('fecha_pago')) {

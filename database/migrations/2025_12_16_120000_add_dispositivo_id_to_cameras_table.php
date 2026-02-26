@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::table('cameras', function (Blueprint $table) {
             $table->foreignId('dispositivo_id')
-                  ->nullable()
-                  ->after('encode_dev_index_code')
-                  ->constrained('dispositivos')
-                  ->onDelete('set null');
-            
+                ->nullable()
+                ->after('encode_dev_index_code')
+                ->constrained('dispositivos')
+                ->onDelete('set null');
+
             $table->index('dispositivo_id');
         });
     }
@@ -30,4 +30,3 @@ return new class extends Migration
         //
     }
 };
-

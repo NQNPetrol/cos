@@ -2,18 +2,22 @@
 
 namespace App\Livewire\Rodados;
 
-use App\Models\TurnoRodado;
 use App\Models\CambioEquipoRodado;
 use App\Models\PagoServiciosRodado;
+use App\Models\TurnoRodado;
 use Carbon\Carbon;
 use Livewire\Component;
 
 class CalendarioRodados extends Component
 {
     public $currentDate;
+
     public $viewMode = 'month'; // 'month', 'week', 'day'
+
     public $selectedDate = null;
+
     public $selectedEvent = null;
+
     public $showModal = false;
 
     public function mount()
@@ -107,10 +111,10 @@ class CalendarioRodados extends Component
             }
 
             $events->push([
-                'id' => 'turno_' . $turno->id,
+                'id' => 'turno_'.$turno->id,
                 'tipo' => 'turno',
                 'tipo_servicio' => $turno->tipo,
-                'title' => 'Turno: ' . ($turno->rodado->patente ?? 'Sin patente'),
+                'title' => 'Turno: '.($turno->rodado->patente ?? 'Sin patente'),
                 'date' => Carbon::parse($turno->fecha_hora),
                 'color' => $color,
                 'estado' => $turno->estado,
@@ -126,9 +130,9 @@ class CalendarioRodados extends Component
 
         foreach ($cambiosEquipos as $cambio) {
             $events->push([
-                'id' => 'cambio_' . $cambio->id,
+                'id' => 'cambio_'.$cambio->id,
                 'tipo' => 'cambio_equipo',
-                'title' => 'Cambio Equipo: ' . ($cambio->rodado->patente ?? 'Sin patente'),
+                'title' => 'Cambio Equipo: '.($cambio->rodado->patente ?? 'Sin patente'),
                 'date' => Carbon::parse($cambio->fecha_hora_estimada),
                 'color' => '#10b981', // Verde
                 'rodado' => $cambio->rodado->display_name ?? 'N/A',
@@ -146,13 +150,13 @@ class CalendarioRodados extends Component
         foreach ($pagos as $pago) {
             // Determinar titulo: si tiene servicio mensual usar nombre del servicio, si no usar patente
             if ($pago->servicioUsuario) {
-                $title = 'Pago Pendiente: ' . $pago->servicioUsuario->nombre;
+                $title = 'Pago Pendiente: '.$pago->servicioUsuario->nombre;
             } else {
-                $title = 'Pago Pendiente: ' . ($pago->rodado?->patente ?? ucfirst(str_replace('_', ' ', $pago->tipo)));
+                $title = 'Pago Pendiente: '.($pago->rodado?->patente ?? ucfirst(str_replace('_', ' ', $pago->tipo)));
             }
 
             $events->push([
-                'id' => 'pago_' . $pago->id,
+                'id' => 'pago_'.$pago->id,
                 'tipo' => 'pago',
                 'title' => $title,
                 'date' => Carbon::parse($pago->fecha_vencimiento),
@@ -189,7 +193,7 @@ class CalendarioRodados extends Component
         $days = [];
         $currentDate = Carbon::parse($this->currentDate);
         $startOfWeek = $currentDate->copy()->startOfWeek();
-        
+
         for ($i = 0; $i < 7; $i++) {
             $days[] = $startOfWeek->copy()->addDays($i);
         }
@@ -201,11 +205,13 @@ class CalendarioRodados extends Component
     {
         $dateStr = $date->format('Y-m-d');
         $events = $this->getEvents();
+
         return $events->filter(function ($event) use ($dateStr) {
             $eventDate = $event['date'];
             if ($eventDate instanceof Carbon) {
                 return $eventDate->format('Y-m-d') === $dateStr;
             }
+
             return false;
         });
     }
@@ -215,4 +221,3 @@ class CalendarioRodados extends Component
         return view('livewire.rodados.calendario-rodados');
     }
 }
-

@@ -12,9 +12,13 @@ class Index extends Component
     use WithPagination;
 
     public ?int $userId = null;
+
     public string $search = '';
+
     public string $logType = '';
+
     public string $dateFrom = '';
+
     public string $dateTo = '';
 
     protected $queryString = [
@@ -55,13 +59,13 @@ class Index extends Component
 
         // Always filter by current user for client layout
         $query->where('causer_id', $this->userId)
-              ->where('causer_type', 'App\Models\User');
+            ->where('causer_type', 'App\Models\User');
 
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('description', 'like', '%' . $this->search . '%')
-                  ->orWhere('log_name', 'like', '%' . $this->search . '%');
+                $q->where('description', 'like', '%'.$this->search.'%')
+                    ->orWhere('log_name', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -96,4 +100,3 @@ class Index extends Component
         ])->layout('layouts.cliente');
     }
 }
-

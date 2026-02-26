@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\RegistroKilometraje;
-use App\Models\Rodado;
+use Illuminate\Http\Request;
 
 class RegistroKilometrajeController extends Controller
 {
@@ -24,7 +23,7 @@ class RegistroKilometrajeController extends Controller
 
         if ($ultimoRegistro && $validated['kilometraje'] < $ultimoRegistro->kilometraje) {
             return redirect()->back()
-                ->with('error', 'El kilometraje debe ser mayor al último registro (' . $ultimoRegistro->kilometraje . ' km).');
+                ->with('error', 'El kilometraje debe ser mayor al último registro ('.$ultimoRegistro->kilometraje.' km).');
         }
 
         RegistroKilometraje::create($validated);

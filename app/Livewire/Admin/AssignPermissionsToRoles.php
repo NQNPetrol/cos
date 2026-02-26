@@ -3,14 +3,15 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AssignPermissionsToRoles extends Component
 {
-
     public $roles;
+
     public $permissions;
+
     public $selectedPermissions = [];
 
     public $currentRoleId;
@@ -34,9 +35,9 @@ class AssignPermissionsToRoles extends Component
 
         if ($roleId) {
             $role = Role::where('id', $roleId)
-                        ->where('guard_name', 'web')
-                        ->firstOrFail();
-            
+                ->where('guard_name', 'web')
+                ->firstOrFail();
+
             $this->selectedPermissions = $role->permissions()
                 ->where('guard_name', 'web')
                 ->pluck('name')
@@ -47,39 +48,38 @@ class AssignPermissionsToRoles extends Component
 
         $this->successMessage = null;
     }
-    
 
     public function updatePermissions()
     {
         $this->validate([
-            'currentRoleId' => 'required|exists:roles,id'
+            'currentRoleId' => 'required|exists:roles,id',
         ]);
 
-        try{
+        try {
             $role = Role::where('id', $this->currentRoleId)
-                        ->where('guard_name', 'web')
-                        ->firstOrFail();
+                ->where('guard_name', 'web')
+                ->firstOrFail();
 
             $permissionsIds = [];
             foreach ($this->selectedPermissions as $permissionName) {
                 $permission = Permission::where('name', $permissionName)
-                                      ->where('guard_name', 'web')
-                                      ->first();
+                    ->where('guard_name', 'web')
+                    ->first();
                 if ($permission) {
                     $permissionIds[] = $permission->id;
                 }
             }
 
-        $role->syncPermissions($permissionIds);
+            $role->syncPermissions($permissionIds);
 
-        $this->successMessage = "Permisos actualizados para el rol: {$role->name}";
+            $this->successMessage = "Permisos actualizados para el rol: {$role->name}";
 
-        // Opcional: recargar datos
-        $this->roles = Role::all();
-        $this->permissions = Permission::all();
+            // Opcional: recargar datos
+            $this->roles = Role::all();
+            $this->permissions = Permission::all();
 
         } catch (\Exception $e) {
-            $this->addError('permissions', 'Error al actualizar permisos: ' . $e->getMessage());
+            $this->addError('permissions', 'Error al actualizar permisos: '.$e->getMessage());
         }
     }
 

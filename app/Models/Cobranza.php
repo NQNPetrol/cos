@@ -38,7 +38,9 @@ class Cobranza extends Model
     ];
 
     const ESTADO_PENDIENTE = 'pendiente';
+
     const ESTADO_COBRADO = 'cobrado';
+
     const ESTADO_VENCIDO = 'vencido';
 
     public function cliente(): BelongsTo

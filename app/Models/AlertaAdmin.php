@@ -49,26 +49,38 @@ class AlertaAdmin extends Model
 
     // Tipos de alerta
     const TIPO_PAGO_SERVICIO = 'pago_servicio';
+
     const TIPO_COBRO_CLIENTE = 'cobro_cliente';
+
     const TIPO_KM_VEHICULO = 'km_vehiculo';
+
     const TIPO_VENCIMIENTO = 'vencimiento';
+
     const TIPO_PERSONALIZADA = 'personalizada';
 
     // Backward compat
     const TIPO_VENCIMIENTO_PAGO = 'vencimiento_pago';
+
     const TIPO_RECORDATORIO_TURNO = 'recordatorio_turno';
+
     const TIPO_AGENDAR_TURNO_KM = 'agendar_turno_km';
 
     const FRECUENCIA_DIARIA = 'diaria';
+
     const FRECUENCIA_SEMANAL = 'semanal';
+
     const FRECUENCIA_MENSUAL = 'mensual';
 
     const ACCION_DASHBOARD = 'dashboard';
+
     const ACCION_NOTIFICACION = 'notificacion';
+
     const ACCION_CORREO = 'correo';
 
     const DESTINATARIO_ADMIN = 'admin';
+
     const DESTINATARIO_CLIENTE = 'cliente';
+
     const DESTINATARIO_AMBOS = 'ambos';
 
     /**
@@ -154,6 +166,7 @@ class AlertaAdmin extends Model
     public function tieneAccion(string $accion): bool
     {
         $acciones = $this->accion_config ?? [];
+
         return in_array($accion, $acciones);
     }
 

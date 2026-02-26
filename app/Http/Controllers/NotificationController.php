@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use App\Models\Notification;
 use App\Models\User;
-use App\Models\Cliente;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class NotificationController extends Controller
@@ -19,16 +19,16 @@ class NotificationController extends Controller
 
         // Obtenemos las notificaciones visibles para el usuario
         $notifications = $this->getUserVisibleNotifications($user)
-            ->with(['users' => function($query) use ($user) {
+            ->with(['users' => function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             }])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
         // Formatear los datos para el frontend
-        $formattedNotifications = $notifications->getCollection()->map(function ($notification) use ($user) {
+        $formattedNotifications = $notifications->getCollection()->map(function ($notification) {
             $pivot = $notification->users->first()?->pivot;
-            
+
             return [
                 'id' => $notification->id,
                 'title' => $notification->title,
@@ -51,19 +51,19 @@ class NotificationController extends Controller
         ]);
     }
 
-    //contador notif sin leer
+    // contador notif sin leer
 
     public function unreadCount(): JsonResponse
     {
         $user = auth()->user();
-        
+
         // Primero obtenemos todas las notificaciones visibles para el usuario
         $visibleNotificationIds = $this->getUserVisibleNotifications($user)->pluck('id');
-        
+
         if ($visibleNotificationIds->isEmpty()) {
             return response()->json(['count' => 0]);
         }
-        
+
         // Contamos las notificaciones visibles que NO están leídas NI descartadas
         $unreadCount = \DB::table('notification_user')
             ->where('user_id', $user->id)
@@ -80,8 +80,8 @@ class NotificationController extends Controller
     public function markAsRead(Notification $notification): JsonResponse
     {
         $user = auth()->user();
-        
-        if (!$notification->isVisibleForUser($user)) {
+
+        if (! $notification->isVisibleForUser($user)) {
             return response()->json(['error' => 'Notificación no encontrada'], 404);
         }
 
@@ -94,8 +94,8 @@ class NotificationController extends Controller
     public function dismiss(Notification $notification): JsonResponse
     {
         $user = auth()->user();
-        
-        if (!$notification->isVisibleForUser($user)) {
+
+        if (! $notification->isVisibleForUser($user)) {
             return response()->json(['error' => 'Notificación no encontrada'], 404);
         }
 
@@ -104,19 +104,19 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    //Marcar TODAS como leida
+    // Marcar TODAS como leida
 
     public function markAllAsRead(): JsonResponse
     {
         try {
             $user = auth()->user();
-            
+
             // Obtener notificaciones visibles
             $visibleNotifications = $this->getUserVisibleNotifications($user)->get();
 
             foreach ($visibleNotifications as $notification) {
                 // Solo marcar como leída si no está descartada
-                if (!$notification->isDismissedByUser($user)) {
+                if (! $notification->isDismissedByUser($user)) {
                     $notification->markAsReadForUser($user);
                 }
             }
@@ -131,9 +131,9 @@ class NotificationController extends Controller
     // vista p administrar notis
     public function admin(Request $request): View
     {
-        
+
         $query = Notification::with(['user', 'cliente']);
-    
+
         if ($request->has('filter_type') && $request->filter_type != '') {
             $query->where('type', $request->filter_type);
         }
@@ -152,7 +152,7 @@ class NotificationController extends Controller
         if ($request->has('filter_date_from') && $request->filter_date_from != '') {
             $query->whereDate('created_at', '>=', $request->filter_date_from);
         }
-        
+
         if ($request->has('filter_date_to') && $request->filter_date_to != '') {
             $query->whereDate('created_at', '<=', $request->filter_date_to);
         }
@@ -164,11 +164,12 @@ class NotificationController extends Controller
         return view('admin.notifications', compact('notifications', 'users', 'clientes'));
     }
 
-    //crear notif nueva
+    // crear notif nueva
     public function create(): View
-    {   
+    {
         $users = User::all();
         $clients = Cliente::all();
+
         return view('admin.nueva-notif', compact('users', 'clients'));
     }
 
@@ -193,19 +194,20 @@ class NotificationController extends Controller
                 ->with('success', 'Notificación creada exitosamente');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al crear la notificación: ' . $e->getMessage())
+                ->with('error', 'Error al crear la notificación: '.$e->getMessage())
                 ->withInput();
         }
     }
+
     public function edit(Notification $notification)
     {
         $users = User::all();
         $clients = Cliente::all();
-        
+
         return view('admin.edit-notif', compact('notification', 'users', 'clients'));
     }
 
-     public function update(Request $request, Notification $notification)
+    public function update(Request $request, Notification $notification)
     {
         try {
             $validated = $request->validate([
@@ -220,13 +222,12 @@ class NotificationController extends Controller
 
             $notification->update($validated);
 
-
             return redirect()->route('notifications.admin')
                 ->with('success', 'Notificación actualizada exitosamente');
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al actualizar la notificación: ' . $e->getMessage())
+                ->with('error', 'Error al actualizar la notificación: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -234,7 +235,7 @@ class NotificationController extends Controller
     public function editData(Notification $notification)
     {
         return response()->json([
-            'notification' => $notification
+            'notification' => $notification,
         ]);
     }
 
@@ -242,15 +243,15 @@ class NotificationController extends Controller
     {
         try {
             $notification = Notification::findOrFail($id);
-            
+
             $request->validate([
-                'activate' => 'required|in:0,1'
+                'activate' => 'required|in:0,1',
             ]);
 
-            $notification->update(['is_active' => (bool)$request->activate]);
+            $notification->update(['is_active' => (bool) $request->activate]);
 
-            $message = $request->activate 
-                ? 'Notificación activada exitosamente' 
+            $message = $request->activate
+                ? 'Notificación activada exitosamente'
                 : 'Notificación desactivada exitosamente';
 
             return redirect()->route('notifications.admin')
@@ -258,7 +259,7 @@ class NotificationController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al actualizar la notificación: ' . $e->getMessage());
+                ->with('error', 'Error al actualizar la notificación: '.$e->getMessage());
         }
     }
 
@@ -269,11 +270,11 @@ class NotificationController extends Controller
             $notification->delete();
 
             return redirect()->route('notifications.admin')
-                    ->with('success', 'Notificación eliminada correctamente.');
-            } catch (\Exception $e) {
-                return redirect()->back()
-                ->with('error', 'Error al eliminar la notificación: ' . $e->getMessage());
-            }
+                ->with('success', 'Notificación eliminada correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al eliminar la notificación: '.$e->getMessage());
+        }
     }
 
     /**
@@ -282,7 +283,7 @@ class NotificationController extends Controller
     public static function createFromAlert(\App\Models\AlertaAdmin $alerta): Notification
     {
         return Notification::create([
-            'title' => 'Alerta: ' . $alerta->titulo,
+            'title' => 'Alerta: '.$alerta->titulo,
             'message' => $alerta->descripcion ?? $alerta->titulo,
             'type' => 'global',
             'priority' => 'NORMAL',
@@ -291,7 +292,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    //obtener notificaciones visibles p un usuario
+    // obtener notificaciones visibles p un usuario
     private function getUserVisibleNotifications(User $user)
     {
         $userClientIds = $user->clientes()->pluck('cliente_id')->toArray();
@@ -299,15 +300,15 @@ class NotificationController extends Controller
         return Notification::active()
             ->where(function ($query) use ($user, $userClientIds) {
                 $query->global()
-                      ->orWhere(function ($q) use ($user) {
-                          $q->forUser($user->id);
-                      })
-                      ->orWhere(function ($q) use ($userClientIds) {
-                          if (!empty($userClientIds)) {
-                              $q->where('type', 'client')
+                    ->orWhere(function ($q) use ($user) {
+                        $q->forUser($user->id);
+                    })
+                    ->orWhere(function ($q) use ($userClientIds) {
+                        if (! empty($userClientIds)) {
+                            $q->where('type', 'client')
                                 ->whereIn('client_id', $userClientIds);
-                          }
-                      });
+                        }
+                    });
             });
     }
 }

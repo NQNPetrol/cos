@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class StreamUrl extends Model
 {
@@ -17,12 +17,12 @@ class StreamUrl extends Model
         'authentication',
         'protocol',
         'stream_type',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'last_updated' => 'datetime'
+        'last_updated' => 'datetime',
     ];
 
     public function camera()

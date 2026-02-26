@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\FlytbaseDock;
 use App\Models\FlytbaseSite;
-
+use Illuminate\Http\Request;
 
 class FlytbaseDockController extends Controller
 {
@@ -22,7 +21,6 @@ class FlytbaseDockController extends Controller
         return view('docks-flytbase.index', compact('docks', 'sites'));
     }
 
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -32,7 +30,7 @@ class FlytbaseDockController extends Controller
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
             'altitude' => 'nullable|numeric|min:0',
-            'active' => 'boolean'
+            'active' => 'boolean',
         ]);
 
         try {
@@ -43,8 +41,8 @@ class FlytbaseDockController extends Controller
                 'latitud' => $request->latitud,
                 'longitud' => $request->longitud,
                 'altitude' => $request->altitude,
-                'active' => $request->active ?? true
-    
+                'active' => $request->active ?? true,
+
             ]);
 
             return redirect()->route('docks-flytbase.index')
@@ -52,7 +50,7 @@ class FlytbaseDockController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al crear el dock: ' . $e->getMessage());
+                ->with('error', 'Error al crear el dock: '.$e->getMessage());
         }
     }
 
@@ -62,14 +60,14 @@ class FlytbaseDockController extends Controller
     public function update(Request $request, FlytbaseDock $flytbase_dock)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:flytbase_docks,nombre,' . $flytbase_dock->id,
+            'nombre' => 'required|string|max:255|unique:flytbase_docks,nombre,'.$flytbase_dock->id,
             'descripcion' => 'nullable|string',
             'flytbase_site_id' => 'required|exists:flytbase_sites,id',
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
             'altitude' => 'nullable|numeric|min:0',
-            'active' => 'boolean'
-      
+            'active' => 'boolean',
+
         ]);
 
         try {
@@ -80,8 +78,8 @@ class FlytbaseDockController extends Controller
                 'latitud' => $request->latitud,
                 'longitud' => $request->longitud,
                 'altitude' => $request->altitude,
-                'active' => $request->active ?? true
- 
+                'active' => $request->active ?? true,
+
             ]);
 
             return redirect()->route('docks-flytbase.index')
@@ -89,27 +87,25 @@ class FlytbaseDockController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error al actualizar el dock: ' . $e->getMessage());
+                ->with('error', 'Error al actualizar el dock: '.$e->getMessage());
         }
     }
 
     public function destroy(FlytbaseDock $flytbase_dock)
     {
-        
+
         try {
             if ($flytbase_dock->misiones()->exists()) {
                 return redirect()->back()->with('error', 'No se puede eliminar el dock porque tiene misiones asociadas.');
             }
-            
 
             $flytbase_dock->delete();
 
             return redirect()->route('docks-flytbase.index')
                 ->with('success', 'Dock eliminado exitosamente.');
-                
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al eliminar el dock: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al eliminar el dock: '.$e->getMessage());
         }
     }
-
 }

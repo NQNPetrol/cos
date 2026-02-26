@@ -5,22 +5,25 @@ namespace App\Livewire\Objetivos;
 use App\Models\ObjetivoAipem;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
 
 class ManageObjetivosAipem extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $pcia = '';
+
     public $nombre = '';
+
     public $localidad = '';
+
     public $showModal = false;
 
     protected $queryString = [
         'search' => ['except' => '', 'as' => 'q'],
         'pcia' => ['except' => ''],
-        'localidad' => ['except' => '']
+        'localidad' => ['except' => ''],
     ];
 
     public function openModal()
@@ -38,9 +41,9 @@ class ManageObjetivosAipem extends Component
     public function resetFilters()
     {
         $this->reset([
-        'search',
-        'pcia',
-        'localidad',
+            'search',
+            'pcia',
+            'localidad',
         ]);
 
         $this->resetPage();
@@ -74,14 +77,14 @@ class ManageObjetivosAipem extends Component
         $objetivos = ObjetivoAipem::query()
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('nombre', 'like', '%' . $this->search . '%')
-                      ->orWhere('localidad', 'like', '%' . $this->search . '%')
-                      ->orWhere('codobj', 'like', '%' . $this->search . '%')
-                      ->orWhere('codcli', 'like', '%' . $this->search . '%')
-                      ->orWhere('codsuc', 'like', '%' . $this->search . '%')
-                      ->orWhere('codsup', 'like', '%' . $this->search . '%')
-                      ->orWhere('codpostal', 'like', '%' . $this->search . '%')
-                      ->orWhere('pcia', 'like', '%' . $this->search . '%');
+                    $q->where('nombre', 'like', '%'.$this->search.'%')
+                        ->orWhere('localidad', 'like', '%'.$this->search.'%')
+                        ->orWhere('codobj', 'like', '%'.$this->search.'%')
+                        ->orWhere('codcli', 'like', '%'.$this->search.'%')
+                        ->orWhere('codsuc', 'like', '%'.$this->search.'%')
+                        ->orWhere('codsup', 'like', '%'.$this->search.'%')
+                        ->orWhere('codpostal', 'like', '%'.$this->search.'%')
+                        ->orWhere('pcia', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->pcia, function ($query) {

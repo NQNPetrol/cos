@@ -43,7 +43,7 @@ class AnprPassingRecord extends Model
     public static function boot()
     {
         parent::boot();
-        
+
         // Opcionalmente agregar índice único en la migración
     }
 }

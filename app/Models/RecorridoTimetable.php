@@ -54,12 +54,13 @@ class RecorridoTimetable extends Model
      */
     public function calcularDuracionEstimada(): ?int
     {
-        if (!$this->velocidad || !$this->recorrido || !$this->recorrido->longitud_mts) {
+        if (! $this->velocidad || ! $this->recorrido || ! $this->recorrido->longitud_mts) {
             return null;
         }
 
         $distanciaKm = $this->recorrido->longitud_mts / 1000;
         $duracionHoras = $distanciaKm / $this->velocidad;
+
         return (int) round($duracionHoras * 60);
     }
 }

@@ -11,14 +11,14 @@ class DispositivoPatrulla extends Pivot
     protected $fillable = [
         'patrulla_id',
         'dispositivo_id',
-        'fecha_asignacion'
+        'fecha_asignacion',
     ];
 
     protected $casts = [
-        'fecha_asignacion' => 'date'
+        'fecha_asignacion' => 'date',
     ];
 
-    //Relaciones
+    // Relaciones
     public function patrulla()
     {
         return $this->belongsTo(Patrulla::class);
@@ -28,5 +28,4 @@ class DispositivoPatrulla extends Pivot
     {
         return $this->belongsTo(Dispositivo::class);
     }
-
 }

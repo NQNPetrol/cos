@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Rodado;
+use App\Models\CambioEquipoRodado;
 use App\Models\Cliente;
+use App\Models\PagoServiciosRodado;
+use App\Models\Patrulla;
 use App\Models\Proveedor;
+use App\Models\Rodado;
 use App\Models\Taller;
 use App\Models\TurnoRodado;
-use App\Models\CambioEquipoRodado;
-use App\Models\PagoServiciosRodado;
-use App\Models\RegistroKilometraje;
-use App\Models\Patrulla;
-use App\Models\ChecklistPatrulla;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class RodadoController extends Controller
@@ -28,7 +26,7 @@ class RodadoController extends Controller
         if ($request->filled('propiedad')) {
             if ($request->propiedad === 'propio') {
                 $query->where('es_propio', true)
-                      ->whereNull('proveedor_id');
+                    ->whereNull('proveedor_id');
             } elseif ($request->propiedad !== 'todos') {
                 // Filtrar por proveedor específico
                 $query->where('proveedor_id', $request->propiedad);
@@ -40,7 +38,7 @@ class RodadoController extends Controller
         $clientes = Cliente::orderBy('nombre')->get();
         $proveedores = Proveedor::orderBy('nombre')->get();
         $talleres = Taller::orderBy('nombre')->get();
-        
+
         // Dispositivos para el modal de cambio de equipo (camara_ip, nvr_dvr, antena_starlink)
         $dispositivos = \App\Models\Dispositivo::whereIn('tipo', ['camara_ip', 'nvr_dvr', 'antena_starlink'])
             ->where('estado_inventario', 'En stock')
@@ -58,7 +56,7 @@ class RodadoController extends Controller
 
         // Combinar turnos y cambios de equipos para la vista de servicios
         $todosLosServicios = collect();
-        
+
         // Agregar turnos
         foreach ($turnos as $turno) {
             $todosLosServicios->push([
@@ -74,7 +72,7 @@ class RodadoController extends Controller
                 'model' => $turno,
             ]);
         }
-        
+
         // Agregar cambios de equipos como si fueran turnos de tipo cambio_equipo
         foreach ($cambiosEquipos as $cambio) {
             $todosLosServicios->push([
@@ -90,9 +88,9 @@ class RodadoController extends Controller
                 'model' => $cambio,
             ]);
         }
-        
+
         // Ordenar por fecha (más reciente primero)
-        $todosLosServicios = $todosLosServicios->sortByDesc(function($item) {
+        $todosLosServicios = $todosLosServicios->sortByDesc(function ($item) {
             return $item['fecha_hora'];
         })->values();
 
@@ -103,7 +101,7 @@ class RodadoController extends Controller
         // Cross-reference patrullas with rodados to get auxilios data
         $auxiliosMap = [];
         $rodadoPatentes = $rodados->pluck('patente')->filter()->toArray();
-        if (!empty($rodadoPatentes)) {
+        if (! empty($rodadoPatentes)) {
             $patrullasConChecklist = Patrulla::whereIn('patente', $rodadoPatentes)
                 ->with('ultimoChecklist')
                 ->get();
@@ -138,7 +136,7 @@ class RodadoController extends Controller
             'marca' => 'required|string|max:255',
             'tipo_vehiculo' => 'required|string|max:255',
             'modelo' => 'required|string|max:255',
-            'año' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'año' => 'required|integer|min:1900|max:'.(date('Y') + 1),
             'proveedor_id' => 'nullable|exists:proveedores,id',
             'cliente_id' => 'required|exists:clientes,id',
             'es_propio' => 'nullable|boolean',
@@ -150,7 +148,7 @@ class RodadoController extends Controller
         ]);
 
         // Asegurar que es_propio sea boolean
-        $validated['es_propio'] = $request->has('es_propio') ? (bool)$request->es_propio : true;
+        $validated['es_propio'] = $request->has('es_propio') ? (bool) $request->es_propio : true;
 
         // Remove image files from validated (handled separately)
         unset($validated['imagen_frente'], $validated['imagen_costado_izq'], $validated['imagen_costado_der'], $validated['imagen_dorso']);
@@ -170,10 +168,10 @@ class RodadoController extends Controller
     public function update(Request $request, Rodado $rodado)
     {
         $validated = $request->validate([
-            'marca' => ['required', 'string', 'in:' . implode(',', Rodado::getMarcas())],
-            'tipo_vehiculo' => ['required', 'string', 'in:' . implode(',', Rodado::getTiposVehiculo())],
+            'marca' => ['required', 'string', 'in:'.implode(',', Rodado::getMarcas())],
+            'tipo_vehiculo' => ['required', 'string', 'in:'.implode(',', Rodado::getTiposVehiculo())],
             'modelo' => 'required|string|max:255',
-            'año' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'año' => 'required|integer|min:1900|max:'.(date('Y') + 1),
             'proveedor_id' => 'nullable|exists:proveedores,id',
             'cliente_id' => 'required|exists:clientes,id',
             'es_propio' => 'nullable|boolean',
@@ -185,7 +183,7 @@ class RodadoController extends Controller
         ]);
 
         // Asegurar que es_propio sea boolean
-        $validated['es_propio'] = $request->has('es_propio') ? (bool)$request->es_propio : false;
+        $validated['es_propio'] = $request->has('es_propio') ? (bool) $request->es_propio : false;
 
         // Remove image files from validated
         unset($validated['imagen_frente'], $validated['imagen_costado_izq'], $validated['imagen_costado_der'], $validated['imagen_dorso']);

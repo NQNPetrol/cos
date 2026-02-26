@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Seguimientos;
 
+use App\Models\Evento;
+use App\Models\Seguimiento;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Seguimiento;
-use App\Models\Evento;
-use Illuminate\Support\Facades\Auth;
 
 class VerSeguimientosCliente extends Component
 {
@@ -14,13 +14,18 @@ class VerSeguimientosCliente extends Component
 
     // Propiedades para filtros
     public $search = '';
+
     public $estadoFilter = '';
+
     public $eventoFilter = '';
+
     public $tipoFilter = '';
+
     public $eventosDisponibles = [];
-    
+
     // Propiedades para ordenar
     public $sortField = 'fecha';
+
     public $sortDirection = 'desc';
 
     /**
@@ -29,8 +34,8 @@ class VerSeguimientosCliente extends Component
     private function getClienteIds()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
 
@@ -40,7 +45,7 @@ class VerSeguimientosCliente extends Component
     public function mount()
     {
         $clienteIds = $this->getClienteIds();
-        
+
         // Solo eventos de los clientes asignados al usuario
         $this->eventosDisponibles = Evento::whereIn('cliente_id', $clienteIds)
             ->with(['cliente', 'categoria'])
@@ -59,7 +64,7 @@ class VerSeguimientosCliente extends Component
         } else {
             $this->sortDirection = 'asc';
         }
-        
+
         $this->sortField = $field;
     }
 
@@ -82,32 +87,32 @@ class VerSeguimientosCliente extends Component
     public function render()
     {
         $clienteIds = $this->getClienteIds();
-        
+
         $query = Seguimiento::with(['evento', 'user'])
-            ->whereHas('evento', function($q) use ($clienteIds) {
+            ->whereHas('evento', function ($q) use ($clienteIds) {
                 $q->whereIn('cliente_id', $clienteIds);
             })
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     if (preg_match('/#(\d+)/', $this->search, $matches)) {
-                        $q->whereHas('evento', function($subQuery) use ($matches) {
+                        $q->whereHas('evento', function ($subQuery) use ($matches) {
                             $subQuery->where('id', $matches[1]);
                         });
                     }
                     // Buscar en detalles o tipo
                     $q->orWhere('observaciones', 'like', '%'.$this->search.'%')
-                      ->orWhere('estado', 'like', '%'.$this->search.'%')
-                      ->orWhere('id', 'like', '%'.$this->search.'%')
-                      ->orWhereHas('evento', function($subQuery) {
-                          $subQuery->where('tipo', 'like', '%'.$this->search.'%');
-                      });
+                        ->orWhere('estado', 'like', '%'.$this->search.'%')
+                        ->orWhere('id', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('evento', function ($subQuery) {
+                            $subQuery->where('tipo', 'like', '%'.$this->search.'%');
+                        });
                 });
             })
-            ->when($this->estadoFilter, function($query) {
+            ->when($this->estadoFilter, function ($query) {
                 $query->where('estado', $this->estadoFilter);
             })
-            ->when($this->tipoFilter, function($query) {
-                $query->whereHas('evento', function($subQuery) {
+            ->when($this->tipoFilter, function ($query) {
+                $query->whereHas('evento', function ($subQuery) {
                     $subQuery->where('tipo', 'like', '%'.$this->tipoFilter.'%');
                 });
             })
@@ -115,7 +120,7 @@ class VerSeguimientosCliente extends Component
 
         return view('livewire.seguimientos.ver-seguimientos-cliente', [
             'seguimientos' => $query->paginate(10),
-            'header' => 'Listado de Seguimientos'
+            'header' => 'Listado de Seguimientos',
         ]);
     }
 }

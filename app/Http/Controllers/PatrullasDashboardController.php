@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\EmpresaAsociada;
 use App\Models\Patrulla;
 use App\Models\PatrullaDocumental;
 use App\Models\Recorrido;
 use App\Models\RecorridoTimetable;
-use App\Models\SupervisorPatrulla;
-use App\Models\EmpresaAsociada;
-use App\Models\Personal;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PatrullasDashboardController extends Controller
 {
     private function getClienteIds()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return collect();
         }
+
         return $user->clientes()->pluck('clientes.id');
     }
 
@@ -63,10 +62,10 @@ class PatrullasDashboardController extends Controller
         foreach ($patrullasPorEstado as $item) {
             $chartDataPatrullasEstado[] = [
                 'nombre' => ucfirst($item->estado ?? 'Sin estado'),
-                'total' => $item->total
+                'total' => $item->total,
             ];
         }
-        usort($chartDataPatrullasEstado, fn($a, $b) => $b['total'] - $a['total']);
+        usort($chartDataPatrullasEstado, fn ($a, $b) => $b['total'] - $a['total']);
 
         $patrullasConGPS = Patrulla::whereIn('cliente_id', $clienteIds)
             ->whereHas('mobileVehicle')
@@ -109,10 +108,18 @@ class PatrullasDashboardController extends Controller
         $documentosVigentes = $totalDocumentos - $documentosVencidos - $documentosPorVencer30Dias;
 
         $chartDataDocumentos = [];
-        if ($documentosVencidos > 0) $chartDataDocumentos[] = ['nombre' => 'Vencidos', 'total' => $documentosVencidos];
-        if ($documentosPorVencer7Dias > 0) $chartDataDocumentos[] = ['nombre' => 'Vence en 7 días', 'total' => $documentosPorVencer7Dias];
-        if (($documentosPorVencer30Dias - $documentosPorVencer7Dias) > 0) $chartDataDocumentos[] = ['nombre' => 'Vence en 30 días', 'total' => $documentosPorVencer30Dias - $documentosPorVencer7Dias];
-        if ($documentosVigentes > 0) $chartDataDocumentos[] = ['nombre' => 'Vigentes', 'total' => $documentosVigentes];
+        if ($documentosVencidos > 0) {
+            $chartDataDocumentos[] = ['nombre' => 'Vencidos', 'total' => $documentosVencidos];
+        }
+        if ($documentosPorVencer7Dias > 0) {
+            $chartDataDocumentos[] = ['nombre' => 'Vence en 7 días', 'total' => $documentosPorVencer7Dias];
+        }
+        if (($documentosPorVencer30Dias - $documentosPorVencer7Dias) > 0) {
+            $chartDataDocumentos[] = ['nombre' => 'Vence en 30 días', 'total' => $documentosPorVencer30Dias - $documentosPorVencer7Dias];
+        }
+        if ($documentosVigentes > 0) {
+            $chartDataDocumentos[] = ['nombre' => 'Vigentes', 'total' => $documentosVigentes];
+        }
 
         $documentosAlerta = PatrullaDocumental::with('patrulla')
             ->whereIn('patrulla_id', $patrullaIds)
@@ -123,20 +130,21 @@ class PatrullasDashboardController extends Controller
             ->map(function ($doc) use ($hoy) {
                 $fechaVto = Carbon::parse($doc->fecha_vto);
                 $diasRestantes = $hoy->diffInDays($fechaVto, false);
+
                 return [
                     'id' => $doc->id,
                     'nombre' => $doc->nombre,
                     'patrulla' => $doc->patrulla->patente ?? 'N/A',
                     'fecha_vto' => $doc->fecha_vto->format('d/m/Y'),
                     'dias_restantes' => $diasRestantes,
-                    'estado' => $diasRestantes < 0 ? 'vencido' : ($diasRestantes <= 7 ? 'critico' : 'alerta')
+                    'estado' => $diasRestantes < 0 ? 'vencido' : ($diasRestantes <= 7 ? 'critico' : 'alerta'),
                 ];
             });
 
         // ========== DATOS PARA FILTROS ==========
         $empresasAsociadas = EmpresaAsociada::whereHas('cliente', function ($q) use ($clienteIds) {
-                $q->whereIn('clientes.id', $clienteIds);
-            })
+            $q->whereIn('clientes.id', $clienteIds);
+        })
             ->orderBy('nombre')
             ->get();
 
@@ -166,7 +174,7 @@ class PatrullasDashboardController extends Controller
         $fechaHasta = $request->input('fecha_hasta');
         $patrullaId = $request->input('patrulla_id');
 
-        if (!$empresaId) {
+        if (! $empresaId) {
             return response()->json(['recorridos' => [], 'legend' => []]);
         }
 
@@ -178,11 +186,14 @@ class PatrullasDashboardController extends Controller
         // Filter to only those with valid waypoints (points array)
         $recorridos = $allRecorridos->filter(function ($rec) {
             $wp = $rec->waypoints;
-            if (!is_array($wp)) return false;
+            if (! is_array($wp)) {
+                return false;
+            }
             // Handle nested structure: {points: [...], metadata: {...}}
             if (isset($wp['points'])) {
                 return is_array($wp['points']) && count($wp['points']) > 0;
             }
+
             // Handle flat array of coordinates
             return count($wp) > 0;
         });
@@ -195,7 +206,7 @@ class PatrullasDashboardController extends Controller
             $query->where('fecha_hora_inicio', '>=', Carbon::now()->startOfMonth());
         }
         if ($fechaHasta) {
-            $query->where('fecha_hora_inicio', '<=', $fechaHasta . ' 23:59:59');
+            $query->where('fecha_hora_inicio', '<=', $fechaHasta.' 23:59:59');
         } else {
             $query->where('fecha_hora_inicio', '<=', Carbon::now()->endOfMonth());
         }
@@ -221,7 +232,7 @@ class PatrullasDashboardController extends Controller
             ->groupBy('recorrido_id', 'patrullas.patente')
             ->get()
             ->groupBy('recorrido_id')
-            ->map(fn($items) => $items->pluck('freq', 'patente')->toArray())
+            ->map(fn ($items) => $items->pluck('freq', 'patente')->toArray())
             ->toArray();
 
         $maxFreq = count($frecuencias) > 0 ? max($frecuencias) : 0;
@@ -257,7 +268,9 @@ class PatrullasDashboardController extends Controller
             for ($i = 0; $i < 5; $i++) {
                 $from = $i * $step;
                 $to = min(($i + 1) * $step - 1, $maxFreq);
-                if ($from > $maxFreq) break;
+                if ($from > $maxFreq) {
+                    break;
+                }
                 $legend[] = ['from' => $from, 'to' => $to];
             }
         }
@@ -279,7 +292,7 @@ class PatrullasDashboardController extends Controller
         $fechaHasta = $request->input('fecha_hasta');
 
         $query = RecorridoTimetable::query()
-            ->whereHas('recorrido', fn($q) => $q->whereIn('cliente_id', $clienteIds));
+            ->whereHas('recorrido', fn ($q) => $q->whereIn('cliente_id', $clienteIds));
 
         if ($fechaDesde) {
             $query->where('fecha_hora_inicio', '>=', $fechaDesde);
@@ -287,7 +300,7 @@ class PatrullasDashboardController extends Controller
             $query->where('fecha_hora_inicio', '>=', Carbon::now()->startOfMonth());
         }
         if ($fechaHasta) {
-            $query->where('fecha_hora_inicio', '<=', $fechaHasta . ' 23:59:59');
+            $query->where('fecha_hora_inicio', '<=', $fechaHasta.' 23:59:59');
         } else {
             $query->where('fecha_hora_inicio', '<=', Carbon::now()->endOfMonth());
         }
@@ -320,9 +333,9 @@ class PatrullasDashboardController extends Controller
         $fechaHasta = $request->input('fecha_hasta', Carbon::now()->endOfMonth()->toDateString());
 
         // Get frequency counts for the period
-        $frecuencias = RecorridoTimetable::whereHas('recorrido', fn($q) => $q->whereIn('cliente_id', $clienteIds))
+        $frecuencias = RecorridoTimetable::whereHas('recorrido', fn ($q) => $q->whereIn('cliente_id', $clienteIds))
             ->where('fecha_hora_inicio', '>=', $fechaDesde)
-            ->where('fecha_hora_inicio', '<=', $fechaHasta . ' 23:59:59')
+            ->where('fecha_hora_inicio', '<=', $fechaHasta.' 23:59:59')
             ->select('recorrido_id', DB::raw('COUNT(*) as freq'))
             ->groupBy('recorrido_id')
             ->get()
@@ -342,8 +355,8 @@ class PatrullasDashboardController extends Controller
         })->sortByDesc('freq')->values();
 
         // Split into most performed (green) and least performed (red)
-        $withFreq = $data->filter(fn($item) => $item['freq'] > 0)->sortByDesc('freq')->values();
-        $withoutFreq = $data->filter(fn($item) => $item['freq'] === 0)->sortBy('nombre')->values();
+        $withFreq = $data->filter(fn ($item) => $item['freq'] > 0)->sortByDesc('freq')->values();
+        $withoutFreq = $data->filter(fn ($item) => $item['freq'] === 0)->sortBy('nombre')->values();
 
         if ($withFreq->count() > 5) {
             // Plenty of data: top 5 vs bottom 5 of those with frequency
@@ -351,7 +364,7 @@ class PatrullasDashboardController extends Controller
             $bottom5 = $withFreq->sortBy('freq')->take(5)->values();
             // Remove overlap
             $topKeys = $top5->pluck('nombre')->toArray();
-            $bottom5 = $bottom5->filter(fn($item) => !in_array($item['nombre'], $topKeys))->values();
+            $bottom5 = $bottom5->filter(fn ($item) => ! in_array($item['nombre'], $topKeys))->values();
             // Add any with zero freq
             $remaining = 5 - $bottom5->count();
             if ($remaining > 0 && $withoutFreq->isNotEmpty()) {
@@ -378,7 +391,7 @@ class PatrullasDashboardController extends Controller
         $inicioMes = Carbon::now()->startOfMonth();
         $finMes = Carbon::now()->endOfMonth();
 
-        $registrosMes = RecorridoTimetable::whereHas('recorrido', fn($q) => $q->whereIn('cliente_id', $clienteIds))
+        $registrosMes = RecorridoTimetable::whereHas('recorrido', fn ($q) => $q->whereIn('cliente_id', $clienteIds))
             ->where('fecha_hora_inicio', '>=', $inicioMes)
             ->where('fecha_hora_inicio', '<=', $finMes)
             ->with(['supervisor', 'patrulla', 'recorrido.empresaAsociada'])
@@ -389,19 +402,19 @@ class PatrullasDashboardController extends Controller
         // Supervisor con más recorridos
         $porSupervisor = $registrosMes->groupBy('supervisor_id');
         if ($porSupervisor->isNotEmpty()) {
-            $maxSup = $porSupervisor->sortByDesc(fn($items) => $items->count())->first();
+            $maxSup = $porSupervisor->sortByDesc(fn ($items) => $items->count())->first();
             if ($maxSup && $maxSup->first()->supervisor) {
                 $sup = $maxSup->first()->supervisor;
                 $empresa = $maxSup->first()->recorrido->empresaAsociada->nombre ?? '';
                 $indicadores[] = [
                     'tipo' => 'success',
                     'icon' => 'trophy',
-                    'texto' => "El supervisor <strong>{$sup->nombre} {$sup->apellido}</strong> realizó la mayor cantidad de recorridos este mes" . ($empresa ? " en <strong>{$empresa}</strong>" : '') . " con <strong>{$maxSup->count()}</strong> recorridos.",
+                    'texto' => "El supervisor <strong>{$sup->nombre} {$sup->apellido}</strong> realizó la mayor cantidad de recorridos este mes".($empresa ? " en <strong>{$empresa}</strong>" : '')." con <strong>{$maxSup->count()}</strong> recorridos.",
                 ];
             }
 
             // Supervisor con menos recorridos
-            $minSup = $porSupervisor->sortBy(fn($items) => $items->count())->first();
+            $minSup = $porSupervisor->sortBy(fn ($items) => $items->count())->first();
             if ($minSup && $minSup->first()->supervisor && $porSupervisor->count() > 1) {
                 $sup = $minSup->first()->supervisor;
                 $indicadores[] = [
@@ -415,7 +428,7 @@ class PatrullasDashboardController extends Controller
         // Patrulla con más recorridos
         $porPatrulla = $registrosMes->groupBy('patrulla_id');
         if ($porPatrulla->isNotEmpty()) {
-            $minPat = $porPatrulla->sortBy(fn($items) => $items->count())->first();
+            $minPat = $porPatrulla->sortBy(fn ($items) => $items->count())->first();
             if ($minPat && $minPat->first()->patrulla) {
                 $pat = $minPat->first()->patrulla;
                 $indicadores[] = [
@@ -430,7 +443,7 @@ class PatrullasDashboardController extends Controller
         $excedidas = $registrosMes->where('velocidad_excedida', true);
         if ($excedidas->isNotEmpty()) {
             $porSupVel = $excedidas->groupBy('supervisor_id');
-            $maxVelSup = $porSupVel->sortByDesc(fn($items) => $items->count())->first();
+            $maxVelSup = $porSupVel->sortByDesc(fn ($items) => $items->count())->first();
             if ($maxVelSup && $maxVelSup->first()->supervisor) {
                 $sup = $maxVelSup->first()->supervisor;
                 $indicadores[] = [
@@ -441,7 +454,7 @@ class PatrullasDashboardController extends Controller
             }
 
             $porPatVel = $excedidas->groupBy('patrulla_id');
-            $maxVelPat = $porPatVel->sortByDesc(fn($items) => $items->count())->first();
+            $maxVelPat = $porPatVel->sortByDesc(fn ($items) => $items->count())->first();
             if ($maxVelPat && $maxVelPat->first()->patrulla) {
                 $pat = $maxVelPat->first()->patrulla;
                 $indicadores[] = [

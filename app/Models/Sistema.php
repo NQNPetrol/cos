@@ -10,13 +10,13 @@ class Sistema extends Model
         'nombre',
         'link',
         'correo_electronico',
-        'telefono'
+        'telefono',
     ];
 
     public function patrullas()
     {
         return $this->belongsToMany(Patrulla::class, 'patrulla_sistemas')
-                    ->withPivot('fecha_registro', 'nro_interno', 'registra_user')
-                    ->withTimestamps();
+            ->withPivot('fecha_registro', 'nro_interno', 'registra_user')
+            ->withTimestamps();
     }
 }

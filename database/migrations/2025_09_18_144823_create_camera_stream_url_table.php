@@ -24,9 +24,9 @@ return new class extends Migration
 
             // Foreign key constraint
             $table->foreign('camera_index_code')
-                  ->references('camera_index_code')
-                  ->on('cameras')
-                  ->onDelete('cascade');
+                ->references('camera_index_code')
+                ->on('cameras')
+                ->onDelete('cascade');
         });
     }
 

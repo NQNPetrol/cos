@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\PagoServiciosRodado;
 use App\Models\Rodado;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PagoServiciosRodadoController extends Controller
@@ -24,7 +24,7 @@ class PagoServiciosRodadoController extends Controller
             'rodado_id' => 'nullable|exists:rodados,id',
             'proveedor_id' => 'nullable|exists:proveedores,id',
             'servicio_usuario_id' => 'nullable|exists:servicios_usuario,id',
-            'tipo' => ['required', 'in:' . implode(',', [
+            'tipo' => ['required', 'in:'.implode(',', [
                 PagoServiciosRodado::TIPO_PAGO_PATENTE,
                 PagoServiciosRodado::TIPO_PAGO_ALQUILER,
                 PagoServiciosRodado::TIPO_PAGO_PROVEEDOR,
@@ -50,10 +50,10 @@ class PagoServiciosRodadoController extends Controller
         $validated = $request->validate($rules);
 
         // Ensure at least one of rodado_id or servicio_usuario_id is provided
-        $hasServicio = !empty($validated['servicio_usuario_id'] ?? null);
-        $hasRodado = !empty($validated['rodado_id'] ?? null);
+        $hasServicio = ! empty($validated['servicio_usuario_id'] ?? null);
+        $hasRodado = ! empty($validated['rodado_id'] ?? null);
 
-        if (!$hasServicio && !$hasRodado) {
+        if (! $hasServicio && ! $hasRodado) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['rodado_id' => 'Seleccione un vehículo o un servicio mensual.']);
@@ -87,14 +87,14 @@ class PagoServiciosRodadoController extends Controller
         if ($request->hasFile('comprobante_pago')) {
             $file = $request->file('comprobante_pago');
             $rodadoId = $validated['rodado_id'] ?? 0;
-            $validated['comprobante_pago_path'] = $file->store('rodados/' . $rodadoId . '/comprobantes', 'public');
+            $validated['comprobante_pago_path'] = $file->store('rodados/'.$rodadoId.'/comprobantes', 'public');
         }
 
         // Adjuntar factura si se envió
         if ($request->hasFile('factura')) {
             $file = $request->file('factura');
             $rodadoId = $validated['rodado_id'] ?? 0;
-            $validated['factura_path'] = $file->store('rodados/' . $rodadoId . '/facturas', 'public');
+            $validated['factura_path'] = $file->store('rodados/'.$rodadoId.'/facturas', 'public');
         }
 
         // Pago por vehículo: si es pago_proveedor y el rodado tiene proveedor, asignar
@@ -119,7 +119,7 @@ class PagoServiciosRodadoController extends Controller
         $validated = $request->validate([
             'rodado_id' => 'required|exists:rodados,id',
             'proveedor_id' => 'nullable|exists:proveedores,id',
-            'tipo' => ['required', 'in:' . implode(',', [
+            'tipo' => ['required', 'in:'.implode(',', [
                 PagoServiciosRodado::TIPO_PAGO_PATENTE,
                 PagoServiciosRodado::TIPO_PAGO_ALQUILER,
                 PagoServiciosRodado::TIPO_PAGO_PROVEEDOR,
@@ -187,7 +187,7 @@ class PagoServiciosRodadoController extends Controller
             }
             $factura = $request->file('factura');
             $rodadoIdForPath = $pago->rodado_id ?? 0;
-            $updateData['factura_path'] = $factura->store('rodados/' . $rodadoIdForPath . '/facturas', 'public');
+            $updateData['factura_path'] = $factura->store('rodados/'.$rodadoIdForPath.'/facturas', 'public');
         }
 
         // Manejar comprobante de pago
@@ -197,7 +197,7 @@ class PagoServiciosRodadoController extends Controller
             }
             $comprobante = $request->file('comprobante_pago');
             $rodadoIdForPath = $pago->rodado_id ?? 0;
-            $updateData['comprobante_pago_path'] = $comprobante->store('rodados/' . $rodadoIdForPath . '/comprobantes', 'public');
+            $updateData['comprobante_pago_path'] = $comprobante->store('rodados/'.$rodadoIdForPath.'/comprobantes', 'public');
 
             // Marcar como pagado y establecer fecha de pago
             $updateData['estado'] = PagoServiciosRodado::ESTADO_PAGADO;
@@ -214,7 +214,7 @@ class PagoServiciosRodadoController extends Controller
             }
         }
 
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             $pago->update($updateData);
         }
 

@@ -27,12 +27,10 @@ class FlytbaseOrg extends Model
         'updated_at',
     ];
 
-
     public function sites(): HasMany
     {
         return $this->hasMany(FlytbaseSite::class, 'organization_id');
     }
-
 
     public function scopeActivas($query)
     {
@@ -41,7 +39,7 @@ class FlytbaseOrg extends Model
 
     public function scopePorNombre($query, $nombre)
     {
-        return $query->where('nombre', 'like', '%' . $nombre . '%');
+        return $query->where('nombre', 'like', '%'.$nombre.'%');
     }
 
     public function getCantidadSitiosActivosAttribute(): int
@@ -78,6 +76,4 @@ class FlytbaseOrg extends Model
     {
         return $this->sites()->exists();
     }
-
-
 }

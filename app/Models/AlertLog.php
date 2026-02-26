@@ -19,14 +19,14 @@ class AlertLog extends Model
         'mensaje_error',
         'payload',
         'respuesta',
-        'mision_id'
+        'mision_id',
     ];
 
     protected $casts = [
         'payload' => 'array',
         'respuesta' => 'array',
         'exito' => 'boolean',
-        'created_at' => 'datetime'
+        'created_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -55,6 +55,7 @@ class AlertLog extends Model
         if ($exitoso !== null) {
             return $query->where('exito', $exitoso);
         }
+
         return $query;
     }
 
@@ -65,7 +66,7 @@ class AlertLog extends Model
 
     public function scopeFechaHasta($query, $fecha)
     {
-        return $fecha ? $query->where('created_at', '<=', $fecha . ' 23:59:59') : $query;
+        return $fecha ? $query->where('created_at', '<=', $fecha.' 23:59:59') : $query;
     }
 
     public function scopePorMisionesUsuario($query, $user)
@@ -76,7 +77,8 @@ class AlertLog extends Model
 
         if ($user->hasRole('cliente')) {
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
-            return $query->whereHas('mision', function($q) use ($userClientes) {
+
+            return $query->whereHas('mision', function ($q) use ($userClientes) {
                 $q->whereIn('cliente_id', $userClientes);
             });
         }

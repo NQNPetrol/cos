@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Permission;
 class ManagePermissions extends Component
 {
     public $name;
+
     public $permissions;
 
     public function mount()
@@ -23,7 +24,7 @@ class ManagePermissions extends Component
     public function createPermission()
     {
         $this->validate([
-            'name' => 'required|unique:permissions,name'
+            'name' => 'required|unique:permissions,name',
         ]);
 
         Permission::create(['name' => $this->name]);

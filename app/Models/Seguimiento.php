@@ -16,14 +16,14 @@ class Seguimiento extends Model
         'user_id'];
 
     protected $casts = [
-        'fecha' => 'datetime'
+        'fecha' => 'datetime',
     ];
 
-    protected $with = ['evento']; 
-    
+    protected $with = ['evento'];
+
     public function evento(): BelongsTo
     {
-       return $this->belongsTo(Evento::class); 
+        return $this->belongsTo(Evento::class);
     }
 
     public function user(): BelongsTo

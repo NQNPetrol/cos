@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Dispositivo extends Model
 {
@@ -33,7 +33,7 @@ class Dispositivo extends Model
         'proximo_mantenimiento',
         'estado_inventario',
     ];
-    
+
     protected $casts = [
         'necesita_actualizacion' => 'boolean',
         'necesita_mantenimiento' => 'boolean',
@@ -60,9 +60,9 @@ class Dispositivo extends Model
     public function patrullas()
     {
         return $this->belongsToMany(Patrulla::class)
-                    ->using(DispositivoPatrulla::class)
-                    ->withPivot('fecha_asignacion')
-                    ->withTimestamps();
+            ->using(DispositivoPatrulla::class)
+            ->withPivot('fecha_asignacion')
+            ->withTimestamps();
     }
 
     public function cambiosEquipos()
@@ -76,7 +76,7 @@ class Dispositivo extends Model
     }
 
     // Scopes
-    
+
     public function scopeInstalados($query)
     {
         return $query->where('estado_inventario', 'Instalado');
@@ -133,7 +133,7 @@ class Dispositivo extends Model
 
     public function getDiasProximoMantenimientoAttribute()
     {
-        if (!$this->proximo_mantenimiento) {
+        if (! $this->proximo_mantenimiento) {
             return null;
         }
 
@@ -147,7 +147,7 @@ class Dispositivo extends Model
 
     public function estaProximoMantenimiento($dias = 30)
     {
-        return $this->proximo_mantenimiento && 
+        return $this->proximo_mantenimiento &&
                Carbon::now()->addDays($dias)->gte($this->proximo_mantenimiento) &&
                Carbon::now()->lte($this->proximo_mantenimiento);
     }
@@ -163,7 +163,7 @@ class Dispositivo extends Model
     public function getCoordenadasAttribute()
     {
         // 1) Si existen columnas numéricas latitud / longitud válidas, usarlas siempre
-        if (!is_null($this->latitud) && !is_null($this->longitud)) {
+        if (! is_null($this->latitud) && ! is_null($this->longitud)) {
             $lat = (float) $this->latitud;
             $lng = (float) $this->longitud;
 
@@ -182,40 +182,40 @@ class Dispositivo extends Model
 
         $value = $rawUbicacion ?: $rawCoordenadas;
 
-        if (!$value) {
+        if (! $value) {
             return null;
         }
-        
+
         // Intentar parsear como JSON primero
         $json = json_decode($value, true);
         if (json_last_error() === JSON_ERROR_NONE && isset($json['lat']) && isset($json['lng'])) {
             $lat = (float) $json['lat'];
             $lng = (float) $json['lng'];
-            
+
             // Validar rango de coordenadas
             if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
                 return [
                     'lat' => $lat,
-                    'lng' => $lng
+                    'lng' => $lng,
                 ];
             }
         }
-        
+
         // Buscar patrón de coordenadas: -XX.XXXX, -XX.XXXX
         $pattern = '/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/';
         if (preg_match($pattern, $value, $matches)) {
             $lat = (float) trim($matches[1]);
             $lng = (float) trim($matches[2]);
-            
+
             // Validar rango de coordenadas
             if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
                 return [
                     'lat' => $lat,
-                    'lng' => $lng
+                    'lng' => $lng,
                 ];
             }
         }
-        
+
         return null;
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -13,7 +12,7 @@ class PermissionObserver
      */
     public function created(Permission $permission): void
     {
-         $adminRole = Role::where('name', 'admin')->first();
+        $adminRole = Role::where('name', 'admin')->first();
 
         if ($adminRole) {
             $adminRole->givePermissionTo($permission);

@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FlytbaseDrone extends Model
 {
@@ -17,11 +17,11 @@ class FlytbaseDrone extends Model
         'drone',
         'share_url',
         'dock_id',
-        'activo'
+        'activo',
     ];
 
     protected $casts = [
-        'activo' => 'boolean'
+        'activo' => 'boolean',
     ];
 
     /**
@@ -36,8 +36,6 @@ class FlytbaseDrone extends Model
     {
         return $this->belongsTo(FlytbaseDock::class, 'dock_id');
     }
-
-  
 
     /**
      * Scope para drones activos

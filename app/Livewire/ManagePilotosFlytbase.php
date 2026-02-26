@@ -2,22 +2,29 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\PilotoFlytbase;
 use App\Models\User;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class ManagePilotosFlytbase extends Component
 {
     use WithPagination;
 
     public $pilotos;
+
     public $users;
+
     public $showModal = false;
+
     public $editing = false;
+
     public $pilotoId = null;
+
     public $nombre = '';
+
     public $token = '';
+
     public $user_id = '';
 
     protected $rules = [
@@ -74,19 +81,19 @@ class ManagePilotosFlytbase extends Component
             $this->closeModal();
             session()->flash('success', 'Piloto creado exitosamente.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al crear el piloto: ' . $e->getMessage());
+            session()->flash('error', 'Error al crear el piloto: '.$e->getMessage());
         }
     }
 
     public function editarPiloto($id)
     {
         $piloto = PilotoFlytbase::findOrFail($id);
-        
+
         $this->pilotoId = $piloto->id;
         $this->nombre = $piloto->nombre;
         $this->token = $piloto->token;
         $this->user_id = $piloto->user_id;
-        
+
         $this->showModal = true;
         $this->editing = true;
     }
@@ -107,7 +114,7 @@ class ManagePilotosFlytbase extends Component
             $this->closeModal();
             session()->flash('success', 'Piloto actualizado exitosamente.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al actualizar el piloto: ' . $e->getMessage());
+            session()->flash('error', 'Error al actualizar el piloto: '.$e->getMessage());
         }
     }
 
@@ -115,10 +122,11 @@ class ManagePilotosFlytbase extends Component
     {
         try {
             $piloto = PilotoFlytbase::findOrFail($id);
-            
+
             // Verificar si tiene asignaciones
             if ($piloto->clientes()->count() > 0) {
                 session()->flash('error', 'No se puede eliminar el piloto porque tiene clientes asignados.');
+
                 return;
             }
 
@@ -126,14 +134,14 @@ class ManagePilotosFlytbase extends Component
             $this->cargarDatos();
             session()->flash('success', 'Piloto eliminado exitosamente.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al eliminar el piloto: ' . $e->getMessage());
+            session()->flash('error', 'Error al eliminar el piloto: '.$e->getMessage());
         }
     }
 
     public function render()
     {
         return view('livewire.manage-pilotos-flytbase', [
-            'pilotosPaginados' => PilotoFlytbase::with('user')->paginate(10)
+            'pilotosPaginados' => PilotoFlytbase::with('user')->paginate(10),
         ]);
     }
 }

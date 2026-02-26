@@ -16,7 +16,7 @@ class EncodingDevice extends Model
 
     protected $casts = [
         'status' => 'integer',
-        'port' => 'integer'
+        'port' => 'integer',
     ];
 
     public function cameras()
@@ -31,7 +31,7 @@ class EncodingDevice extends Model
 
     public function getStatusTextAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             1 => 'Activo',
             2 => 'Inactivo',
             default => 'Desconocido'
@@ -40,6 +40,6 @@ class EncodingDevice extends Model
 
     public function getFullAddressAttribute()
     {
-        return $this->ip . ($this->port ? ':' . $this->port : '');
+        return $this->ip.($this->port ? ':'.$this->port : '');
     }
 }

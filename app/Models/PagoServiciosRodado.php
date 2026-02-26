@@ -37,22 +37,33 @@ class PagoServiciosRodado extends Model
     ];
 
     const TIPO_PAGO_PATENTE = 'pago_patente';
+
     const TIPO_PAGO_ALQUILER = 'pago_alquiler';
+
     const TIPO_PAGO_PROVEEDOR = 'pago_proveedor';
+
     const TIPO_PAGO_A_PROVEEDOR = 'pago_a_proveedor';
+
     const TIPO_PAGO_SEGURO = 'pago_seguro';
+
     const TIPO_PAGO_SERVICIO_STARLINK = 'pago_servicio_starlink';
+
     const TIPO_PAGO_VTV = 'pago_vtv';
+
     const TIPO_PAGOS_ADICIONALES = 'pagos_adicionales';
 
     const MONEDA_ARS = 'ARS';
+
     const MONEDA_USD = 'USD';
 
     const ESTADO_PENDIENTE = 'pendiente';
+
     const ESTADO_PAGADO = 'pagado';
+
     const ESTADO_VENCIDO = 'vencido';
 
     const TIPO_PAGO_SERVICE = 'pago_service';
+
     const TIPO_PAGO_TALLER = 'pago_taller';
 
     public function rodado(): BelongsTo

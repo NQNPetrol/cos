@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Taller;
+use Illuminate\Http\Request;
 
 class TallerController extends Controller
 {

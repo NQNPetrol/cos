@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->enum('status', ['nuevo', 'contactado', 'demo_agendado', 'cerrado'])->default('nuevo');
             $table->timestamps();
-            
+
             // Índices
             $table->index('email');
             $table->index('status');

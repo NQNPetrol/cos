@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Sistema;
+use Illuminate\Database\Seeder;
 
 class SistemasSeeder extends Seeder
 {
@@ -50,6 +49,6 @@ class SistemasSeeder extends Seeder
             Sistema::create($sistema);
         }
 
-        $this->command->info('Se han creado ' . count($sistemas) . ' sistemas correctamente.');
+        $this->command->info('Se han creado '.count($sistemas).' sistemas correctamente.');
     }
 }

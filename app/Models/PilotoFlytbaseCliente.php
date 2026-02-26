@@ -13,7 +13,7 @@ class PilotoFlytbaseCliente extends Model
 
     protected $fillable = [
         'piloto_flytbase_id',
-        'cliente_id'
+        'cliente_id',
     ];
 
     /**

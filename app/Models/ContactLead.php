@@ -50,8 +50,6 @@ class ContactLead extends Model
 
     /**
      * Get the status label.
-     *
-     * @return string
      */
     public function getStatusLabelAttribute(): string
     {

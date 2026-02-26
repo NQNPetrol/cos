@@ -2,24 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camera;
+use App\Models\Cliente;
+use App\Models\EncodingDevice;
+use App\Models\Evento;
+use App\Models\FlightLog;
+use App\Models\FlytbaseDock;
+use App\Models\MobileVehicle;
+use App\Models\Rodado;
+use App\Models\Seguimiento;
+use App\Models\UserCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-use App\Models\Evento;
-use App\Models\Seguimiento;
-use App\Models\EncodingDevice;
-use App\Models\Rodado;
-use App\Models\FlightLog;
-use App\Models\Camera;
-use App\Models\Dispositivo;
-use App\Models\MobileVehicle;
-use App\Models\FlytbaseDock;
-use App\Models\Cliente;
-use App\Models\UserCliente;
-use App\Http\Controllers\MobileVehicleController;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class OperacionesDashboardController extends Controller
@@ -43,10 +39,10 @@ class OperacionesDashboardController extends Controller
         // Permitir aplicar un filtro manual opcional por cliente desde el layout principal
         $clienteId = $this->getClienteFilter($request);
         $eventosIniciales = $this->getEventosIniciales($clienteId);
-        
+
         // Obtener KPIs iniciales (cacheados por contexto de cliente)
         $kpisIniciales = Cache::remember(
-            'operaciones_kpis_' . ($clienteId ?? 'all'),
+            'operaciones_kpis_'.($clienteId ?? 'all'),
             60,
             function () use ($clienteId) {
                 return $this->calculateKPIs($clienteId);
@@ -63,7 +59,7 @@ class OperacionesDashboardController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             abort(403);
         }
 
@@ -72,7 +68,7 @@ class OperacionesDashboardController extends Controller
         // Para el layout de clientes siempre se filtra por el cliente asociado al usuario
         $clienteId = $this->getClienteFilter($request);
 
-        if (!$clienteId) {
+        if (! $clienteId) {
             // Si el usuario no tiene cliente asociado no debe ver este dashboard
             abort(403, 'Usuario cliente sin cliente asociado');
         }
@@ -81,7 +77,7 @@ class OperacionesDashboardController extends Controller
 
         // KPIs cacheados por cliente
         $kpisIniciales = Cache::remember(
-            'operaciones_kpis_' . $clienteId,
+            'operaciones_kpis_'.$clienteId,
             60,
             function () use ($clienteId) {
                 return $this->calculateKPIs($clienteId);
@@ -98,27 +94,27 @@ class OperacionesDashboardController extends Controller
     {
         try {
             $clienteId = $this->getClienteFilter($request);
-            $cacheKey = "operaciones_kpis_" . ($clienteId ?? 'all');
-            
-            $kpis = Cache::remember($cacheKey, 60, function() use ($clienteId) {
+            $cacheKey = 'operaciones_kpis_'.($clienteId ?? 'all');
+
+            $kpis = Cache::remember($cacheKey, 60, function () use ($clienteId) {
                 return $this->calculateKPIs($clienteId);
             });
 
             return response()->json([
                 'success' => true,
                 'data' => $kpis,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo KPIs: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Error obteniendo KPIs: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cargar KPIs',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno'
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno',
             ], 500);
         }
     }
@@ -132,7 +128,7 @@ class OperacionesDashboardController extends Controller
             $validated = $request->validate([
                 'cliente_id' => 'nullable|exists:clientes,id',
                 'estado_evento' => 'nullable|array',
-                'estado_evento.*' => 'in:ABIERTO,EN REVISION,CERRADO'
+                'estado_evento.*' => 'in:ABIERTO,EN REVISION,CERRADO',
             ]);
 
             $clienteId = $this->getClienteFilter($request);
@@ -165,18 +161,18 @@ class OperacionesDashboardController extends Controller
                 'vehiculos' => $vehiculos,
                 'docks' => $docks,
                 'camaras' => $camaras,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo datos del mapa: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Error obteniendo datos del mapa: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cargar datos del mapa',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno'
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno',
             ], 500);
         }
     }
@@ -191,7 +187,7 @@ class OperacionesDashboardController extends Controller
                 'cliente_id' => 'nullable|exists:clientes,id',
                 'estado_evento' => 'nullable|array',
                 'estado_evento.*' => 'in:ABIERTO,EN REVISION,CERRADO',
-                'page' => 'nullable|integer|min:1'
+                'page' => 'nullable|integer|min:1',
             ]);
 
             $clienteId = $this->getClienteFilter($request);
@@ -201,7 +197,7 @@ class OperacionesDashboardController extends Controller
 
             $page = $validated['page'] ?? 1;
             $perPage = 20;
-            
+
             $eventos = $this->getEventosIniciales(
                 $validated['cliente_id'] ?? null,
                 $validated['estado_evento'] ?? [],
@@ -216,20 +212,20 @@ class OperacionesDashboardController extends Controller
                     'current_page' => $eventos->currentPage(),
                     'last_page' => $eventos->lastPage(),
                     'per_page' => $eventos->perPage(),
-                    'total' => $eventos->total()
+                    'total' => $eventos->total(),
                 ],
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo eventos: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Error obteniendo eventos: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cargar eventos',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno'
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno',
             ], 500);
         }
     }
@@ -257,17 +253,17 @@ class OperacionesDashboardController extends Controller
                 'creador:id,name',
             ])
             ->orderBy('eventos.fecha_hora', 'desc');
-        
+
         // Aplicar filtro de cliente
         if ($clienteId) {
             $query->where('eventos.cliente_id', $clienteId);
         }
-        
+
         // Aplicar filtro de estado
-        if (!empty($estadosFiltro)) {
-            $query->where(function($q) use ($estadosFiltro) {
+        if (! empty($estadosFiltro)) {
+            $query->where(function ($q) use ($estadosFiltro) {
                 // Eventos con seguimientos que tienen el estado (último seguimiento)
-                $q->whereExists(function($subquery) use ($estadosFiltro) {
+                $q->whereExists(function ($subquery) use ($estadosFiltro) {
                     $subquery->selectRaw('1')
                         ->from('seguimientos as s1')
                         ->whereColumn('s1.evento_id', 'eventos.id')
@@ -283,20 +279,20 @@ class OperacionesDashboardController extends Controller
                             )
                         )');
                 });
-                
+
                 // Eventos sin seguimientos (se consideran ABIERTO por defecto)
                 if (in_array('ABIERTO', $estadosFiltro)) {
                     $q->orWhereDoesntHave('seguimientos');
                 }
             });
         }
-        
+
         $eventos = $query->paginate($perPage, ['*'], 'page', $page);
-        
+
         // Obtener el último seguimiento para cada evento de forma eficiente
         $eventoIds = $eventos->pluck('id')->toArray();
-        
-        if (!empty($eventoIds)) {
+
+        if (! empty($eventoIds)) {
             // Obtener el último seguimiento por evento usando subconsulta
             $ultimosSeguimientos = Seguimiento::whereIn('evento_id', $eventoIds)
                 ->whereRaw('id = (
@@ -314,9 +310,9 @@ class OperacionesDashboardController extends Controller
         } else {
             $ultimosSeguimientos = collect();
         }
-        
+
         // Transformar eventos con su estado
-        $eventos->getCollection()->transform(function($evento) use ($ultimosSeguimientos) {
+        $eventos->getCollection()->transform(function ($evento) use ($ultimosSeguimientos) {
             $ultimoSeguimiento = $ultimosSeguimientos->get($evento->id);
             $estado = $ultimoSeguimiento ? $ultimoSeguimiento->estado : 'ABIERTO';
 
@@ -328,7 +324,7 @@ class OperacionesDashboardController extends Controller
                         ->translatedFormat('l, d \\d\\e F Y H:i\\h\\s')
                 )
                 : null;
-            
+
             return [
                 'id' => $evento->id,
                 'cliente' => $evento->cliente->nombre ?? 'N/A',
@@ -340,10 +336,10 @@ class OperacionesDashboardController extends Controller
                 'latitud' => $evento->latitud,
                 'longitud' => $evento->longitud,
                 'registrado_por' => $evento->creador->name
-                    ?? ($evento->user_id ? 'Usuario ID ' . $evento->user_id : 'N/A'),
+                    ?? ($evento->user_id ? 'Usuario ID '.$evento->user_id : 'N/A'),
             ];
         });
-        
+
         return $eventos;
     }
 
@@ -356,7 +352,7 @@ class OperacionesDashboardController extends Controller
         $camarasQuery = EncodingDevice::where('status', 1);
         if ($clienteId) {
             // Filtrar por cliente si es necesario (a través de cámaras -> dispositivos)
-            $camarasQuery->whereHas('cameras.dispositivo', function($q) use ($clienteId) {
+            $camarasQuery->whereHas('cameras.dispositivo', function ($q) use ($clienteId) {
                 $q->where('cliente_id', $clienteId);
             });
         }
@@ -423,15 +419,15 @@ class OperacionesDashboardController extends Controller
         $eventosUltimos30 = $eventosQueryUltimos30->count();
         $eventosAnteriores30 = $eventosQueryAnteriores30->count();
 
-        $porcentajeCambio = $eventosAnteriores30 > 0 
+        $porcentajeCambio = $eventosAnteriores30 > 0
             ? round((($eventosUltimos30 - $eventosAnteriores30) / $eventosAnteriores30) * 100, 2)
             : ($eventosUltimos30 > 0 ? 100 : 0);
 
         $tendencia = $porcentajeCambio >= 0 ? 'aumento' : 'disminucion';
 
         // 4. Eventos Abiertos
-        $eventosAbiertosQuery = Evento::where(function($q) {
-            $q->whereExists(function($subquery) {
+        $eventosAbiertosQuery = Evento::where(function ($q) {
+            $q->whereExists(function ($subquery) {
                 $subquery->selectRaw('1')
                     ->from('seguimientos as s1')
                     ->whereColumn('s1.evento_id', 'eventos.id')
@@ -456,7 +452,7 @@ class OperacionesDashboardController extends Controller
         $eventosAbiertos = $eventosAbiertosQuery->count();
 
         // 5. Tiempo Promedio de Cierre
-        $eventosCerradosQuery = Evento::whereHas('seguimientos', function($q) {
+        $eventosCerradosQuery = Evento::whereHas('seguimientos', function ($q) {
             $q->where('estado', 'CERRADO');
         });
 
@@ -466,16 +462,17 @@ class OperacionesDashboardController extends Controller
 
         $eventosCerrados = $eventosCerradosQuery->get();
 
-        $tiemposCierre = $eventosCerrados->map(function($evento) {
+        $tiemposCierre = $eventosCerrados->map(function ($evento) {
             $creacion = $evento->fecha_hora;
             $cierre = $evento->seguimientos()
                 ->where('estado', 'CERRADO')
                 ->latest('fecha')
                 ->first();
-            
+
             if ($cierre && $cierre->fecha) {
                 return $creacion->diffInHours($cierre->fecha);
             }
+
             return null;
         })->filter();
 
@@ -488,10 +485,10 @@ class OperacionesDashboardController extends Controller
         $vuelosIncompletosQuery = FlightLog::whereIn('estado', ['en_proceso', 'interrumpido']);
 
         if ($clienteId) {
-            $vuelosQuery->whereHas('mision', function($q) use ($clienteId) {
+            $vuelosQuery->whereHas('mision', function ($q) use ($clienteId) {
                 $q->where('cliente_id', $clienteId);
             });
-            $vuelosIncompletosQuery->whereHas('mision', function($q) use ($clienteId) {
+            $vuelosIncompletosQuery->whereHas('mision', function ($q) use ($clienteId) {
                 $q->where('cliente_id', $clienteId);
             });
         }
@@ -504,20 +501,20 @@ class OperacionesDashboardController extends Controller
             ->with(['mision.cliente', 'mision.drone']);
 
         if ($clienteId) {
-            $triggersQuery->whereHas('mision', function($q) use ($clienteId) {
+            $triggersQuery->whereHas('mision', function ($q) use ($clienteId) {
                 $q->where('cliente_id', $clienteId);
             });
         }
 
         $triggers = $triggersQuery->get()
-            ->groupBy(function($log) {
+            ->groupBy(function ($log) {
                 return $log->drone_name ?? 'Desconocido';
             })
-            ->map(function($logs, $drone) {
+            ->map(function ($logs, $drone) {
                 return [
                     'drone_name' => $drone,
                     'count' => $logs->count(),
-                    'cliente' => $logs->first()->mision->cliente->nombre ?? 'N/A'
+                    'cliente' => $logs->first()->mision->cliente->nombre ?? 'N/A',
                 ];
             })
             ->values();
@@ -531,20 +528,20 @@ class OperacionesDashboardController extends Controller
                 'tendencia' => $tendencia,
                 'periodo' => '30_dias',
                 'eventos_actuales' => $eventosUltimos30,
-                'eventos_anteriores' => $eventosAnteriores30
+                'eventos_anteriores' => $eventosAnteriores30,
             ],
             'eventos_abiertos' => $eventosAbiertos,
             'tiempo_promedio_cierre' => [
                 'dias' => $dias,
                 'horas' => $horas,
-                'total_horas' => round($promedioHoras, 2)
+                'total_horas' => round($promedioHoras, 2),
             ],
             'vuelos_total' => $vuelosTotal,
             'vuelos_incompletos' => $vuelosIncompletos,
             'triggers_misiones' => [
                 'total' => $triggers->sum('count'),
-                'por_dron' => $triggers->toArray()
-            ]
+                'por_dron' => $triggers->toArray(),
+            ],
         ];
     }
 
@@ -578,18 +575,18 @@ class OperacionesDashboardController extends Controller
                 $query->where('eventos.cliente_id', $filters['cliente_id']);
             }
 
-            if (isset($filters['estado_evento']) && !empty($filters['estado_evento'])) {
-                $query->where(function($q) use ($filters) {
+            if (isset($filters['estado_evento']) && ! empty($filters['estado_evento'])) {
+                $query->where(function ($q) use ($filters) {
                     // Eventos con seguimientos que tienen el estado
-                    $q->whereHas('seguimientos', function($sq) use ($filters) {
+                    $q->whereHas('seguimientos', function ($sq) use ($filters) {
                         $sq->whereIn('estado', $filters['estado_evento'])
-                           ->whereRaw('seguimientos.id = (
+                            ->whereRaw('seguimientos.id = (
                                SELECT MAX(s2.id) 
                                FROM seguimientos s2 
                                WHERE s2.evento_id = seguimientos.evento_id
                            )');
                     });
-                    
+
                     // Eventos sin seguimientos (se consideran ABIERTO por defecto)
                     if (in_array('ABIERTO', $filters['estado_evento'])) {
                         $q->orWhereDoesntHave('seguimientos');
@@ -598,19 +595,19 @@ class OperacionesDashboardController extends Controller
             }
 
             $eventos = $query->get();
-            
+
             // Obtener últimos seguimientos de forma eficiente
             $eventoIds = $eventos->pluck('id')->toArray();
             $ultimosSeguimientos = Seguimiento::whereIn('evento_id', $eventoIds)
                 ->selectRaw('seguimientos.*, 
                     ROW_NUMBER() OVER (PARTITION BY seguimientos.evento_id ORDER BY seguimientos.fecha DESC, seguimientos.id DESC) as rn')
                 ->get()
-                ->filter(function($item) {
+                ->filter(function ($item) {
                     return $item->rn == 1;
                 })
                 ->keyBy('evento_id');
 
-            return $eventos->map(function($evento) use ($ultimosSeguimientos) {
+            return $eventos->map(function ($evento) use ($ultimosSeguimientos) {
                 $ultimoSeguimiento = $ultimosSeguimientos->get($evento->id);
                 $estado = $ultimoSeguimiento ? $ultimoSeguimiento->estado : 'ABIERTO';
 
@@ -634,12 +631,13 @@ class OperacionesDashboardController extends Controller
                     'categoria' => $evento->tipo ?? ($evento->categoria->nombre ?? 'N/A'),
                     'descripcion' => $evento->descripcion ?? '',
                     'registrado_por' => $evento->creador->name
-                        ?? ($evento->user_id ? 'Usuario ID ' . $evento->user_id : 'N/A'),
+                        ?? ($evento->user_id ? 'Usuario ID '.$evento->user_id : 'N/A'),
                 ];
             });
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo eventos para mapa: ' . $e->getMessage());
+            Log::error('Error obteniendo eventos para mapa: '.$e->getMessage());
+
             return collect([]);
         }
     }
@@ -651,15 +649,15 @@ class OperacionesDashboardController extends Controller
     {
         try {
             $vehicleQuery = MobileVehicle::with('patrulla.cliente');
-            
+
             if (isset($filters['cliente_id'])) {
-                $vehicleQuery->whereHas('patrulla', function($q) use ($filters) {
+                $vehicleQuery->whereHas('patrulla', function ($q) use ($filters) {
                     $q->where('cliente_id', $filters['cliente_id']);
                 });
             }
-            
+
             $vehicles = $vehicleQuery->get();
-            
+
             if ($vehicles->isEmpty()) {
                 return [];
             }
@@ -688,7 +686,7 @@ class OperacionesDashboardController extends Controller
                         'direction' => $location['direction'] ?? 0,
                         'occur_time' => $location['occurTime'] ?? 'N/A',
                         'status' => $vehicle->status ?? 0,
-                        'cliente' => $vehicle->patrulla->cliente->nombre ?? 'N/A'
+                        'cliente' => $vehicle->patrulla->cliente->nombre ?? 'N/A',
                     ];
                 }
             }
@@ -696,14 +694,15 @@ class OperacionesDashboardController extends Controller
             return $mapData;
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo vehículos para mapa: ' . $e->getMessage());
+            Log::error('Error obteniendo vehículos para mapa: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Obtener docks para el mapa
-     * 
+     *
      * Filtro por cliente: los docks se filtran a través de la relación con FlytbaseSite
      * - FlytbaseDock.flytbase_site_id -> FlytbaseSite.id
      * - FlytbaseSite.cliente_id -> Cliente.id
@@ -712,24 +711,24 @@ class OperacionesDashboardController extends Controller
     {
         try {
             $query = FlytbaseDock::with([
-                    'site.cliente',
-                    'drones' => function ($q) {
-                        $q->activos();
-                    },
-                ])
+                'site.cliente',
+                'drones' => function ($q) {
+                    $q->activos();
+                },
+            ])
                 ->where('active', true)
                 ->whereNotNull('latitud')
                 ->whereNotNull('longitud');
 
             // Filtrar por cliente a través de la relación site -> cliente_id
             if (isset($filters['cliente_id'])) {
-                $query->whereHas('site', function($q) use ($filters) {
+                $query->whereHas('site', function ($q) use ($filters) {
                     $q->where('cliente_id', $filters['cliente_id']);
                 });
             }
 
             return $query->get()
-                ->map(function($dock) {
+                ->map(function ($dock) {
                     $drone = $dock->drones->first();
 
                     return [
@@ -746,7 +745,8 @@ class OperacionesDashboardController extends Controller
                 });
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo docks para mapa: ' . $e->getMessage());
+            Log::error('Error obteniendo docks para mapa: '.$e->getMessage());
+
             return collect([]);
         }
     }
@@ -759,19 +759,20 @@ class OperacionesDashboardController extends Controller
         try {
             // Verificar si la columna dispositivo_id existe
             $hasDispositivoId = \Schema::hasColumn('cameras', 'dispositivo_id');
-            
-            if (!$hasDispositivoId) {
+
+            if (! $hasDispositivoId) {
                 // Si no existe la columna, retornar vacío (la migración no se ejecutó)
                 Log::warning('La columna dispositivo_id no existe en la tabla cameras. Ejecutar migración.');
+
                 return collect([]);
             }
-            
+
             $query = Camera::with(['dispositivo.cliente'])
                 ->whereNotNull('dispositivo_id')
                 ->whereHas('dispositivo');
 
             if (isset($filters['cliente_id'])) {
-                $query->whereHas('dispositivo', function($q) use ($filters) {
+                $query->whereHas('dispositivo', function ($q) use ($filters) {
                     $q->where('cliente_id', $filters['cliente_id']);
                 });
             }
@@ -783,7 +784,7 @@ class OperacionesDashboardController extends Controller
             ]);
 
             $resultado = $camaras
-                ->filter(function($camara) {
+                ->filter(function ($camara) {
                     $tiene = $camara->dispositivo && $camara->dispositivo->tieneCoordenadas();
                     Log::info('OperacionesDashboard: cámara evaluada para coordenadas', [
                         'camera_id' => $camara->id,
@@ -795,9 +796,10 @@ class OperacionesDashboardController extends Controller
                         'ubicacion' => $camara->dispositivo->ubicacion ?? null,
                         'dispositivo_nombre' => $camara->dispositivo->nombre ?? null,
                     ]);
+
                     return $tiene;
                 })
-                ->map(function($camara) {
+                ->map(function ($camara) {
                     $coords = $camara->dispositivo->coordenadas;
 
                     $dispositivoNombre = $camara->dispositivo->nombre
@@ -830,7 +832,8 @@ class OperacionesDashboardController extends Controller
             return $resultado;
 
         } catch (\Exception $e) {
-            Log::error('Error obteniendo cámaras para mapa: ' . $e->getMessage());
+            Log::error('Error obteniendo cámaras para mapa: '.$e->getMessage());
+
             return collect([]);
         }
     }
@@ -838,7 +841,7 @@ class OperacionesDashboardController extends Controller
     /**
      * Obtener filtro de cliente según el tipo de usuario
      */
-    private function getClienteFilter(Request $request = null)
+    private function getClienteFilter(?Request $request = null)
     {
         $user = Auth::user();
 
@@ -848,14 +851,13 @@ class OperacionesDashboardController extends Controller
          * - En layout PRINCIPAL: SOLO se filtra si el request trae explícitamente cliente_id
          *   (por ejemplo, desde el selector visual de clientes).
          */
-
         if ($this->isClientLayout($request)) {
             // Usuario cliente en layout cliente: obtener siempre su cliente_id
             $userCliente = $user
                 ? UserCliente::where('user_id', $user->id)->first()
                 : null;
 
-            if (!$userCliente) {
+            if (! $userCliente) {
                 return null;
             }
 
@@ -870,7 +872,7 @@ class OperacionesDashboardController extends Controller
 
         return null;
     }
-    
+
     /**
      * Verificar si el request actual corresponde al layout cliente.
      *
@@ -879,17 +881,17 @@ class OperacionesDashboardController extends Controller
      *   para evitar filtrar automáticamente en el layout principal.
      * - Intentamos inferir el contexto por ruta o referer.
      */
-    private function isClientLayout(Request $request = null)
+    private function isClientLayout(?Request $request = null)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 
         // Si el usuario no tiene relación UserCliente, nunca es layout cliente
         $tieneRelacionCliente = UserCliente::where('user_id', $user->id)->exists();
-        if (!$tieneRelacionCliente) {
+        if (! $tieneRelacionCliente) {
             return false;
         }
 
@@ -922,4 +924,3 @@ class OperacionesDashboardController extends Controller
         return false;
     }
 }
-

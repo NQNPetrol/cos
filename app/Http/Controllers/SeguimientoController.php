@@ -11,13 +11,13 @@ class SeguimientoController extends Controller
 {
     public function create()
     {
-        $eventos = Evento::whereDoesntHave('seguimientos', function($query){
+        $eventos = Evento::whereDoesntHave('seguimientos', function ($query) {
             $query->where('estado', 'CERRADO');
         })->get();
 
         return view('seguimientos.nuevo', [
             'eventos' => $eventos,
-            'header' => 'Nuevo Seguimiento'
+            'header' => 'Nuevo Seguimiento',
         ]);
     }
 
@@ -25,8 +25,8 @@ class SeguimientoController extends Controller
     {
         $query = Seguimiento::with(['evento', 'user'])
             ->latest();
-        
-        if ($request->has('estado') && in_array($request->estado, ['ABIERTO', 'EN REVISION', 'CERRADO'])){
+
+        if ($request->has('estado') && in_array($request->estado, ['ABIERTO', 'EN REVISION', 'CERRADO'])) {
             $query->where('estado', $request->estado);
         }
 
@@ -35,9 +35,9 @@ class SeguimientoController extends Controller
         }
 
         if ($request->has('busqueda')) {
-            $query->where(function($q) use ($request){
+            $query->where(function ($q) use ($request) {
                 $q->where('titulo', 'like', '%'.$request->busqueda.'%')
-                ->orWhere('descripcion', 'like', '%'.$request->busqueda.'%');
+                    ->orWhere('descripcion', 'like', '%'.$request->busqueda.'%');
             });
         }
 
@@ -47,9 +47,10 @@ class SeguimientoController extends Controller
         return view('seguimientos.index', [
             'seguimientos' => $seguimientos,
             'eventos' => $eventos,
-            'filtros' => $request->only(['estado', 'evento_id', 'busqueda'])
+            'filtros' => $request->only(['estado', 'evento_id', 'busqueda']),
         ]);
     }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -57,9 +58,8 @@ class SeguimientoController extends Controller
             'descripcion' => 'required|string',
             'fecha' => 'required|date',
             'estado' => 'required|in:ABIERTO,EN REVISION,CERRADO',
-            'evento_id' => 'required|exists:eventos,id'
+            'evento_id' => 'required|exists:eventos,id',
         ]);
-
 
         return redirect()->route('seguimientos.index');
     }
@@ -70,8 +70,8 @@ class SeguimientoController extends Controller
     private function getClienteIds()
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
 
@@ -84,6 +84,7 @@ class SeguimientoController extends Controller
     private function userHasAccessToCliente($clienteId)
     {
         $clienteIds = $this->getClienteIds();
+
         return $clienteIds->contains($clienteId);
     }
 
@@ -93,10 +94,10 @@ class SeguimientoController extends Controller
     private function userHasAccessToEvento($eventoId)
     {
         $evento = Evento::find($eventoId);
-        if (!$evento) {
+        if (! $evento) {
             return false;
         }
-        
+
         return $this->userHasAccessToCliente($evento->cliente_id);
     }
 
@@ -106,14 +107,13 @@ class SeguimientoController extends Controller
     private function redirectIfNoClientes()
     {
         $clienteIds = $this->getClienteIds();
-        
+
         if ($clienteIds->isEmpty()) {
             return redirect()->back()->with('error', 'No tienes clientes asignados. Contacta al administrador.');
         }
-        
+
         return null;
     }
-
 
     public function indexClientLayout(Request $request)
     {
@@ -125,12 +125,12 @@ class SeguimientoController extends Controller
         $clienteIds = $this->getClienteIds();
 
         $query = Seguimiento::with(['evento', 'user'])
-            ->whereHas('evento', function($q) use ($clienteIds) {
+            ->whereHas('evento', function ($q) use ($clienteIds) {
                 $q->whereIn('cliente_id', $clienteIds);
             })
             ->latest();
-        
-        if ($request->has('estado') && in_array($request->estado, ['ABIERTO', 'EN REVISION', 'CERRADO'])){
+
+        if ($request->has('estado') && in_array($request->estado, ['ABIERTO', 'EN REVISION', 'CERRADO'])) {
             $query->where('estado', $request->estado);
         }
 
@@ -143,9 +143,9 @@ class SeguimientoController extends Controller
         }
 
         if ($request->has('busqueda')) {
-            $query->where(function($q) use ($request){
+            $query->where(function ($q) use ($request) {
                 $q->where('titulo', 'like', '%'.$request->busqueda.'%')
-                ->orWhere('descripcion', 'like', '%'.$request->busqueda.'%');
+                    ->orWhere('descripcion', 'like', '%'.$request->busqueda.'%');
             });
         }
 
@@ -155,8 +155,7 @@ class SeguimientoController extends Controller
         return view('seguimientos.client.index', [
             'seguimientos' => $seguimientos,
             'eventos' => $eventos,
-            'filtros' => $request->only(['estado', 'evento_id', 'busqueda'])
+            'filtros' => $request->only(['estado', 'evento_id', 'busqueda']),
         ]);
     }
-
 }

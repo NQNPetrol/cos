@@ -47,17 +47,25 @@ class TurnoRodado extends Model
     ];
 
     const TIPO_TURNO_SERVICE = 'turno_service';
+
     const TIPO_TURNO_MECANICO = 'turno_mecanico';
+
     const TIPO_CAMBIO_EQUIPO = 'cambio_equipo';
+
     const TIPO_TURNO_TALLER = 'turno_taller';
 
     const ESTADO_PENDIENTE = 'pendiente';
+
     const ESTADO_COMPLETADO = 'completado';
+
     const ESTADO_CANCELADO = 'cancelado';
+
     const ESTADO_ATENDIDO = 'atendido';
 
     const COBERTURA_PENDIENTE = 'pendiente';
+
     const COBERTURA_APROBADA = 'aprobada';
+
     const COBERTURA_RECHAZADA = 'rechazada';
 
     public function getPartesAfectadasAttribute($value)
@@ -65,11 +73,11 @@ class TurnoRodado extends Model
         if (is_null($value)) {
             return [];
         }
-        
+
         if (is_string($value)) {
             return json_decode($value, true) ?? [];
         }
-        
+
         return $value ?? [];
     }
 

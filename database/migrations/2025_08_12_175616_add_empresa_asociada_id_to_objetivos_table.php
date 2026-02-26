@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if(!Schema::hasColumn('objetivos', 'empresa_asociada_id')){
+        if (! Schema::hasColumn('objetivos', 'empresa_asociada_id')) {
             Schema::table('objetivos', function (Blueprint $table) {
                 $table->foreignId('empresa_asociada_id')->constrained('empresas_asociadas')->after('cliente_id');
             });

@@ -2,14 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Patrulla;
 use App\Models\PatrullaDocumental;
 use App\Models\PatrullaSistema;
 use App\Models\Sistema;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class PatrullasSeeder extends Seeder
 {
@@ -29,7 +27,7 @@ class PatrullasSeeder extends Seeder
                 'estado' => 'operativa',
                 'año' => 2022,
                 'cliente_id' => 17,
-                'observaciones' => 'Vehículo principal de patrulla, estado óptimo'
+                'observaciones' => 'Vehículo principal de patrulla, estado óptimo',
             ],
             [
                 'patente' => 'EF456GH',
@@ -39,7 +37,7 @@ class PatrullasSeeder extends Seeder
                 'estado' => 'operativa',
                 'año' => 2023,
                 'cliente_id' => 17,
-                'observaciones' => 'Nuevo ingreso a flota, equipamiento completo'
+                'observaciones' => 'Nuevo ingreso a flota, equipamiento completo',
             ],
             [
                 'patente' => 'IJ789KL',
@@ -49,7 +47,7 @@ class PatrullasSeeder extends Seeder
                 'estado' => 'en_mantenimiento',
                 'año' => 2021,
                 'cliente_id' => 17,
-                'observaciones' => 'En taller por cambio de frenos'
+                'observaciones' => 'En taller por cambio de frenos',
             ],
             [
                 'patente' => 'MN012OP',
@@ -59,7 +57,7 @@ class PatrullasSeeder extends Seeder
                 'estado' => 'operativa',
                 'año' => 2022,
                 'cliente_id' => 17,
-                'observaciones' => 'Vehículo de apoyo, baja kilometraje'
+                'observaciones' => 'Vehículo de apoyo, baja kilometraje',
             ],
             [
                 'patente' => 'QR345ST',
@@ -69,16 +67,16 @@ class PatrullasSeeder extends Seeder
                 'estado' => 'operativa',
                 'año' => 2023,
                 'cliente_id' => 17,
-                'observaciones' => 'Vehículo de supervisión, uso administrativo'
-            ]
+                'observaciones' => 'Vehículo de supervisión, uso administrativo',
+            ],
         ];
 
         foreach ($patrullas as $patrullaData) {
             $patrulla = Patrulla::create($patrullaData);
-            
+
             // Crear documentación para cada patrulla
             $this->crearDocumentacion($patrulla);
-            
+
             // Registrar patrulla en sistemas
             $this->registrarEnSistemas($patrulla, $sistemas);
         }
@@ -93,26 +91,26 @@ class PatrullasSeeder extends Seeder
                 'nombre' => 'VTV',
                 'fecha_inicio' => Carbon::now()->subMonths(6),
                 'fecha_vto' => Carbon::now()->addMonths(6),
-                'detalles' => 'Certificado de inspección técnica emitido por organismo oficial'
+                'detalles' => 'Certificado de inspección técnica emitido por organismo oficial',
             ],
             [
                 'nombre' => 'Póliza de Seguro',
                 'fecha_inicio' => Carbon::now()->subMonths(3),
                 'fecha_vto' => Carbon::now()->addMonths(9),
-                'detalles' => 'Cobertura completa contra todo riesgo, número de póliza: TSB-' . $patrulla->patente
+                'detalles' => 'Cobertura completa contra todo riesgo, número de póliza: TSB-'.$patrulla->patente,
             ],
             [
                 'nombre' => 'RTO Nacional',
                 'fecha_inicio' => Carbon::now()->subMonths(1),
                 'fecha_vto' => Carbon::now()->addMonths(5),
-                'detalles' => 'Último servicio realizado en taller autorizado TSB'
+                'detalles' => 'Último servicio realizado en taller autorizado TSB',
             ],
             [
                 'nombre' => 'RTO Provincial',
                 'fecha_inicio' => Carbon::now()->subMonths(2),
                 'fecha_vto' => Carbon::now()->addMonths(10),
-                'detalles' => 'Control de emisiones y sistema de combustible'
-            ]
+                'detalles' => 'Control de emisiones y sistema de combustible',
+            ],
         ];
 
         foreach ($documentos as $documento) {
@@ -128,22 +126,22 @@ class PatrullasSeeder extends Seeder
                 'fecha_registro' => Carbon::now()->subYear(),
                 'fecha_vto' => Carbon::now()->addMonths(8),
                 'nro_interno' => '88',
-                'registra_user' => 1
+                'registra_user' => 1,
             ],
             [
                 'sistema_id' => $sistemas[1]->id,
                 'fecha_registro' => Carbon::now()->subMonths(3),
-                'fecha_vto' => Carbon::now()->subMonths(1), 
+                'fecha_vto' => Carbon::now()->subMonths(1),
                 'nro_interno' => '89',
-                'registra_user' => 1
+                'registra_user' => 1,
             ],
             [
                 'sistema_id' => $sistemas[2]->id,
                 'fecha_registro' => Carbon::now()->subMonths(1),
                 'fecha_vto' => Carbon::now()->addMonths(11),
                 'nro_interno' => '75',
-                'registra_user' => 1
-            ]
+                'registra_user' => 1,
+            ],
         ];
 
         foreach ($registros as $registro) {

@@ -19,21 +19,21 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->comment('Usuario cliente que hizo la petición');
             $table->foreignId('site_id')->nullable()->constrained('flytbase_sites')->onDelete('set null');
             $table->foreignId('drone_id')->nullable()->constrained('drones_flytbase')->onDelete('set null');
-            
+
             $table->decimal('route_altitude', 6, 2)->default(35.00);
             $table->decimal('route_speed', 5, 2)->default(5.33);
             $table->enum('route_waypoint_type', [
-                'linear_route', 
-                'transits_waypoint', 
-                'curved_route_drone_stops', 
-                'curved_route_drone_continues'
+                'linear_route',
+                'transits_waypoint',
+                'curved_route_drone_stops',
+                'curved_route_drone_continues',
             ])->default('linear_route');
             $table->json('waypoints')->nullable();
 
             $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente');
             $table->foreignId('revisado_por')->nullable()->constrained('users')->comment('Operador que revisó la petición');
             $table->text('observaciones')->nullable();
-            
+
             $table->foreignId('mision_aprobada_id')->nullable()->constrained('misiones_flytbase')->comment('ID de la misión creada tras aprobación');
 
             $table->timestamps();

@@ -2,24 +2,28 @@
 
 namespace App\Livewire\FlotasVehiculares;
 
-use Livewire\Component;
-use Livewire\WithPagination;
+use App\Models\Documento;
 use App\Models\Patrulla;
 use App\Models\PatrullaDocumental;
-use App\Models\Documento;
-use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class DocumentacionPatrullaListado extends Component
 {
     use WithPagination;
 
     public $patrullaId;
+
     public $patrulla;
 
     public $mostrarFormulario = false;
+
     public $nuevoNombre = '';
+
     public $nuevaFechaInicio = '';
+
     public $nuevaFechaVto = '';
+
     public $nuevosDetalles = '';
 
     public function mount($patrullaId)
@@ -61,7 +65,7 @@ class DocumentacionPatrullaListado extends Component
         $opcionesActivas = Documento::activos()->pluck('nombre')->toArray();
 
         $this->validate([
-            'nuevoNombre' => 'required|string|in:' . implode(',', $opcionesActivas),
+            'nuevoNombre' => 'required|string|in:'.implode(',', $opcionesActivas),
             'nuevaFechaInicio' => 'required|date',
             'nuevaFechaVto' => 'nullable|date',
             'nuevosDetalles' => 'nullable|string|max:500',
@@ -82,7 +86,7 @@ class DocumentacionPatrullaListado extends Component
             $this->resetPage();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'Error al agregar la documentación: ' . $e->getMessage());
+            session()->flash('error', 'Error al agregar la documentación: '.$e->getMessage());
         }
     }
 

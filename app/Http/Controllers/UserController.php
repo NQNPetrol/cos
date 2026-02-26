@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use App\Models\User;
 use Spatie\Permission\Models\Role;
-use App\Models\Cliente;
 
 class UserController extends Controller
 {
     public function index()
     {
         $usuarios = User::with(['roles', 'clientes'])->get();
+
         return view('usuarios.manage-users', compact('usuarios'));
     }
+
     public function roles()
     {
         $usuarios = User::with('roles')->get();
         $roles = Role::all();
+
         return view('usuarios.index', compact('usuarios', 'roles'));
     }
 
@@ -48,7 +50,7 @@ class UserController extends Controller
 
             return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente.');
         } catch (\Exception $e) {
-            return redirect()->route('usuarios.index')->with('error', 'Error al crear el usuario: ' . $e->getMessage());
+            return redirect()->route('usuarios.index')->with('error', 'Error al crear el usuario: '.$e->getMessage());
         }
     }
 
@@ -56,7 +58,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
         ]);
 
         try {
@@ -67,7 +69,7 @@ class UserController extends Controller
 
             return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
         } catch (\Exception $e) {
-            return redirect()->route('usuarios.index')->with('error', 'Error al actualizar el usuario: ' . $e->getMessage());
+            return redirect()->route('usuarios.index')->with('error', 'Error al actualizar el usuario: '.$e->getMessage());
         }
     }
 
@@ -84,7 +86,7 @@ class UserController extends Controller
 
             return redirect()->route('usuarios.index')->with('success', 'Contraseña reseteada exitosamente.');
         } catch (\Exception $e) {
-            return redirect()->route('usuarios.index')->with('error', 'Error al resetear la contraseña: ' . $e->getMessage());
+            return redirect()->route('usuarios.index')->with('error', 'Error al resetear la contraseña: '.$e->getMessage());
         }
     }
 
@@ -97,10 +99,10 @@ class UserController extends Controller
             }
 
             $user->delete();
+
             return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente.');
         } catch (\Exception $e) {
-            return redirect()->route('usuarios.index')->with('error', 'Error al eliminar el usuario: ' . $e->getMessage());
+            return redirect()->route('usuarios.index')->with('error', 'Error al eliminar el usuario: '.$e->getMessage());
         }
     }
-
 }

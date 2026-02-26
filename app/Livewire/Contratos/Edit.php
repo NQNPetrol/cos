@@ -2,30 +2,38 @@
 
 namespace App\Livewire\Contratos;
 
-use Livewire\Component;
-use App\Models\Contrato;
 use App\Models\Cliente;
+use App\Models\Contrato;
 use Carbon\Carbon;
+use Livewire\Component;
 
 class Edit extends Component
 {
     public $contrato;
+
     public $clientes;
+
     public $cliente_id;
+
     public $empresa_asociada_id;
+
     public $empresasFiltradas = [];
-    
+
     public $nombre_proyecto;
+
     public $localidad;
+
     public $provincia;
+
     public $observaciones;
+
     public $fecha_inicio;
 
     public function mount(Contrato $contrato)
     {
         $this->contrato = $contrato;
         $this->clientes = Cliente::all();
-        
+
         // Cargar datos del contrato
         $this->cliente_id = $contrato->cliente_id;
         $this->empresa_asociada_id = $contrato->empresa_asociada_id;
@@ -33,10 +41,10 @@ class Edit extends Component
         $this->localidad = $contrato->localidad;
         $this->provincia = $contrato->provincia;
         $this->observaciones = $contrato->observaciones;
-        $this->fecha_inicio = $this->contrato->fecha_inicio 
+        $this->fecha_inicio = $this->contrato->fecha_inicio
             ? Carbon::parse($this->contrato->fecha_inicio)->format('Y-m-d')
             : null;
-        
+
         // Cargar empresas asociadas iniciales
         $this->cargarEmpresas($this->cliente_id);
         $this->dispatch('empresas-cargadas');
@@ -45,9 +53,10 @@ class Edit extends Component
     public function cargarEmpresas($clienteId)
     {
         $this->cliente_id = $clienteId;
-        
+
         if (empty($clienteId)) {
             $this->empresasFiltradas = collect();
+
             return;
         }
 
@@ -68,7 +77,7 @@ class Edit extends Component
         ]);
 
         $this->contrato->update($validated);
-        
+
         return redirect()->route('contratos.index')
             ->with('success', 'Contrato actualizado correctamente.');
     }

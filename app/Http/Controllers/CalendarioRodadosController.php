@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\TurnoRodado;
 use App\Models\CambioEquipoRodado;
-use App\Models\PagoServiciosRodado;
 use App\Models\Cobranza;
+use App\Models\PagoServiciosRodado;
+use App\Models\TurnoRodado;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class CalendarioRodadosController extends Controller
 {
@@ -15,7 +15,7 @@ class CalendarioRodadosController extends Controller
     {
         return view('rodados.calendario');
     }
-    
+
     // Este método ya no se usa, pero se mantiene por compatibilidad con el componente Livewire
     // El componente Livewire ahora obtiene los datos directamente
 
@@ -27,7 +27,7 @@ class CalendarioRodadosController extends Controller
         $turnos = TurnoRodado::with(['rodado', 'taller'])->get();
         foreach ($turnos as $turno) {
             $color = '#3b82f6'; // Azul por defecto
-            
+
             if ($turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE) {
                 $color = '#3b82f6'; // Azul
             } elseif ($turno->tipo === TurnoRodado::TIPO_TURNO_MECANICO) {
@@ -35,8 +35,8 @@ class CalendarioRodadosController extends Controller
             }
 
             $eventos->push([
-                'id' => 'turno_' . $turno->id,
-                'title' => 'Turno: ' . ($turno->rodado->patente ?? 'Sin patente'),
+                'id' => 'turno_'.$turno->id,
+                'title' => 'Turno: '.($turno->rodado->patente ?? 'Sin patente'),
                 'start' => $turno->fecha_hora->toIso8601String(),
                 'color' => $color,
                 'tipo' => 'turno',
@@ -54,8 +54,8 @@ class CalendarioRodadosController extends Controller
         $cambiosEquipos = CambioEquipoRodado::with(['rodado', 'taller'])->get();
         foreach ($cambiosEquipos as $cambio) {
             $eventos->push([
-                'id' => 'cambio_' . $cambio->id,
-                'title' => 'Cambio Equipo: ' . ($cambio->rodado->patente ?? 'Sin patente'),
+                'id' => 'cambio_'.$cambio->id,
+                'title' => 'Cambio Equipo: '.($cambio->rodado->patente ?? 'Sin patente'),
                 'start' => $cambio->fecha_hora_estimada->toIso8601String(),
                 'color' => '#10b981', // Verde
                 'tipo' => 'cambio_equipo',
@@ -71,12 +71,14 @@ class CalendarioRodadosController extends Controller
         foreach ($pagos as $pago) {
             // Use fecha_vencimiento if available, else fecha_pago
             $fecha = $pago->fecha_vencimiento ?? $pago->fecha_pago;
-            if (!$fecha) continue;
+            if (! $fecha) {
+                continue;
+            }
 
             $isPendiente = in_array($pago->estado, ['pendiente', 'vencido']);
             $eventos->push([
-                'id' => 'pago_' . $pago->id,
-                'title' => ($isPendiente ? '⏳ Pago pendiente: ' : '✓ Pago: ') . ($pago->rodado->patente ?? 'Sin patente'),
+                'id' => 'pago_'.$pago->id,
+                'title' => ($isPendiente ? '⏳ Pago pendiente: ' : '✓ Pago: ').($pago->rodado->patente ?? 'Sin patente'),
                 'start' => Carbon::parse($fecha)->toIso8601String(),
                 'color' => $isPendiente ? '#ef4444' : '#6b7280', // Rojo si pendiente, gris si pagado
                 'tipo' => 'pago',
@@ -92,12 +94,14 @@ class CalendarioRodadosController extends Controller
         $cobranzas = Cobranza::with(['cliente'])->get();
         foreach ($cobranzas as $cobranza) {
             $fecha = $cobranza->fecha_vencimiento ?? $cobranza->fecha_emision;
-            if (!$fecha) continue;
+            if (! $fecha) {
+                continue;
+            }
 
             $isPendiente = in_array($cobranza->estado, ['pendiente', 'vencido']);
             $eventos->push([
-                'id' => 'cobranza_' . $cobranza->id,
-                'title' => ($isPendiente ? '💰 Cobrar: ' : '✓ Cobrado: ') . ($cobranza->cliente->nombre ?? 'Sin cliente'),
+                'id' => 'cobranza_'.$cobranza->id,
+                'title' => ($isPendiente ? '💰 Cobrar: ' : '✓ Cobrado: ').($cobranza->cliente->nombre ?? 'Sin cliente'),
                 'start' => Carbon::parse($fecha)->toIso8601String(),
                 'color' => $isPendiente ? '#f59e0b' : '#6b7280', // Amarillo si pendiente
                 'tipo' => 'cobranza',
@@ -118,8 +122,8 @@ class CalendarioRodadosController extends Controller
     {
         if ($tipo === 'turno') {
             $turno = TurnoRodado::with(['rodado.cliente', 'rodado.proveedor', 'taller'])->find($id);
-            
-            if (!$turno) {
+
+            if (! $turno) {
                 return response()->json(['error' => 'Turno no encontrado'], 404);
             }
 
@@ -141,8 +145,8 @@ class CalendarioRodadosController extends Controller
             ]);
         } elseif ($tipo === 'cambio_equipo') {
             $cambio = CambioEquipoRodado::with(['rodado.cliente', 'rodado.proveedor', 'taller', 'dispositivo'])->find($id);
-            
-            if (!$cambio) {
+
+            if (! $cambio) {
                 return response()->json(['error' => 'Cambio de equipo no encontrado'], 404);
             }
 
@@ -164,8 +168,8 @@ class CalendarioRodadosController extends Controller
             ]);
         } elseif ($tipo === 'pago') {
             $pago = PagoServiciosRodado::with(['rodado.cliente', 'rodado.proveedor', 'proveedor'])->find($id);
-            
-            if (!$pago) {
+
+            if (! $pago) {
                 return response()->json(['error' => 'Pago no encontrado'], 404);
             }
 
@@ -194,6 +198,7 @@ class CalendarioRodadosController extends Controller
         if ($pago->factura_path) {
             return 'pagado';
         }
+
         return 'pendiente';
     }
 }

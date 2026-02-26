@@ -12,6 +12,7 @@ class CoberturaRechazadaMail extends Mailable
     use Queueable, SerializesModels;
 
     public $turno;
+
     public $userName;
 
     /**
@@ -30,11 +31,11 @@ class CoberturaRechazadaMail extends Mailable
     {
         $this->turno->load(['rodado', 'taller']);
 
-        return $this->subject('Cobertura Rechazada - Vehículo ' . ($this->turno->rodado->patente ?? 'Sin patente'))
-                    ->view('emails.cobertura-rechazada')
-                    ->with([
-                        'turno' => $this->turno,
-                        'userName' => $this->userName,
-                    ]);
+        return $this->subject('Cobertura Rechazada - Vehículo '.($this->turno->rodado->patente ?? 'Sin patente'))
+            ->view('emails.cobertura-rechazada')
+            ->with([
+                'turno' => $this->turno,
+                'userName' => $this->userName,
+            ]);
     }
 }

@@ -2,24 +2,28 @@
 
 namespace App\Livewire\Contratos;
 
-use Livewire\Component;
-use App\Models\EmpresaAsociada;
 use App\Models\Cliente;
 use App\Models\Contrato;
+use Livewire\Component;
 
 class Create extends Component
 {
-
     public $clientes;
+
     public $cliente_id;
+
     public $empresa_asociada_id;
+
     public $empresasFiltradas = [];
 
-
     public $nombre_proyecto;
+
     public $localidad;
+
     public $provincia;
+
     public $observaciones;
+
     public $fecha_inicio;
 
     public function mount($contrato = null)
@@ -31,10 +35,11 @@ class Create extends Component
     public function cargarEmpresas($clienteId)
     {
         $this->cliente_id = $clienteId;
-        $this->empresa_asociada_id = null; 
+        $this->empresa_asociada_id = null;
 
         if (empty($clienteId)) {
             $this->empresasFiltradas = collect();
+
             return;
         }
 
@@ -56,7 +61,7 @@ class Create extends Component
             'fecha_inicio' => 'nullable|date',
         ]);
         Contrato::create($validated);
-        
+
         return redirect()->route('contratos.index')
             ->with('success', 'Contrato creado correctamente.');
     }
@@ -65,5 +70,4 @@ class Create extends Component
     {
         return view('livewire.contratos.create');
     }
-
 }

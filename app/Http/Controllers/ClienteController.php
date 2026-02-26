@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Cliente;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ClienteController extends Controller
@@ -13,7 +13,7 @@ class ClienteController extends Controller
         return view('clientes.nuevo');
     }
 
-     public function edit(Cliente $cliente)
+    public function edit(Cliente $cliente)
     {
         return view('clientes.edit', compact('cliente'));
     }
@@ -21,14 +21,14 @@ class ClienteController extends Controller
     public function update(Request $request, Cliente $cliente)
     {
         $validated = $request->validate([
-            'nombre'    => 'required|min:3',
-            'cuit'      => 'nullable',
+            'nombre' => 'required|min:3',
+            'cuit' => 'nullable',
             'domicilio' => 'nullable',
-            'ciudad'    => 'nullable',
+            'ciudad' => 'nullable',
             'provincia' => 'nullable',
             'categoria' => 'nullable',
-            'convenio'  => 'nullable',
-            'logo'      => 'nullable|image|mimes:png|max:2048',
+            'convenio' => 'nullable',
+            'logo' => 'nullable|image|mimes:png|max:2048',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -36,7 +36,7 @@ class ClienteController extends Controller
             if ($cliente->logo && Storage::disk('public')->exists($cliente->logo)) {
                 Storage::disk('public')->delete($cliente->logo);
             }
-            
+
             // Guardar nuevo logo
             $logoPath = $request->file('logo')->store('clientes/logos', 'public');
             $validated['logo'] = $logoPath;
@@ -55,12 +55,11 @@ class ClienteController extends Controller
             if (Storage::disk('public')->exists($cliente->logo)) {
                 Storage::disk('public')->delete($cliente->logo);
             }
-            
+
             // Actualizar el campo en la base de datos
             $cliente->update(['logo' => null]);
         }
 
         return back()->with('success', 'Logo eliminado correctamente.');
     }
-
 }

@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Personal;
 use App\Models\Categoria;
 use App\Models\Cliente;
+use App\Models\Personal;
+use Illuminate\Http\Request;
 
 class PersonalController extends Controller
 {
     public function index()
     {
         $personal = Personal::with('categoria')->paginate(10);
+
         return view('personal.index', compact('personal'));
     }
 
@@ -19,6 +20,7 @@ class PersonalController extends Controller
     {
         $categorias = Categoria::orderBy('nombre')->get();
         $clientes = Cliente::orderBy('nombre')->get();
+
         return view('personal.create', compact('clientes', 'categorias'));
     }
 
@@ -31,7 +33,7 @@ class PersonalController extends Controller
             'fecha_inicio' => 'nullable|date',
             'cliente_id' => 'required|exists:clientes,id',
             'puesto' => 'nullable|string|max:255',
-            'cargo' => 'required|string'
+            'cargo' => 'required|string',
         ]);
 
         Personal::create($validated);
@@ -53,7 +55,7 @@ class PersonalController extends Controller
         $personal = Personal::findOrFail($id);
 
         $clientes = Cliente::orderBy('nombre')->get();
-        
+
         return view('personal.edit', compact('personal', 'clientes'));
     }
 
@@ -70,12 +72,12 @@ class PersonalController extends Controller
             'fecha_inicio' => 'nullable|date',
             'cliente_id' => 'required|exists:clientes,id',
             'puesto' => 'nullable|string|max:255',
-            'cargo' => 'required|string'
+            'cargo' => 'required|string',
         ]);
         $personal->update($validated);
 
         return redirect()->route('personal.index')
-        ->with('success', 'Personal actualizado correctamente');
+            ->with('success', 'Personal actualizado correctamente');
 
     }
 

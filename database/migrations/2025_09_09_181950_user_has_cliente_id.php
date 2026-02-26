@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('cliente_id')->constrained('clientes');
             $table->timestamps();
-            
+
             // Evitar duplicados
             $table->unique(['user_id', 'cliente_id']);
         });
