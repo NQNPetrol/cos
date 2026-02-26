@@ -62,6 +62,8 @@
   Configuración Pest/CI (MySQL en CI), tests de autenticación y autorización (permisos admin/cliente). Prompt en `agent-bootstrap/prompts/completados/v0.1.0-base-tests-seguridad.md`. Tag `v0.1.0`.
 - [ ] **v0.2.0 — Tests funcionales de módulos críticos** *(pendiente)*  
   Prompt: `agent-bootstrap/prompts/pendientes/v0.2.0-tests-funcionales-modulos.md`. Unit + feature para Eventos, Rodados y Tickets; factories; CI; documentación. Depende de v0.1.0 (ya completado).
+- [ ] **v0.3.0 — Corrección y mejora carga KML en Recorridos** *(pendiente)*  
+  Prompt: `agent-bootstrap/prompts/pendientes/v0.3.0-recorridos-kml-fix.md`. Fix parseo KML (waypoints 0, mapa sin ruta, velocidad); soporte namespace/LineString; mensajes de error y UX. Prioridad alta por reclamo de cliente.
 
 Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proceso / completados / bloqueados).
 
