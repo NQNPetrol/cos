@@ -73,7 +73,11 @@ class RecorridosController extends Controller
             'objetivos' => 'nullable|string|max:500',
             'velocidadmax_permitida' => 'nullable|integer|min:1|max:300',
             'duracion_promedio' => 'nullable|integer|min:1',
-            'kml_file' => 'nullable|file|max:5120',
+            'kml_file' => ['nullable', 'file', 'max:5120', 'sometimes', function ($attr, $value, $fail) {
+            if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
+                $fail('El archivo debe tener extensión .kml o .kmz.');
+            }
+        }],
         ]);
 
         $user = auth()->user();
@@ -162,7 +166,11 @@ class RecorridosController extends Controller
             'objetivos' => 'nullable|string|max:500',
             'velocidadmax_permitida' => 'nullable|integer|min:1|max:300',
             'duracion_promedio' => 'nullable|integer|min:1',
-            'kml_file' => 'nullable|file|max:5120',
+            'kml_file' => ['nullable', 'file', 'max:5120', 'sometimes', function ($attr, $value, $fail) {
+            if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
+                $fail('El archivo debe tener extensión .kml o .kmz.');
+            }
+        }],
         ]);
 
         $user = auth()->user();
@@ -220,15 +228,29 @@ class RecorridosController extends Controller
     }
 
     /**
-     * Import a KML file and return parsed waypoints (preview).
+     * Import a KML/KMZ file and return parsed waypoints (preview).
      */
     public function importKml(Request $request)
     {
         $request->validate([
-            'kml_file' => 'required|file|max:5120',
+            'kml_file' => ['required', 'file', 'max:5120', function ($attr, $value, $fail) {
+                if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
+                    $fail('El archivo debe tener extensión .kml o .kmz.');
+                }
+            }],
         ]);
 
         $parsed = Recorrido::parseKmlFile($request->file('kml_file'));
+        $waypoints = $parsed['waypoints'] ?? [];
+        $count = count($waypoints);
+
+        if ($count === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron extraer waypoints del archivo. Verifique que sea un KML válido con coordenadas (LineString o Point).',
+                'data' => $parsed,
+            ], 422);
+        }
 
         return response()->json([
             'success' => true,
