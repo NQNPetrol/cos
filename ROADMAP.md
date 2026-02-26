@@ -58,10 +58,10 @@
 
 ## 📋 Planeado
 
-- [ ] **v0.1.0 — Base de tests + seguridad** *(pendiente)*  
-  Prompt: `agent-bootstrap/prompts/pendientes/v0.1.0-base-tests-seguridad.md`. Configuración Pest/CI, tests de autenticación y autorización (permisos admin/cliente). Sin dependencias.
-- [ ] **v0.2.0 — Tests funcionales de módulos críticos** *(bloqueado)*  
-  Prompt: `agent-bootstrap/prompts/bloqueados/v0.2.0-tests-funcionales-modulos.md`. Unit + feature para Eventos, Rodados y Tickets; factories; CI; documentación. **Depende de v0.1.0:** se mueve a `pendientes/` cuando v0.1.0 pase a `completados/`.
+- [x] **v0.1.0 — Base de tests + seguridad** *(completado)*  
+  Configuración Pest/CI (MySQL en CI), tests de autenticación y autorización (permisos admin/cliente). Prompt en `agent-bootstrap/prompts/completados/v0.1.0-base-tests-seguridad.md`. Tag `v0.1.0`.
+- [ ] **v0.2.0 — Tests funcionales de módulos críticos** *(pendiente)*  
+  Prompt: `agent-bootstrap/prompts/pendientes/v0.2.0-tests-funcionales-modulos.md`. Unit + feature para Eventos, Rodados y Tickets; factories; CI; documentación. Depende de v0.1.0 (ya completado).
 
 Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proceso / completados / bloqueados).
 
