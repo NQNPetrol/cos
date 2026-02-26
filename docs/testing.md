@@ -35,6 +35,12 @@ La suite de tests está configurada para usar **MySQL** en CI (GitHub Actions co
 
 Si no existe `.env.testing`, se usan las variables de `.env`; si ahí tienes SQLite, las migraciones pueden fallar.
 
-## Próximos pasos (v0.2.0)
+## Cobertura (v0.2.0)
 
-Tests funcionales de módulos críticos: Eventos, Rodados, Tickets (unit + feature). Ver prompt en `agent-bootstrap/prompts/bloqueados/` (se desbloquea al completar v0.1.0).
+- **Factories:** Evento, Rodado, Ticket, Cliente, Categoria, Personal (`database/factories/`).
+- **Unit:** Evento (atributos, relaciones), Rodado (marca/tipo, display_name), Ticket (estado, categoría) — `tests/Unit/`.
+- **Feature Eventos (admin):** ver listado (ver.eventos), formulario creación (crear.eventos), store con datos válidos, editar/update (editar.eventos), sin permiso 403 — `tests/Feature/Eventos/EventosAdminTest.php`.
+- **Feature Rodados:** acceso listado, creación con datos válidos — `tests/Feature/Rodados/RodadosAdminTest.php`.
+- **Feature Tickets (admin):** acceso vista tickets (ver.tickets), sin permiso 403 — `tests/Feature/Tickets/TicketsAdminTest.php`.
+
+Módulos cubiertos en esta versión: Eventos, Rodados, Tickets.
