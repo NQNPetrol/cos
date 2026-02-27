@@ -74,10 +74,10 @@ class RecorridosController extends Controller
             'velocidadmax_permitida' => 'nullable|integer|min:1|max:300',
             'duracion_promedio' => 'nullable|integer|min:1',
             'kml_file' => ['nullable', 'file', 'max:5120', 'sometimes', function ($attr, $value, $fail) {
-            if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
-                $fail('El archivo debe tener extensión .kml o .kmz.');
-            }
-        }],
+                if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
+                    $fail('El archivo debe tener extensión .kml o .kmz.');
+                }
+            }],
         ]);
 
         $user = auth()->user();
@@ -167,10 +167,10 @@ class RecorridosController extends Controller
             'velocidadmax_permitida' => 'nullable|integer|min:1|max:300',
             'duracion_promedio' => 'nullable|integer|min:1',
             'kml_file' => ['nullable', 'file', 'max:5120', 'sometimes', function ($attr, $value, $fail) {
-            if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
-                $fail('El archivo debe tener extensión .kml o .kmz.');
-            }
-        }],
+                if ($value && ! in_array(strtolower($value->getClientOriginalExtension()), ['kml', 'kmz'], true)) {
+                    $fail('El archivo debe tener extensión .kml o .kmz.');
+                }
+            }],
         ]);
 
         $user = auth()->user();

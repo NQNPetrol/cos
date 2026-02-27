@@ -110,10 +110,12 @@ class Recorrido extends Model
             if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) === 'kml') {
                 $content = $zip->getFromIndex($i);
                 $zip->close();
+
                 return $content !== false ? $content : null;
             }
         }
         $zip->close();
+
         return null;
     }
 
@@ -128,6 +130,7 @@ class Recorrido extends Model
         $xml = simplexml_load_string($content);
         if ($xml === false) {
             libxml_clear_errors();
+
             return $safe;
         }
 
@@ -235,6 +238,7 @@ class Recorrido extends Model
         if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
             return null;
         }
+
         return [
             'lat' => $lat,
             'lng' => $lng,

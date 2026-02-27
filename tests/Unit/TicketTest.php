@@ -2,7 +2,6 @@
 
 use App\Models\Ticket;
 use App\Models\User;
-use App\Models\Cliente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

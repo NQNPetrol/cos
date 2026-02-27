@@ -277,6 +277,10 @@ Route::middleware(['auth', 'verified'])->prefix('client')->name('client.')->grou
         ->middleware('can:eliminar.recorridos-cliente')
         ->name('recorridos.destroy');
 
+    // ========== MESA DE AYUDA ==========
+    Route::get('/ayuda', [\App\Http\Controllers\MesaAyudaController::class, 'index'])
+        ->name('ayuda.index');
+
 });
 
 Route::middleware(['auth'])->group(function () {

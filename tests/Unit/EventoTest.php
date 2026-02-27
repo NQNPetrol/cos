@@ -1,10 +1,8 @@
 <?php
 
-use App\Models\Evento;
-use App\Models\Cliente;
 use App\Models\Categoria;
-use App\Models\Personal;
-use App\Models\User;
+use App\Models\Cliente;
+use App\Models\Evento;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
