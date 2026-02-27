@@ -42,21 +42,7 @@
 
 ---
 
-## 🔄 En progreso / ajuste
-
-> Trabajo actual reflejado en ramas (develop y features). Sin fecha fija de release.
-
-- [ ] **Recorridos:** mejoras de aspecto en vistas, mapa, KPIs y gráficos *(rama feature/recorridos)*
-- [ ] **Gestión de rodados:** migraciones, modelos, controladores y vistas adicionales *(rama feature/gestion)*
-- [ ] **Dashboard:** ajustes de estilos *(rama update/dashboard)*
-- [ ] **Flight logs:** mejora de interfaz previa al envío del drone *(rama update/flightlogs)*
-- [ ] **Misiones Flytbase:** peticiones cliente para aceptar archivos .kmz *(rama update/misionesflyt)*
-- [ ] **Turnos rodados:** corrección de errores en la sección *(rama update/ui)*
-- [ ] **Rodados:** mejoras de layout administrativo *(rama upgrade/rodados)*
-
----
-
-## 📋 Planeado
+##  Planeado
 
 - [x] **v0.1.0 — Base de tests + seguridad** *(completado)*  
   Configuración Pest/CI (MySQL en CI), tests de autenticación y autorización (permisos admin/cliente). Prompt en `agent-bootstrap/prompts/completados/v0.1.0-base-tests-seguridad.md`. Tag `v0.1.0`.
@@ -72,6 +58,20 @@
   Mesa de ayuda accesible desde cliente (y opcionalmente admin) con chat que guíe: crear ticket, crear evento, documentación patrullas. Respuestas estáticas o por palabras clave. Prompt: `agent-bootstrap/prompts/pendientes/v0.6.0-mesa-ayuda-chat-asistente.md`. Recomendable v0.4.0 y v0.5.0.
 
 Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proceso / completados / bloqueados).
+
+### 🤖 Sistema de Agentes
+
+- [ ] **v-agents-0.1.0 — Activar AgenteQA y AgenteDesigner** *(pendiente)*  
+  Verificar integridad de archivos existentes y registrar ambos agentes formalmente en el sistema. Actualizar el CEO para incluir delegación explícita a ambos.  
+  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.1.0-activar-agenteqa-y-designer.md`.
+
+- [ ] **v-agents-0.2.0 — AGENTE_REVIEWER** *(pendiente — recomendable v-agents-0.1.0)*  
+  Nuevo agente de revisión de código antes del merge. Inspecciona diffs, detecta BLOCKERs/WARNINGs/SUGGESTIONs, y genera prompts de fix si hay bloqueantes. Complementa al AgenteQA (que verifica funcionalidad) con revisión de código estática. Inspirado en el rol "Code Reviewer" del framework FactoryAI.  
+  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.2.0-agente-reviewer.md`.
+
+- [ ] **v-agents-0.3.0 — Handoffs estructurados** *(pendiente — recomendable v-agents-0.1.0 y v-agents-0.2.0)*  
+  Formalizar el traspaso de contexto entre agentes con archivos de handoff en `agent-bootstrap/handoffs/`. El PM deja un handoff para el Dev; el Reviewer deja un handoff para el CEO. Mejora la continuidad en sesiones largas o multi-agente. Inspirado en "Agent Handoffs" del framework FactoryAI.  
+  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.3.0-handoffs-estructurados.md`.
 
 ---
 

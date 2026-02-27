@@ -14,7 +14,7 @@
 
 | Estado       | Cantidad | Detalle |
 |-------------|----------|---------|
-| **Pendientes** | 1        | v0.6.0 en `agent-bootstrap/prompts/pendientes/` |
+| **Pendientes** | 4        | v0.6.0, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 en `agent-bootstrap/prompts/pendientes/` |
 | **En proceso** | 0        | Ninguno en `agent-bootstrap/prompts/en_proceso/` |
 | **Completados** | 5      | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0 |
 
@@ -34,8 +34,9 @@
 
 ## Próximo paso
 
-- **Siguiente en cola:** v0.6.0 — Mesa de ayuda / chat asistente (pendiente en `pendientes/`).
+- **Siguiente en cola:** v0.6.0 — Mesa de ayuda / chat asistente
+- **Cola de agentes:** v-agents-0.1.0 → v-agents-0.2.0 → v-agents-0.3.0 (pueden ejecutarse en paralelo a las versiones de producto)
 
 ---
 
-*Última actualización: 2026-02-27 (tras v0.5.0).*
+*Última actualización: 2026-02-27 (sesión PM — incorporación FactoryAI).*
