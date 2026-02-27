@@ -184,36 +184,50 @@ Seguí cada paso del prompt en orden desde **PASO 1**.
 
 ## PASO 5 — Verificación técnica obligatoria
 
-> ⚠️ **Adaptar estos comandos al stack del proyecto.**
-> Reemplazar con los comandos reales de build/lint/test.
+> Stack del proyecto: **Laravel (PHP 8.2)**, Pest, Laravel Pint.
+
+Ejecutar en este orden:
 
 ```bash
-# === ADAPTAR AL STACK ===
+# 1. Lint (Laravel Pint — solo verificar, sin modificar)
+./vendor/bin/pint --test 2>&1 | tail -15
 
-# Ejemplo para proyecto Rust + TypeScript (como MetaOS):
-# cargo build --target [TARGET] 2>&1 | tail -5
-# cargo clippy -- -D warnings 2>&1 | tail -5
-# cargo test 2>&1 | tail -5
-# npx tsc --noEmit 2>&1 | head -10
-
-# Ejemplo para Node.js / TypeScript:
-# npm run build 2>&1 | tail -10
-# npm run lint 2>&1 | tail -10
-# npm test 2>&1 | tail -10
-
-# Ejemplo para Python:
-# python -m pytest 2>&1 | tail -10
-# python -m mypy src/ 2>&1 | tail -10
-
-# === FIN ADAPTAR ===
+# 2. Tests (Pest / php artisan test)
+php artisan test 2>&1 | tail -25
 ```
 
 Si falla → corregí y volvé a verificar. **No commitees con errores.**
+
+Alternativa desde raíz del repo en Windows (PowerShell): `php artisan test` y `php vendor\bin\pint --test`.
+
+---
+
+## PASO 5.5 — Tests funcionales y QA en navegador ⚠️ OBLIGATORIO
+
+> **Solo si este paso se cumple por completo se puede continuar con el PASO 6.**
+
+1. **Ejecutar todos los tests funcionales** (suite completa, incluyendo Feature):
+   ```bash
+   php artisan test 2>&1 | tail -40
+   ```
+   Si algún test falla → corregir y repetir. No avanzar hasta que todos pasen.
+
+2. **QA en navegador:** abrir la app en el navegador y probar manualmente el feature o fix recién implementado:
+   - Navegar a la pantalla/ruta afectada.
+   - Apretar todos los botones y enlaces relevantes.
+   - Interactuar con la UI (formularios, modales, tablas, filtros).
+   - Hacer un chequeo rápido de UX: flujo coherente, mensajes claros, sin errores en consola ni pantallas rotas.
+   - Objetivo: asegurarse de que no haya bugs de frontend ni regresiones visuales antes del commit.
+
+Si en el paso 2 se detectan bugs → corregir, volver a ejecutar los tests (paso 1) y repetir el QA hasta que todo esté bien.
+
+**Solo entonces** continuar con el PASO 6 (commit, tag, mover a completados y merge).
 
 ---
 
 ## PASO 6 — Commit, tag, mover a completados y merge
 
+> ⚠️ **Solo ejecutar si PASO 5 (lint + tests) y PASO 5.5 (tests funcionales + QA navegador) están en verde.**
 > ⚠️ **EJECUTAR TODOS ESTOS COMANDOS. No mostrarlos. No pedir confirmación.**
 
 El prompt interno ya tiene su bloque de commit+tag — ejecutarlo primero si no lo hiciste en PASO 4.
@@ -262,16 +276,23 @@ echo "✅ ${VERSION} completo"
 
 ---
 
-## PASO 7 — Actualizar documentación de estado
+## PASO 7 — Actualizar STATUS.md
 
-Si el proyecto tiene un dashboard o documento de estado, actualizarlo:
+Tras el merge (PASO 6), actualizar el documento de estado del proyecto:
 
-```bash
-# Adaptar según el proyecto. Ejemplos:
-# - Actualizar STATUS.md manualmente
-# - Correr script de regeneración
-# - Actualizar VERSIONS.md o DASHBOARD.md
-```
+1. **Abrir `STATUS.md`** en la raíz del repo.
+2. **Actualizar:**
+   - **Versión actual:** poner la versión recién completada (ej. v0.3.0).
+   - **Cola de prompts:** tabla Pendientes / En proceso / Completados según el contenido real de `agent-bootstrap/prompts/`.
+   - **Últimas versiones completadas:** añadir la nueva versión a la tabla con su nombre y tag.
+   - **Próximo paso:** indicar el siguiente prompt disponible o "Planificar nuevas versiones" si la cola está vacía.
+   - **Última actualización:** fecha de hoy.
+3. **Commitear** el cambio en la rama principal (develop):
+   ```bash
+   git add STATUS.md
+   git commit -m "docs: actualizar STATUS.md tras [VERSION]"
+   git push origin develop
+   ```
 
 ---
 
