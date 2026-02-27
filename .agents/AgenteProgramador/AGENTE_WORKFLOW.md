@@ -141,6 +141,15 @@ Si hubo colisión → volver al PASO 1.
 
 ## PASO 3 — Leer el prompt y el contexto del repo
 
+### 3.0 — Verificar si hay handoff del PM
+
+```bash
+ls agent-bootstrap/handoffs/ | grep "${VERSION}"
+```
+
+Si existe un handoff → leerlo antes del prompt. Es el contexto mínimo que el PM dejó.
+Si no existe → continuar normalmente con el prompt.
+
 Leer el prompt completo desde su nueva ubicación:
 ```
 @agent-bootstrap/prompts/en_proceso/[ARCHIVO_ELEGIDO]

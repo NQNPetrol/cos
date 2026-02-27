@@ -273,6 +273,19 @@ Completar cada campo con lo acordado en la conversación:
 
 Guardar en: `agent-bootstrap/prompts/pendientes/[VERSION]-[SLUG].md`
 
+### 4.1 — Generar handoff de salida (opcional pero recomendado)
+
+Si la versión es compleja o requiere contexto especial para el Dev, generar un handoff:
+
+Guardar en: `agent-bootstrap/handoffs/[VERSION]-pm-to-dev.md`
+
+Usar la plantilla `agent-bootstrap/handoffs/HANDOFF.template.md`.
+Completar con:
+- Lo que se acordó en la sesión
+- Decisiones de scope tomadas con el usuario
+- Archivos clave para que el Dev lea primero
+- Advertencias o edge cases detectados
+
 Luego actualizar `ROADMAP.md` agregando la nueva versión en la sección correcta
 (Planeado / En progreso / según corresponda).
 
