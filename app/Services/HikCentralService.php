@@ -67,9 +67,9 @@ class HikCentralService
                 'x-ca-signature' => $signature,
                 'x-ca-timestamp' => $timestamp,
             ])->post($url, [
-             'pageNo' => $pageNo,
-             'pageSize' => $pageSize,
-         ]);
+                'pageNo' => $pageNo,
+                'pageSize' => $pageSize,
+            ]);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -146,12 +146,12 @@ class HikCentralService
                 'x-ca-signature' => $signature,
                 'x-ca-timestamp' => $timestamp,
             ])->post($url, [
-             'pageNo' => 1,
-             'pageSize' => 100,
-             'siteIndexCode' => '0',
-             'deviceType' => 'encodeDevice',
-             'bRecordSetting' => 1,
-         ]);
+                'pageNo' => 1,
+                'pageSize' => 100,
+                'siteIndexCode' => '0',
+                'deviceType' => 'encodeDevice',
+                'bRecordSetting' => 1,
+            ]);
 
         if ($response->successful()) {
             $data = $response->json();

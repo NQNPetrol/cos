@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Rodado;
 use App\Models\Cliente;
+use App\Models\Rodado;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
