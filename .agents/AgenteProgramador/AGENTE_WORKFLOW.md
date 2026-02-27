@@ -256,7 +256,7 @@ git commit --no-verify -m "chore(agent): ${VERSION} completado → completados/"
 # 2. Push de la rama con tags
 git push origin $BRANCH --tags
 
-# 3. Merge a main/develop
+# 3. Merge a develop
 git checkout $MAIN_BRANCH
 git pull origin $MAIN_BRANCH
 git merge --no-ff $BRANCH -m "merge: ${VERSION} completado"
