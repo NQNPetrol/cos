@@ -74,8 +74,8 @@ class ManageTickets extends Component
             } elseif ($this->clientTypeFilter === 'cliente') {
                 $query->whereNotNull('cliente_id');
             }
-        } elseif ($user->hasRole('cliente')) {
-            // Usuarios con rol cliente ven tickets de sus clientes y tickets asignados a ellos
+        } elseif ($user->hasAnyRole(['cliente', 'clientadmin', 'clientsupervisor'])) {
+            // Usuarios de la familia cliente ven tickets de sus clientes y tickets asignados a ellos
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
 
             $query->where(function ($q) use ($user, $userClientes) {
@@ -135,8 +135,8 @@ class ManageTickets extends Component
                     ->orderBy('name')
                     ->get();
             }
-        } elseif ($user->hasRole('cliente')) {
-            // Usuarios cliente solo pueden asignar si pertenecen al COS
+        } elseif ($user->hasAnyRole(['cliente', 'clientadmin', 'clientsupervisor'])) {
+            // Usuarios de la familia cliente solo pueden asignar si pertenecen al COS
             if ($cosCliente && UserCliente::where('user_id', $user->id)->where('cliente_id', $cosCliente->id)->exists()) {
                 return User::whereHas('userClientes', function ($q) use ($cosCliente) {
                     $q->where('cliente_id', $cosCliente->id);
@@ -674,8 +674,8 @@ class ManageTickets extends Component
             return true;
         }
 
-        if ($user->hasRole('cliente')) {
-            // Usuarios cliente pueden editar tickets de sus clientes o asignados a ellos
+        if ($user->hasAnyRole(['cliente', 'clientadmin', 'clientsupervisor'])) {
+            // Usuarios de la familia cliente pueden editar tickets de sus clientes o asignados a ellos
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
 
             return in_array($ticket->cliente_id, $userClientes->toArray()) ||
