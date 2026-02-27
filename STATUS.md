@@ -14,9 +14,9 @@
 
 | Estado       | Cantidad | Detalle |
 |-------------|----------|---------|
-| **Pendientes** | 2        | v-agents-0.3.0, v0.6.0 en `agent-bootstrap/prompts/pendientes/` |
+| **Pendientes** | 1        | v0.6.0 en `agent-bootstrap/prompts/pendientes/` |
 | **En proceso** | 0        | Ninguno en `agent-bootstrap/prompts/en_proceso/` |
-| **Completados** | 7      | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v-agents-0.1.0, v-agents-0.2.0 |
+| **Completados** | 8      | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 |
 
 ---
 
@@ -24,6 +24,7 @@
 
 | Versión | Nombre | Tag |
 |---------|--------|-----|
+| v-agents-0.3.0 | Handoffs estructurados entre agentes | `v-agents-0.3.0` |
 | v-agents-0.2.0 | AgenteReviewer (revisión de código) | `v-agents-0.2.0` |
 | v-agents-0.1.0 | Activar AgenteQA y AgenteDesigner | `v-agents-0.1.0` |
 | v0.5.0 | UX creación de tickets cliente | `v0.5.0` |
@@ -36,9 +37,9 @@
 
 ## Próximo paso
 
-- **Cola de agentes:** v-agents-0.3.0 (dep: v-agents-0.1.0 ✅ y v-agents-0.2.0 ✅ — ambas satisfechas)
+- **Cola de agentes:** ✅ Completa (v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 todos mergeados)
 - **Siguiente en cola app:** v0.6.0 — Mesa de ayuda / chat asistente (dep: v0.4.0 ✅ y v0.5.0 ✅)
 
 ---
 
-*Última actualización: 2026-02-27 (v-agents-0.2.0 completado).*
+*Última actualización: 2026-02-27 (v-agents-0.3.0 completado).*
