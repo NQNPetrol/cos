@@ -39,21 +39,23 @@
 - [x] Inventario de dispositivos
 - [x] Objetivos y objetivos AIPEM
 - [x] CI/CD (workflow en repo), Laravel Pint
+- [x] **v0.1.0 — Base de tests + seguridad** *(completado)*  
+  Configuración Pest/CI (MySQL en CI), tests de autenticación y autorización (permisos admin/cliente). Prompt en `agent-bootstrap/prompts/completados/v0.1.0-base-tests-seguridad.md`. Tag `v0.1.0`.
+- [x] **v0.3.0 — Corrección y mejora carga KML en Recorridos** *(completado)*  
+  Prompt en `agent-bootstrap/prompts/completados/v0.3.0-recorridos-kml-fix.md`. Tag `v0.3.0`. Parseo KML robusto (namespace, LineString/Point), mapa preview y detalle, velocidad máxima, mensajes de error y validación .kml/.kmz.
+- [x] **v0.4.0 — Visibilidad de tickets para todos los roles cliente** *(completado)*  
+  Que cliente, clientadmin y clientsupervisor vean los tickets del/los cliente(s) asignados. Prompt: `agent-bootstrap/prompts/pendientes/v0.4.0-tickets-visibilidad-roles-cliente.md`. Sin dependencias.
+- [x] **v0.5.0 — UX creación de tickets** *(completado)*  
+  Menos clicks, formulario intuitivo y feedback claro al crear ticket (vista cliente). Prompt: `agent-bootstrap/prompts/pendientes/v0.5.0-tickets-ux-creacion.md`. Recomendable v0.4.0.
+- [x] **v0.2.0 — Tests funcionales de módulos críticos** *(completado)*  
+  Prompt: `agent-bootstrap/prompts/pendientes/v0.2.0-tests-funcionales-modulos.md`. Unit + feature para Eventos, Rodados y Tickets; factories; CI; documentación. Depende de v0.1.0 (ya completado).
 
 ---
 
 ##  Planeado
 
-- [x] **v0.1.0 — Base de tests + seguridad** *(completado)*  
-  Configuración Pest/CI (MySQL en CI), tests de autenticación y autorización (permisos admin/cliente). Prompt en `agent-bootstrap/prompts/completados/v0.1.0-base-tests-seguridad.md`. Tag `v0.1.0`.
-- [ ] **v0.2.0 — Tests funcionales de módulos críticos** *(pendiente)*  
-  Prompt: `agent-bootstrap/prompts/pendientes/v0.2.0-tests-funcionales-modulos.md`. Unit + feature para Eventos, Rodados y Tickets; factories; CI; documentación. Depende de v0.1.0 (ya completado).
-- [x] **v0.3.0 — Corrección y mejora carga KML en Recorridos** *(completado)*  
-  Prompt en `agent-bootstrap/prompts/completados/v0.3.0-recorridos-kml-fix.md`. Tag `v0.3.0`. Parseo KML robusto (namespace, LineString/Point), mapa preview y detalle, velocidad máxima, mensajes de error y validación .kml/.kmz.
-- [ ] **v0.4.0 — Visibilidad de tickets para todos los roles cliente** *(pendiente)*  
-  Que cliente, clientadmin y clientsupervisor vean los tickets del/los cliente(s) asignados. Prompt: `agent-bootstrap/prompts/pendientes/v0.4.0-tickets-visibilidad-roles-cliente.md`. Sin dependencias.
-- [ ] **v0.5.0 — UX creación de tickets** *(pendiente)*  
-  Menos clicks, formulario intuitivo y feedback claro al crear ticket (vista cliente). Prompt: `agent-bootstrap/prompts/pendientes/v0.5.0-tickets-ux-creacion.md`. Recomendable v0.4.0.
+
+
 - [ ] **v0.6.0 — Mesa de ayuda / chat asistente** *(pendiente)*  
   Mesa de ayuda accesible desde cliente (y opcionalmente admin) con chat que guíe: crear ticket, crear evento, documentación patrullas. Respuestas estáticas o por palabras clave. Prompt: `agent-bootstrap/prompts/pendientes/v0.6.0-mesa-ayuda-chat-asistente.md`. Recomendable v0.4.0 y v0.5.0.
 

@@ -11,6 +11,8 @@ Este directorio contiene todo lo necesario para que un agente de IA pueda **ayud
 | `AGENTE_CEO.md` | **Orquestador** — interfaz principal, delega al PM y al DEV según lo que el usuario necesite |
 | `AGENTE_PM.md` | **Agente de planificación** — conversa con el equipo/cliente y genera prompts en `pendientes/` |
 | `AGENTE_DEV.md` | **Agente de ejecución** — toma prompts de la cola y los implementa con lock multi-agente |
+| `AGENTE_QA.md` | **Agente de calidad** — ejecuta tests, verifica en el navegador y genera prompts de fix (ver `.agents/AgenteQA/`) |
+| `AGENTE_DESIGNER.md` | **Agente de diseño** — piensa la UI/UX antes de implementar y recomienda mejoras (ver `.agents/AgenteDesigner/`) |
 | `AGENT_PROMPT.md` | Diagnóstico y generación de documentación — para proyectos sin docs |
 | `prompts/` | Cola de tareas del agente (`pendientes/`, `en_proceso/`, `completados/`) + prompts de descubrimiento |
 | `templates/` | Plantillas de documentos y de prompts de tarea |
