@@ -13,6 +13,7 @@ Este directorio contiene todo lo necesario para que un agente de IA pueda **ayud
 | `AGENTE_DEV.md` | **Agente de ejecución** — toma prompts de la cola y los implementa con lock multi-agente |
 | `AGENTE_QA.md` | **Agente de calidad** — ejecuta tests, verifica en el navegador y genera prompts de fix (ver `.agents/AgenteQA/`) |
 | `AGENTE_DESIGNER.md` | **Agente de diseño** — piensa la UI/UX antes de implementar y recomienda mejoras (ver `.agents/AgenteDesigner/`) |
+| `AGENTE_REVIEWER.md` | **Agente de revisión de código** — inspecciona diffs, detecta BLOCKERs/WARNINGs/SUGGESTIONs antes del merge (ver `.agents/AgenteReviewer/`) |
 | `AGENT_PROMPT.md` | Diagnóstico y generación de documentación — para proyectos sin docs |
 | `prompts/` | Cola de tareas del agente (`pendientes/`, `en_proceso/`, `completados/`) + prompts de descubrimiento |
 | `templates/` | Plantillas de documentos y de prompts de tarea |
@@ -100,6 +101,22 @@ Lee agent-bootstrap/templates/ROADMAP.template.md y generá el ROADMAP.md del pr
 - `CHANGELOG.md` — Historial de cambios por versión
 - `CONTRIBUTING.md` — Guía para contribuidores
 - `docs/PROJECT_OVERVIEW.md` — Visión general extendida
+
+---
+
+## 🔍 Delegación al AgenteReviewer
+
+Invocar al Reviewer antes del merge cuando:
+- La versión toca código sensible (permisos, autenticación, pagos)
+- La versión es grande (muchos archivos cambiados)
+- El usuario lo solicita explícitamente
+
+```
+[DELEGANDO A AGENTE_REVIEWER]
+Lee .agents/AgenteReviewer/AGENTE_REVIEWER.md.
+Scope: diff de [vX.Y.Z].
+Cuando termines, reportá el resultado al AGENTE_CEO.
+```
 
 ---
 
