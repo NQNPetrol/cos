@@ -90,6 +90,17 @@ VEREDICTO:
 ══════════════════════════════════════════════════
 ```
 
+### Handoff al CEO tras revisión aprobada
+
+Si el veredicto es ✅ o ⚠️, generar handoff opcional:
+
+Guardar en: `agent-bootstrap/handoffs/[VERSION]-reviewer-to-ceo.md`
+
+Incluir:
+- Veredicto y resumen de hallazgos
+- Si hay WARNINGs pendientes: listarlos para que el CEO los comunique al Dev
+- Confirmación de que el merge puede proceder
+
 ---
 
 ## PASO 3 — Si hay BLOCKERs: generar prompt de fix
