@@ -6,7 +6,7 @@
 
 ## Versión actual
 
-**v0.5.0** — Última versión de la app completada y mergeada en `develop`.
+**v0.6.0** — Última versión de la app completada y mergeada en `develop`.
 
 ---
 
@@ -14,9 +14,9 @@
 
 | Estado       | Cantidad | Detalle |
 |-------------|----------|---------|
-| **Pendientes** | 1        | v0.6.0 en `agent-bootstrap/prompts/pendientes/` |
+| **Pendientes** | 0        | Cola vacía |
 | **En proceso** | 0        | Ninguno en `agent-bootstrap/prompts/en_proceso/` |
-| **Completados** | 8      | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 |
+| **Completados** | 9      | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 |
 
 ---
 
@@ -24,6 +24,7 @@
 
 | Versión | Nombre | Tag |
 |---------|--------|-----|
+| v0.6.0 | Mesa de ayuda / chat asistente | `v0.6.0` |
 | v-agents-0.3.0 | Handoffs estructurados entre agentes | `v-agents-0.3.0` |
 | v-agents-0.2.0 | AgenteReviewer (revisión de código) | `v-agents-0.2.0` |
 | v-agents-0.1.0 | Activar AgenteQA y AgenteDesigner | `v-agents-0.1.0` |
@@ -38,8 +39,9 @@
 ## Próximo paso
 
 - **Cola de agentes:** ✅ Completa (v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 todos mergeados)
-- **Siguiente en cola app:** v0.6.0 — Mesa de ayuda / chat asistente (dep: v0.4.0 ✅ y v0.5.0 ✅)
+- **Cola de app:** ✅ Completa (todos los prompts hasta v0.6.0 mergeados)
+- **Siguiente:** Planificar nuevas versiones o definir nuevos prompts en `agent-bootstrap/prompts/pendientes/`
 
 ---
 
-*Última actualización: 2026-02-27 (v-agents-0.3.0 completado).*
+*Última actualización: 2026-02-27 (v0.6.0 completado).*
