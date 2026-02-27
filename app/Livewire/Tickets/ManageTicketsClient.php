@@ -38,6 +38,8 @@ class ManageTicketsClient extends Component
 
     public $ticketId;
 
+    public $expandedTicketId = null;
+
     public $statusFilter = '';
 
     public $categoryFilter = '';
@@ -58,6 +60,39 @@ class ManageTicketsClient extends Component
     public function mount()
     {
         $this->resetForm();
+        $this->autoConfigureForClienteRole();
+    }
+
+    private function isClienteRole(): bool
+    {
+        $user = auth()->user();
+
+        return $user->hasAnyRole(['cliente', 'clientadmin', 'clientsupervisor'])
+            && ! $user->hasRole('admin')
+            && ! $user->hasRole('operador');
+    }
+
+    private function autoConfigureForClienteRole(): void
+    {
+        if (! $this->isClienteRole()) {
+            return;
+        }
+
+        // Force emitido_por = CLIENTE for client users
+        $this->emitido_por = 'CLIENTE';
+        $this->showClienteField = true;
+
+        // Auto-select the first client the user belongs to
+        $user = auth()->user();
+        $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
+        if ($userClientes->count() === 1) {
+            $this->cliente_id = $userClientes->first();
+        }
+    }
+
+    public function toggleDetails($id): void
+    {
+        $this->expandedTicketId = ($this->expandedTicketId === $id) ? null : $id;
     }
 
     public function render()
@@ -81,9 +116,9 @@ class ManageTicketsClient extends Component
             $query->where(function ($q) use ($user, $userClientes) {
                 // Tickets de los clientes a los que pertenece
                 $q->whereIn('cliente_id', $userClientes)
-                  // O tickets asignados específicamente a este usuario
+                    // O tickets asignados específicamente a este usuario
                     ->orWhere('asignado_a', $user->id)
-                  // O tickets creados por el usuario
+                    // O tickets creados por el usuario
                     ->orWhere('user_id', $user->id);
             });
         } else {
@@ -152,6 +187,7 @@ class ManageTicketsClient extends Component
     public function openModal()
     {
         $this->resetForm();
+        $this->autoConfigureForClienteRole();
         $this->showModal = true;
         $this->editMode = false;
 
@@ -168,6 +204,7 @@ class ManageTicketsClient extends Component
     public function create()
     {
         $this->resetForm();
+        $this->autoConfigureForClienteRole();
         $this->showModal = true;
         $this->editMode = false;
     }
@@ -679,8 +716,8 @@ class ManageTicketsClient extends Component
             $userClientes = UserCliente::where('user_id', $user->id)->pluck('cliente_id');
 
             return in_array($ticket->cliente_id, $userClientes->toArray()) ||
-                   $ticket->asignado_a === $user->id ||
-                   $ticket->user_id === $user->id;
+                $ticket->asignado_a === $user->id ||
+                $ticket->user_id === $user->id;
         }
 
         // Otros roles solo pueden editar sus propios tickets
