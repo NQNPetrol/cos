@@ -63,9 +63,9 @@ Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proce
 
 ### 🤖 Sistema de Agentes
 
-- [ ] **v-agents-0.1.0 — Activar AgenteQA y AgenteDesigner** *(pendiente)*  
-  Verificar integridad de archivos existentes y registrar ambos agentes formalmente en el sistema. Actualizar el CEO para incluir delegación explícita a ambos.  
-  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.1.0-activar-agenteqa-y-designer.md`.
+- [x] **v-agents-0.1.0 — Activar AgenteQA y AgenteDesigner** *(completado)*  
+  Verificada integridad de archivos existentes, ambos agentes registrados formalmente en el sistema. CEO actualizado con delegación explícita a ambos.  
+  Prompt: `agent-bootstrap/prompts/completados/v-agents-0.1.0-activar-agenteqa-y-designer.md`. Tag `v-agents-0.1.0`.
 
 - [ ] **v-agents-0.2.0 — AGENTE_REVIEWER** *(pendiente — recomendable v-agents-0.1.0)*  
   Nuevo agente de revisión de código antes del merge. Inspecciona diffs, detecta BLOCKERs/WARNINGs/SUGGESTIONs, y genera prompts de fix si hay bloqueantes. Complementa al AgenteQA (que verifica funcionalidad) con revisión de código estática. Inspirado en el rol "Code Reviewer" del framework FactoryAI.  
