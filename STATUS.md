@@ -34,8 +34,9 @@
 
 ## Próximo paso
 
-- **Siguiente en cola:** v0.6.0 — Mesa de ayuda / chat asistente
 - **Cola de agentes:** v-agents-0.1.0 → v-agents-0.2.0 → v-agents-0.3.0 (pueden ejecutarse en paralelo a las versiones de producto)
+- **Siguiente en cola:** v0.6.0 — Mesa de ayuda / chat asistente
+
 
 ---
 

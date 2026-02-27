@@ -229,8 +229,33 @@ Escuchar feedback y ajustar. Cosas comunes a negociar:
 ```
 Voy a generar el prompt para [vX.Y.Z].
 Lo voy a guardar en: agent-bootstrap/prompts/pendientes/[ARCHIVO].md
+```
 
-¿Procedemos?
+Antes de generar, evaluar si la versión involucra **pantallas nuevas o cambios de interfaz significativos**.
+Si es así, preguntar:
+
+```
+Esta versión incluye cambios de UI. ¿Querés que invoque al AGENTE_DESIGNER
+para que documente el diseño antes de que el DEV empiece a implementar?
+
+1. Sí — el Designer diseña primero, el DEV implementa con ese contexto
+2. No — el DEV implementa directamente
+```
+
+Si dice sí → delegar al Designer antes de guardar el prompt:
+
+```
+[DELEGANDO A AGENTE_DESIGNER]
+Lee .agents/AgenteDesigner/AGENTE_DESIGNER.md.
+Modo: nueva pantalla.
+Feature: [descripción de la versión y sus componentes visuales].
+Cuando termines, el documento de diseño va a ser contexto adicional para el AGENTE_DEV.
+```
+
+Una vez el Designer terminó (o si el usuario dijo no), continuar con:
+
+```
+¿Procedemos a generar el prompt de tarea?
 ```
 
 ---
@@ -312,3 +337,4 @@ Para arrancar el agente de ejecución:
 4. **Una versión por sesión mínimo** — no terminar la sesión sin haber generado algo concreto
 5. **Lenguaje adaptable** — técnico con devs, funcional con clientes
 6. **El ROADMAP es la fuente de verdad** — siempre actualizarlo al final
+7. **Invocar al Designer en versiones con UI nueva** — antes de generar el prompt de tarea, preguntar si se necesita diseño previo cuando la versión tiene pantallas o componentes visuales nuevos
