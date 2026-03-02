@@ -57,7 +57,12 @@
 
 ##  Planeado
 
-- Cola vacía. Planificar nuevas versiones según requerimientos del cliente.
+> Cola de prompts listos. Ver `agent-bootstrap/prompts/pendientes/`.
+
+- [ ] **v0.7.0 — Rediseño vistas de autenticación + reCAPTCHA v2** *(pendiente)*  
+  Unificar y modernizar login, register, forgot-password y reset-password con el sistema dark de la app. Logo CyH Sur SA correcto (`cyh-white.png`). reCAPTCHA v2 en login. Responsive mobile-first.  
+  Prompt: `agent-bootstrap/prompts/pendientes/v0.7.0-auth-redesign-recaptcha.md`.  
+  Diseño: `agent-bootstrap/prompts/pendientes/DISEÑO_v0.7.0-auth-recaptcha.md`.
 
 Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proceso / completados / bloqueados).
 
@@ -67,19 +72,25 @@ Flujo de prompts: ver `agent-bootstrap/prompts/README.md` (pendientes / en_proce
   Verificada integridad de archivos existentes, ambos agentes registrados formalmente en el sistema. CEO actualizado con delegación explícita a ambos.  
   Prompt: `agent-bootstrap/prompts/completados/v-agents-0.1.0-activar-agenteqa-y-designer.md`. Tag `v-agents-0.1.0`.
 
-- [ ] **v-agents-0.2.0 — AGENTE_REVIEWER** *(pendiente — recomendable v-agents-0.1.0)*  
-  Nuevo agente de revisión de código antes del merge. Inspecciona diffs, detecta BLOCKERs/WARNINGs/SUGGESTIONs, y genera prompts de fix si hay bloqueantes. Complementa al AgenteQA (que verifica funcionalidad) con revisión de código estática. Inspirado en el rol "Code Reviewer" del framework FactoryAI.  
-  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.2.0-agente-reviewer.md`.
+- [x] **v-agents-0.2.0 — AGENTE_REVIEWER** *(completado)*  
+  Agente de revisión de código antes del merge. Inspecciona diffs, detecta BLOCKERs/WARNINGs/SUGGESTIONs, y genera prompts de fix si hay bloqueantes. Complementa al AgenteQA con revisión estática de código.  
+  Prompt: `agent-bootstrap/prompts/completados/v-agents-0.2.0-agente-reviewer.md`.
 
-- [ ] **v-agents-0.3.0 — Handoffs estructurados** *(pendiente — recomendable v-agents-0.1.0 y v-agents-0.2.0)*  
-  Formalizar el traspaso de contexto entre agentes con archivos de handoff en `agent-bootstrap/handoffs/`. El PM deja un handoff para el Dev; el Reviewer deja un handoff para el CEO. Mejora la continuidad en sesiones largas o multi-agente. Inspirado en "Agent Handoffs" del framework FactoryAI.  
-  Prompt: `agent-bootstrap/prompts/pendientes/v-agents-0.3.0-handoffs-estructurados.md`.
+- [x] **v-agents-0.3.0 — Handoffs estructurados** *(completado)*  
+  Traspaso de contexto entre agentes con archivos de handoff en `agent-bootstrap/handoffs/`. El PM deja un handoff para el Dev; el Reviewer lo deja para el CEO. Mejora la continuidad en sesiones largas o multi-agente.  
+  Prompt: `agent-bootstrap/prompts/completados/v-agents-0.3.0-handoffs-estructurados.md`.
 
 ---
 
 ## 🔮 Backlog / Ideas
 
-- Próximas funcionalidades y prioridades según requerimientos del cliente (CyH Sur) y prompts en el repo.
+> Ideas priorizadas sin prompt generado aún. Al definir cada una con el PM, se creará el prompt y se moverá a `pendientes/`.
+
+- [ ] **v0.8.0 — Dashboard de Operaciones: migración a Leaflet** *(prioridad 1 — sin prompt)*  
+  Reemplazar Google Maps por Leaflet.js en el dashboard de operaciones. Respetar marcadores con colores e iconos distintivos, mejorar el comportamiento de agrupamiento (clustering) al quitar zoom, mantener los filtros estilo pill y la interacción mapa ↔ panel de eventos lateral. Modernizar y optimizar sin sobrecargar la vista.
+
+- [ ] **v0.9.0 — Auditoría y corrección responsive de vistas cliente** *(prioridad 2 — sin prompt)*  
+  Verificar que todas las vistas del proyecto (principalmente vistas cliente) sean responsive. Adaptar las que no lo sean. Incluir tests con AgenteQA para asegurar la calidad del resultado en múltiples tamaños de pantalla.
 
 ---
 
