@@ -24,7 +24,7 @@ Este directorio contiene todo lo necesario para que un agente de IA pueda **ayud
 Para proyectos con tareas definidas en `prompts/pendientes/`:
 
 ```
-Lee agent-bootstrap/AGENTE_WORKFLOW.md y ejecutá el ciclo.
+Lee .agents/AgenteProgramador/AGENTE_WORKFLOW.md y ejecutá el ciclo.
 ```
 
 El agente va a:

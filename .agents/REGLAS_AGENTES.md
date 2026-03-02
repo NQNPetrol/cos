@@ -22,3 +22,15 @@
 - Si aparece algún error o comportamiento incorrecto → **corregir antes de commitear**.
 
 Solo después de que **tests pasen** y **la verificación manual en navegador sea correcta**, se puede proceder al commit y al Pull Request.
+
+---
+
+## Skills obligatorias
+
+Antes de realizar cualquier tarea, el agente **DEBE**:
+
+1. **Revisar las skills disponibles** en `.agents/skills/`.
+2. **Leer el `SKILL.md`** de toda skill relevante a la tarea antes de comenzar.
+3. **Seguir las instrucciones** de la skill al pie de la letra durante la ejecución.
+
+> Si una tarea involucra múltiples skills (ej.: diseño + Vue + responsive), se deben leer **todas** las skills aplicables antes de escribir código.
