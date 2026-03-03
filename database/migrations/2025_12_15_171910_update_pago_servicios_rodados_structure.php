@@ -12,15 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pago_servicios_rodados', function (Blueprint $table) {
-            // Drop mes and año columns
-            $table->dropColumn(['mes', 'año']);
+        if (Schema::hasColumn('pago_servicios_rodados', 'mes')) {
+            Schema::table('pago_servicios_rodados', function (Blueprint $table) {
+                $table->dropColumn(['mes', 'año']);
+            });
+        }
 
-            // Add moneda enum column
-            $table->enum('moneda', ['ARS', 'USD'])->default('ARS')->after('monto');
-        });
+        if (! Schema::hasColumn('pago_servicios_rodados', 'moneda')) {
+            Schema::table('pago_servicios_rodados', function (Blueprint $table) {
+                $table->enum('moneda', ['ARS', 'USD'])->default('ARS')->after('monto');
+            });
+        }
 
-        // Update tipo enum - Laravel doesn't support modifying enums directly, so we use DB::statement
         DB::statement("ALTER TABLE pago_servicios_rodados MODIFY COLUMN tipo ENUM('pago_patente', 'pago_alquiler', 'pago_proveedor', 'pago_a_proveedor', 'pago_seguro', 'pago_servicio_starlink', 'pago_vtv', 'pagos_adicionales') DEFAULT 'pago_patente'");
     }
 

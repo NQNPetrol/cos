@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('objetivos_aipem')) { return; }
+
         Schema::create('objetivos_aipem', function (Blueprint $table) {
             $table->id();
             $table->string('codobj');

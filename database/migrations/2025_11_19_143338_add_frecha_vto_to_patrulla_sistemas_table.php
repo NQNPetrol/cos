@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('patrulla_sistemas', function (Blueprint $table) {
-            $table->date('fecha_vto')->nullable()->after('fecha_registro');
-        });
+        if (! Schema::hasColumn('patrulla_sistemas', 'fecha_vto')) {
+            Schema::table('patrulla_sistemas', function (Blueprint $table) {
+                $table->date('fecha_vto')->nullable()->after('fecha_registro');
+            });
+        }
     }
 
     /**

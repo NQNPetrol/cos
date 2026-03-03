@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('alert_logs', function (Blueprint $table) {
-            $table->foreignId('mision_id')->nullable()->constrained('misiones_flytbase');
-            $table->index('mision_id');
-        });
+        if (! Schema::hasColumn('alert_logs', 'mision_id')) {
+            Schema::table('alert_logs', function (Blueprint $table) {
+                $table->foreignId('mision_id')->nullable()->constrained('misiones_flytbase');
+                $table->index('mision_id');
+            });
+        }
     }
 
     /**

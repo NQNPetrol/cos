@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('patrullas', function (Blueprint $table) {
-            $table->foreignId('cliente_id')
-                ->nullable()
-                ->constrained('clientes');
-        });
+        if (! Schema::hasColumn('patrullas', 'cliente_id')) {
+            Schema::table('patrullas', function (Blueprint $table) {
+                $table->foreignId('cliente_id')
+                    ->nullable()
+                    ->constrained('clientes');
+            });
+        }
     }
 
     /**

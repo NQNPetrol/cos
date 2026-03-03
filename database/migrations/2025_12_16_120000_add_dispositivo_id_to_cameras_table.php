@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cameras', function (Blueprint $table) {
-            $table->foreignId('dispositivo_id')
-                ->nullable()
-                ->after('encode_dev_index_code')
-                ->constrained('dispositivos')
-                ->onDelete('set null');
+        if (! Schema::hasColumn('cameras', 'dispositivo_id')) {
+            Schema::table('cameras', function (Blueprint $table) {
+                $table->foreignId('dispositivo_id')
+                    ->nullable()
+                    ->after('encode_dev_index_code')
+                    ->constrained('dispositivos')
+                    ->onDelete('set null');
 
-            $table->index('dispositivo_id');
-        });
+                $table->index('dispositivo_id');
+            });
+        }
     }
 
     /**

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('personal', function (Blueprint $table) {
-            $table->string('tipo_doc')->nullable();
-            $table->string('nro_doc')->nullable();
-            $table->string('telefono')->nullable();
-            $table->integer('legajo')->nullable();
-        });
+        if (! Schema::hasColumn('personal', 'tipo_doc')) {
+            Schema::table('personal', function (Blueprint $table) {
+                $table->string('tipo_doc')->nullable();
+                $table->string('nro_doc')->nullable();
+                $table->string('telefono')->nullable();
+                $table->integer('legajo')->nullable();
+            });
+        }
     }
 
     /**

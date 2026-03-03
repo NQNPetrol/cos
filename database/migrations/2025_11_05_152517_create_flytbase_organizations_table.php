@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('flytbase_organizations')) { return; }
+
         Schema::create('flytbase_organizations', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');

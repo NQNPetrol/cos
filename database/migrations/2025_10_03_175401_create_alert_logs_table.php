@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('alert_logs')) { return; }
+
         Schema::create('alert_logs', function (Blueprint $table) {
             $table->id();
             $table->string('tipo_alerta'); // trigger_mision, alerta_tecnica, alerta_hardware

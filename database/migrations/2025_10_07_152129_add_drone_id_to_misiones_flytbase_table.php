@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('misiones_flytbase', function (Blueprint $table) {
-            $table->foreignId('drone_id')
-                ->after('cliente_id')
-                ->nullable()
-                ->constrained('drones_flytbase')
-                ->onDelete('set null');
-        });
+        if (! Schema::hasColumn('misiones_flytbase', 'drone_id')) {
+            Schema::table('misiones_flytbase', function (Blueprint $table) {
+                $table->foreignId('drone_id')
+                    ->after('cliente_id')
+                    ->nullable()
+                    ->constrained('drones_flytbase')
+                    ->onDelete('set null');
+            });
+        }
     }
 
     /**

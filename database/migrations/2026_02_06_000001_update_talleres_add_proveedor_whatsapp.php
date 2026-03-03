@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('talleres', function (Blueprint $table) {
-            $table->foreignId('proveedor_id')->nullable()->constrained('proveedores')->onDelete('set null');
-            $table->string('whatsapp')->nullable();
-        });
+        if (! Schema::hasColumn('talleres', 'proveedor_id')) {
+            Schema::table('talleres', function (Blueprint $table) {
+                $table->foreignId('proveedor_id')->nullable()->constrained('proveedores')->onDelete('set null');
+                $table->string('whatsapp')->nullable();
+            });
+        }
     }
 
     public function down(): void

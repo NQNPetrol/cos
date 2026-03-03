@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('drones_flytbase', function (Blueprint $table) {
-            $table->foreignId('dock_id')->nullable()->constrained('flytbase_docks');
-        });
+        if (! Schema::hasColumn('drones_flytbase', 'dock_id')) {
+            Schema::table('drones_flytbase', function (Blueprint $table) {
+                $table->foreignId('dock_id')->nullable()->constrained('flytbase_docks');
+            });
+        }
     }
 
     /**

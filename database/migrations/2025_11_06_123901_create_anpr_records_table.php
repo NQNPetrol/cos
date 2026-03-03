@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('anpr_passing_records')) { return; }
+
         Schema::create('anpr_passing_records', function (Blueprint $table) {
             $table->id();
             $table->string('cross_record_syscode');

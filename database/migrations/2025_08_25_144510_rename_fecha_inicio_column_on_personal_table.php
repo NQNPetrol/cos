@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('personal', function (Blueprint $table) {
-            $table->renameColumn('fecha_inicio', 'fecha_ing');
-        });
+        if (Schema::hasColumn('personal', 'fecha_inicio')) {
+            Schema::table('personal', function (Blueprint $table) {
+                $table->renameColumn('fecha_inicio', 'fecha_ing');
+            });
+        }
     }
 
     /**

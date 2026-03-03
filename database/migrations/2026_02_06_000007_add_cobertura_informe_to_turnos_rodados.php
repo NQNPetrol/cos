@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('turnos_rodados', function (Blueprint $table) {
-            $table->string('cobertura_estado')->default('pendiente');
-            $table->string('informe_path')->nullable();
-        });
+        if (! Schema::hasColumn('turnos_rodados', 'cobertura_estado')) {
+            Schema::table('turnos_rodados', function (Blueprint $table) {
+                $table->string('cobertura_estado')->default('pendiente');
+                $table->string('informe_path')->nullable();
+            });
+        }
     }
 
     public function down(): void

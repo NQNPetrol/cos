@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contratos', function (Blueprint $table) {
-            $table->date('fecha_inicio')->nullable()->change();
-        });
+        if (Schema::hasColumn('contratos', 'fecha_inicio')) {
+            Schema::table('contratos', function (Blueprint $table) {
+                $table->date('fecha_inicio')->nullable()->change();
+            });
+        }
     }
 
     /**
