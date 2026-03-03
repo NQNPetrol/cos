@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('eventos', function (Blueprint $table) {
-            $table->json('elementos_sustraidos')->nullable();
-            $table->json('cantidad')->nullable();
-        });
+        if (! Schema::hasColumn('eventos', 'elementos_sustraidos')) {
+            Schema::table('eventos', function (Blueprint $table) {
+                $table->json('elementos_sustraidos')->nullable();
+                $table->json('cantidad')->nullable();
+            });
+        }
     }
 
     /**

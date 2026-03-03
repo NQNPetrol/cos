@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('patrulla_documental')) { return; }
+
         Schema::create('patrulla_documental', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patrulla_id')->constrained('patrullas');

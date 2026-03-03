@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('dispositivos')) { return; }
+
         Schema::create('dispositivos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->comment('Nombre descriptivo del dispositivo');

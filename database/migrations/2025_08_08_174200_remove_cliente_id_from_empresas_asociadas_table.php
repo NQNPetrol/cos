@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('empresas_asociadas', function (Blueprint $table) {
-            $table->dropForeign(['cliente_id']);
-            $table->dropColumn('cliente_id');
-        });
+        if (Schema::hasColumn('empresas_asociadas', 'cliente_id')) {
+            Schema::table('empresas_asociadas', function (Blueprint $table) {
+                $table->dropForeign(['cliente_id']);
+                $table->dropColumn('cliente_id');
+            });
+        }
     }
 
     /**

@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('reportes_generados')) { return; }
+
         Schema::create('reportes_generados', function (Blueprint $table) {
             $table->id();
             $table->foreignId('evento_id')->constrained('eventos');

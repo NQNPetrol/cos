@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('eventos', function (Blueprint $table) {
-            // Cambiar la columna para permitir NULL
-            $table->foreignId('empresa_asociada_id')
-                ->nullable()
-                ->change();
-        });
+        if (Schema::hasColumn('eventos', 'empresa_asociada_id')) {
+            Schema::table('eventos', function (Blueprint $table) {
+                $table->foreignId('empresa_asociada_id')
+                    ->nullable()
+                    ->change();
+            });
+        }
     }
 
     /**

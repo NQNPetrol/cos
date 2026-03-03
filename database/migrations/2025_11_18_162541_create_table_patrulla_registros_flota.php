@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('patrulla_registros_flota')) { return; }
+
         Schema::create('patrulla_registros_flota', function (Blueprint $table) {
             $table->id();
             $table->datetime('fecha_registro')->nullable();

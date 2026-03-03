@@ -7,7 +7,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE pago_servicios_rodados MODIFY COLUMN rodado_id BIGINT UNSIGNED NULL');
+        if (Schema::hasColumn('pago_servicios_rodados', 'rodado_id')) {
+            DB::statement('ALTER TABLE pago_servicios_rodados MODIFY COLUMN rodado_id BIGINT UNSIGNED NULL');
+        }
     }
 
     public function down(): void

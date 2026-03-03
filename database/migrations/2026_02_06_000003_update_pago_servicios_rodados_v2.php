@@ -8,13 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('pago_servicios_rodados', function (Blueprint $table) {
-            $table->foreignId('servicio_usuario_id')->nullable()->constrained('servicios_usuario')->onDelete('set null');
-            $table->foreignId('turno_rodado_id')->nullable()->constrained('turnos_rodados')->onDelete('set null');
-            $table->string('estado')->default('pendiente');
-            $table->date('fecha_vencimiento')->nullable();
-            $table->text('observaciones')->nullable();
-        });
+        if (! Schema::hasColumn('pago_servicios_rodados', 'servicio_usuario_id')) {
+            Schema::table('pago_servicios_rodados', function (Blueprint $table) {
+                $table->foreignId('servicio_usuario_id')->nullable()->constrained('servicios_usuario')->onDelete('set null');
+                $table->foreignId('turno_rodado_id')->nullable()->constrained('turnos_rodados')->onDelete('set null');
+                $table->string('estado')->default('pendiente');
+                $table->date('fecha_vencimiento')->nullable();
+                $table->text('observaciones')->nullable();
+            });
+        }
     }
 
     public function down(): void

@@ -8,12 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('rodados', function (Blueprint $table) {
-            $table->string('imagen_frente_path')->nullable()->after('patente');
-            $table->string('imagen_costado_izq_path')->nullable()->after('imagen_frente_path');
-            $table->string('imagen_costado_der_path')->nullable()->after('imagen_costado_izq_path');
-            $table->string('imagen_dorso_path')->nullable()->after('imagen_costado_der_path');
-        });
+        if (! Schema::hasColumn('rodados', 'imagen_frente_path')) {
+            Schema::table('rodados', function (Blueprint $table) {
+                $table->string('imagen_frente_path')->nullable()->after('patente');
+                $table->string('imagen_costado_izq_path')->nullable()->after('imagen_frente_path');
+                $table->string('imagen_costado_der_path')->nullable()->after('imagen_costado_izq_path');
+                $table->string('imagen_dorso_path')->nullable()->after('imagen_costado_der_path');
+            });
+        }
     }
 
     /**

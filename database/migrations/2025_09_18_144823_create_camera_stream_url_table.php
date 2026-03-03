@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('camera_stream_urls')) { return; }
+
         Schema::create('camera_stream_urls', function (Blueprint $table) {
             $table->id();
             $table->string('camera_index_code')->unique();

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('flytbase_flight_logs', function (Blueprint $table) {
-            $table->unsignedBigInteger('piloto_flytbase_id')->nullable()->change();
-        });
+        if (Schema::hasColumn('flytbase_flight_logs', 'piloto_flytbase_id')) {
+            Schema::table('flytbase_flight_logs', function (Blueprint $table) {
+                $table->unsignedBigInteger('piloto_flytbase_id')->nullable()->change();
+            });
+        }
     }
 
     /**

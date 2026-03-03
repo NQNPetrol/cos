@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('encoding_devices')) { return; }
+
         Schema::create('encoding_devices', function (Blueprint $table) {
             $table->id();
             $table->string('encode_dev_index_code')->unique();

@@ -8,6 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('checklist_patrullas')) { return; }
+
         Schema::create('checklist_patrullas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patrulla_id')->nullable()->constrained('patrullas')->onDelete('set null');

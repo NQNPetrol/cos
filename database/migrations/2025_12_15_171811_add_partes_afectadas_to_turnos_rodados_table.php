@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('turnos_rodados', function (Blueprint $table) {
-            $table->json('partes_afectadas')->nullable()->after('descripcion');
-        });
+        if (! Schema::hasColumn('turnos_rodados', 'partes_afectadas')) {
+            Schema::table('turnos_rodados', function (Blueprint $table) {
+                $table->json('partes_afectadas')->nullable()->after('descripcion');
+            });
+        }
     }
 
     /**

@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('anpr_event_images')) { return; }
+
         Schema::create('anpr_event_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('anpr_record_id')->constrained('anpr_passing_records')->nullable();

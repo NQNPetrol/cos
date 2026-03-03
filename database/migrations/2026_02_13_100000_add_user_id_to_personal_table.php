@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('personal', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->after('legajo')->constrained('users')->nullOnDelete();
-            $table->index('user_id');
-        });
+        if (! Schema::hasColumn('personal', 'user_id')) {
+            Schema::table('personal', function (Blueprint $table) {
+                $table->foreignId('user_id')->nullable()->after('legajo')->constrained('users')->nullOnDelete();
+                $table->index('user_id');
+            });
+        }
     }
 
     public function down(): void

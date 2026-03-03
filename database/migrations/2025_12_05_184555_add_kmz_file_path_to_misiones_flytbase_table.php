@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('misiones_flytbase', function (Blueprint $table) {
-            $table->string('kmz_file_path')->nullable()->after('waypoints')->comment('Ruta del archivo KMZ asociado a la misión');
-        });
+        if (! Schema::hasColumn('misiones_flytbase', 'kmz_file_path')) {
+            Schema::table('misiones_flytbase', function (Blueprint $table) {
+                $table->string('kmz_file_path')->nullable()->after('waypoints')->comment('Ruta del archivo KMZ asociado a la misión');
+            });
+        }
     }
 
     /**

@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('eventos', function (Blueprint $table) {
-            $table->boolean('es_anulado')->default(false);
-            $table->string('anulado_por')->nullable();
-            $table->timestamp('fecha_anulado')->nullable();
-        });
+        if (! Schema::hasColumn('eventos', 'es_anulado')) {
+            Schema::table('eventos', function (Blueprint $table) {
+                $table->boolean('es_anulado')->default(false);
+                $table->string('anulado_por')->nullable();
+                $table->timestamp('fecha_anulado')->nullable();
+            });
+        }
     }
 
     /**

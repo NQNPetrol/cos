@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('flytbase_flight_logs', function (Blueprint $table) {
-            $table->timestamp('trigger_senttime')->nullable()->after('flight_starttime');
-            $table->index('trigger_senttime');
-        });
+        if (! Schema::hasColumn('flytbase_flight_logs', 'trigger_senttime')) {
+            Schema::table('flytbase_flight_logs', function (Blueprint $table) {
+                $table->timestamp('trigger_senttime')->nullable()->after('flight_starttime');
+                $table->index('trigger_senttime');
+            });
+        }
     }
 
     /**

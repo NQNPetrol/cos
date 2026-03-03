@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('mobile_vehicles')) { return; }
+
         Schema::create('mobile_vehicles', function (Blueprint $table) {
             $table->id();
             $table->string('mobile_vehicle_index_code')->unique();

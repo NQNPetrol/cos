@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contratos', function (Blueprint $table) {
-            // Quitar columnas
-            $table->dropColumn(['fecha_fin', 'detalles']);
+        if (Schema::hasColumn('contratos', 'fecha_fin')) {
+            Schema::table('contratos', function (Blueprint $table) {
+                // Quitar columnas
+                $table->dropColumn(['fecha_fin', 'detalles']);
 
-            // Modificar columnas a nullable
-            $table->string('localidad')->nullable()->change();
-            $table->string('provincia')->nullable()->change();
-            $table->string('observaciones')->nullable()->change();
-        });
+                // Modificar columnas a nullable
+                $table->string('localidad')->nullable()->change();
+                $table->string('provincia')->nullable()->change();
+                $table->string('observaciones')->nullable()->change();
+            });
+        }
     }
 
     /**
