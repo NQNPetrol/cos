@@ -262,9 +262,9 @@
             <div>
                 <label class="block text-sm font-medium text-gray-300 mb-1.5">Archivo KML de la Ruta</label>
                 <div id="kml-dropzone" class="kml-dropzone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('kml-file-input').click()">
-                    <input type="file" id="kml-file-input" accept=".kml,.KML" class="hidden" onchange="handleKmlFile(this)">
+                    <input type="file" id="kml-file-input" accept=".kml,.KML,.kmz,.KMZ" class="hidden" onchange="handleKmlFile(this)">
                     <i class="bi bi-cloud-arrow-up text-3xl text-gray-500 mb-2 block"></i>
-                    <p class="text-sm text-gray-400" id="kml-filename">Arrastar archivo .kml o hacer clic para seleccionar</p>
+                    <p class="text-sm text-gray-400" id="kml-filename">Arrastrar archivo .kml o .kmz o hacer clic para seleccionar</p>
                     <p class="text-xs text-gray-600 mt-1">Máximo 5MB</p>
                 </div>
                 <div id="kml-info" class="hidden mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-sm">
@@ -411,11 +411,14 @@ function handleKmlFile(input) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) {
+        if (data.success && data.data && data.data.waypoints && data.data.waypoints.length > 0) {
             kmlData = data.data;
             document.getElementById('kml-info').classList.remove('hidden');
             document.getElementById('kml-stats').textContent = `${kmlData.waypoints.length} waypoints | ${(kmlData.longitud_mts/1000).toFixed(2)} km`;
             showPreviewMap(kmlData.waypoints);
+        } else {
+            const msg = data.message || 'No se pudieron extraer waypoints del archivo. Verifique que sea un KML válido con coordenadas (LineString o Point).';
+            alert(msg);
         }
     })
     .catch(() => alert('Error al procesar el archivo KML'));
