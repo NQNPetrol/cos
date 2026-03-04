@@ -542,6 +542,10 @@ Route::middleware([
         ->middleware('can:crear.notificaciones')
         ->name('notifications.store');
 
+    Route::post('/admin/notificaciones/{notification}/enviar-email', [App\Http\Controllers\NotificationController::class, 'sendEmail'])
+        ->middleware('can:crear.notificaciones')
+        ->name('notifications.send-email');
+
     Route::post('/notificaciones/{notification}/toggle', [NotificationController::class, 'toggle'])->name('notifications.toggle')->middleware('can:crear.notif');
 
     Route::delete('/admin/notificaciones/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy')->middleware('can:crear.notif');

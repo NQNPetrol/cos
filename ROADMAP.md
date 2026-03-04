@@ -59,6 +59,10 @@
 
 > Cola de prompts listos. Ver `agent-bootstrap/prompts/pendientes/`.
 
+- [x] **v0.6.1 — Envío de email desde notificaciones admin** *(completado)*  
+  Checkbox "Enviar por email" al crear notificación + botón "Enviar email" en listado admin. Destinatarios según tipo: global→todos, user→seleccionado, client→usuarios del cliente. Email simple (asunto=título, cuerpo=mensaje).  
+  Prompt: `agent-bootstrap/prompts/completados/v0.6.1-notificaciones-envio-email.md`. Tag `v0.6.1`.
+
 - [ ] **v0.7.0 — Rediseño vistas de autenticación + reCAPTCHA v2** *(pendiente)*  
   Unificar y modernizar login, register, forgot-password y reset-password con el sistema dark de la app. Logo CyH Sur SA correcto (`cyh-white.png`). reCAPTCHA v2 en login. Responsive mobile-first.  
   Prompt: `agent-bootstrap/prompts/pendientes/v0.7.0-auth-redesign-recaptcha.md`.  
