@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificationEmail;
 use App\Models\Cliente;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\UserCliente;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class NotificationController extends Controller
@@ -190,8 +194,15 @@ class NotificationController extends Controller
 
             $notification = Notification::create($validated);
 
+            $message = 'Notificación creada exitosamente.';
+
+            if ($request->input('send_email') == '1') {
+                $count = $this->sendNotificationEmail($notification);
+                $message .= " Email enviado a {$count} destinatario(s).";
+            }
+
             return redirect()->route('notifications.admin')
-                ->with('success', 'Notificación creada exitosamente');
+                ->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error al crear la notificación: '.$e->getMessage())
@@ -290,6 +301,87 @@ class NotificationController extends Controller
             'is_active' => true,
             'user_id' => $alerta->user_id,
         ]);
+    }
+
+    public function sendEmail(Notification $notification)
+    {
+        try {
+            $count = $this->sendNotificationEmail($notification);
+
+            return redirect()->route('notifications.admin')
+                ->with('success', "Email enviado a {$count} destinatario(s).");
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al enviar email: '.$e->getMessage());
+        }
+    }
+
+    private function sendNotificationEmail(Notification $notification): int
+    {
+        $recipients = collect();
+
+        switch ($notification->type) {
+            case 'global':
+                $recipients = User::all();
+                break;
+            case 'user':
+                $user = User::find($notification->user_id);
+                if ($user) {
+                    $recipients = collect([$user]);
+                }
+                break;
+            case 'client':
+                $userIds = UserCliente::where('cliente_id', $notification->client_id)
+                    ->pluck('user_id');
+                $recipients = User::whereIn('id', $userIds)->get();
+                break;
+        }
+
+        Log::info('[NotificationEmail] Iniciando envío', [
+            'notification_id' => $notification->id,
+            'type' => $notification->type,
+            'title' => $notification->title,
+            'recipients_count' => $recipients->count(),
+        ]);
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($recipients as $recipient) {
+            if (! $recipient->email) {
+                Log::warning('[NotificationEmail] Usuario sin email, omitido', [
+                    'user_id' => $recipient->id,
+                    'user_name' => $recipient->name,
+                ]);
+
+                continue;
+            }
+
+            try {
+                Mail::to($recipient)->queue(new NotificationEmail($notification));
+                $sent++;
+                Log::info('[NotificationEmail] Encolado OK', [
+                    'user_id' => $recipient->id,
+                    'email' => $recipient->email,
+                ]);
+            } catch (\Exception $e) {
+                $failed++;
+                Log::error('[NotificationEmail] Error al encolar', [
+                    'user_id' => $recipient->id,
+                    'email' => $recipient->email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info('[NotificationEmail] Envío finalizado', [
+            'notification_id' => $notification->id,
+            'sent' => $sent,
+            'failed' => $failed,
+            'total' => $recipients->count(),
+        ]);
+
+        return $sent;
     }
 
     // obtener notificaciones visibles p un usuario
