@@ -95,14 +95,23 @@
                         <!-- Checkbox activa -->
                         <div>
                             <label class="flex items-center">
-                                <!-- Campo hidden que siempre se envía -->
                                 <input type="hidden" name="is_active" value="0">
-                                <!-- Checkbox que sobrescribe el valor cuando está marcado -->
                                 <input type="checkbox" name="is_active" value="1" 
                                     {{ old('is_active', true) ? 'checked' : '' }}
                                     class="rounded border-zinc-600 bg-zinc-700 text-blue-500 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-300">Notificación activa</span>
                             </label>
+                        </div>
+
+                        <!-- Checkbox enviar por email -->
+                        <div>
+                            <label class="flex items-center">
+                                <input type="hidden" name="send_email" value="0">
+                                <input type="checkbox" name="send_email" value="1"
+                                    class="rounded border-zinc-600 bg-zinc-700 text-blue-500 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-300">Enviar también por email</span>
+                            </label>
+                            <p class="mt-1 ml-6 text-xs text-gray-500">Se enviará a los destinatarios según el tipo de notificación seleccionado.</p>
                         </div>
 
                         <!-- Botones -->
