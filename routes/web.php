@@ -843,6 +843,7 @@ Route::middleware([
         Route::put('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'update'])->name('pagos.update');
         Route::delete('/pagos/{pago}', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'destroy'])->name('pagos.destroy');
         Route::post('/pagos/{pago}/adjuntar-factura', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'adjuntarFactura'])->name('pagos.adjuntar-factura');
+        Route::post('/pagos/adjuntar-comprobante-batch', [\App\Http\Controllers\PagoServiciosRodadoController::class, 'adjuntarComprobanteBatch'])->name('pagos.adjuntar-comprobante-batch');
 
         // Calendario
         Route::get('/calendario', [\App\Http\Controllers\CalendarioRodadosController::class, 'index'])->name('calendario.index');
