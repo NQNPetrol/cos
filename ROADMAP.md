@@ -67,9 +67,9 @@
   Fix error 413/500 al adjuntar factura (nginx `client_max_body_size` + manejo `PostTooLargeException`). Rediseño columna Estado de servicios: estados dinámicos (programado, próximo, asistido a confirmar, asistido, cancelado, perdido) con interacción de confirmación.  
   Prompt: `agent-bootstrap/prompts/completados/v0.6.2-fix-upload-rodados-estados-turnos.md`. Tag `v0.6.2`.
 
-- [ ] **v0.6.3 — Comprobante de pago masivo en rodados** *(pendiente)*  
+- [x] **v0.6.3 — Comprobante de pago masivo en rodados** *(completado)*  
   Seleccionar múltiples pagos pendientes y adjuntar un único comprobante para todos. Un archivo en disco referenciado por N registros. Checkboxes, seleccionar todos (respeta filtros), modal batch, backend batch.  
-  Prompt: `agent-bootstrap/prompts/pendientes/v0.6.3-comprobante-pago-masivo.md`.
+  Prompt: `agent-bootstrap/prompts/completados/v0.6.3-comprobante-pago-masivo.md`. Tag `v0.6.3`.
 
 - [ ] **v0.7.0 — Rediseño vistas de autenticación + reCAPTCHA v2** *(pendiente)*  
   Unificar y modernizar login, register, forgot-password y reset-password con el sistema dark de la app. Logo CyH Sur SA correcto (`cyh-white.png`). reCAPTCHA v2 en login. Responsive mobile-first.  

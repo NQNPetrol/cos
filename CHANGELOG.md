@@ -17,6 +17,17 @@
 
 ---
 
+## [v0.6.3] — 2026-03-20
+
+### Added
+- **Comprobante de pago masivo:** seleccionar múltiples pagos pendientes y adjuntar un único comprobante para todos.
+- Checkboxes de selección en tabla de pagos pendientes con "Seleccionar todos" (respeta filtro de búsqueda).
+- Modal de upload batch con dropzone y validación de archivo (PDF/JPG/PNG, max 10 MB).
+- Ruta y método `adjuntarComprobanteBatch` en `PagoServiciosRodadoController` para procesamiento batch.
+- Un archivo en disco referenciado por N registros — todos marcados como pagados.
+
+---
+
 ## [v0.6.2] — 2026-03-20
 
 ### Fixed
