@@ -230,10 +230,28 @@ class PagoServiciosRodadoController extends Controller
             'pago_ids.*' => 'exists:pago_servicios_rodados,id',
         ]);
 
+        $pagos = PagoServiciosRodado::whereIn('id', $request->pago_ids)->get();
+
+        $noPendientes = $pagos->where('estado', '!=', PagoServiciosRodado::ESTADO_PENDIENTE);
+        if ($noPendientes->isNotEmpty()) {
+            return redirect()->route('rodados.pagos-servicios.index')
+                ->with('error', 'Algunos pagos seleccionados no están en estado pendiente.');
+        }
+
+        $conComprobante = $pagos->whereNotNull('comprobante_pago_path');
+        if ($conComprobante->isNotEmpty()) {
+            return redirect()->route('rodados.pagos-servicios.index')
+                ->with('error', 'Algunos pagos seleccionados ya tienen comprobante adjunto.');
+        }
+
+        $proveedores = $pagos->pluck('proveedor_id')->unique()->filter();
+        if ($proveedores->count() > 1) {
+            return redirect()->route('rodados.pagos-servicios.index')
+                ->with('error', 'Todos los pagos seleccionados deben ser del mismo proveedor.');
+        }
+
         $comprobantePath = $request->file('comprobante_pago')
             ->store('rodados/comprobantes-batch', 'public');
-
-        $pagos = PagoServiciosRodado::whereIn('id', $request->pago_ids)->get();
 
         foreach ($pagos as $pago) {
             $pago->update([
