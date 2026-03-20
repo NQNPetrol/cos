@@ -99,11 +99,18 @@
             <div id="pagos-tab-content-pendientes" class="pagos-tab-content">
                 <!-- Action Bar -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                    <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <input type="text" id="busqueda-pendiente" placeholder="Buscar pago pendiente..."
-                            class="pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 w-72 transition-all"
-                            oninput="buscarPago(this.value, 'pendiente')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="text" id="busqueda-pendiente" placeholder="Buscar pago pendiente..."
+                                class="pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 w-72 transition-all"
+                                oninput="buscarPago(this.value, 'pendiente')">
+                        </div>
+                        <button id="btn-batch-comprobante" onclick="abrirModalBatch()"
+                            class="hidden items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm font-medium text-white shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                            Adjuntar comprobante (<span id="batch-count">0</span>)
+                        </button>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="document.getElementById('modal-servicios').classList.remove('hidden')"
@@ -125,6 +132,10 @@
                         <table class="min-w-full">
                             <thead>
                                 <tr class="border-b border-zinc-700/50">
+                                    <th class="pl-4 pr-1 py-3.5 w-10">
+                                        <input type="checkbox" id="select-all-pagos" onchange="toggleSelectAllPagos(this)"
+                                            class="rounded border-zinc-600 bg-zinc-700 text-blue-500 focus:ring-blue-500 cursor-pointer">
+                                    </th>
                                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tipo</th>
                                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Vehiculo</th>
                                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Detalle</th>
@@ -142,6 +153,10 @@
                                 @endphp
                                 <tr class="pago-pendiente-row group hover:bg-zinc-700/30 transition-colors duration-150"
                                     data-search="{{ strtolower(($pago->rodado?->patente ?? '') . ' ' . ($pago->rodado?->marca ?? '') . ' ' . ($pago->rodado?->modelo ?? '') . ' ' . ($pago->servicioUsuario?->nombre ?? '') . ' ' . ($pago->observaciones ?? '') . ' ' . str_replace(['pago_', '_'], ['', ' '], $pago->tipo)) }}">
+                                    <td class="pl-4 pr-1 py-4">
+                                        <input type="checkbox" class="pago-checkbox rounded border-zinc-600 bg-zinc-700 text-blue-500 focus:ring-blue-500 cursor-pointer"
+                                            value="{{ $pago->id }}" onchange="actualizarBatchCount()">
+                                    </td>
                                     <td class="px-5 py-4">
                                         @if($pago->tipo === 'pago_service')
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
@@ -259,7 +274,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-5 py-16 text-center">
+                                    <td colspan="8" class="px-5 py-16 text-center">
                                         <div class="flex flex-col items-center">
                                             <div class="w-16 h-16 rounded-full bg-zinc-700/30 flex items-center justify-center mb-4">
                                                 <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -643,8 +658,123 @@
         </div>
     </div>
 
+    <!-- Modal Batch Comprobante -->
+    <div id="modal-batch-comprobante" class="hidden fixed inset-0 z-50 modal-backdrop" style="background:rgba(0,0,0,.6); backdrop-filter:blur(4px);">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-zinc-900 border border-zinc-700/50 rounded-2xl shadow-2xl w-full max-w-md modal-content">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Adjuntar comprobante de pago</h3>
+                            <p class="text-sm text-gray-400 mt-0.5"><span id="modal-batch-count">0</span> registros seleccionados</p>
+                        </div>
+                        <button onclick="cerrarModalBatch()" class="p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-zinc-800 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <form id="form-batch-comprobante" action="{{ route('rodados.pagos.adjuntar-comprobante-batch') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div id="batch-ids-container"></div>
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Comprobante de pago</label>
+                            <div id="batch-dropzone" class="border-2 border-dashed border-zinc-700 rounded-xl p-6 text-center hover:border-blue-500/50 transition-colors cursor-pointer"
+                                onclick="document.getElementById('batch-file-input').click()">
+                                <svg class="w-8 h-8 mx-auto text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <p class="text-sm text-gray-400" id="batch-file-label">Click para seleccionar archivo</p>
+                                <p class="text-xs text-gray-600 mt-1">PDF, JPG, PNG — max 10 MB</p>
+                            </div>
+                            <input type="file" id="batch-file-input" name="comprobante_pago" class="hidden" accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="actualizarBatchFileLabel(this)">
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="cerrarModalBatch()"
+                                class="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-sm font-medium text-gray-300 transition-all">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm font-medium text-white shadow-lg shadow-emerald-600/20 transition-all">
+                                Adjuntar y marcar como pagados
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
+        // === Batch selection ===
+        function toggleSelectAllPagos(master) {
+            document.querySelectorAll('.pago-pendiente-row').forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cb = row.querySelector('.pago-checkbox');
+                    if (cb) cb.checked = master.checked;
+                }
+            });
+            actualizarBatchCount();
+        }
+
+        function actualizarBatchCount() {
+            const checked = document.querySelectorAll('.pago-checkbox:checked');
+            const count = checked.length;
+            document.getElementById('batch-count').textContent = count;
+            const btn = document.getElementById('btn-batch-comprobante');
+            if (count > 0) {
+                btn.classList.remove('hidden');
+                btn.classList.add('inline-flex');
+            } else {
+                btn.classList.add('hidden');
+                btn.classList.remove('inline-flex');
+            }
+            const masterCb = document.getElementById('select-all-pagos');
+            const visibleCbs = [...document.querySelectorAll('.pago-pendiente-row')].filter(r => r.style.display !== 'none').map(r => r.querySelector('.pago-checkbox')).filter(Boolean);
+            const allChecked = visibleCbs.length > 0 && visibleCbs.every(cb => cb.checked);
+            const someChecked = visibleCbs.some(cb => cb.checked);
+            masterCb.checked = allChecked;
+            masterCb.indeterminate = someChecked && !allChecked;
+        }
+
+        function abrirModalBatch() {
+            const checked = document.querySelectorAll('.pago-checkbox:checked');
+            if (checked.length === 0) return;
+            const container = document.getElementById('batch-ids-container');
+            container.innerHTML = '';
+            checked.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'pago_ids[]';
+                input.value = cb.value;
+                container.appendChild(input);
+            });
+            document.getElementById('modal-batch-count').textContent = checked.length;
+            document.getElementById('batch-file-input').value = '';
+            document.getElementById('batch-file-label').textContent = 'Click para seleccionar archivo';
+            document.getElementById('modal-batch-comprobante').classList.remove('hidden');
+        }
+
+        function cerrarModalBatch() {
+            document.getElementById('modal-batch-comprobante').classList.add('hidden');
+        }
+
+        function actualizarBatchFileLabel(input) {
+            const label = document.getElementById('batch-file-label');
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    label.textContent = 'El archivo supera 10 MB';
+                    label.classList.add('text-red-400');
+                    input.value = '';
+                    return;
+                }
+                label.textContent = file.name;
+                label.classList.remove('text-red-400');
+            } else {
+                label.textContent = 'Click para seleccionar archivo';
+                label.classList.remove('text-red-400');
+            }
+        }
+
         // === Tab switching ===
         function switchPagosTab(tabName) {
             document.querySelectorAll('.pagos-tab-content').forEach(c => c.classList.add('hidden'));
@@ -672,6 +802,10 @@
             const countEl = document.getElementById(tipo === 'pendiente' ? 'pendientes-count-text' : 'realizados-count-text');
             const label = tipo === 'pendiente' ? 'pagos pendientes' : 'pagos realizados';
             if (countEl) countEl.textContent = visible === total ? `Mostrando ${total} ${label}` : `Mostrando ${visible} de ${total} ${label}`;
+            if (tipo === 'pendiente') {
+                document.getElementById('select-all-pagos').checked = false;
+                actualizarBatchCount();
+            }
         }
 
         // === Modal Nuevo Pago ===

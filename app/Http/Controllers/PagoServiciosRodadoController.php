@@ -221,4 +221,38 @@ class PagoServiciosRodadoController extends Controller
         return redirect()->route('rodados.pagos-servicios.index')
             ->with('success', $request->hasFile('comprobante_pago') ? 'Comprobante adjuntado. Pago marcado como realizado.' : 'Documentación actualizada exitosamente.');
     }
+
+    public function adjuntarComprobanteBatch(Request $request)
+    {
+        $request->validate([
+            'comprobante_pago' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'pago_ids' => 'required|array|min:1',
+            'pago_ids.*' => 'exists:pago_servicios_rodados,id',
+        ]);
+
+        $comprobantePath = $request->file('comprobante_pago')
+            ->store('rodados/comprobantes-batch', 'public');
+
+        $pagos = PagoServiciosRodado::whereIn('id', $request->pago_ids)->get();
+
+        foreach ($pagos as $pago) {
+            $pago->update([
+                'comprobante_pago_path' => $comprobantePath,
+                'estado' => PagoServiciosRodado::ESTADO_PAGADO,
+                'fecha_pago' => now()->toDateString(),
+            ]);
+
+            if ($pago->turno_rodado_id) {
+                $turno = \App\Models\TurnoRodado::find($pago->turno_rodado_id);
+                if ($turno) {
+                    $turno->update(['comprobante_pago_path' => $comprobantePath]);
+                }
+            }
+        }
+
+        $count = $pagos->count();
+
+        return redirect()->route('rodados.pagos-servicios.index')
+            ->with('success', "Comprobante adjuntado a {$count} pagos. Marcados como pagados.");
+    }
 }
