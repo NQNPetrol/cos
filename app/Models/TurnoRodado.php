@@ -54,19 +54,45 @@ class TurnoRodado extends Model
 
     const TIPO_TURNO_TALLER = 'turno_taller';
 
-    const ESTADO_PENDIENTE = 'pendiente';
+    const ESTADO_PROGRAMADO = 'programado';
 
-    const ESTADO_COMPLETADO = 'completado';
+    const ESTADO_ASISTIDO = 'asistido';
 
     const ESTADO_CANCELADO = 'cancelado';
 
-    const ESTADO_ATENDIDO = 'atendido';
+    const ESTADO_PERDIDO = 'perdido';
+
+    /** @deprecated Use ESTADO_PROGRAMADO */
+    const ESTADO_PENDIENTE = 'programado';
+
+    /** @deprecated Use ESTADO_ASISTIDO */
+    const ESTADO_COMPLETADO = 'asistido';
+
+    /** @deprecated Use ESTADO_ASISTIDO */
+    const ESTADO_ATENDIDO = 'asistido';
 
     const COBERTURA_PENDIENTE = 'pendiente';
 
     const COBERTURA_APROBADA = 'aprobada';
 
     const COBERTURA_RECHAZADA = 'rechazada';
+
+    public function getEstadoVisualAttribute(): string
+    {
+        if (in_array($this->estado, [self::ESTADO_ASISTIDO, self::ESTADO_CANCELADO, self::ESTADO_PERDIDO])) {
+            return $this->estado;
+        }
+
+        if ($this->fecha_hora && $this->fecha_hora->isPast()) {
+            return 'asistido_a_confirmar';
+        }
+
+        if ($this->fecha_hora && $this->fecha_hora->diffInDays(now()) <= 7) {
+            return 'proximo';
+        }
+
+        return 'programado';
+    }
 
     public function getPartesAfectadasAttribute($value)
     {

@@ -172,7 +172,7 @@ class TurnoRodadoController extends Controller
             'partes_afectadas.*.item' => 'required_with:partes_afectadas|string|max:255',
             'partes_afectadas.*.cantidad' => 'required_with:partes_afectadas|integer|min:1',
             'partes_afectadas.*.descripcion' => 'required_with:partes_afectadas|string',
-            'estado' => 'nullable|in:pendiente,completado,atendido,cancelado',
+            'estado' => 'nullable|in:programado,asistido,cancelado,perdido',
         ]);
 
         // Si es turno_taller, cambiar a turno_mecanico automáticamente
@@ -511,6 +511,24 @@ class TurnoRodadoController extends Controller
 
         return redirect()->route('rodados.index')
             ->with('success', 'Turno cancelado exitosamente.');
+    }
+
+    public function confirmarEstado(Request $request, TurnoRodado $turno)
+    {
+        $validated = $request->validate([
+            'estado' => 'required|in:asistido,perdido',
+        ]);
+
+        $turno->update(['estado' => $validated['estado']]);
+
+        $label = $validated['estado'] === 'asistido' ? 'Asistencia confirmada' : 'Turno marcado como perdido';
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => "$label exitosamente."]);
+        }
+
+        return redirect()->route('rodados.index')
+            ->with('success', "$label exitosamente.");
     }
 
     public function reprogramarTurno(Request $request, TurnoRodado $turno)

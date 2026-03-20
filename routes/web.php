@@ -826,6 +826,7 @@ Route::middleware([
         Route::post('/turnos/{turno}/rechazar-cobertura', [\App\Http\Controllers\TurnoRodadoController::class, 'rechazarCobertura'])->name('turnos.rechazar-cobertura');
         Route::post('/turnos/{turno}/cancelar', [\App\Http\Controllers\TurnoRodadoController::class, 'cancelarTurno'])->name('turnos.cancelar');
         Route::post('/turnos/{turno}/reprogramar', [\App\Http\Controllers\TurnoRodadoController::class, 'reprogramarTurno'])->name('turnos.reprogramar');
+        Route::post('/turnos/{turno}/confirmar-estado', [\App\Http\Controllers\TurnoRodadoController::class, 'confirmarEstado'])->name('turnos.confirmar-estado');
 
         // Cambios de Equipos
         Route::post('/cambios-equipos', [\App\Http\Controllers\CambioEquipoRodadoController::class, 'store'])->name('cambios-equipos.store');

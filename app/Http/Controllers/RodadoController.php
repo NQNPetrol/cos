@@ -66,7 +66,7 @@ class RodadoController extends Controller
                 'rodado' => $turno->rodado,
                 'taller' => $turno->taller,
                 'fecha_hora' => $turno->fecha_hora,
-                'estado' => $turno->estado,
+                'estado' => $turno->estado_visual,
                 'cubre_servicio' => $turno->cubre_servicio ?? false,
                 'fecha_vencimiento_pago' => $turno->fecha_vencimiento_pago,
                 'model' => $turno,

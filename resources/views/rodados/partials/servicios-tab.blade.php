@@ -78,10 +78,12 @@
                 <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Estado</label>
                 <select id="filtro-servicio-estado" class="w-full rounded-lg bg-zinc-900 border-zinc-700 text-gray-200 text-sm px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30">
                     <option value="">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="atendido">Atendido</option>
-                    <option value="completado">Completado</option>
+                    <option value="programado">Programado</option>
+                    <option value="proximo">Próximo</option>
+                    <option value="asistido_a_confirmar">A confirmar</option>
+                    <option value="asistido">Asistido</option>
                     <option value="cancelado">Cancelado</option>
+                    <option value="perdido">Perdido</option>
                 </select>
             </div>
         </div>
@@ -193,20 +195,61 @@
 
                         <!-- Estado -->
                         <td class="px-5 py-4">
-                            @if($servicio['estado'] === 'completado' || $servicio['estado'] === 'atendido')
+                            @if($servicio['estado'] === 'programado')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                                    Programado
+                                </span>
+                            @elseif($servicio['estado'] === 'proximo')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                    Próximo
+                                </span>
+                            @elseif($servicio['estado'] === 'asistido_a_confirmar')
+                                <div class="relative estado-confirmar-wrapper">
+                                    <button type="button" onclick="toggleEstadoDropdown(this)"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 cursor-pointer hover:bg-yellow-500/20 transition-all animate-pulse-soft">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/></svg>
+                                        A confirmar
+                                        <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+                                    </button>
+                                    <div class="estado-dropdown hidden absolute z-50 mt-1 left-0 w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl overflow-hidden">
+                                        <form method="POST" action="{{ route('rodados.turnos.confirmar-estado', $servicio['id']) }}">
+                                            @csrf
+                                            <input type="hidden" name="estado" value="asistido">
+                                            <button type="submit" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-emerald-400 hover:bg-zinc-700 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                Confirmar asistencia
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('rodados.turnos.confirmar-estado', $servicio['id']) }}">
+                                            @csrf
+                                            <input type="hidden" name="estado" value="perdido">
+                                            <button type="submit" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-700 transition-colors border-t border-zinc-700/50">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                No asistió
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @elseif($servicio['estado'] === 'asistido')
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    {{ $servicio['estado'] === 'completado' ? 'Completado' : 'Atendido' }}
+                                    Asistido
                                 </span>
                             @elseif($servicio['estado'] === 'cancelado')
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                     Cancelado
                                 </span>
+                            @elseif($servicio['estado'] === 'perdido')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-600/30 text-red-300 border border-zinc-600/30">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    Perdido
+                                </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Pendiente
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-600/30 text-gray-400 border border-zinc-600/30">
+                                    {{ ucfirst($servicio['estado']) }}
                                 </span>
                             @endif
                         </td>
@@ -626,4 +669,33 @@
     #ver-docs-container::-webkit-scrollbar { width: 6px; }
     #ver-docs-container::-webkit-scrollbar-track { background: transparent; }
     #ver-docs-container::-webkit-scrollbar-thumb { background: rgba(39,39,42,0.8); border-radius: 3px; }
+
+    @keyframes pulse-soft {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
 </style>
+
+<script>
+    function toggleEstadoDropdown(btn) {
+        const wrapper = btn.closest('.estado-confirmar-wrapper');
+        const dropdown = wrapper.querySelector('.estado-dropdown');
+        const isHidden = dropdown.classList.contains('hidden');
+
+        document.querySelectorAll('.estado-confirmar-wrapper').forEach(w => w.style.zIndex = '');
+        document.querySelectorAll('.estado-dropdown').forEach(d => d.classList.add('hidden'));
+
+        if (isHidden) {
+            wrapper.style.zIndex = '50';
+            dropdown.classList.remove('hidden');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.estado-confirmar-wrapper')) {
+            document.querySelectorAll('.estado-confirmar-wrapper').forEach(w => w.style.zIndex = '');
+            document.querySelectorAll('.estado-dropdown').forEach(d => d.classList.add('hidden'));
+        }
+    });
+</script>
