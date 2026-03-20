@@ -13,8 +13,25 @@
 - Ajustes de estilos en dashboard.
 - Mejora de interfaz de flight logs (previa al envío del drone).
 - Peticiones de misiones cliente: soporte para archivos .kmz.
-- Correcciones en la sección de turnos rodados.
 - Mejoras de layout administrativo en rodados.
+
+---
+
+## [v0.6.2] — 2026-03-20
+
+### Fixed
+- **Upload rodados:** documentación de `client_max_body_size` para nginx (error 413).
+- **PostTooLargeException:** manejo amigable con redirect y mensaje flash en lugar de pantalla 500.
+
+### Changed
+- **Estados de turnos:** migración de `enum('pendiente','completado')` a `string(30)` con estados: programado, asistido, cancelado, perdido.
+- **Estado visual calculado:** accessor `estado_visual` que calcula dinámicamente próximo y asistido a confirmar según la fecha del turno.
+- **Columna Estado en servicios:** badges color-coded con interacción para confirmar asistencia o marcar como perdido.
+
+### Added
+- Ruta y método `confirmarEstado` en `TurnoRodadoController` para confirmar/rechazar asistencia.
+- Dropdown inline en badge "A confirmar" con opciones de confirmación.
+- Documentación nginx en `docs/nginx-config.md`.
 
 ---
 
