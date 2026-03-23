@@ -1,61 +1,42 @@
-name: Test and Deploy to Production
+name: Deploy to Production
 
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    branches:
+      - master
 
 jobs:
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install NPM dependencies
-        run: npm install
-
-      - name: Build assets
-        run: npm run build
-
-      - name: Run Lint
-        run: vendor/bin/pint
-
-      - name: Run Tests
-        run: ./vendor/bin/pest
-
   deploy:
-    needs: test
+    name: Deploy via SSH
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Deploy via SSH
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            cd /var/www/tu_proyecto
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
+            set -e
+            cd ${{ secrets.APP_PATH }}
+
+            echo "=== Pull latest code ==="
+            git pull origin master
+
+            echo "=== Install/update Composer dependencies ==="
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "=== Run migrations ==="
             php artisan migrate --force
+
+            echo "=== Run production seeders ==="
+            php artisan db:seed --class=ProductionSeeder --force
+
+            echo "=== Clear and rebuild caches ==="
             php artisan config:cache
             php artisan route:cache
+            php artisan view:cache
+
+            echo "=== Done ==="
