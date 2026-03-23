@@ -46,9 +46,12 @@ class SistemasSeeder extends Seeder
         ];
 
         foreach ($sistemas as $sistema) {
-            Sistema::create($sistema);
+            Sistema::firstOrCreate(
+                ['nombre' => $sistema['nombre']],
+                $sistema
+            );
         }
 
-        $this->command->info('Se han creado '.count($sistemas).' sistemas correctamente.');
+        $this->command->info('Sistemas de referencia sincronizados ('.count($sistemas).' registros).');
     }
 }

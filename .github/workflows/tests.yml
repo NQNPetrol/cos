@@ -63,6 +63,18 @@ jobs:
       - name: Copy Environment File
         run: cp .env.example .env
 
+      # Solo en el runner de GitHub (VM efímera): no modifica tu .env local ni el servidor de deploy.
+      # .env.example usa sqlite sin archivo; además hay migraciones solo compatibles con MySQL.
+      # Las variables del job no siempre pisan el .env al cargar Laravel, así que fijamos MySQL aquí.
+      - name: Configure .env for CI MySQL
+        run: |
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          grep -q '^DB_HOST=' .env && sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env || echo 'DB_HOST=127.0.0.1' >> .env
+          grep -q '^DB_PORT=' .env && sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env || echo 'DB_PORT=3306' >> .env
+          grep -q '^DB_DATABASE=' .env && sed -i 's/^DB_DATABASE=.*/DB_DATABASE=cos_test/' .env || echo 'DB_DATABASE=cos_test' >> .env
+          grep -q '^DB_USERNAME=' .env && sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env || echo 'DB_USERNAME=root' >> .env
+          grep -q '^DB_PASSWORD=' .env && sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=password/' .env || echo 'DB_PASSWORD=password' >> .env
+
       - name: Generate Application Key
         run: php artisan key:generate
 
