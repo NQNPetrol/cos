@@ -63,6 +63,14 @@
   Checkbox "Enviar por email" al crear notificación + botón "Enviar email" en listado admin. Destinatarios según tipo: global→todos, user→seleccionado, client→usuarios del cliente. Email simple (asunto=título, cuerpo=mensaje).  
   Prompt: `agent-bootstrap/prompts/completados/v0.6.1-notificaciones-envio-email.md`. Tag `v0.6.1`.
 
+- [x] **v0.6.2 — Fix upload rodados + rediseño estados de turnos** *(completado)*  
+  Fix error 413/500 al adjuntar factura (nginx `client_max_body_size` + manejo `PostTooLargeException`). Rediseño columna Estado de servicios: estados dinámicos (programado, próximo, asistido a confirmar, asistido, cancelado, perdido) con interacción de confirmación.  
+  Prompt: `agent-bootstrap/prompts/completados/v0.6.2-fix-upload-rodados-estados-turnos.md`. Tag `v0.6.2`.
+
+- [x] **v0.6.3 — Comprobante de pago masivo en rodados** *(completado)*  
+  Seleccionar múltiples pagos pendientes y adjuntar un único comprobante para todos. Un archivo en disco referenciado por N registros. Checkboxes, seleccionar todos (respeta filtros), modal batch, backend batch.  
+  Prompt: `agent-bootstrap/prompts/completados/v0.6.3-comprobante-pago-masivo.md`. Tag `v0.6.3`.
+
 - [ ] **v0.7.0 — Rediseño vistas de autenticación + reCAPTCHA v2** *(pendiente)*  
   Unificar y modernizar login, register, forgot-password y reset-password con el sistema dark de la app. Logo CyH Sur SA correcto (`cyh-white.png`). reCAPTCHA v2 en login. Responsive mobile-first.  
   Prompt: `agent-bootstrap/prompts/pendientes/v0.7.0-auth-redesign-recaptcha.md`.  

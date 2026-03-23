@@ -172,7 +172,7 @@ class TurnoRodadoController extends Controller
             'partes_afectadas.*.item' => 'required_with:partes_afectadas|string|max:255',
             'partes_afectadas.*.cantidad' => 'required_with:partes_afectadas|integer|min:1',
             'partes_afectadas.*.descripcion' => 'required_with:partes_afectadas|string',
-            'estado' => 'nullable|in:pendiente,completado,atendido,cancelado',
+            'estado' => 'nullable|in:programado,asistido,cancelado,perdido',
         ]);
 
         // Si es turno_taller, cambiar a turno_mecanico automáticamente
@@ -366,16 +366,30 @@ class TurnoRodadoController extends Controller
             }
         }
 
+        // Handle comprobante de pago
+        if ($request->hasFile('comprobante_pago')) {
+            if ($turno->comprobante_pago_path) {
+                Storage::disk('public')->delete($turno->comprobante_pago_path);
+            }
+            $updateData['comprobante_pago_path'] = $request->file('comprobante_pago')
+                ->store('rodados/'.$turno->rodado_id.'/comprobantes', 'public');
+        }
+
         if (! empty($updateData)) {
             $turno->update($updateData);
         }
 
-        // Auto-crear pago pendiente cuando se adjunta factura a un turno (si no existe ya)
-        if ($request->hasFile('factura')) {
+        // Auto-crear pago pendiente cuando se adjunta factura a un turno (si no existe ya).
+        // No aplica a turno_service con rodado de proveedor (alquilado): esos se pagan
+        // en conjunto (services + alquiler) y el usuario crea el pago manualmente.
+        $rodado = $turno->rodado;
+        $esServiceDeProveedor = $turno->tipo === TurnoRodado::TIPO_TURNO_SERVICE
+            && $rodado && $rodado->proveedor_id;
+
+        if ($request->hasFile('factura') && ! $esServiceDeProveedor) {
             $turno->refresh();
             $existingPago = PagoServiciosRodado::where('turno_rodado_id', $turno->id)->first();
 
-            // Usar el monto ingresado en el formulario, o fallback a pago_mano_obra, o 0
             $montoPago = $montoFactura !== null ? (float) $montoFactura : ($turno->pago_mano_obra ?? 0);
 
             if (! $existingPago) {
@@ -403,6 +417,11 @@ class TurnoRodadoController extends Controller
                     'fecha_vencimiento' => $turno->fecha_vencimiento_pago ?? $existingPago->fecha_vencimiento,
                 ]);
             }
+        }
+
+        if (empty($updateData)) {
+            return redirect()->route('rodados.index')
+                ->with('error', 'No se recibió ningún archivo. Verificá que hayas seleccionado al menos un documento y que no exceda el límite de subida del servidor.');
         }
 
         return redirect()->route('rodados.index')
@@ -511,6 +530,24 @@ class TurnoRodadoController extends Controller
 
         return redirect()->route('rodados.index')
             ->with('success', 'Turno cancelado exitosamente.');
+    }
+
+    public function confirmarEstado(Request $request, TurnoRodado $turno)
+    {
+        $validated = $request->validate([
+            'estado' => 'required|in:asistido,perdido',
+        ]);
+
+        $turno->update(['estado' => $validated['estado']]);
+
+        $label = $validated['estado'] === 'asistido' ? 'Asistencia confirmada' : 'Turno marcado como perdido';
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => "$label exitosamente."]);
+        }
+
+        return redirect()->route('rodados.index')
+            ->with('success', "$label exitosamente.");
     }
 
     public function reprogramarTurno(Request $request, TurnoRodado $turno)

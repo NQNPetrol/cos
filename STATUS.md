@@ -6,7 +6,7 @@
 
 ## Versión actual
 
-**v0.6.1** — Última versión de la app completada y mergeada en `develop`.
+**v0.6.3** — Última versión de la app completada y mergeada en `develop`.
 
 ---
 
@@ -16,7 +16,7 @@
 |-------------|----------|---------|
 | **Pendientes** | 1        | v0.7.0 en `agent-bootstrap/prompts/pendientes/` |
 | **En proceso** | 0        | Ninguno en `agent-bootstrap/prompts/en_proceso/` |
-| **Completados** | 10     | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.6.1, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 |
+| **Completados** | 12     | v0.1.0, v0.2.0, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.6.1, v0.6.2, v0.6.3, v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 |
 
 ---
 
@@ -24,6 +24,8 @@
 
 | Versión | Nombre | Tag |
 |---------|--------|-----|
+| v0.6.3 | Comprobante de pago masivo en rodados | `v0.6.3` |
+| v0.6.2 | Fix upload rodados + rediseño estados turnos | `v0.6.2` |
 | v0.6.1 | Envío de email desde notificaciones admin | `v0.6.1` |
 | v0.6.0 | Mesa de ayuda / chat asistente | `v0.6.0` |
 | v-agents-0.3.0 | Handoffs estructurados entre agentes | `v-agents-0.3.0` |
@@ -40,9 +42,9 @@
 ## Próximo paso
 
 - **Cola de agentes:** ✅ Completa (v-agents-0.1.0, v-agents-0.2.0, v-agents-0.3.0 todos mergeados)
-- **Cola de app:** v0.7.0 pendiente (Rediseño vistas de autenticación + reCAPTCHA v2)
+- **Cola de app:** v0.7.0 pendiente
 - **Siguiente:** v0.7.0 — `agent-bootstrap/prompts/pendientes/v0.7.0-auth-redesign-recaptcha.md`
 
 ---
 
-*Última actualización: 2026-03-04 (v0.6.1 completado).*
+*Última actualización: 2026-03-20 (v0.6.3 completado).*

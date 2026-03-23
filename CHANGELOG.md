@@ -13,8 +13,36 @@
 - Ajustes de estilos en dashboard.
 - Mejora de interfaz de flight logs (previa al envío del drone).
 - Peticiones de misiones cliente: soporte para archivos .kmz.
-- Correcciones en la sección de turnos rodados.
 - Mejoras de layout administrativo en rodados.
+
+---
+
+## [v0.6.3] — 2026-03-20
+
+### Added
+- **Comprobante de pago masivo:** seleccionar múltiples pagos pendientes y adjuntar un único comprobante para todos.
+- Checkboxes de selección en tabla de pagos pendientes con "Seleccionar todos" (respeta filtro de búsqueda).
+- Modal de upload batch con dropzone y validación de archivo (PDF/JPG/PNG, max 10 MB).
+- Ruta y método `adjuntarComprobanteBatch` en `PagoServiciosRodadoController` para procesamiento batch.
+- Un archivo en disco referenciado por N registros — todos marcados como pagados.
+
+---
+
+## [v0.6.2] — 2026-03-20
+
+### Fixed
+- **Upload rodados:** documentación de `client_max_body_size` para nginx (error 413).
+- **PostTooLargeException:** manejo amigable con redirect y mensaje flash en lugar de pantalla 500.
+
+### Changed
+- **Estados de turnos:** migración de `enum('pendiente','completado')` a `string(30)` con estados: programado, asistido, cancelado, perdido.
+- **Estado visual calculado:** accessor `estado_visual` que calcula dinámicamente próximo y asistido a confirmar según la fecha del turno.
+- **Columna Estado en servicios:** badges color-coded con interacción para confirmar asistencia o marcar como perdido.
+
+### Added
+- Ruta y método `confirmarEstado` en `TurnoRodadoController` para confirmar/rechazar asistencia.
+- Dropdown inline en badge "A confirmar" con opciones de confirmación.
+- Documentación nginx en `docs/nginx-config.md`.
 
 ---
 

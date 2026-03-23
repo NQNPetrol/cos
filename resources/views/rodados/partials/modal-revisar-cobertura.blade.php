@@ -282,6 +282,24 @@
     function openDocumentacionModal(turnoId) {
         const form = document.getElementById('documentacion-form');
         form.action = `{{ url('/rodados/turnos') }}/${turnoId}/documentacion`;
+        form.reset();
+        document.querySelectorAll('#documentacion-form label span.text-sm').forEach(s => {
+            if (s.textContent !== 'Seleccionar informe' && s.textContent !== 'Seleccionar factura' && s.textContent !== 'Seleccionar comprobante')
+                return;
+        });
         document.getElementById('documentacion-modal').classList.remove('hidden');
     }
+
+    document.getElementById('documentacion-form')?.addEventListener('submit', function(e) {
+        const formData = new FormData(this);
+        let hasFiles = false;
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File && value.size > 0) { hasFiles = true; break; }
+        }
+        if (!hasFiles) {
+            e.preventDefault();
+            alert('No se seleccionó ningún archivo. Por favor seleccioná al menos un documento.');
+            return false;
+        }
+    });
 </script>
