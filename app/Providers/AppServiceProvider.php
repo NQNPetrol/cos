@@ -14,10 +14,9 @@ use App\Policies\RecorridoPolicy;
 use App\Policies\RecorridoTimetablePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Models\Permission;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,8 +34,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
+
         Permission::observe(PermissionObserver::class);
-        Route::aliasMiddleware('role', RoleMiddleware::class);
         Livewire::component('client.update-profile-information-form', UpdateProfileInformationForm::class);
         Livewire::component('client.update-password-form', UpdatePasswordForm::class);
         Livewire::component('client.logout-other-browser-sessions-form', LogoutOtherBrowserSessionsForm::class);

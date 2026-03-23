@@ -131,6 +131,24 @@ class User extends Authenticatable
     }
 
     /**
+     * URLs permitidas para redirect post-login (evita open redirects).
+     */
+    public function isIntendedUrlAllowed(string $url): bool
+    {
+        if ($url === '' || str_starts_with($url, '//')) {
+            return false;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return true;
+        }
+
+        $appUrl = rtrim((string) config('app.url'), '/');
+
+        return $url === $appUrl || str_starts_with($url, $appUrl.'/');
+    }
+
+    /**
      * Verifica si el usuario es del COS (staff interno)
      */
     public function esCOS(): bool
