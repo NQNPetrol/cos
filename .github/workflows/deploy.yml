@@ -3,6 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
+      - main
       - master
 
 jobs:
@@ -22,8 +23,8 @@ jobs:
             set -e
             cd ${{ secrets.APP_PATH }}
 
-            echo "=== Pull latest code ==="
-            git pull origin master
+            echo "=== Pull latest code (branch: ${{ github.ref_name }}) ==="
+            git pull origin ${{ github.ref_name }}
 
             echo "=== Install/update Composer dependencies ==="
             composer install --no-dev --optimize-autoloader --no-interaction
