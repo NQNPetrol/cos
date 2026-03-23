@@ -82,7 +82,22 @@ jobs:
         run: npm run build
 
       - name: Run Migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: cos_test
+          DB_USERNAME: root
+          DB_PASSWORD: password
         run: php artisan migrate --force
 
+      # env a nivel de step: mitiga variables DB_* del entorno GitHub "Testing" que pisan el job.
       - name: Run Tests
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: cos_test
+          DB_USERNAME: root
+          DB_PASSWORD: password
         run: ./vendor/bin/pest
