@@ -2,8 +2,15 @@
 
 use App\Models\Team;
 use App\Models\User;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\DeleteTeamForm;
 use Livewire\Livewire;
+
+beforeEach(function () {
+    if (! Features::hasTeamFeatures()) {
+        $this->markTestSkipped('Jetstream teams están deshabilitados en config/jetstream.php.');
+    }
+});
 
 test('teams can be deleted', function () {
     $this->actingAs($user = User::factory()->withPersonalTeam()->create());
