@@ -1938,6 +1938,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     .recorrido-popup .leaflet-popup-tip { background: #1f2937; }
     .recorrido-popup .leaflet-popup-content { margin: 0; padding: 0; }
+    .recorrido-popup .recmap-popup-inner { min-width: 240px; max-width: 320px; }
+    .recorrido-popup .recmap-obj-section {
+        margin-top: 12px; padding: 10px 10px 8px;
+        border-radius: 10px;
+        background: linear-gradient(145deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.06));
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .recorrido-popup .recmap-obj-label {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+        color: #a5b4fc; margin-bottom: 8px;
+    }
+    .recorrido-popup .recmap-obj-label svg { flex-shrink: 0; opacity: 0.9; }
+    .recorrido-popup .recmap-obj-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .recorrido-popup .recmap-obj-chip {
+        display: inline-flex; align-items: center;
+        font-size: 11px; font-weight: 600; line-height: 1.35;
+        padding: 5px 11px; border-radius: 9999px;
+        color: #f9fafb;
+        background: rgba(17, 24, 39, 0.65);
+        border: 1px solid rgba(129, 140, 248, 0.45);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .recorrido-popup .recmap-obj-empty {
+        font-size: 11px; color: #6b7280; font-style: italic; padding: 2px 0;
+    }
     .recmap-tooltip {
         background: rgba(31,41,55,0.92); color: #e5e7eb; border: 1px solid #374151;
         border-radius: 8px; padding: 6px 12px; font-size: 12px;
@@ -1949,6 +1976,11 @@ document.addEventListener('DOMContentLoaded', function () {
         background: #fff; color: #333;
     }
     #recorridos-map .leaflet-control-map-style a svg { width: 16px; height: 16px; }
+    #recorridos-map .leaflet-control-recmap-reset a {
+        width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+        background: #fff; color: #333;
+    }
+    #recorridos-map .leaflet-control-recmap-reset a svg { width: 18px; height: 18px; stroke: currentColor; }
 </style>
 
 <script>
@@ -1964,8 +1996,44 @@ document.addEventListener('DOMContentLoaded', function () {
     let recBaseLayers = {};
     let recLabelsLayer = null;
     let recCurrentBase = 'satelital';
+    /** Bounds del último fit global (todos los recorridos cargados); usado por “vista inicial”. */
+    let recMapInitialBounds = null;
+    const recMapDefaultCenter = [-38.95, -68.05];
+    const recMapDefaultZoom = 12;
 
     // Same gradient as the events heatmap: blue -> cyan -> green -> yellow -> red
+    function recmapEscapeHtml(s) {
+        if (s == null || s === '') return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    /** Parte texto de objetivos en ítems para chips (comas, punto y coma o saltos de línea). */
+    function recmapParseObjetivos(raw) {
+        if (raw == null || raw === '') return [];
+        if (Array.isArray(raw)) {
+            return raw.map(x => String(x).trim()).filter(Boolean);
+        }
+        return String(raw)
+            .split(/[,;\n\r]+/)
+            .map(t => t.trim())
+            .filter(Boolean);
+    }
+
+    function recmapObjetivosPopupHtml(objetivosRaw, accentColor) {
+        const items = recmapParseObjetivos(objetivosRaw);
+        const pinSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-4.5-8-11a8 8 0 1116 0c0 6.5-8 11-8 11z"/><circle cx="12" cy="10" r="3"/></svg>';
+        const accentBar = accentColor ? `border-left: 3px solid ${accentColor};` : '';
+        if (items.length === 0) {
+            return `<div class="recmap-obj-section" style="${accentBar}"><div class="recmap-obj-label">${pinSvg} Objetivos del recorrido</div><p class="recmap-obj-empty">Sin objetivos indicados para esta ruta.</p></div>`;
+        }
+        const chips = items.map(text => `<span class="recmap-obj-chip">${recmapEscapeHtml(text)}</span>`).join('');
+        return `<div class="recmap-obj-section" style="${accentBar}"><div class="recmap-obj-label">${pinSvg} Objetivos cubiertos</div><div class="recmap-obj-chips">${chips}</div></div>`;
+    }
+
     function getHeatColor(intensity) {
         const stops = [
             { pos: 0.0, r: 37,  g: 99,  b: 235 }, // #2563eb
@@ -2044,6 +2112,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         new MapStyleCtrl({ position: 'topleft' }).addTo(recMap);
+
+        const RecMapResetCtrl = L.Control.extend({
+            onAdd: function() {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-recmap-reset');
+                const btn = L.DomUtil.create('a', '', container);
+                btn.href = '#';
+                btn.title = 'Ver todos los recorridos (vista inicial)';
+                btn.setAttribute('aria-label', 'Restablecer vista del mapa de recorridos');
+                btn.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    if (!recMap) return;
+                    recMap.closePopup();
+                    if (recMapInitialBounds && typeof recMapInitialBounds.isValid === 'function' && recMapInitialBounds.isValid()) {
+                        recMap.flyToBounds(recMapInitialBounds, { padding: [40, 40], duration: 0.55 });
+                    } else {
+                        recMap.flyTo(recMapDefaultCenter, { zoom: recMapDefaultZoom, duration: 0.45 });
+                    }
+                });
+                return container;
+            }
+        });
+        new RecMapResetCtrl({ position: 'topleft' }).addTo(recMap);
     }
 
     function clearRecRoutes() {
@@ -2143,35 +2236,53 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     });
 
+                    // Clic: acercar el mapa a este recorrido (útil cuando el fit inicial muestra todo muy lejos)
+                    polyline.on('click', function() {
+                        const b = this.getBounds();
+                        if (b && typeof b.isValid === 'function' && b.isValid()) {
+                            try {
+                                const padded = typeof b.pad === 'function' ? b.pad(0.08) : b;
+                                recMap.flyToBounds(padded, { padding: [80, 80], maxZoom: 17, duration: 0.55 });
+                            } catch (e) {
+                                recMap.fitBounds(b, { padding: [80, 80], maxZoom: 17 });
+                            }
+                        }
+                    });
+
                     // Popup on click with full details
                     let patBreakdown = '';
                     if (rec.frecuencia_patrulla && Object.keys(rec.frecuencia_patrulla).length > 0) {
                         patBreakdown = '<div class="mt-2 border-t border-gray-600 pt-2"><span class="text-[10px] uppercase tracking-wider text-gray-500">Por patrulla:</span>';
                         for (const [pat, cnt] of Object.entries(rec.frecuencia_patrulla)) {
-                            patBreakdown += `<div class="flex justify-between text-xs mt-0.5"><span class="text-gray-400">${pat}</span><span class="text-white font-medium">${cnt}</span></div>`;
+                            patBreakdown += `<div class="flex justify-between text-xs mt-0.5"><span class="text-gray-400">${recmapEscapeHtml(pat)}</span><span class="text-white font-medium">${recmapEscapeHtml(String(cnt))}</span></div>`;
                         }
                         patBreakdown += '</div>';
                     }
 
+                    const objetivosBlock = recmapObjetivosPopupHtml(rec.objetivos, color);
+
                     polyline.bindPopup(`
-                        <div class="p-3 min-w-[220px]">
-                            <div class="font-bold text-sm text-white mb-1">${rec.nombre}</div>
-                            ${rec.descripcion ? `<div class="text-xs text-gray-400 mb-2">${rec.descripcion}</div>` : ''}
-                            <div class="space-y-1 text-xs">
-                                <div class="flex justify-between"><span class="text-gray-400">Frecuencia</span><span class="font-bold" style="color:${color}">${rec.frecuencia} veces</span></div>
-                                ${rec.longitud_km ? `<div class="flex justify-between"><span class="text-gray-400">Longitud</span><span class="text-white">${rec.longitud_km} km</span></div>` : ''}
-                                ${rec.velocidadmax ? `<div class="flex justify-between"><span class="text-gray-400">Vel. Máx</span><span class="text-white">${rec.velocidadmax} km/h</span></div>` : ''}
-                                ${rec.duracion_promedio ? `<div class="flex justify-between"><span class="text-gray-400">Dur. Prom.</span><span class="text-white">${rec.duracion_promedio} min</span></div>` : ''}
+                        <div class="p-3 recmap-popup-inner">
+                            <div class="font-bold text-sm text-white mb-1">${recmapEscapeHtml(rec.nombre)}</div>
+                            ${rec.descripcion ? `<div class="text-xs text-gray-400 mb-2">${recmapEscapeHtml(rec.descripcion)}</div>` : ''}
+                            ${objetivosBlock}
+                            <div class="space-y-1 text-xs mt-3">
+                                <div class="flex justify-between"><span class="text-gray-400">Frecuencia</span><span class="font-bold" style="color:${color}">${recmapEscapeHtml(String(rec.frecuencia))} veces</span></div>
+                                ${rec.longitud_km ? `<div class="flex justify-between"><span class="text-gray-400">Longitud</span><span class="text-white">${recmapEscapeHtml(String(rec.longitud_km))} km</span></div>` : ''}
+                                ${rec.velocidadmax ? `<div class="flex justify-between"><span class="text-gray-400">Vel. Máx</span><span class="text-white">${recmapEscapeHtml(String(rec.velocidadmax))} km/h</span></div>` : ''}
+                                ${rec.duracion_promedio ? `<div class="flex justify-between"><span class="text-gray-400">Dur. Prom.</span><span class="text-white">${recmapEscapeHtml(String(rec.duracion_promedio))} min</span></div>` : ''}
                             </div>
                             ${patBreakdown}
-                        </div>`, { className: 'recorrido-popup', maxWidth: 300 });
+                        </div>`, { className: 'recorrido-popup', maxWidth: 340 });
 
                     recRouteLayers.push(polyline, innerGlow);
                 });
 
                 if (bounds.length > 0) {
+                    recMapInitialBounds = L.latLngBounds(bounds);
                     recMap.fitBounds(bounds, { padding: [40, 40] });
                 } else {
+                    recMapInitialBounds = null;
                     document.getElementById('recmap-empty').classList.remove('hidden');
                 }
                 renderRecLegend(data.legend, data.maxFreq);

@@ -1,8 +1,15 @@
 <?php
 
 use App\Models\User;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\TeamMemberManager;
 use Livewire\Livewire;
+
+beforeEach(function () {
+    if (! Features::hasTeamFeatures()) {
+        $this->markTestSkipped('Jetstream teams están deshabilitados en config/jetstream.php.');
+    }
+});
 
 test('users can leave teams', function () {
     $user = User::factory()->withPersonalTeam()->create();

@@ -1,0 +1,18 @@
+---
+description: Raíz del proyecto COS en Windows, worktrees de Cursor y alineación con php artisan serve — evitar editar una copia y ejecutar otra
+alwaysApply: true
+---
+
+# COS — Desarrollo local y una sola fuente de verdad
+
+Al modificar código de este repositorio:
+
+1. **Asumí que la raíz canónica del proyecto es** `C:\wamp64\www\cos` (o la ruta que el usuario declare explícitamente como workspace activo). Los cambios deben aplicarse a los archivos bajo **esa** raíz que el usuario tiene abierta en Cursor.
+
+2. **Worktrees de Cursor** pueden existir en `C:\Users\...\ .cursor\worktrees\cos\...`. Es una **copia distinta** del mismo repo: misma rama Git no implica mismos archivos en disco. **No asumas** que editar en `wamp64\www\cos` actualiza el worktree ni al revés.
+
+3. Si el usuario reporta que “el código no corre”, “el método no existe” o “los logs no aparecen” pese a cambios visibles en el editor, **considerá desalineación de carpetas**: el proceso `php artisan serve` podría estar sirviendo desde otra raíz. Sugerí verificar `base_path()` con tinker y la ruta real del archivo vía `ReflectionClass::getFileName()`.
+
+4. **Detalle ampliado** (PHP/WAMP/OPcache, checklist humano, casos reales): leer y seguir **`docs/desarrollo-local-y-worktrees.md`**.
+
+5. Al ejecutar comandos (`php artisan`, tests), usar el directorio del **workspace actual** del usuario (`c:\wamp64\www\cos` cuando sea el workspace abierto).
