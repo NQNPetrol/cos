@@ -2,22 +2,23 @@
 
 /*
 |--------------------------------------------------------------------------
-| CI (GitHub Actions): base de datos MySQL del workflow
+| CI: Pest con MySQL del workflow tests.yml
 |--------------------------------------------------------------------------
 |
-| Si el entorno "Testing" de GitHub define DB_CONNECTION=sqlite (u otras DB_*),
-| pisa el env del job y Pest termina usando database.sqlite inexistente.
-| GITHUB_ACTIONS está definido en los runners; forzamos MySQL antes de bootear Laravel.
+| No usar GITHUB_ACTIONS: está definido en cualquier job de Actions (lint, etc.)
+| y forzaría MySQL sin servicio → "Connection refused".
+| Solo se activa con COS_CI_MYSQL=1 (definido únicamente en .github/workflows/tests.yml).
 |
 */
-if ((getenv('GITHUB_ACTIONS') ?: ($_SERVER['GITHUB_ACTIONS'] ?? '')) === 'true') {
+$useCiMysql = (getenv('COS_CI_MYSQL') ?: ($_SERVER['COS_CI_MYSQL'] ?? $_ENV['COS_CI_MYSQL'] ?? '')) === '1';
+if ($useCiMysql) {
     $ciDb = [
         'DB_CONNECTION' => 'mysql',
-        'DB_HOST' => '127.0.0.1',
-        'DB_PORT' => '3306',
-        'DB_DATABASE' => 'cos_test',
-        'DB_USERNAME' => 'root',
-        'DB_PASSWORD' => 'password',
+        'DB_HOST' => getenv('DB_HOST') ?: ($_SERVER['DB_HOST'] ?? '127.0.0.1'),
+        'DB_PORT' => getenv('DB_PORT') ?: ($_SERVER['DB_PORT'] ?? '3306'),
+        'DB_DATABASE' => getenv('DB_DATABASE') ?: ($_SERVER['DB_DATABASE'] ?? 'cos_test'),
+        'DB_USERNAME' => getenv('DB_USERNAME') ?: ($_SERVER['DB_USERNAME'] ?? 'root'),
+        'DB_PASSWORD' => getenv('DB_PASSWORD') ?: ($_SERVER['DB_PASSWORD'] ?? 'password'),
     ];
     foreach ($ciDb as $key => $value) {
         putenv("{$key}={$value}");
