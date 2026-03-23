@@ -29,6 +29,10 @@ npm run build
 php artisan serve
 ```
 
+### Desarrollo en Windows (WAMP, Cursor, worktrees)
+
+Si trabajás con **WAMP** y/o **Cursor**, leé **[`docs/desarrollo-local-y-worktrees.md`](docs/desarrollo-local-y-worktrees.md)** para evitar servir una copia del repo y editar otra (misma rama Git, archivos distintos).
+
 ### Requisitos previos
 
 - PHP 8.2+
