@@ -286,7 +286,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                         </svg>
                                     </button>
-                                    <button onclick="openVerDocumentosModal({{ $item->id }}, '{{ $turno && $turno->informe_path ? asset('storage/' . $turno->informe_path) : '' }}', '{{ $turno && $turno->factura_path ? asset('storage/' . $turno->factura_path) : '' }}')"
+                                    <button onclick="openVerDocumentosModal({{ $item->id }}, '{{ $turno && $turno->informe_path ? asset('storage/' . $turno->informe_path) : '' }}', '{{ $turno && $turno->factura_path ? asset('storage/' . $turno->factura_path) : '' }}', '{{ $turno && $turno->comprobante_pago_path ? asset('storage/' . $turno->comprobante_pago_path) : '' }}')"
                                         class="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all" title="Ver documentos">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
@@ -584,7 +584,7 @@
         toggleCambioEquipoFields();
     }
 
-    function openVerDocumentosModal(turnoId, informeUrl, facturaUrl) {
+    function openVerDocumentosModal(turnoId, informeUrl, facturaUrl, comprobanteUrl) {
         const container = document.getElementById('ver-docs-container');
         container.innerHTML = '';
 
@@ -623,6 +623,29 @@
                     </div>
                     <div class="rounded-xl overflow-hidden border border-zinc-700/50 bg-zinc-800">
                         <iframe src="${facturaUrl}" class="w-full h-[400px]" frameborder="0"></iframe>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (comprobanteUrl) {
+            hasContent = true;
+            const isImage = comprobanteUrl.match(/\.(jpg|jpeg|png)$/i);
+            const preview = isImage
+                ? `<img src="${comprobanteUrl}" class="w-full max-h-[400px] object-contain" alt="Comprobante de pago">`
+                : `<iframe src="${comprobanteUrl}" class="w-full h-[400px]" frameborder="0"></iframe>`;
+            container.innerHTML += `
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                        <h4 class="text-sm font-semibold text-gray-200">Comprobante de Pago</h4>
+                        <a href="${comprobanteUrl}" target="_blank" class="ml-auto text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                            Abrir
+                        </a>
+                    </div>
+                    <div class="rounded-xl overflow-hidden border border-zinc-700/50 bg-zinc-800">
+                        ${preview}
                     </div>
                 </div>
             `;
